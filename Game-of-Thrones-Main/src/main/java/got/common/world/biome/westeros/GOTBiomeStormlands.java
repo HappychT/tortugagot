@@ -32,18 +32,6 @@ public class GOTBiomeStormlands extends GOTBiomeWesteros {
 		decorator.cornPerChunk = 4;
 		decorator.addVillage(new GOTStructureStormlandsCity(this, 1.0f));
 		decorator.addRandomStructure(new GOTStructureStormlandsWatchfort(false), 800);
-		invasionSpawns.addInvasion(GOTInvasions.WESTERLANDS, GOTEventSpawner.EventChance.UNCOMMON);
-		invasionSpawns.addInvasion(GOTInvasions.DRAGONSTONE, GOTEventSpawner.EventChance.UNCOMMON);
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.STORMLANDS_CONQUEST, 4).setSpawnChance(GOTBiome.SPAWN));
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.STORMLANDS_MILITARY, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
-		ArrayList<SpawnListContainer> c1 = new ArrayList<>();
-		c1.add(GOTBiomeSpawnList.entry(GOTSpawnList.DRAGONSTONE_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
-		npcSpawnList.newFactionList(0).add(c1);
-		ArrayList<SpawnListContainer> c2 = new ArrayList<>();
-		c2.add(GOTBiomeSpawnList.entry(GOTSpawnList.WESTERLANDS_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
-		npcSpawnList.newFactionList(0).add(c2);
 		ArrayList<SpawnListContainer> c3 = new ArrayList<>();
 		c3.add(GOTBiomeSpawnList.entry(GOTSpawnList.WALKERS_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
 		npcSpawnList.newFactionList(0).add(c3);

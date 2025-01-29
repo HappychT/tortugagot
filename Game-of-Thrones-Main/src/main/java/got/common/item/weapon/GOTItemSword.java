@@ -74,6 +74,7 @@ public class GOTItemSword extends ItemSword implements GOTMaterialFinder {
 		if (effect == HitEffect.FIRE) {
 			applyStandardFire(hitEntity);
 		}
+
 		return true;
 	}
 

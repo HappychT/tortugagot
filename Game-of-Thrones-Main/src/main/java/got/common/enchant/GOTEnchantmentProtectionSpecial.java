@@ -11,6 +11,12 @@ public abstract class GOTEnchantmentProtectionSpecial extends GOTEnchantment {
 		setValueModifier((2.0F + protectLevel) / 2.0F);
 	}
 
+	public GOTEnchantmentProtectionSpecial(String s, GOTEnchantmentType [] types, int level) {
+		super(s, types);
+		protectLevel = level;
+		setValueModifier((2.0F + protectLevel) / 2.0F);
+	}
+
 	public GOTEnchantmentProtectionSpecial(String s, int level) {
 		this(s, GOTEnchantmentType.ARMOR, level);
 	}
@@ -36,7 +42,7 @@ public abstract class GOTEnchantmentProtectionSpecial extends GOTEnchantment {
 	public boolean isCompatibleWith(GOTEnchantment other) {
 		if (super.isCompatibleWith(other)) {
 			if (other instanceof GOTEnchantmentProtectionSpecial) {
-				return isCompatibleWithOtherProtection() || ((GOTEnchantmentProtectionSpecial) other).isCompatibleWithOtherProtection();
+				return (!isWeaponProtection() || !((GOTEnchantmentProtectionSpecial) other).isWeaponProtection()) && (isCompatibleWithOtherProtection() || ((GOTEnchantmentProtectionSpecial) other).isCompatibleWithOtherProtection());
 			}
 			return true;
 		}
@@ -44,6 +50,10 @@ public abstract class GOTEnchantmentProtectionSpecial extends GOTEnchantment {
 	}
 
 	public boolean isCompatibleWithOtherProtection() {
+		return false;
+	}
+
+	public boolean isWeaponProtection() {
 		return false;
 	}
 

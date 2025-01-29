@@ -20,10 +20,6 @@ public class GOTBiomeThenn extends GOTBiomeHauntedForest {
 		decorator.clearTrees();
 		decorator.addTree(GOTTreeType.FOTINIA, 20);
 		decorator.addVillage(new GOTStructureThennVillage(this, 1.0f));
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.WILDING_GIANT, 1).setSpawnChance(GOTBiome.SPAWN));
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.WILDING_THENN, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
 		ArrayList<SpawnListContainer> c1 = new ArrayList<>();
 		c1.add(GOTBiomeSpawnList.entry(GOTSpawnList.WALKERS_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
 		npcSpawnList.newFactionList(0).add(c1);

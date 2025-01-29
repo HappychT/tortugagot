@@ -8,7 +8,7 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemReachPike extends GOTItemPolearmLong {
+public class GOTItemReachPike extends GOTItemPolearmLong implements GOTFactionWeaponChecker{
     public GOTItemReachPike(Item.ToolMaterial material) {
         super(material);
     }

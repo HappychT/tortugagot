@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.world.World;
 
-public class GOTItemSpear extends GOTItemSword {
+public class GOTItemSpear extends GOTItemPolearm {
 	public GOTItemSpear(Item.ToolMaterial material) {
 		super(material);
 		gotWeaponDamage -= 0.5f;

@@ -25,13 +25,6 @@ public class GOTBiomeArrynMountainsFoothills extends GOTBiomeWesteros {
 		decorator.flowersPerChunk = 3;
 		decorator.doubleFlowersPerChunk = 1;
 		decorator.addVillage(new GOTStructureHillmanVillage(this, 1.0f));
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.HILL_TRIBES_CIVILIAN, 4).setSpawnChance(GOTBiome.SPAWN));
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.HILL_TRIBES_MILITARY, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
-		ArrayList<SpawnListContainer> c1 = new ArrayList<>();
-		c1.add(GOTBiomeSpawnList.entry(GOTSpawnList.ARRYN_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
-		npcSpawnList.newFactionList(0).add(c1);
 		ArrayList<SpawnListContainer> c2 = new ArrayList<>();
 		c2.add(GOTBiomeSpawnList.entry(GOTSpawnList.WALKERS_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
 		npcSpawnList.newFactionList(0).add(c2);

@@ -20,7 +20,7 @@ public class GOTBiomeSummerIslands extends GOTBiomeSothoryosJungle {
 		addBiomeVariant(GOTBiomeVariant.FOREST_LIGHT);
 		addBiomeVariant(GOTBiomeVariant.HILLS);
 		addBiomeVariant(GOTBiomeVariant.HILLS_FOREST);
-		setUnreliableChance(GOTEventSpawner.EventChance.COMMON);
+		setUnreliableChance(GOTEventSpawner.EventChance.RARE);
 		decorator.treesPerChunk = 1;
 		decorator.clearVillages();
 		decorator.addRandomStructure(new GOTStructureRuinedHouse(false), 2000);
@@ -28,9 +28,6 @@ public class GOTBiomeSummerIslands extends GOTBiomeSothoryosJungle {
 		decorator.addRandomStructure(new GOTStructureRottenHouse(false), 4000);
 		decorator.addRandomStructure(new GOTStructureStoneRuin.RuinSandstone(1, 4), 400);
 		npcSpawnList.clear();
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.SUMMER_MILITARY, 4).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(8).add(c0);
 		ArrayList<SpawnListContainer> c2 = new ArrayList<>();
 		c2.add(GOTBiomeSpawnList.entry(GOTSpawnList.MANTICORE, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
 		npcSpawnList.newFactionList(2).add(c2);

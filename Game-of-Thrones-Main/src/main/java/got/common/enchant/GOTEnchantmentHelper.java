@@ -245,6 +245,20 @@ public class GOTEnchantmentHelper {
 		return damage;
 	}
 
+	public static float calcRangedSpeed(ItemStack itemstack) {
+		float speed = 1.0F;
+
+		if (itemstack != null) {
+			List<GOTEnchantment> enchants = getEnchantList(itemstack);
+			for (GOTEnchantment ench : enchants) {
+				if (ench instanceof GOTEnchantmentRangedSpeed) {
+					speed *= ((GOTEnchantmentRangedSpeed) ench).rangedSpeed;
+				}
+			}
+		}
+		return speed;
+	}
+
 	public static int calcRangedKnockback(ItemStack itemstack) {
 		int kb = 0;
 
@@ -568,7 +582,7 @@ public class GOTEnchantmentHelper {
 						lastKnownInv[i] = lastKnownItem;
 					}
 				}
-
+				System.out.println(inv.getItemStack());
 				if (tryApplyRandomEnchantsForEntity(inv.getItemStack(), rand)) {
 					entityplayer.updateHeldItem();
 				}

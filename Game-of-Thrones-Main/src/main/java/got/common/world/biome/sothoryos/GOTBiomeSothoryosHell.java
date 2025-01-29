@@ -14,9 +14,6 @@ public class GOTBiomeSothoryosHell extends GOTBiomeSothoryosJungle {
 	public GOTBiomeSothoryosHell(int i, boolean major) {
 		super(i, major);
 		npcSpawnList.clear();
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.WYVERN, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 import software.bernie.geckolib3.model.provider.GeoModelProvider;
+import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 import software.bernie.geckolib3.renderers.geo.GeoBlockRenderer;
 
 import java.lang.reflect.Field;

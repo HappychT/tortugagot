@@ -2131,7 +2131,6 @@ got.enchant.protectFire.desc=%s защита от огня
 got.enchant.protectFire1=Охлаждающий
 got.enchant.protectFire2=Тугоплавкий
 got.enchant.protectFire3=Огнеупорный
-got.enchant.protectPolearm.desc=%s защита от копий
 got.enchant.protectPolearm=Утолщённый
 got.enchant.protectRanged.desc=%s защита от снарядов
 got.enchant.protectRanged1=Сверкающий

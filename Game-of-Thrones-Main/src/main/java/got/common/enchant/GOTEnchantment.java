@@ -6,14 +6,13 @@ import java.util.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
-import org.lwjgl.Sys;
 
 public abstract class GOTEnchantment {
 	public static List<GOTEnchantment> allEnchantments = new ArrayList<>();
 	public static Map<String, GOTEnchantment> enchantsByName = new HashMap<>();
 	public static GOTEnchantment strong1 = new GOTEnchantmentDamage("strong1", 0.5F).setEnchantWeight(10);
 	public static GOTEnchantment strong2 = new GOTEnchantmentDamage("strong2", 1.0F).setEnchantWeight(5);
-	public static GOTEnchantment strong3 = new GOTEnchantmentDamage("strong3", 2.0F).setEnchantWeight(2).setSkilful();
+	public static GOTEnchantment strong3 = new GOTEnchantmentDamage("strong3", 2.0F).setEnchantWeight(2);
 	public static GOTEnchantment strong4 = new GOTEnchantmentDamage("strong4", 3.0F).setEnchantWeight(1).setSkilful();
 	public static GOTEnchantment weak1 = new GOTEnchantmentDamage("weak1", -0.5F).setEnchantWeight(6);
 	public static GOTEnchantment weak2 = new GOTEnchantmentDamage("weak2", -1.0F).setEnchantWeight(4);
@@ -25,12 +24,12 @@ public abstract class GOTEnchantment {
 
 	public static GOTEnchantment meleeSpeed1 = new GOTEnchantmentMeleeSpeed("meleeSpeed1", 1.1F).setEnchantWeight(6);
 	public static GOTEnchantment meleeSpeed2 = new GOTEnchantmentMeleeSpeed("meleeSpeed2", 1.2F).setEnchantWeight(6);
-	public static GOTEnchantment meleeSpeed3 = new GOTEnchantmentMeleeSpeed("meleeSpeed3", 1.3F).setEnchantWeight(6);
+	public static GOTEnchantment meleeSpeed3 = new GOTEnchantmentMeleeSpeed("meleeSpeed3", 1.3F).setEnchantWeight(6).setSkilful();
 	public static GOTEnchantment meleeSlow1 = new GOTEnchantmentMeleeSpeed("meleeSlow1", 0.75F).setEnchantWeight(4);
 
 	public static GOTEnchantment meleeReach1 = new GOTEnchantmentMeleeReach("meleeReach1", 1.1F).setEnchantWeight(6);
 	public static GOTEnchantment meleeReach2 = new GOTEnchantmentMeleeReach("meleeReach2", 1.2F).setEnchantWeight(6);
-	public static GOTEnchantment meleeReach3 = new GOTEnchantmentMeleeReach("meleeReach3", 1.3F).setEnchantWeight(6);
+	public static GOTEnchantment meleeReach3 = new GOTEnchantmentMeleeReach("meleeReach3", 1.3F).setEnchantWeight(6).setSkilful();
 	public static GOTEnchantment meleeUnreach1 = new GOTEnchantmentMeleeReach("meleeUnreach1", 0.75F).setEnchantWeight(4);
 
 	public static GOTEnchantment knockback1 = new GOTEnchantmentKnockback("knockback1", 1).setEnchantWeight(6);
@@ -45,7 +44,7 @@ public abstract class GOTEnchantment {
 	public static GOTEnchantment toolSilk = new GOTEnchantmentSilkTouch("toolSilk").setEnchantWeight(10).setSkilful();
 
 	public static GOTEnchantment looting1 = new GOTEnchantmentLooting("looting1", 1).setEnchantWeight(6);
-	public static GOTEnchantment looting2 = new GOTEnchantmentLooting("looting2", 2).setEnchantWeight(2).setSkilful();
+	public static GOTEnchantment looting2 = new GOTEnchantmentLooting("looting2", 2).setEnchantWeight(2);
 	public static GOTEnchantment looting3 = new GOTEnchantmentLooting("looting3", 3).setEnchantWeight(1).setSkilful();
 
 	public static GOTEnchantment protect1 = new GOTEnchantmentProtection("protect1", 1).setEnchantWeight(10);
@@ -54,18 +53,34 @@ public abstract class GOTEnchantment {
 	public static GOTEnchantment protectWeak2 = new GOTEnchantmentProtection("protectWeak2", -2).setEnchantWeight(2);
 
 	public static GOTEnchantment protectFire1 = new GOTEnchantmentProtectionFire("protectFire1", 1).setEnchantWeight(5);
-	public static GOTEnchantment protectFire2 = new GOTEnchantmentProtectionFire("protectFire2", 2).setEnchantWeight(2).setSkilful();
+	public static GOTEnchantment protectFire2 = new GOTEnchantmentProtectionFire("protectFire2", 2).setEnchantWeight(2);
 	public static GOTEnchantment protectFire3 = new GOTEnchantmentProtectionFire("protectFire3", 3).setEnchantWeight(1).setSkilful();
 
 	public static GOTEnchantment protectFall1 = new GOTEnchantmentProtectionFall("protectFall1", 1).setEnchantWeight(5);
-	public static GOTEnchantment protectFall2 = new GOTEnchantmentProtectionFall("protectFall2", 2).setEnchantWeight(2).setSkilful();
+	public static GOTEnchantment protectFall2 = new GOTEnchantmentProtectionFall("protectFall2", 2).setEnchantWeight(2);
 	public static GOTEnchantment protectFall3 = new GOTEnchantmentProtectionFall("protectFall3", 3).setEnchantWeight(1).setSkilful();
 
 	public static GOTEnchantment protectRanged1 = new GOTEnchantmentProtectionRanged("protectRanged1", 1).setEnchantWeight(5);
-	public static GOTEnchantment protectRanged2 = new GOTEnchantmentProtectionRanged("protectRanged2", 2).setEnchantWeight(2).setSkilful();
+	public static GOTEnchantment protectRanged2 = new GOTEnchantmentProtectionRanged("protectRanged2", 2).setEnchantWeight(2);
 	public static GOTEnchantment protectRanged3 = new GOTEnchantmentProtectionRanged("protectRanged3", 3).setEnchantWeight(1).setSkilful();
 
 	public static GOTEnchantment protectValyrian = new GOTEnchantmentProtectionValyrian("protectMithril").setEnchantWeight(0);
+
+	public static GOTEnchantment protectSword1 = new GOTEnchantmentProtectionSword("protectSword1", 1).setEnchantWeight(5);
+	public static GOTEnchantment protectSword2 = new GOTEnchantmentProtectionSword("protectSword2", 2).setEnchantWeight(2);
+	public static GOTEnchantment protectSword3 = new GOTEnchantmentProtectionSword("protectSword3", 3).setEnchantWeight(1).setSkilful();
+
+	public static GOTEnchantment protectPolearm1 = new GOTEnchantmentProtectionPolearm("protectPolearm1", 1).setEnchantWeight(5);
+	public static GOTEnchantment protectPolearm2 = new GOTEnchantmentProtectionPolearm("protectPolearm2", 2).setEnchantWeight(2);
+	public static GOTEnchantment protectPolearm3 = new GOTEnchantmentProtectionPolearm("protectPolearm3", 3).setEnchantWeight(1).setSkilful();
+
+	public static GOTEnchantment protectBattleaxe1 = new GOTEnchantmentProtectionBattlaxe("protectBattleaxe1", 1).setEnchantWeight(5);
+	public static GOTEnchantment protectBattleaxe2 = new GOTEnchantmentProtectionBattlaxe("protectBattleaxe2", 2).setEnchantWeight(2);
+	public static GOTEnchantment protectBattleaxe3 = new GOTEnchantmentProtectionBattlaxe("protectBattleaxe3", 4).setEnchantWeight(1).setSkilful();
+
+	public static GOTEnchantment protectHammer1 = new GOTEnchantmentProtectionHammer("protectHammer1", 1).setEnchantWeight(5);
+	public static GOTEnchantment ProtectHammer2 = new GOTEnchantmentProtectionHammer("getProtectHammer2", 2).setEnchantWeight(2);
+	public static GOTEnchantment ProtectHammer3 = new GOTEnchantmentProtectionHammer("getProtectHammer3", 4).setEnchantWeight(1).setSkilful();
 
 	public static GOTEnchantment rangedStrong1 = new GOTEnchantmentRangedDamage("rangedStrong1", 1.1F).setEnchantWeight(10);
 	public static GOTEnchantment rangedStrong2 = new GOTEnchantmentRangedDamage("rangedStrong2", 1.2F).setEnchantWeight(3);
@@ -74,11 +89,19 @@ public abstract class GOTEnchantment {
 	public static GOTEnchantment rangedWeak2 = new GOTEnchantmentRangedDamage("rangedWeak2", 0.5F).setEnchantWeight(3);
 
 	public static GOTEnchantment rangedKnockback1 = new GOTEnchantmentRangedKnockback("rangedKnockback1", 1).setEnchantWeight(6);
-	public static GOTEnchantment rangedKnockback2 = new GOTEnchantmentRangedKnockback("rangedKnockback2", 2).setEnchantWeight(0);
+	public static GOTEnchantment rangedKnockback2 = new GOTEnchantmentRangedKnockback("rangedKnockback2", 2).setEnchantWeight(0).setSkilful();
+
+	public static GOTEnchantment rangedSpeed1 = new GOTEnchantmentRangedSpeed("rangedSpeed1", 1.1f).setEnchantWeight(5);
+	public static GOTEnchantment rangedSpeed2 = new GOTEnchantmentRangedSpeed("rangedSpeed2", 1.2f).setEnchantWeight(3);
+	public static GOTEnchantment rangedSpeed3 = new GOTEnchantmentRangedSpeed("rangedSpeed3", 1.3f).setEnchantWeight(1).setSkilful();
 
 	public static GOTEnchantment fire = new GOTEnchantmentWeaponSpecial("fire").setEnchantWeight(0).setApplyToProjectile();
 	public static GOTEnchantment chill = new GOTEnchantmentWeaponSpecial("chill").setEnchantWeight(0).setApplyToProjectile();
 	public static GOTEnchantment headhunting = new GOTEnchantmentWeaponSpecial("headhunting").setCompatibleOtherSpecial().setEnchantWeight(0).setApplyToProjectile();
+
+	public static GOTEnchantment multifracConverter = new GOTEnchantmentMultifractionConverter("multifracConverter").setEnchantWeight(1).setSkilful();
+
+	public static GOTEnchantment extraMining = new GOTEnchantmentExtraMining("extraMining").setEnchantWeight(1).setSkilful();
 
 	public String enchantName;
 

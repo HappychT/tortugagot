@@ -8,7 +8,7 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemDragonStoneBow extends GOTItemBow{
+public class GOTItemDragonStoneBow extends GOTItemBow implements GOTFactionWeaponChecker{
     public GOTItemDragonStoneBow(Item.ToolMaterial material, double d) {
         super(material, d);
     }

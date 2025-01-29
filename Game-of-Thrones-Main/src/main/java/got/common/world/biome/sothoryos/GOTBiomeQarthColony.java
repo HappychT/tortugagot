@@ -14,7 +14,7 @@ import got.common.world.structure.other.*;
 public class GOTBiomeQarthColony extends GOTBiomeSothoryosSavannah {
 	public GOTBiomeQarthColony(int i, boolean major) {
 		super(i, major);
-		setUnreliableChance(GOTEventSpawner.EventChance.COMMON);
+		setUnreliableChance(GOTEventSpawner.EventChance.RARE);
 		decorator.clearVillages();
 		decorator.addRandomStructure(new GOTStructureRuinedHouse(false), 2000);
 		decorator.addRandomStructure(new GOTStructureBurntHouse(false), 2000);

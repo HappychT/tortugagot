@@ -21,10 +21,11 @@ import net.minecraft.init.*;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.*;
 
-public class GOTRecipe {
+public class GOTRecipe{
 	public static List<IRecipe> slab = new ArrayList<>();
 	public static List<IRecipe> north = new ArrayList<>();
 	public static List<IRecipe> hillmen = new ArrayList<>();
@@ -64,6 +65,7 @@ public class GOTRecipe {
 	public static List<IRecipe> commonEssos = new ArrayList<>();
 	public static String[] dyeOreNames = { "dyeBlack", "dyeRed", "dyeGreen", "dyeBrown", "dyeBlue", "dyePurple", "dyeCyan", "dyeLightGray", "dyeGray", "dyePink", "dyeLime", "dyeYellow", "dyeLightBlue", "dyeMagenta", "dyeOrange", "dyeWhite" };
 	public static List<IRecipe> mossovy = new ArrayList<>();
+	public Item item = GOTRegistry.shieldReachPike;
 
 	public static void addDyeableWoolRobeRecipes(List[] recipeLists, ItemStack result, Object... params) {
 		for (List<IRecipe> list : recipeLists) {
@@ -263,7 +265,7 @@ public class GOTRecipe {
 		dragonstone.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassSpear), "  X", " Y ", "Y  ", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
 		dragonstone.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassSword), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
 		dragonstone.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassBattleaxe), "XXX", "XYX", " Y ", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
-
+		dragonstone.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassDagger), "X", "Y", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
 	}
 
 	public static void createGhiscarRecipes() {
@@ -293,6 +295,7 @@ public class GOTRecipe {
 		gift.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassSpear), "  X", " Y ", "Y  ", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
 		gift.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassSword), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
 		gift.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassBattleaxe), "XXX", "XYX", " Y ", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
+		gift.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dragonGlassDagger), "X", "Y", Character.valueOf('X'), GOTRegistry.dragonGlassShard, Character.valueOf('Y'), "stickWood"));
 		gift.addAll(commonWesteros);
 	}
 
@@ -1389,6 +1392,10 @@ public class GOTRecipe {
 		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.yitiDaggerPoisoned, GOTRegistry.yitiDagger, GOTRegistry.bottlePoison));
 		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.summerDaggerPoisoned, GOTRegistry.summerDagger, GOTRegistry.bottlePoison));
 		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.valyrianChisel, GOTRegistry.chisel, GOTRegistry.valyrianPowder));
+		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosPike, GOTRegistry.essosPike, GOTRegistry.shield));
+		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorPike, GOTRegistry.shield, GOTRegistry.westerosPike));
+		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosSpear, GOTRegistry.shield, GOTRegistry.essosSpear));
+		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorSpear, GOTRegistry.shield, GOTRegistry.westerosSpear));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.woodBeamRotten, 3, 0), "X", "X", "X", Character.valueOf('X'), new ItemStack(GOTRegistry.rottenLog, 1, 0)));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.fenceRotten, 3, 0), "XYX", "XYX", Character.valueOf('X'), new ItemStack(GOTRegistry.planksRotten, 1, 0), Character.valueOf('Y'), "stickWood"));
 		GameRegistry.addRecipe(new GOTRecipeBanners());

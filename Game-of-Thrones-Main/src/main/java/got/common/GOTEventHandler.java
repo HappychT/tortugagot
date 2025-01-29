@@ -77,7 +77,6 @@ import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.entity.player.PlayerEvent.*;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 import net.minecraftforge.event.world.*;
-import org.lwjgl.Sys;
 
 public class GOTEventHandler implements IFuelHandler {
 	public GOTItemBow proxyBowItemServer;
@@ -102,6 +101,7 @@ public class GOTEventHandler implements IFuelHandler {
 	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
 		EntityPlayer entityplayer = event.player;
 		World world = entityplayer.worldObj;
+		entityplayer.getHeldItem();
 		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem() instanceof GOTItemCrossbow && GOTItemCrossbow.isLoaded(entityplayer.getHeldItem())) {
 			new java.util.Timer().schedule(
 					new java.util.TimerTask() {
@@ -559,44 +559,44 @@ public class GOTEventHandler implements IFuelHandler {
 		Entity entity = event.target;
 		World world = entity.worldObj;
 		EntityPlayer entityplayer = event.entityPlayer;
-		//IAttributeInstance entityAttribute = entityplayer.getEntityAttribute(SharedMonsterAttributes.knockbackResistance);
+		ItemStack heldItem = entityplayer.getHeldItem();
 		GOTPlayerData pd = GOTLevelData.getData(entityplayer);
 		if (!world.isRemote && (entity instanceof EntityHanging || entity instanceof GOTBannerProtectable) && GOTBannerProtection.isProtected(world, entity, GOTBannerProtection.forPlayer(entityplayer, GOTBannerProtection.Permission.FULL), true)) {
 			event.setCanceled(true);
 		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.dornePolearm) && pd.getPledgeFaction() != GOTFaction.DORNE) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.arrynClaymore) && pd.getPledgeFaction() != GOTFaction.ARRYN) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.stormlandsHammer) && pd.getPledgeFaction() != GOTFaction.STORMLANDS) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.ironBornAxe) && pd.getPledgeFaction() != GOTFaction.IRONBORN) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.reachPike) && pd.getPledgeFaction() != GOTFaction.REACH) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.riverlandsTrident) && pd.getPledgeFaction() != GOTFaction.RIVERLANDS) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.northGreatSword) && pd.getPledgeFaction() != GOTFaction.NORTH) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
+		
+		if (!world.isRemote && heldItem != null && heldItem.getItem() instanceof GOTFactionWeaponChecker && !GOTEnchantmentHelper.hasEnchant(heldItem, GOTEnchantment.multifracConverter)) {
+
+			if (heldItem.getItem() instanceof GOTItemDornePolearm && pd.getPledgeFaction() != GOTFaction.DORNE) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if (heldItem.getItem() instanceof GOTItemArrynClaymore && pd.getPledgeFaction() != GOTFaction.ARRYN) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if (heldItem.getItem() instanceof GOTItemStormlandsHammer && pd.getPledgeFaction() != GOTFaction.STORMLANDS) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if (heldItem.getItem() instanceof GOTItemIronBornAxe && pd.getPledgeFaction() != GOTFaction.IRONBORN) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if ((heldItem.getItem() instanceof GOTItemReachPike|| heldItem.getItem() instanceof GOTItemShieldReachPike) && pd.getPledgeFaction() != GOTFaction.REACH) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if ((heldItem.getItem() instanceof GOTItemRiverlandsTrident || heldItem.getItem() instanceof GOTItemShieldRiverlandsTrident) && pd.getPledgeFaction() != GOTFaction.RIVERLANDS) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if (heldItem.getItem() instanceof GOTItemNorthGreatSword && pd.getPledgeFaction() != GOTFaction.NORTH) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
 		}
 
-//		if (!world.isRemote && entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem().equals(GOTRegistry.dornePolearm))
-//			entityAttribute.setBaseValue(1.0F);
-//
-//		entityAttribute.setBaseValue(0.0F);
 	}
 
 	@SubscribeEvent
@@ -857,13 +857,15 @@ public class GOTEventHandler implements IFuelHandler {
 		World world = entityplayer.worldObj;
 		ItemStack itemstack = event.item;
 		GOTPlayerData pd = GOTLevelData.getData(entityplayer);
-		if (!world.isRemote && itemstack.getItem().equals(GOTRegistry.westerlandsCrossBow) && pd.getPledgeFaction() != GOTFaction.WESTERLANDS) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
-		}
-		if (!world.isRemote && itemstack.getItem().equals(GOTRegistry.dorneBow) && pd.getPledgeFaction() != GOTFaction.DRAGONSTONE) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-			event.setCanceled(true);
+		if (!world.isRemote && itemstack.getItem() instanceof GOTFactionWeaponChecker && !GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.getEnchantmentByName("multifracConverter"))) {
+			if (itemstack.getItem() instanceof GOTItemWesterlandsCrossbow && pd.getPledgeFaction() != GOTFaction.WESTERLANDS) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
+			if (itemstack.getItem() instanceof  GOTItemDragonStoneBow && pd.getPledgeFaction() != GOTFaction.DRAGONSTONE) {
+				entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+				event.setCanceled(true);
+			}
 		}
 
 	}
@@ -1251,9 +1253,9 @@ public class GOTEventHandler implements IFuelHandler {
 	public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
 		EntityLivingBase entity = event.entityLiving;
 		World world = entity.worldObj;
-		if (!world.isRemote) {
-			GOTEnchantmentHelper.onEntityUpdate(entity);
-		}
+//		if (!world.isRemote) {
+//			GOTEnchantmentHelper.onEntityUpdate(entity);
+//		}
 		if (GOTConfig.enchantingAutoRemoveVanilla && !world.isRemote && entity instanceof EntityPlayer && entity.ticksExisted % 60 == 0) {
 			EntityPlayer entityplayer = (EntityPlayer) entity;
 			for (int l = 0; l < entityplayer.inventory.getSizeInventory(); l++) {
@@ -1384,9 +1386,8 @@ public class GOTEventHandler implements IFuelHandler {
 				BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
 				boolean standartColdBiome = biome instanceof GOTBiome && biome.temperature == 0.0f;
 				boolean altitudeColdBiome = biome instanceof GOTBiome && ((GOTBiome) biome).getClimateType() != null && ((GOTBiome) biome).getClimateType().isAltitudeZone() && k >= 140;
-				boolean isOpenAir = world.canBlockSeeTheSky(i, j, k);
 				boolean noLightSource = world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) < 10;
-				if ((standartColdBiome || altitudeColdBiome) && (isOpenAir || inWater) && noLightSource) {
+				if ((standartColdBiome || altitudeColdBiome) && (world.isRaining() || inWater) && noLightSource) {
 					int frostChance = 50;
 					int frostProtection = 0;
 					for (int l = 0; l < 4; l++) {

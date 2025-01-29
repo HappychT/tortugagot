@@ -2706,8 +2706,6 @@ got.miniquest.welcome.map=Pressione '%s' para abrir o mapa
 got.miniquest.welcome.speak=Fale com o Andarilho Cinzento
 got.music.nowPlaying=Tocando agora:
 got.potion.drinkPoison=Bebida envenenada
-got.potion.secondBreath=Second Breath
-got.potion.rest=Rest
 got.potion=Persistente
 got.rank.ARRYN≠of Arryn Vale
 got.rank.ASSHAI≠of Asshai
@@ -5730,9 +5728,6 @@ item.got:westking_helmet.name=Capacete dos Reis do Oeste
 item.got:westking_leggings.name=Leggings de West Kings
 item.got:wheel.name=Roda
 item.got:white_bison_horn.name=Chifre de Rês de White Bison
-item.got:white_mammoth_skin.name=White Mammoth Skin
-item.got:millitary_card.name=Millitary Card
-item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name≠White Walkers Boots
 item.got:white_walkers_chestplate.name≠White Walkers Chestplate
 item.got:white_walkers_leggings.name≠White Walkers Leggings

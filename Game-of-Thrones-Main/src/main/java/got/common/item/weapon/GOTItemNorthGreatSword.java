@@ -8,10 +8,9 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemNorthGreatSword extends GOTItemSword{
+public class GOTItemNorthGreatSword extends GOTItemGreatsword implements GOTFactionWeaponChecker{
     public GOTItemNorthGreatSword(Item.ToolMaterial material) {
         super(material);
-        gotWeaponDamage += 3;
     }
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean show) {

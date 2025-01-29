@@ -27,7 +27,7 @@ public class GOTItemKebab extends GOTItemFood {
 	@Override
 	public ItemStack onEaten(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		if (!world.isRemote && world.rand.nextInt(100) == 0) {
-			entityplayer.addChatMessage(new ChatComponentText("–Ø —Ç–æ–≥–æ —Ä–æ—Ç –µ–±–∞–ª! –≠–¢–ê –ß–û –ó–ê –®–ê–®–õ–ò–ö –ë–ò–õ–Ø!"));
+			entityplayer.addChatMessage(new ChatComponentText("ﬂ ÚÓ„Ó ÓÚ Â·‡Î! ›“¿ ◊Œ «¿ ÿ¿ÿÀ»  ¡»Àﬂ!"));
 			entityplayer.addPotionEffect(new PotionEffect(effectID, duration * 10));
 			return super.onEaten(itemstack, world, entityplayer);
 		}

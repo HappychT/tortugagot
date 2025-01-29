@@ -5,7 +5,9 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Multimap;
 
+import got.GOT;
 import got.common.enchant.GOTEnchantmentHelper;
+import got.common.enchant.GOTEnchantmentRangedDamage;
 import got.common.item.weapon.*;
 import net.minecraft.enchantment.*;
 import net.minecraft.entity.EnumCreatureAttribute;
@@ -36,7 +38,22 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemReachPike.class, 0.30f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemStormlandsHammer.class, 0.3f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemDornePolearm.class, 0.54f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldSpear.class, 0.54f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldPike.class, 0.3f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemDagger.class, 1.5f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemSpear.class, 0.65f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearm.class, 0.667f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearmLong.class, 0.38f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemLance.class, 0.5f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemHammer.class, 0.45f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemNorthGreatSword.class,0.545f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldReachPike.class, 0.25f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldRiverlandsTrident.class, 0.35f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemLeaderBattleaxe.class, 0.45f);
+		GOTWeaponStats.registerMeleeReach(GOTItemLeaderBattleaxe.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemArrynClaymore.class, 1.04f);
+		GOTWeaponStats.registerMeleeReach(GOTItemShieldRiverlandsTrident.class, 1.9f);
+		GOTWeaponStats.registerMeleeReach(GOTItemShieldReachPike.class, 2.2f);
 		GOTWeaponStats.registerMeleeReach(GOTItemRiverlandsTrident.class, 1.9f);
 		GOTWeaponStats.registerMeleeReach(GOTItemIronBornAxe.class, 1.04f);
 		GOTWeaponStats.registerMeleeReach(GOTItemReachPike.class, 2.2f);
@@ -45,22 +62,17 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeReach(GOTItemGreatsword.class, 1.5f);
 		GOTWeaponStats.registerMeleeReach(GOTItemLongsword.class, 1.25f);
 		GOTWeaponStats.registerMeleeReach(GOTItemSword.class, 0.957f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemDagger.class, 1.5f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemSpear.class, 0.65f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearm.class, 0.667f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearmLong.class, 0.38f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemLance.class, 0.5f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemHammer.class, 0.45f);
+		GOTWeaponStats.registerMeleeReach(GOTItemShieldSpear.class, 1.3f);
+		GOTWeaponStats.registerMeleeReach(GOTItemShieldPike.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemDagger.class, 0.75f);
 		GOTWeaponStats.registerMeleeReach(GOTItemSpear.class, 1.3f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPolearm.class, 1.5f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPolearmLong.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemLance.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemHammer.class, 1.0f);
+		GOTWeaponStats.registerMeleeReach(GOTItemNorthGreatSword.class, 1.1f);
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemHammer.class, 1);
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemLance.class, 1);
-		GOTWeaponStats.registerMeleeReach(GOTItemNorthGreatSword.class, 1.1f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemNorthGreatSword.class,0.545f);
 	}
 
 	public static int getArmorProtection(ItemStack itemstack) {
@@ -235,7 +247,7 @@ public class GOTWeaponStats {
 			}
 		}
 		if (time > 0) {
-			return 1.0f / ((float) time / (float) base);
+			return 1.0f / ((float) time / ((float) base * GOTEnchantmentHelper.calcRangedSpeed(itemstack) ));
 		}
 		return 0.0f;
 	}

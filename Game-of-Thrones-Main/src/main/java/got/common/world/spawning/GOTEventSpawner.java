@@ -46,12 +46,12 @@ public class GOTEventSpawner {
 			}
 			GOTBiome gotbiome = (GOTBiome) biome;
 			Class<? extends GOTEntityWesterosBandit> banditClass = gotbiome.getBanditEntityClass();
-			double chance = gotbiome.getUnreliableChance().chancesPerSecondPerChunk[16];
+			double chance = gotbiome.getUnreliableChance().chancesPerSecondPerChunk[5];
 			if (chance <= 0.0 || world.rand.nextDouble() >= chance || world.selectEntitiesWithinAABB(EntityPlayer.class, AxisAlignedBB.getBoundingBox(i - (range = 48), 0.0, k - range, i + range, world.getHeight(), k + range), GOT.selectNonCreativePlayers()).isEmpty()) {
 				continue;
 			}
 			int banditsSpawned = 0;
-			int maxBandits = MathHelper.getRandomIntegerInRange(world.rand, 1, 4);
+			int maxBandits = MathHelper.getRandomIntegerInRange(world.rand, 1, 3);
 			for (int attempts = 0; attempts < 32; ++attempts) {
 				Block block;
 				GOTEntityWesterosBandit bandit;

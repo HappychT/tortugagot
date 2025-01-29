@@ -1215,10 +1215,6 @@ public class GOTChestContents {
 				if (itemstack.stackSize > itemstack.getMaxStackSize()) {
 					itemstack.stackSize = itemstack.getMaxStackSize();
 				}
-				if (GOTConfig.enchantingGOT) {
-					boolean skilful = !isNPCDrop && random.nextInt(5) == 0;
-					GOTEnchantmentHelper.applyRandomEnchantments(itemstack, random, skilful, false);
-				}
 				if ((item = itemstack.getItem()) instanceof GOTItemMug) {
 					GOTItemMug.Vessel[] vessels;
 					if (((GOTItemMug) item).isBrewable) {

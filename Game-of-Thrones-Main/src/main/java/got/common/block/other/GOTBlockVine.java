@@ -1,6 +1,7 @@
 package got.common.block.other;
 
 import cpw.mods.fml.relauncher.*;
+import got.common.block.base.BaseDecorBlock;
 import got.common.database.GOTCreativeTabs;
 import net.minecraft.block.*;
 import net.minecraft.world.IBlockAccess;

@@ -8,7 +8,7 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemRiverlandsTrident extends GOTItemPolearmLong {
+public class GOTItemRiverlandsTrident extends GOTItemTrident implements GOTFactionWeaponChecker{
     public GOTItemRiverlandsTrident(Item.ToolMaterial material) {
         super(material);
     }

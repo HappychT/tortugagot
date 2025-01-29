@@ -2,6 +2,8 @@ package got.common.inventory;
 
 import java.util.*;
 
+import got.common.item.GOTMaterialFinder;
+import got.common.item.tool.GOTItemAxe;
 import org.apache.commons.lang3.StringUtils;
 
 import cpw.mods.fml.relauncher.*;
@@ -21,6 +23,7 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import org.lwjgl.Sys;
 
 public class GOTContainerAnvil extends Container {
 	public static int maxReforgeTime = 40;
@@ -198,6 +201,11 @@ public class GOTContainerAnvil extends Container {
 	}
 
 	public boolean isRepairMaterial(ItemStack inputItem, ItemStack materialItem) {
+
+		if (invInput.getStackInSlot(1) != null && invInput.getStackInSlot(1).getItem() instanceof GOTItemModifierTemplate && (inputItem.getItem() instanceof GOTItemSword || inputItem.getItem() instanceof GOTMaterialFinder || inputItem.getItem() instanceof GOTItemArmor || inputItem.getItem() instanceof GOTItemCrossbow)) {
+			return materialItem.getItem() == GOTRegistry.alloySteelIngot;
+		}
+		
 		if (inputItem.getItem().getIsRepairable(inputItem, materialItem)) {
 			return true;
 		}
@@ -280,7 +288,7 @@ public class GOTContainerAnvil extends Container {
 			if (inputItem.isItemStackDamageable()) {
 				inputItem.setItemDamage(0);
 			}
-			GOTEnchantmentHelper.applyRandomEnchantments(inputItem, theWorld.rand, true, true);
+			GOTEnchantmentHelper.applyRandomEnchantments(inputItem, theWorld.rand, false, true);
 			GOTEnchantmentHelper.setAnvilCost(inputItem, 0);
 			if (isTrader && theNPC instanceof GOTEntityWesterosScrapTrader && applyMischief(inputItem)) {
 				doneMischief = true;
@@ -579,7 +587,7 @@ public class GOTContainerAnvil extends Container {
 					outputEnchants.clear();
 				}
 				EnchantmentHelper.setEnchantments(outputEnchants, inputCopy);
-				int maxMods = 3;
+				int maxMods = 5;
 				ArrayList<GOTEnchantment> outputMods = new ArrayList<>(inputModifiers);
 				List<GOTEnchantment> combinerMods = GOTEnchantmentHelper.getEnchantList(combinerItem);
 				if (combinerItemEnchant != null) {
@@ -612,48 +620,48 @@ public class GOTContainerAnvil extends Container {
 					if (!combinerMod.isBeneficial()) {
 						continue;
 					}
-					combineCost += Math.max(1, (int) combinerMod.getValueModifier());
+					combineCost = 20;
 				}
 				GOTEnchantmentHelper.setEnchantList(inputCopy, outputMods);
 			}
 			if (combineCost > 0) {
 				combining = true;
 			}
-			int numEnchants = 0;
-			for (Object obj : inputEnchants.keySet()) {
-				int enchID = (Integer) obj;
-				Enchantment ench = Enchantment.enchantmentsList[enchID];
-				int enchLevel = (Integer) inputEnchants.get(enchID);
-				++numEnchants;
-				int costPerLevel = 0;
-				int enchWeight = ench.getWeight();
-				switch (enchWeight) {
-				case 1:
-					costPerLevel = 8;
-					break;
-				case 2:
-					costPerLevel = 4;
-					break;
-				case 5:
-					costPerLevel = 2;
-					break;
-				case 10:
-					costPerLevel = 1;
-					break;
-				default:
-					break;
-				}
-				baseAnvilCost += numEnchants + enchLevel * costPerLevel;
-			}
+//			int numEnchants = 0;
+//			for (Object obj : inputEnchants.keySet()) {
+//				int enchID = (Integer) obj;
+//				Enchantment ench = Enchantment.enchantmentsList[enchID];
+//				int enchLevel = (Integer) inputEnchants.get(enchID);
+//				++numEnchants;
+//				int costPerLevel = 0;
+//				int enchWeight = ench.getWeight();
+//				switch (enchWeight) {
+//				case 1:
+//					costPerLevel = 8;
+//					break;
+//				case 2:
+//					costPerLevel = 4;
+//					break;
+//				case 5:
+//					costPerLevel = 2;
+//					break;
+//				case 10:
+//					costPerLevel = 1;
+//					break;
+//				default:
+//					break;
+//				}
+//				baseAnvilCost += numEnchants + enchLevel * costPerLevel;
+//			}
 			if (enchantingWithBook && !inputCopy.getItem().isBookEnchantable(inputCopy, combinerItem)) {
 				inputCopy = null;
 			}
-			for (GOTEnchantment mod : inputModifiers) {
-				if (!mod.isBeneficial()) {
-					continue;
-				}
-				baseAnvilCost += Math.max(1, (int) mod.getValueModifier());
-			}
+//			for (GOTEnchantment mod : inputModifiers) {
+//				if (!mod.isBeneficial()) {
+//					continue;
+//				}
+//				baseAnvilCost += Math.max(1, (int) mod.getValueModifier());
+//			}
 			if (inputCopy.isItemStackDamageable()) {
 				boolean canRepair = false;
 				int availableMaterials = 0;
@@ -699,7 +707,7 @@ public class GOTContainerAnvil extends Container {
 					nextAnvilCost = Math.max(nextAnvilCost, combinerAnvilCost);
 				}
 				if (combining) {
-					nextAnvilCost += 2;
+					nextAnvilCost += 0;
 				} else if (repairing) {
 					++nextAnvilCost;
 				}

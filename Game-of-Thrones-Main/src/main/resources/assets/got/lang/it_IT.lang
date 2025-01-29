@@ -2705,8 +2705,6 @@ got.miniquest.welcome.map=Premi “%s” per aprire la mappa
 got.miniquest.welcome.speak=Parla con il Grigio Pellegrino
 got.music.nowPlaying=In riproduzione:
 got.potion.drinkPoison=Bevanda avvelenata
-got.potion.secondBreath=Second Breath
-got.potion.rest=Rest
 got.potion=Persistente
 got.rank.ARRYN≠of Arryn Vale
 got.rank.ASSHAI≠of Asshai
@@ -5729,9 +5727,6 @@ item.got:westking_helmet.name=Elmo dei Re dell'Ovest
 item.got:westking_leggings.name=Gambiere dei Re dell'Ovest
 item.got:wheel.name=Ruota
 item.got:white_bison_horn.name=Corno di bufalo di White Bison
-item.got:white_mammoth_skin.name=White Mammoth Skin
-item.got:millitary_card.name=Millitary Card
-item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name≠White Walkers Boots
 item.got:white_walkers_chestplate.name≠White Walkers Chestplate
 item.got:white_walkers_leggings.name≠White Walkers Leggings
