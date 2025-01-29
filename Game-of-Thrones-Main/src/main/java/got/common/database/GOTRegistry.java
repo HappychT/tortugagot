@@ -24,6 +24,7 @@ import got.common.item.other.*;
 import got.common.item.tool.*;
 import got.common.item.weapon.*;
 import got.common.itemreg.GOTItems;
+import got.common.potions.CustomPotion;
 import got.common.registers.EffectRegister;
 import got.common.tileentity.*;
 import got.common.util.GOTEnumDyeColor;
@@ -1389,6 +1390,9 @@ public class GOTRegistry {
 	public static Item stormlandsHammer;
 	public static Item westerlandsCrossBow;
 	public static Item northGreatSword;
+	public static Item whiteMammothSkin;
+	public static Item millitaryCard;
+	public static Item frostSpiderString;
 
 
 
@@ -2261,7 +2265,7 @@ public class GOTRegistry {
 		giftChestplate = new GOTItemArmor(GOTMaterial.GIFT, 1);
 		giftHelmet = new GOTItemArmor(GOTMaterial.GIFT, 0);
 		giftLeggings = new GOTItemArmor(GOTMaterial.GIFT, 2);
-		gingerbread = new GOTItemFood(8, 1.0f, false);
+		gingerbread = new GOTItemEffectFood(8, 1.0f, false, EffectRegister.rest.id, 8);
 		giraffeRug = new GOTItemGiraffeRug();
 		gobletCopper = new GOTItemVessel();
 		gobletGold = new GOTItemVessel();
@@ -2322,7 +2326,7 @@ public class GOTRegistry {
 		kaftanChestplate = new GOTItemKaftan(1);
 		kaftanLeggings = new GOTItemKaftan(2);
 		katana = new GOTItemLegendarySword(GOTMaterial.IRON);
-		kebab = new GOTItemKebab(8, 0.8f, true);
+		kebab = new GOTItemKebab(8, 0.8f, true, EffectRegister.rest.id, 3);
 		kingsguardBoots = new GOTItemArmor(GOTMaterial.KINGSGUARD, 3);
 		kingsguardChestplate = new GOTItemArmor(GOTMaterial.KINGSGUARD, 1);
 		kingsguardHelmet = new GOTItemArmor(GOTMaterial.KINGSGUARD, 0);
@@ -2369,9 +2373,9 @@ public class GOTRegistry {
 		lysLeggings = new GOTItemArmor(GOTMaterial.LYS, 2);
 		mango = new GOTItemFood(4, 0.3f, false);
 		mapleSyrup = new GOTItemStew(2, 0.1f, false);
-		marzipan = new GOTItemFood(6, 0.6f, false);
-		marzipanChocolate = new GOTItemFood(8, 0.8f, false);
-		melonSoup = new GOTItemStew(5, 0.5f, false);
+		marzipan = new GOTItemEffectFood(6, 0.6f, false, EffectRegister.rest.id, 8);
+		marzipanChocolate = new GOTItemEffectFood(8, 0.8f, false, EffectRegister.rest.id, 10);
+		melonSoup = new GOTItemEffectFood(5, 0.5f, false, EffectRegister.rest.id, 3, true);
 		mossovyBoots = new GOTItemArmor(GOTMaterial.MOSSOVY, 3);
 		mossovyChestplate = new GOTItemArmor(GOTMaterial.MOSSOVY, 1);
 		mossovyDagger = new GOTItemDagger(GOTMaterial.SILVER_TOOL);
@@ -2400,14 +2404,14 @@ public class GOTRegistry {
 		mugLemonade = new GOTItemMug(true, true).setDrinkStats(5, 0.3f);
 		mugLimeLiqueur = new GOTItemMug(1.0f).setDrinkStats(3, 0.3f);
 		mugMangoJuice = new GOTItemMug(true, true).setDrinkStats(6, 0.6f);
-		mugMapleBeer = new GOTItemMug(0.4f).setDrinkStats(4, 0.6f);
+		mugMapleBeer = new GOTItemMug(0.4f).setDrinkStats(4, 0.6f).addPotionEffect(EffectRegister.secondBreath.id, 20);
 		mugMead = new GOTItemMug(0.6f).setDrinkStats(4, 0.4f);
 		mugMelonLiqueur = new GOTItemMug(1.0f).setDrinkStats(3, 0.3f);
 		mugMilk = new GOTItemMug(true, false).setCuresEffects();
 		mugOrangeJuice = new GOTItemMug(true, true).setDrinkStats(6, 0.6f);
 		mugPerry = new GOTItemMug(0.3f).setDrinkStats(4, 0.4f);
 		mugPlantainBrew = new GOTItemMug(0.0f).setDrinkStats(6, 0.6f).addPotionEffect(Potion.regeneration.id, 20);
-		mugPlumKvass = new GOTItemMug(0.2f).setDrinkStats(4, 0.4f);
+		mugPlumKvass = new GOTItemMug(0.2f).setDrinkStats(4, 0.4f).addPotionEffect(EffectRegister.secondBreath.id, 10);
 		mugPomegranateJuice = new GOTItemMug(true, true).setDrinkStats(6, 0.6f);
 		mugPomegranateWine = new GOTItemMug(0.9f).setDrinkStats(4, 0.4f);
 		mugPoppyMilk = new GOTItemMugPoppyMilk(0.0f).addPotionEffect(Potion.regeneration.id, 100).addPotionEffect(Potion.weakness.id, 100);
@@ -2417,12 +2421,12 @@ public class GOTRegistry {
 		mugRum = new GOTItemMug(1.5f).setDrinkStats(3, 0.3f);
 		mugSambuca = new GOTItemMug(1.0f).setDrinkStats(3, 0.3f);
 		mugShadeEvening = new GOTItemMugWarlockDraught().setDrinkStats(4, 0.4f).setDamageAmount(3).addPotionEffect(Potion.nightVision.id, 300);
-		mugSourMilk = new GOTItemMug(0.2f).setDrinkStats(5, 0.5f);
+		mugSourMilk = new GOTItemMug(0.2f).setDrinkStats(5, 0.5f).addPotionEffect(EffectRegister.secondBreath.id, 10);
 		mugTermiteTequila = new GOTItemMugTermite(0.0f).setDrinkStats(3, 0.3f);
 		mugUnsulliedTonic = new GOTItemMug(0.0f).setDrinkStats(6, 0.6f).addPotionEffect(Potion.damageBoost.id, 60).addPotionEffect(Potion.moveSpeed.id, 20).setDamageAmount(2);
 		mugVodka = new GOTItemMug(1.75f).setDrinkStats(3, 0.3f);
 		mugWater = new GOTItemMug(true, false);
-		mugWhisky = new GOTItemMug(1.0f).setDrinkStats(4, 0.4f);
+		mugWhisky = new GOTItemMug(1.0f).setDrinkStats(4, 0.4f).addPotionEffect(EffectRegister.secondBreath.id, 10);
 		mugWhiteGrapeJuice = new GOTItemMug(true, true).setDrinkStats(5, 0.5f);
 		mugWhiteWine = new GOTItemMug(0.9f).setDrinkStats(4, 0.4f);
 		mugWildFire = new GOTItemMugFire(0.0f).setDrinkStats(3, 0.3f);
@@ -2464,7 +2468,7 @@ public class GOTRegistry {
 		orange = new GOTItemFood(4, 0.3f, false);
 		orphanMaker = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL);
 		pancake = new GOTItemFood(4, 0.6f, false);
-		pancakeMapleSyrup = new GOTItemFood(5, 0.6f, false);
+		pancakeMapleSyrup = new GOTItemEffectFood(5, 0.6f, false, EffectRegister.rest.id, 8);
 		partyHat = new GOTItemPartyHat();
 		pastryItem = new GOTItemPlaceableFood(pastry);
 		pear = new GOTItemFood(4, 0.3f, false);
@@ -2518,12 +2522,12 @@ public class GOTRegistry {
 		renlyLeggings = new GOTItemArmor(GOTMaterial.RENLY, 2).setCreativeTab(GOTCreativeTabs.tabStory);
 		rhaegarSword = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL);
 		rhinoArmor = new GOTItemMountArmor(ArmorMaterial.CLOTH, GOTItemMountArmor.Mount.RHINO, "rhino");
-		rhinoCooked = new GOTItemFood(7, 0.4f, true);
+		rhinoCooked = new GOTItemEffectFood(7, 0.4f, true, EffectRegister.rest.id, 5);
 		rhinoHorn = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
 		rhinoRaw = new GOTItemFood(2, 0.1f, true);
-		elephantCooked = new GOTItemFood(7, 0.4f, true);
+		elephantCooked = new GOTItemEffectFood(7, 0.4f, true, EffectRegister.rest.id, 7);
 		elephantRaw = new GOTItemFood(2, 0.1f, true);
-		walrusLardCooked = new GOTItemFood(7, 0.4f, true);
+		walrusLardCooked = new GOTItemEffectFood(7, 0.4f, true, EffectRegister.rest.id, 9);
 		walrusLardRaw = new GOTItemFood(2, 0.1f, true);
 		riverlandsBoots = new GOTItemArmor(GOTMaterial.RIVERLANDS, 3);
 		riverlandsChestplate = new GOTItemArmor(GOTMaterial.RIVERLANDS, 1);
@@ -2550,7 +2554,7 @@ public class GOTRegistry {
 		sapphire = new GOTItemGemWithAnvilNameColor(EnumChatFormatting.BLUE);
 		seedsGrapeRed = new GOTItemGrapeSeeds(grapevineRed);
 		seedsGrapeWhite = new GOTItemGrapeSeeds(grapevineWhite);
-		shishKebab = new GOTItemKebab(8, 0.8f, false).setFull3D();
+		shishKebab = new GOTItemKebab(8, 0.8f, false, EffectRegister.rest.id, 6).setFull3D();
 		silverIngot = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
 		silverNugget = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
 		ironNugget = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
@@ -2748,6 +2752,9 @@ public class GOTRegistry {
 		reachPike = new GOTItemReachPike(GOTMaterial.IRON).addWeaponDamage(1.0f);
 		stormlandsHammer = new GOTItemStormlandsHammer(GOTMaterial.IRON).addWeaponDamage(-0.5f);
 		northGreatSword = new GOTItemNorthGreatSword(GOTMaterial.IRON).addWeaponDamage(-2.0f);
+		whiteMammothSkin = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
+		millitaryCard = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
+		frostSpiderString = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
 
 	}
 
@@ -4196,5 +4203,8 @@ public class GOTRegistry {
 		registerItem(riverlandsTrident, "riverlandsTrident");
 		registerItem(reachPike, "reachPike");
 		registerItem(stormlandsHammer, "stormlandsHammer");
+		registerItem(whiteMammothSkin, "whiteMammothSkin");
+		registerItem(millitaryCard, "millitaryCard");
+		registerItem(frostSpiderString, "frostSpiderString");
 	}
 }

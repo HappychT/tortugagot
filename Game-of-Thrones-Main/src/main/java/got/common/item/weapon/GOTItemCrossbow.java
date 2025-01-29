@@ -152,7 +152,7 @@ public class GOTItemCrossbow extends ItemBow {
 				}
 				if (!world.isRemote) {
 					world.spawnEntityInWorld(bolt);
-					StaminaServerHandler.drainStaminaByPercent(8.0, entityplayer);
+					StaminaServerHandler.drainStaminaByPercent(0.8, entityplayer);
 				}
 				world.playSoundAtEntity(entityplayer, "got:item.crossbow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
 				itemstack.damageItem(1, entityplayer);

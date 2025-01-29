@@ -14,6 +14,7 @@ import net.minecraft.entity.ai.*;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.AnimalChest;
 import net.minecraft.item.*;
@@ -235,7 +236,7 @@ public class GOTEntityHorse extends EntityHorse implements GOTNPCMount {
 
 	@Override
 	public boolean interact(EntityPlayer entityplayer) {
-		if (!getMountable() || isMountEnraged()) {
+		if (!getMountable() || isMountEnraged() || !isTame()) {
 			return false;
 		}
 		if (getBelongsToNPC()) {
@@ -248,6 +249,9 @@ public class GOTEntityHorse extends EntityHorse implements GOTNPCMount {
 			return false;
 		}
 		ItemStack itemstack = entityplayer.getHeldItem();
+		if (itemstack.getItem() == Item.getItemFromBlock(Blocks.chest)) {
+			return false;
+		}
 		if (itemstack != null && isBreedingItem(itemstack) && getGrowingAge() == 0 && !isInLove() && isTame()) {
 			if (!entityplayer.capabilities.isCreativeMode) {
 				--itemstack.stackSize;

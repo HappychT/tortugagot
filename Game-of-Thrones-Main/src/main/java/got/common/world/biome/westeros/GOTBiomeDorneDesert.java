@@ -20,6 +20,7 @@ public class GOTBiomeDorneDesert extends GOTBiomeDorne implements GOTBiome.Deser
 	public GOTBiomeDorneDesert(int i, boolean major) {
 		super(i, major);
 		setupDesertFauna();
+		setDisableRain();
 		clearBiomeVariants();
 		addBiomeVariant(GOTBiomeVariant.HILLS);
 		topBlock = Blocks.sand;

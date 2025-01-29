@@ -17,6 +17,7 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 public class GOTBiomeFrostfangs extends GOTBiomeWesterosFrost {
 	public GOTBiomeFrostfangs(int i, boolean major) {
 		super(i, major);
+		setEnableSnow();
 		clearBiomeVariants();
 		addBiomeVariant(GOTBiomeVariant.MOUNTAIN);
 		fillerBlock = Blocks.packed_ice;

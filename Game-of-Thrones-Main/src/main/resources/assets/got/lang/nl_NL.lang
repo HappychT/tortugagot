@@ -2705,6 +2705,8 @@ got.miniquest.welcome.map=Druk op ' %s' om de kaart te openen
 got.miniquest.welcome.speak=Praat met de Jaken H'ghar
 got.music.nowPlaying=Nu speelt:
 got.potion.drinkPoison=Vergiftigde drank
+got.potion.secondBreath=Second Breath
+got.potion.rest=Rest
 got.potion=Aanhoudende
 got.rank.ARRYN≠of Arryn Vale
 got.rank.ASSHAI≠of Asshai
@@ -5727,6 +5729,9 @@ item.got:westking_helmet.name=Helm van West Kings
 item.got:westking_leggings.name=Legging van West Kings
 item.got:wheel.name=Wiel
 item.got:white_bison_horn.name=Kine van White Bison Hoorn
+item.got:white_mammoth_skin.name=White Mammoth Skin
+item.got:millitary_card.name=Millitary Card
+item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name≠White Walkers Boots
 item.got:white_walkers_chestplate.name≠White Walkers Chestplate
 item.got:white_walkers_leggings.name≠White Walkers Leggings

@@ -2705,6 +2705,8 @@ got.miniquest.welcome.map=Tuşa bas '%s' ve haritayı aç
 got.miniquest.welcome.speak=Gri Hacı ile Konuş
 got.music.nowPlaying=Şimdi Çalıyor:
 got.potion.drinkPoison=Zehirli İçki
+got.potion.secondBreath=Second Breath
+got.potion.rest=Rest
 got.potion=Kalan
 got.rank.ARRYN≠of Arryn Vale
 got.rank.ASSHAI≠of Asshai
@@ -5727,6 +5729,9 @@ item.got:westking_helmet.name=Batı Krallarının Kask
 item.got:westking_leggings.name=West Kings Pantolon
 item.got:wheel.name=Teker
 item.got:white_bison_horn.name=Beyaz Bizon Boynuzu
+item.got:white_mammoth_skin.name=White Mammoth Skin
+item.got:millitary_card.name=Millitary Card
+item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name=Ak Gezenler Bot
 item.got:white_walkers_chestplate.name=Ak Gezenler Zırh
 item.got:white_walkers_leggings.name=Ak Gezenler Pantolon

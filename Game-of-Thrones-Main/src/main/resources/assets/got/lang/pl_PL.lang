@@ -2705,6 +2705,8 @@ got.miniquest.welcome.map=Wciśnij '%s' aby otworzyć mapę
 got.miniquest.welcome.speak=Porozmawiaj z Szarym Wędrowcem
 got.music.nowPlaying=Teraz odtwarzane:
 got.potion.drinkPoison=Zatruty napój
+got.potion.secondBreath=Second Breath
+got.potion.rest=Rest
 got.potion=Przewlekły
 got.rank.ARRYN=Arrynów
 got.rank.ASSHAI=Asshai
@@ -5727,6 +5729,9 @@ item.got:westking_helmet.name=Hełm zachodnich królów
 item.got:westking_leggings.name=Nogawice West Kings
 item.got:wheel.name=Koło
 item.got:white_bison_horn.name=Róg bawołu Arawa
+item.got:white_mammoth_skin.name=White Mammoth Skin
+item.got:millitary_card.name=Millitary Card
+item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name≠White Walkers Boots
 item.got:white_walkers_chestplate.name≠White Walkers Chestplate
 item.got:white_walkers_leggings.name≠White Walkers Leggings

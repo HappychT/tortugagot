@@ -22,7 +22,7 @@ public class StaminaServerHandler {
     public static final int MAX_STAMINA = 10000; // Maximum stamina, increase if needed
 
     private static final int BOUNCE_RANGE = 1; // The range for the bounce, change to your liking
-    private static final int BOUNCE_PERCENT = 15; // The percentage of stamina to drain when bouncing, change to your liking
+    private static final int BOUNCE_PERCENT = 3; // The percentage of stamina to drain when bouncing, change to your liking
     private static final int REGAIN_RATE = 100; // The rate at which stamina is regained, change to your liking
     private static final int STANDING_STILL_COOLDOWN = 25; // The cooldown before stamina regen, when standing in-place, change to your liking
 
@@ -49,18 +49,15 @@ public class StaminaServerHandler {
 
         boolean isMoving = currentPosX != previousPosX || currentPosZ != previousPosZ;
 
-        if (isMoving && !isRunning) {
-            drainStaminaByPercent(0.05, player);
-            extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
-        }
-
-        if (isRunning) {
-            drainStaminaByPercent(0.1, player);
+        if (isMoving) {
+            if (isRunning) {
+                drainStaminaByPercent(0.025, player);
+            }
             extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
         }
 
         if (isJumping) {
-            drainStaminaByPercent(0.5, player);
+            drainStaminaByPercent(0.3, player);
             extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
         }
 
@@ -69,10 +66,10 @@ public class StaminaServerHandler {
         }
 
         if (player.isPotionActive(EffectRegister.rest)) { // Resting potion effect stamina regen, stacks with normal regen
-            regainStamina(REGAIN_RATE * 2, player); // May be too OP, adjust to your liking
+            regainStamina(REGAIN_RATE / 4, player); // May be too OP, adjust to your liking
         }
 
-        if (!isMoving && player.onGround && !player.isSprinting() && extendedPlayer.getStandingStillCooldown() == 0) {
+        if (!isMoving && player.onGround && !isJumping && extendedPlayer.getStandingStillCooldown() == 0) {
             regainStamina(REGAIN_RATE, player);
         }
 
@@ -204,9 +201,9 @@ public class StaminaServerHandler {
             DamageSource source = event.source;
 
             if (source == DamageSource.fall) {
-                drainStaminaByPercent(1, player);
+                drainStaminaByPercent(0.1, player);
             } else if (source.isProjectile()) {
-                drainStaminaByPercent(1.33, player);
+                drainStaminaByPercent(0.33, player);
             }
         }
     }
@@ -217,7 +214,7 @@ public class StaminaServerHandler {
         if(player.worldObj.isRemote) {
             return;
         }
-        drainStaminaByPercent(4.0, player);
+        drainStaminaByPercent(0.4, player);
     }
 
 }

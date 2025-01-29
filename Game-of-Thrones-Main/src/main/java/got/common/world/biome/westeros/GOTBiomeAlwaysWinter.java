@@ -23,6 +23,7 @@ public class GOTBiomeAlwaysWinter extends GOTBiomeWesterosFrost {
 
 	public GOTBiomeAlwaysWinter(int i, boolean major) {
 		super(i, major);
+		setEnableSnow();
 		spawnableCreatureList.clear();
 		fillerBlock = Blocks.ice;
 		ArrayList<SpawnListContainer> c0 = new ArrayList<>();

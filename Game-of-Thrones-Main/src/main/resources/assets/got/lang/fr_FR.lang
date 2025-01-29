@@ -2705,6 +2705,8 @@ got.miniquest.welcome.map=Pressez '%s' pour ouvrir la carte
 got.miniquest.welcome.speak=Parlez avec Jaqen
 got.music.nowPlaying=En lecture:
 got.potion.drinkPoison=Boisson empoisonnée
+got.potion.secondBreath=Second Breath
+got.potion.rest=Rest
 got.potion=Persistant
 got.rank.ARRYN≠of Arryn Vale
 got.rank.ASSHAI≠of Asshai
@@ -5727,6 +5729,9 @@ item.got:westking_helmet.name=Casque des rois de l'ouest
 item.got:westking_leggings.name=Jambières des rois de l'ouest
 item.got:wheel.name=La roue
 item.got:white_bison_horn.name=Corne de Bison Blanc
+item.got:white_mammoth_skin.name=White Mammoth Skin
+item.got:millitary_card.name=Millitary Card
+item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name=Bottes de Marcheur blanc
 item.got:white_walkers_chestplate.name=Plastron de Marcheur blanc
 item.got:white_walkers_leggings.name=Jambières de Marcheur blanc

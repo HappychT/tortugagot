@@ -2705,6 +2705,8 @@ got.miniquest.welcome.map=Drücke '%s' um die Karte zu öffnen
 got.miniquest.welcome.speak=Rede mit dem Grauen Wanderer
 got.music.nowPlaying=Nun erklingt:
 got.potion.drinkPoison=Vergiftetes Getränk
+got.potion.secondBreath=Second Breath
+got.potion.rest=Rest
 got.potion=Verweilen
 got.rank.ARRYN=der Grünes Tal
 got.rank.ASSHAI=der Asshai
@@ -5727,6 +5729,9 @@ item.got:westking_helmet.name=Helm des Königs vom Stein
 item.got:westking_leggings.name=Beinschutz des Königs vom Stein
 item.got:wheel.name=Rad
 item.got:white_bison_horn.name=Horn von Araws Rind
+item.got:white_mammoth_skin.name=White Mammoth Skin
+item.got:millitary_card.name=Millitary Card
+item.got:frost_spider_string.name=Frost Spider String
 item.got:white_walkers_boots.name≠White Walkers Boots
 item.got:white_walkers_chestplate.name≠White Walkers Chestplate
 item.got:white_walkers_leggings.name≠White Walkers Leggings

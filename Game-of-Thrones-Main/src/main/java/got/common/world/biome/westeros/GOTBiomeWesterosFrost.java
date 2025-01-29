@@ -12,6 +12,7 @@ import net.minecraft.init.Blocks;
 public class GOTBiomeWesterosFrost extends GOTBiomeWesteros {
 	public GOTBiomeWesterosFrost(int i, boolean major) {
 		super(i, major);
+		setEnableSnow();
 		setupFrostFauna();
 		clearBiomeVariants();
 		addBiomeVariant(GOTBiomeVariant.HILLS);
