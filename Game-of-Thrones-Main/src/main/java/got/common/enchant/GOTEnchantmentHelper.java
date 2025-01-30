@@ -640,6 +640,14 @@ public class GOTEnchantmentHelper {
 		}
 	}
 
+	public static void addEnchant(ItemStack itemstack, GOTEnchantment ench) {
+		NBTTagList tags = getItemEnchantTags(itemstack, true);
+		if (tags != null) {
+			String enchName = ench.enchantName;
+			tags.appendTag(new NBTTagString(enchName));
+		}
+	}
+
 	public static void setProjectileEnchantment(Entity entity, GOTEnchantment ench) {
 		if (!hasProjectileEnchantment(entity, ench)) {
 			NBTTagList tags = getEntityEnchantTags(entity, true);

@@ -24,7 +24,7 @@ public class GOTCommandEnchant extends CommandBase {
 				if (itemstack2 != null) {
 					ArrayList<String> enchNames = new ArrayList<>();
 					for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-						if (GOTEnchantmentHelper.hasEnchant(itemstack2, ench) || !ench.canApply(itemstack2, false) || !GOTEnchantmentHelper.checkEnchantCompatible(itemstack2, ench)) {
+						if (!ench.canApply(itemstack2, false)) {
 							continue;
 						}
 						enchNames.add(ench.enchantName);
@@ -79,8 +79,8 @@ public class GOTCommandEnchant extends CommandBase {
 				String enchName = args[2];
 				GOTEnchantment ench = GOTEnchantment.getEnchantmentByName(enchName);
 				if (ench != null) {
-					if (!GOTEnchantmentHelper.hasEnchant(itemstack, ench) && ench.canApply(itemstack, false) && GOTEnchantmentHelper.checkEnchantCompatible(itemstack, ench)) {
-						GOTEnchantmentHelper.setHasEnchant(itemstack, ench);
+					if (ench.canApply(itemstack, false)) {
+						GOTEnchantmentHelper.addEnchant(itemstack, ench);
 						CommandBase.func_152373_a(sender, this, "got.command.got_enchant.add", enchName, entityplayer.getCommandSenderName(), itemstack.getDisplayName());
 						return;
 					}
