@@ -34,8 +34,8 @@ public class GOTClientStaminaHandler {
             //System.out.println(jumpKey + " " + rightMouseButton + " " + sneakKey + " " + leftKey + " " + rightKey + " " + backKey);
 
             if (jumpKey && rightMouseButton) {
-                String direction = getMovementDirection(leftKey, rightKey, backKey);
-                if (!direction.isEmpty()) {
+                int direction = getMovementDirection(leftKey, rightKey, backKey);
+                if (direction != 0) {
                     //System.out.println("Bouncing in " + direction);
                     PacketBounceRequest packet = new PacketBounceRequest(direction);
                     PacketDispatcher.sendToServer(packet);
@@ -52,10 +52,10 @@ public class GOTClientStaminaHandler {
         }
     }
 
-    private String getMovementDirection(boolean leftKey, boolean rightKey, boolean backKey) {
-        if (backKey) return "backward";
-        if (rightKey) return "right";
-        if (leftKey) return "left";
-        return "";
+    private int getMovementDirection(boolean leftKey, boolean rightKey, boolean backKey) {
+        if (backKey) return 1;
+        if (rightKey) return 2;
+        if (leftKey) return 3;
+        return 0;
     }
 }

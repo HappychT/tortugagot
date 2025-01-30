@@ -10,22 +10,22 @@ import java.io.IOException;
 
 public class PacketBounceRequest extends AbstractPacket.AbstractServerMessage<PacketBounceRequest> {
 
-    private String direction;
+    private int direction;
 
     public PacketBounceRequest() {}
 
-    public PacketBounceRequest(String direction) {
+    public PacketBounceRequest(int direction) {
         this.direction = direction;
     }
 
     @Override
     protected void read(PacketBuffer buffer) throws IOException {
-        this.direction = buffer.readStringFromBuffer(255);
+        this.direction = buffer.readVarIntFromBuffer();
     }
 
     @Override
     protected void write(PacketBuffer buffer) throws IOException {
-        buffer.writeStringToBuffer(direction);
+        buffer.writeVarIntToBuffer(direction);
     }
 
     @Override

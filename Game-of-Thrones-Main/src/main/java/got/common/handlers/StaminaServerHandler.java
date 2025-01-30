@@ -99,46 +99,44 @@ public class StaminaServerHandler {
 
     }
 
-    public void handleBounceRequest(EntityPlayer player, String direction) {
+    public void handleBounceRequest(EntityPlayer player, int direction) {
         if (!player.onGround) {
             return;
         }
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
 
-        int staminaAfterBounce = extendedPlayer.getStamina() - (int) (MAX_STAMINA * (BOUNCE_PERCENT / 100.0));
-
-        if (staminaAfterBounce < 0) {
-            return;
-        }
-
         if (extendedPlayer.getBounceCooldown() > 0) {
             return;
         }
 
-        if (direction.equals("left") || direction.equals("right") || direction.equals("backward")) {
+        if (extendedPlayer.getStamina() < (MAX_STAMINA * (BOUNCE_PERCENT / 100.0))) {
+            return;
+        }
+
+        if (direction != 0) {
             executeBounce(player, direction);
         }
     }
 
-    private void executeBounce(EntityPlayer player, String direction) {
+    private void executeBounce(EntityPlayer player, int direction) {
         double bounceRange = BOUNCE_RANGE; // Example bounce range
         double motionX = 0;
         double motionZ = 0;
         double motionY = 0.5; // Adding a vertical component
 
         switch (direction) {
-            case "backward":
+            case 1: //"backward"
                 motionX = Math.sin(Math.toRadians(player.rotationYaw)) * bounceRange;
                 motionZ = -Math.cos(Math.toRadians(player.rotationYaw)) * bounceRange;
                 break;
-            case "left":
-                motionX = Math.cos(Math.toRadians(player.rotationYaw)) * bounceRange;
-                motionZ = Math.sin(Math.toRadians(player.rotationYaw)) * bounceRange;
-                break;
-            case "right":
+            case 2: //"right"
                 motionX = -Math.cos(Math.toRadians(player.rotationYaw)) * bounceRange;
                 motionZ = -Math.sin(Math.toRadians(player.rotationYaw)) * bounceRange;
+                break;
+            case 3: //"left"
+                motionX = Math.cos(Math.toRadians(player.rotationYaw)) * bounceRange;
+                motionZ = Math.sin(Math.toRadians(player.rotationYaw)) * bounceRange;
                 break;
         }
 
