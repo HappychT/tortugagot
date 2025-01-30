@@ -369,9 +369,9 @@ public class GOTReplacedMethods {
 	public static class Potions {
 		public static double getStrengthModifier(Potion thisPotion, int level, AttributeModifier modifier) {
 			if (thisPotion.id == Potion.weakness.id) {
-				return -0.5 * (level + 1);
+				return -0.1 * (level + 1);
 			}
-			return 0.5 * (level + 1);
+			return 0.1 + 0.1 * (level + 1) * (level + 1); //20%, 50%, 100% for levels 1, 2, 3
 		}
 	}
 
