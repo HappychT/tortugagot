@@ -19,6 +19,9 @@ public abstract class GOTEntityRugBase extends Entity implements GOTBannerProtec
 
 	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (damagesource.isProjectile()){
+			return false;
+		}
 		if (!worldObj.isRemote && !isDead) {
 			boolean creative;
 			Block.SoundType blockSound = Blocks.wool.stepSound;

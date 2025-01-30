@@ -464,4 +464,10 @@ public class GOTReplacedMethods {
 		}
 	}
 
+	public static class EntityItemFrame {
+		public static boolean isProjectile(DamageSource damagesource) {
+			return damagesource.isProjectile();
+		}
+	}
+
 }
