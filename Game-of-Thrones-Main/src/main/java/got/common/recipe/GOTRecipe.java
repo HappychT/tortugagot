@@ -1392,10 +1392,10 @@ public class GOTRecipe{
 		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.yitiDaggerPoisoned, GOTRegistry.yitiDagger, GOTRegistry.bottlePoison));
 		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.summerDaggerPoisoned, GOTRegistry.summerDagger, GOTRegistry.bottlePoison));
 		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.valyrianChisel, GOTRegistry.chisel, GOTRegistry.valyrianPowder));
-		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosPike, GOTRegistry.essosPike, GOTRegistry.shield));
-		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorPike, GOTRegistry.shield, GOTRegistry.westerosPike));
-		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosSpear, GOTRegistry.shield, GOTRegistry.essosSpear));
-		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorSpear, GOTRegistry.shield, GOTRegistry.westerosSpear));
+//		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosPike, GOTRegistry.essosPike, GOTRegistry.shield));
+//		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorPike, GOTRegistry.shield, GOTRegistry.westerosPike));
+//		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosSpear, GOTRegistry.shield, GOTRegistry.essosSpear));
+//		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorSpear, GOTRegistry.shield, GOTRegistry.westerosSpear));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.woodBeamRotten, 3, 0), "X", "X", "X", Character.valueOf('X'), new ItemStack(GOTRegistry.rottenLog, 1, 0)));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.fenceRotten, 3, 0), "XYX", "XYX", Character.valueOf('X'), new ItemStack(GOTRegistry.planksRotten, 1, 0), Character.valueOf('Y'), "stickWood"));
 		GameRegistry.addRecipe(new GOTRecipeBanners());
@@ -1406,6 +1406,7 @@ public class GOTRecipe{
 		GameRegistry.addRecipe(new GOTRecipePipe());
 		GameRegistry.addRecipe(new GOTRecipePoisonDrinks());
 		GameRegistry.addRecipe(new GOTRecipePouch());
+		GameRegistry.addRecipe(new GOTRecipePolearmWeapon());
 		for (GOTEnumDyeColor dye : GOTEnumDyeColor.values()) {
 			GameRegistry.addShapelessRecipe(new ItemStack(getPowderFromDye(dye), 8), Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.gravel, Blocks.gravel, Blocks.gravel, Blocks.gravel, new ItemStack(Items.dye, 1, dye.getDyeDamage()));
 		}
