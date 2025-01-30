@@ -1780,6 +1780,7 @@ got.chat.bountyKilled1=%s claimed a bounty placed on you by %s!
 got.chat.bountyKilled2=%s are displeased, and your reputation with them has fallen...
 got.chat.bountyPlaced=%s have placed a bounty on your head!
 got.chat.conquestHornProtected=%s cannot invade this area
+got.chat.goodkebab=That was a good kebab. You feel a lot better.
 got.chat.ftDisabled=Fast travel is disabled on this server
 got.chat.insufficientAlignment2=You need at least %s %s or %s reputation to perform this action
 got.chat.insufficientAlignment3=You need at least %s %s, %s, or %s reputation to perform this action

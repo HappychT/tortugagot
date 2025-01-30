@@ -50,10 +50,10 @@ public class GOTItems {
     public static Block WOWChains1 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:WOWChains").setCreativeTab(GOTCreativeTabs.tabUtil);
     public static Block WOWChains2 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:ChainsDouble").setCreativeTab(GOTCreativeTabs.tabUtil);
     public static Block WOWChains3 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:ChainsTriple").setCreativeTab(GOTCreativeTabs.tabUtil);
-    public static Block WOWCandle1 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:WOWCandle").setCreativeTab(GOTCreativeTabs.tabUtil);
-    public static Block WOWCandle2 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:CandleDouble").setCreativeTab(GOTCreativeTabs.tabUtil);
-    public static Block WOWCandle3 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:CandleTriple").setCreativeTab(GOTCreativeTabs.tabUtil);
-    public static Block WOWCandle4 = new BaseDecorBlock(1F,1F,1F).setBlockName("got:CandleQuad").setCreativeTab(GOTCreativeTabs.tabUtil);
+    public static Block WOWCandle1 = new BaseDecorBlock(0.2F,0.4F,0.2F).setBlockName("got:WOWCandle").setCreativeTab(GOTCreativeTabs.tabUtil);
+    public static Block WOWCandle2 = new BaseDecorBlock(0.3F,0.4F,0.3F).setBlockName("got:CandleDouble").setCreativeTab(GOTCreativeTabs.tabUtil);
+    public static Block WOWCandle3 = new BaseDecorBlock(0.4F,0.4F,0.4F).setBlockName("got:CandleTriple").setCreativeTab(GOTCreativeTabs.tabUtil);
+    public static Block WOWCandle4 = new BaseDecorBlock(0.5F,0.4F,0.5F).setBlockName("got:CandleQuad").setCreativeTab(GOTCreativeTabs.tabUtil);
 
 
 
