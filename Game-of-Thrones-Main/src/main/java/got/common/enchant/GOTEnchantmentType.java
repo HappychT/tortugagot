@@ -1,11 +1,14 @@
 package got.common.enchant;
 
 import got.common.item.GOTWeaponStats;
+import got.common.item.other.GOTItemArmor;
+import got.common.item.other.GOTItemFactionArmor;
+import got.common.item.tool.GOTItemPickaxe;
 import got.common.item.weapon.*;
 import net.minecraft.item.*;
 
 public enum GOTEnchantmentType {
-	BREAKABLE, ARMOR, ARMOR_FEET, ARMOR_LEGS, ARMOR_BODY, ARMOR_HEAD, MELEE, TOOL, SHEARS, RANGED, RANGED_LAUNCHER, THROWING_AXE, FISHING;
+	BREAKABLE, ARMOR, ARMOR_FEET, ARMOR_LEGS, ARMOR_BODY, ARMOR_HEAD, MELEE, TOOL, SHEARS, RANGED, RANGED_LAUNCHER, THROWING_AXE, FISHING, FACTION_WEAPON, FACTION_ARMOR, PICKAXE;
 
 	public boolean canApply(ItemStack itemstack, boolean considering) {
 		Item item = itemstack.getItem();
@@ -16,6 +19,10 @@ public enum GOTEnchantmentType {
 
 		if (item instanceof ItemArmor && ((ItemArmor) item).damageReduceAmount > 0) {
 			if (this == ARMOR) {
+				return true;
+			}
+			
+			if (this == FACTION_ARMOR && item instanceof GOTItemFactionArmor) {
 				return true;
 			}
 
@@ -39,6 +46,9 @@ public enum GOTEnchantmentType {
 			return true;
 		}
 
+		if (this == PICKAXE && item instanceof GOTItemPickaxe)
+			return true;
+
 		if (this == TOOL && !item.getToolClasses(itemstack).isEmpty() || this == SHEARS && item instanceof ItemShears) {
 			return true;
 		}
@@ -55,6 +65,10 @@ public enum GOTEnchantmentType {
 			return true;
 		}
 
+		if (this == FACTION_WEAPON && item instanceof GOTFactionWeaponChecker) {
+			return true;
+		}
+		
 		return false;
 	}
 }

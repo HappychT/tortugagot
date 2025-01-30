@@ -19,6 +19,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 public class GOTBiomeHauntedForest extends GOTBiomeWesteros {
 	public GOTBiomeHauntedForest(int i, boolean major) {
 		super(i, major);
+		setEnableSnow();
 		setupTaigaFauna();
 		clearBiomeVariants();
 		addBiomeVariant(GOTBiomeVariant.CLEARING, 0.2f);

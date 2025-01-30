@@ -38,9 +38,6 @@ public class GOTBiomeStepstones extends GOTBiomeEssos {
 		decorator.clayGen = new GOTWorldGenSand(GOTRegistry.redClay, 5, 1);
 		decorator.addSoil(new WorldGenMinable(GOTRegistry.redClay, 32, Blocks.dirt), 40.0f, 0, 80);
 		biomeTerrain.setXZScale(30.0);
-		ArrayList<SpawnListContainer> c1 = new ArrayList<>();
-		c1.add(GOTBiomeSpawnList.entry(GOTSpawnList.IRONBORN_CONQUEST, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(5).add(c1);
 		ArrayList<SpawnListContainer> c2 = new ArrayList<>();
 		c2.add(GOTBiomeSpawnList.entry(GOTSpawnList.CROCODILE, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
 		npcSpawnList.newFactionList(10).add(c2);

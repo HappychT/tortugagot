@@ -14,6 +14,7 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 public class GOTBiomeDorneMountains extends GOTBiomeDorne {
 	public GOTBiomeDorneMountains(int i, boolean major) {
 		super(i, major);
+		setEnableSnow();
 		setupStandartForestFauna();
 		clearBiomeVariants();
 		addBiomeVariantSet(GOTBiomeVariant.SET_MOUNTAINS);

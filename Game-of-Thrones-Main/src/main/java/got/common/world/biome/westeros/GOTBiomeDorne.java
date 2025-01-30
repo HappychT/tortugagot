@@ -19,6 +19,7 @@ public class GOTBiomeDorne extends GOTBiomeEssos {
 	public GOTBiomeDorne(int i, boolean major) {
 		super(i, major);
 		setDarkUnreliable();
+		setDisableRain();
 		addBiomeVariant(GOTBiomeVariant.ORCHARD_ALMOND, 0.2f);
 		addBiomeVariant(GOTBiomeVariant.ORCHARD_APPLE_PEAR, 0.2f);
 		addBiomeVariant(GOTBiomeVariant.ORCHARD_DATE, 0.2f);

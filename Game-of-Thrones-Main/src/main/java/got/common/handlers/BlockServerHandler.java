@@ -39,11 +39,11 @@ public class BlockServerHandler {
                 StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaMissPercent(), attacker);
             }
             if (isDamageBlocked(player, event.source, blockAngles)) {
-                StaminaServerHandler.drainStaminaByPercent(5, player);
+                StaminaServerHandler.drainStaminaByPercent(0.5, player);
                 player.worldObj.playSoundAtEntity(player, "got:combat_block", 1, 1);
                 event.setCanceled(true);
             } else {
-                StaminaServerHandler.drainStaminaByPercent(6, player);
+                StaminaServerHandler.drainStaminaByPercent(0.6, player);
                 event.ammount += (float) (event.ammount * 0.15); // 15% more damage to make the 20% total reduction of damage(50% vanilla reduction + 30% more damage)
             }
         } else {

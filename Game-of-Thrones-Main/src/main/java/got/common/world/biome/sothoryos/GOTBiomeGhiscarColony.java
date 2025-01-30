@@ -14,7 +14,7 @@ import got.common.world.structure.other.*;
 public class GOTBiomeGhiscarColony extends GOTBiomeSothoryosJungle {
 	public GOTBiomeGhiscarColony(int i, boolean major) {
 		super(i, major);
-		setUnreliableChance(GOTEventSpawner.EventChance.COMMON);
+		setUnreliableChance(GOTEventSpawner.EventChance.RARE);
 		decorator.treesPerChunk = 1;
 		decorator.clearVillages();
 		decorator.addRandomStructure(new GOTStructureRuinedHouse(false), 2000);

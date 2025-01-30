@@ -232,7 +232,7 @@ public class GOTItemMug extends Item {
 		if (!world.isRemote && this == GOTRegistry.mugPlantainBrew) {
 			GOTLevelData.getData(entityplayer).addAchievement(GOTAchievement.drinkPlantainBrew);
 			for (Potion potion : Potion.potionTypes) {
-				if (potion == null || !GOTReflection.isBadEffect(potion)) {
+				if (potion == null || potion != Potion.weakness) {
 					continue;
 				}
 				entityplayer.removePotionEffect(potion.id);

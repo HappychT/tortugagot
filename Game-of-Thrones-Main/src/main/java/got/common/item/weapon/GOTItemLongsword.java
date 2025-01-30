@@ -2,9 +2,9 @@ package got.common.item.weapon;
 
 import net.minecraft.item.Item;
 
-public class GOTItemLongsword extends GOTItemSword {
+public class GOTItemLongsword extends GOTItemGreatsword {
 	public GOTItemLongsword(Item.ToolMaterial material) {
 		super(material);
-		gotWeaponDamage += 1.5;
+		gotWeaponDamage -= 1.5f;
 	}
 }

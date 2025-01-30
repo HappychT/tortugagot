@@ -15,14 +15,6 @@ public class GOTBiomeIbben extends GOTBiomeEssosCold {
 	public GOTBiomeIbben(int i, boolean major) {
 		super(i, major);
 		decorator.addTree(GOTTreeType.IBBEN_PINE, 500);
-		invasionSpawns.addInvasion(GOTInvasions.IRONBORN, GOTEventSpawner.EventChance.UNCOMMON);
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.IBBEN_CIVILIAN, 10).setSpawnChance(GOTBiome.SPAWN));
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.IBBEN_MILITARY, 4).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
-		ArrayList<SpawnListContainer> c1 = new ArrayList<>();
-		c1.add(GOTBiomeSpawnList.entry(GOTSpawnList.IRONBORN_CONQUEST, 10).setSpawnChance(GOTBiome.CONQUEST_SPAWN));
-		npcSpawnList.newFactionList(0).add(c1);
 	}
 
 	@Override

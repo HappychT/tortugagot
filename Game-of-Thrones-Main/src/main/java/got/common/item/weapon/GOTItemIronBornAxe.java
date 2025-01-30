@@ -7,7 +7,7 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemIronBornAxe extends GOTItemBattleaxe {
+public class GOTItemIronBornAxe extends GOTItemBattleaxe implements GOTFactionWeaponChecker{
     public GOTItemIronBornAxe(Item.ToolMaterial material) {
         super(material);
     }

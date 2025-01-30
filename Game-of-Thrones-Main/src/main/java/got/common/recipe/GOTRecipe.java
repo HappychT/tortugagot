@@ -65,6 +65,7 @@ public class GOTRecipe{
 	public static List<IRecipe> commonEssos = new ArrayList<>();
 	public static String[] dyeOreNames = { "dyeBlack", "dyeRed", "dyeGreen", "dyeBrown", "dyeBlue", "dyePurple", "dyeCyan", "dyeLightGray", "dyeGray", "dyePink", "dyeLime", "dyeYellow", "dyeLightBlue", "dyeMagenta", "dyeOrange", "dyeWhite" };
 	public static List<IRecipe> mossovy = new ArrayList<>();
+	public Item item = GOTRegistry.shieldReachPike;
 
 	public static void addDyeableWoolRobeRecipes(List[] recipeLists, ItemStack result, Object... params) {
 		for (List<IRecipe> list : recipeLists) {

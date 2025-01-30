@@ -176,6 +176,7 @@ public class BaseDecorBlock extends BlockDirectional implements ITileEntityProvi
                 metadata = 2; // Facing West
                 break;
         }
+        
 
         // Remove the original block (where the player attempted to place it)
         world.setBlockToAir(x, y, z);

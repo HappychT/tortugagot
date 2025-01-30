@@ -18,6 +18,7 @@ public class GOTBiomeArrynMountains extends GOTBiomeArryn {
 	public GOTBiomeArrynMountains(int i, boolean major) {
 		super(i, major);
 		setupStandartForestFauna();
+		setEnableSnow();
 		clearBiomeVariants();
 		addBiomeVariantSet(GOTBiomeVariant.SET_MOUNTAINS);
 		setUnreliableChance(GOTEventSpawner.EventChance.NEVER);

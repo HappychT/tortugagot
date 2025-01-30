@@ -253,7 +253,7 @@ public abstract class GOTBiome extends BiomeGenBase {
 		spawnableCaveCreatureList.clear();
 		spawnableWaterCreatureList.add(new BiomeGenBase.SpawnListEntry(GOTEntityFish.class, 10, 4, 4));
 		spawnableCaveCreatureList.add(new BiomeGenBase.SpawnListEntry(EntityBat.class, 10, 8, 8));
-		setUnreliableChance(GOTEventSpawner.EventChance.COMMON);
+		setUnreliableChance(GOTEventSpawner.EventChance.RARE);
 		invasionSpawns = new GOTBiomeInvasionSpawns(this);
 		GOTFixer.affixWaypointLocations(this);
 	}

@@ -9,6 +9,7 @@ import got.common.world.spawning.GOTEventSpawner;
 public class GOTBiomeGiftOld extends GOTBiomeGiftNew {
 	public GOTBiomeGiftOld(int i, boolean major) {
 		super(i, major);
+		setEnableSnow();
 		clearBiomeVariants();
 		addBiomeVariant(GOTBiomeVariant.HILLS);
 		decorator.treesPerChunk = -1;

@@ -8,7 +8,7 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemStormlandsHammer extends GOTItemGreatsword {
+public class GOTItemStormlandsHammer extends GOTItemHammer implements GOTFactionWeaponChecker{
     public GOTItemStormlandsHammer(Item.ToolMaterial material) {
         super(material);
     }

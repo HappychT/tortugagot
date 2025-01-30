@@ -15,12 +15,6 @@ public class GOTBiomeMossovy extends GOTBiomeEssosCold {
 	public GOTBiomeMossovy(int i, boolean major) {
 		super(i, major);
 		addBiomeVariant(GOTBiomeVariant.FOREST_PINE, 0.2f);
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.MOSSOVY_MILITARY, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
-		ArrayList<SpawnListContainer> c1 = new ArrayList<>();
-		c1.add(GOTBiomeSpawnList.entry(GOTSpawnList.MOSSOVY_WEREWOLF, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c1);
 	}
 
 	@Override

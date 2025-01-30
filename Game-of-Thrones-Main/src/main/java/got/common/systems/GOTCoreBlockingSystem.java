@@ -18,17 +18,17 @@ public class GOTCoreBlockingSystem {
     }
 
     public static void registerWeapons() {
-        registerWeapon(GOTItemSword.class, 35.0f, 35.0f, 10.0, 5.0);
-        registerWeapon(ItemSword.class, 35.0f, 35.0f, 10.0, 5.0);
-        registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 15.0, 7.5);
-        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 12.0, 6.0);
-        registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 14.0, 7.0);
-        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 8.0, 4.0);
-        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 20.0, 10.0);
+        registerWeapon(GOTItemSword.class, 35.0f, 35.0f, 0.5, 0.3);
+        registerWeapon(ItemSword.class, 35.0f, 35.0f, 0.5, 0.3);
+        registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 0.8, 0.6);
+        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 0.7, 0.6);
+        registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 0.6, 0.4);
+        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 0.4, 0.2);
+        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 1.0, 0.5);
     }
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {
-        WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(35.0f, 35.0f, 10.0, 5.0));
+        WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(35.0f, 35.0f, 0.5, 0.3));
         if (player.isPotionActive(EffectRegister.exhaustion) || player.isPotionActive(Potion.digSlowdown)) {
             return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaMissPercent());
         }

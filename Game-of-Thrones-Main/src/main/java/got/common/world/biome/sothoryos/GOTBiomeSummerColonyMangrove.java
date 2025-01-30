@@ -14,15 +14,12 @@ import got.common.world.structure.other.*;
 public class GOTBiomeSummerColonyMangrove extends GOTBiomeSothoryosMangrove {
 	public GOTBiomeSummerColonyMangrove(int i, boolean major) {
 		super(i, major);
-		setUnreliableChance(GOTEventSpawner.EventChance.COMMON);
+		setUnreliableChance(GOTEventSpawner.EventChance.RARE);
 		decorator.clearVillages();
 		decorator.addRandomStructure(new GOTStructureRuinedHouse(false), 2000);
 		decorator.addRandomStructure(new GOTStructureBurntHouse(false), 2000);
 		decorator.addRandomStructure(new GOTStructureRottenHouse(false), 4000);
 		npcSpawnList.clear();
-		ArrayList<SpawnListContainer> c0 = new ArrayList<>();
-		c0.add(GOTBiomeSpawnList.entry(GOTSpawnList.SUMMER_MILITARY, 10).setSpawnChance(GOTBiome.SPAWN));
-		npcSpawnList.newFactionList(10).add(c0);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package got.common.item.other;
 
 import got.common.database.GOTCreativeTabs;
+import got.common.faction.GOTFaction;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.*;
 import net.minecraft.util.StringUtils;
@@ -9,6 +10,8 @@ public class GOTItemArmor extends ItemArmor {
 	public String extraName;
 	public String path;
 	public int slot;
+	public boolean isFactionArmor = false;
+	public GOTFaction faction;
 
 	public GOTItemArmor(ArmorMaterial material, int slotType) {
 		this(material, slotType, "");

@@ -1,7 +1,10 @@
 package got.common.enchant;
 
+import got.common.item.weapon.GOTItemSword;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
+import org.lwjgl.Sys;
 
 public class GOTEnchantmentProtectionFall extends GOTEnchantmentProtectionSpecial {
 	public GOTEnchantmentProtectionFall(String s, int level) {

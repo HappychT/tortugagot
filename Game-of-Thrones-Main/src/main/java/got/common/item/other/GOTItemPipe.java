@@ -5,10 +5,12 @@ import java.util.List;
 import cpw.mods.fml.relauncher.*;
 import got.common.database.*;
 import got.common.entity.other.GOTEntitySmokeRing;
+import got.common.registers.EffectRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -63,6 +65,9 @@ public class GOTItemPipe extends Item {
 				int color = GOTItemPipe.getSmokeColor(itemstack);
 				smoke.setSmokeColour(color);
 				world.spawnEntityInWorld(smoke);
+			}
+			if (getSmokeColor(itemstack) == 16)  {
+				entityplayer.addPotionEffect(new PotionEffect(EffectRegister.rest.id, 200));
 			}
 			world.playSoundAtEntity(entityplayer, "got:item.puff", 1.0f, (itemRand.nextFloat() - itemRand.nextFloat()) * 0.2f + 1.0f);
 		}

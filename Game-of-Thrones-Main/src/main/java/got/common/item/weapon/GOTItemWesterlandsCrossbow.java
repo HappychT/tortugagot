@@ -8,12 +8,15 @@ import net.minecraft.util.StatCollector;
 
 import java.util.List;
 
-public class GOTItemWesterlandsCrossbow extends GOTItemCrossbow{
+public class GOTItemWesterlandsCrossbow extends GOTItemCrossbow implements GOTFactionWeaponChecker{
     public GOTItemWesterlandsCrossbow(Item.ToolMaterial material) {
         super(material);
+        boltDamageFactor = 1.05d;
     }
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean show) {
         list.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted("got.faction.WESTERLANDS.name"));
     }
+
+
 }
