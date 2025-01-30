@@ -1081,6 +1081,33 @@ public class GOTClassTransformer implements IClassTransformer {
 		return writer.toByteArray();
 	}
 
+	public byte[] patchEntityItemFrame(String name, byte[] bytes) {
+		String targetMethodName = "attackEntityFrom";
+		String targetMethodNameObf = "func_70097_a";
+		String targetMethodSign = "(Lnet/minecraft/util/DamageSource;F)Z";
+		String targetMethodSignObf = "(Lro;F)Z"; // copied from patchEntityLivingBase
+		ClassNode classNode = new ClassNode();
+		ClassReader classReader = new ClassReader(bytes);
+		classReader.accept(classNode, 0);
+		for (MethodNode method : classNode.methods) {
+			if ((method.name.equals(targetMethodName) || method.name.equals(targetMethodNameObf)) && (method.desc.equals(targetMethodSign) || method.desc.equals(targetMethodSignObf))) {
+				InsnList newIns = new InsnList();
+				newIns.add(new VarInsnNode(25, 1));
+				newIns.add(new MethodInsnNode(184, "got/coremod/GOTReplacedMethods$EntityItemFrame", "isProjectile", "(Lnet/minecraft/util/DamageSource;)Z", false));
+				LabelNode notProjectile = new LabelNode();
+				newIns.add(new JumpInsnNode(153, notProjectile));
+				newIns.add(new InsnNode(3));
+				newIns.add(new InsnNode(172));
+				newIns.add(notProjectile);
+				method.instructions.insert(newIns);
+				System.out.println("TortugaGOT: Patched method " + method.name);
+			}
+		}
+		ClassWriter writer = new ClassWriter(1);
+		classNode.accept(writer);
+		return writer.toByteArray();
+	}
+
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if ("anv".equals(name) || "net.minecraft.block.BlockStone".equals(name)) {
@@ -1160,6 +1187,9 @@ public class GOTClassTransformer implements IClassTransformer {
 		if ("cpw.mods.fml.common.network.internal.FMLNetworkHandler".equals(name)) {
 			return patchFMLNetworkHandler(name, basicClass);
 		}
+		if ("net.minecraft.entity.item.EntityItemFrame".equals(name)) {
+			return patchEntityItemFrame(name, basicClass);
+		}
 		return basicClass;
 	}
 
@@ -1224,3 +1254,4 @@ public class GOTClassTransformer implements IClassTransformer {
 		return null;
 	}
 }
+
