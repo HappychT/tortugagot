@@ -10,8 +10,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-
 public class GOTInterfaceHandler {
 
     public static final GOTInterfaceHandler INSTANCE = new GOTInterfaceHandler();
@@ -85,7 +83,16 @@ public class GOTInterfaceHandler {
         interpolatedStamina += (currentStamina - interpolatedStamina) * 0.1f; // Adjust the 0.1f value for smoother or faster interpolation
         drawTextureCustomSize(staminaPosX, staminaPosY, 0, 0, (double) ((currentStamina + fix) * 37) / StaminaServerHandler.MAX_STAMINA, 3, 37, 3); // put interpolatedStamina instead of currentStamina to return lerp(smooth transition animation)
 
+        float cooldownPosX = (aX - 260 + disposX) / scaleFactor;
+        float cooldownPosY = (aY - 99.2F + disposY) / scaleFactor;
+        int secondBreathCooldown = ExtendedPlayer.get(player).getSecondBreathCooldown();
+        if (secondBreathCooldown > 0) {
+            String cooldownText = String.valueOf(secondBreathCooldown / 20  + 1);
+            mc.fontRenderer.drawString(cooldownText, (int) cooldownPosX, (int) cooldownPosY, 0xFFFFFF);
+        }
+
         GL11.glPopMatrix();
+
     }
 
     public static void drawTextureCustomSize(double posX, double posY, double startPixX, double startPixY, double pieceSizeX, double pieceSizeY, float sizeTextureX, float sizeTextureY) {
