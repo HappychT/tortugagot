@@ -103,6 +103,10 @@ public abstract class GOTEnchantment {
 
 	public static GOTEnchantment extraMining = new GOTEnchantmentExtraMining("extraMining").setEnchantWeight(1).setSkilful();
 
+	public static GOTEnchantment restBuff = new GOTEnchantmentRestBuff("restBuff").setEnchantWeight(1).setSkilful();
+	public static GOTEnchantment secondBreathBuff = new GOTEnchantmentSecondBreathBuff("secondBreathBuff").setEnchantWeight(1).setSkilful();
+	public static GOTEnchantment dexterityBuff = new GOTEnchantmentDexterityBuff("dexterityBuff").setEnchantWeight(1).setSkilful();
+
 	public String enchantName;
 
 	public List<GOTEnchantmentType> itemTypes;
