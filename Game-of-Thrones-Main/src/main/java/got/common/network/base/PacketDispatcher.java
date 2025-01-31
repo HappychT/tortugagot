@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.Side;
 import got.common.network.clientToServer.PacketBounceRequest;
 import got.common.network.clientToServer.PacketSendAttackCooldown;
 import got.common.network.serverToClient.PacketSendBounceCooldown;
+import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
 import got.common.network.serverToClient.PacketSendStamina;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -24,6 +25,7 @@ public class PacketDispatcher {
         registerMessage(PacketSendStamina.class);
         registerMessage(PacketBounceRequest.class);
         registerMessage(PacketSendBounceCooldown.class);
+        registerMessage(PacketSendSecondBreathCooldown.class);
     }
 
     private static final <T extends AbstractPacket<T> & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz) {
