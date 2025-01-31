@@ -15,6 +15,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
     private int attackCooldown;
     private int stamina;
     private int standingStillCooldown; // New field for standing still cooldown
+    private int secondBreathCooldown;
     private double previousPosX; // New field for previous X position
     private double previousPosZ; // New field for previous Z position
     private int bounceCooldown; // New field for bounce cooldown
@@ -24,6 +25,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         this.attackCooldown = 0;
         this.stamina = 100;
         this.standingStillCooldown = 0; // Initialize the new field
+        this.secondBreathCooldown = 0;
         this.previousPosX = player.posX; // Initialize the previous X position
         this.previousPosZ = player.posZ; // Initialize the previous Z position
         this.bounceCooldown = 0; // Initialize bounce cooldown
@@ -46,6 +48,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         properties.setDouble("previousPosX", this.previousPosX); // Save the previous X position
         properties.setDouble("previousPosZ", this.previousPosZ); // Save the previous Z position
         properties.setInteger("bounceCooldown", this.bounceCooldown); // Save bounce cooldown
+        properties.setInteger("secondBreathCooldown", this.secondBreathCooldown);
         compound.setTag(EXT_PROP_NAME, properties);
     }
 
@@ -58,6 +61,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         this.previousPosX = properties.getDouble("previousPosX"); // Load the previous X position
         this.previousPosZ = properties.getDouble("previousPosZ"); // Load the previous Z position
         this.bounceCooldown = properties.getInteger("bounceCooldown"); // Load bounce cooldown
+        this.secondBreathCooldown = properties.getInteger("secondBreathCooldown");
     }
 
     @Override
@@ -80,13 +84,20 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         this.stamina = Math.max(0, Math.min(stamina, StaminaServerHandler.INSTANCE.MAX_STAMINA));
     }
 
-
     public int getStandingStillCooldown() {
         return standingStillCooldown;
     }
 
     public void setStandingStillCooldown(int standingStillCooldown) {
         this.standingStillCooldown = standingStillCooldown;
+    }
+
+    public int getSecondBreathCooldown() {
+        return secondBreathCooldown;
+    }
+
+    public void setSecondBreathCooldown(int secondBreathCooldown) {
+        this.secondBreathCooldown = secondBreathCooldown;
     }
 
     public double getPreviousPosX() {
