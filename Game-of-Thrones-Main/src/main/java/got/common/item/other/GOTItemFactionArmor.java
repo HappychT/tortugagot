@@ -37,8 +37,9 @@ public class GOTItemFactionArmor extends GOTItemArmor {
 
     @Override
     public void onArmorTick(World world, EntityPlayer entityplayer, ItemStack itemstack) {
+        super.onArmorTick(world, entityplayer, itemstack);
         if (!GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.multifracConverter)) {
-            if (GOTLevelData.getData(entityplayer).getPledgeFaction() != faction && entityplayer.getActivePotionEffect(Potion.weakness) == null)
+            if (GOTLevelData.getData(entityplayer).getPledgeFaction() != faction && !entityplayer.isPotionActive(Potion.weakness))
                 entityplayer.addPotionEffect(new PotionEffect(Potion.weakness.id, 200));
         }
     }
