@@ -37,7 +37,9 @@ public class BlockServerHandler {
             };
             if(event.source.getEntity() instanceof EntityPlayer) {
                 EntityPlayer attacker = (EntityPlayer) event.source.getEntity();
-                StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaMissPercent(), attacker);
+                if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() instanceof ItemSword) {
+                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaMissPercent(), attacker);
+                }
             }
             if (isDamageBlocked(player, event.source, blockAngles)) {
                 StaminaServerHandler.drainStaminaByPercent(0.5, player);
@@ -50,13 +52,15 @@ public class BlockServerHandler {
         } else {
             if(event.source.getEntity() instanceof EntityPlayer) {
                 EntityPlayer attacker = (EntityPlayer) event.source.getEntity();
-                StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaHitPercent(), attacker);
+                if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() instanceof ItemSword) {
+                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaHitPercent(), attacker);
+                }
             }
         }
     }
 
     public boolean isBlocking(EntityPlayer player) {
-        return player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword && player.getItemInUse().getItemUseAction() == EnumAction.block;
+        return (player.isUsingItem()) && (player.getHeldItem() != null) && (player.getHeldItem().getItem() instanceof ItemSword) && player.isBlocking();
     }
 
     private boolean isDamageBlocked(EntityPlayer player, DamageSource source, float[] blockAngles) {
