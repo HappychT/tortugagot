@@ -3,6 +3,7 @@ package got.common.handlers;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import got.common.systems.GOTCoreBlockingSystem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemSword;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -55,7 +56,7 @@ public class BlockServerHandler {
     }
 
     public boolean isBlocking(EntityPlayer player) {
-        return player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword;
+        return player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword && player.getItemInUse().getItemUseAction() == EnumAction.block;
     }
 
     private boolean isDamageBlocked(EntityPlayer player, DamageSource source, float[] blockAngles) {
