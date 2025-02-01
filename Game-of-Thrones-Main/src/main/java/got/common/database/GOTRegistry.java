@@ -2243,7 +2243,7 @@ public class GOTRegistry {
 		essosHammer = new GOTItemHammer(GOTMaterial.IRON);
 		essosHorseArmor = new GOTItemMountArmor(ArmorMaterial.IRON, GOTItemMountArmor.Mount.HORSE, "horse_essos");
 		essosPike = new GOTItemPike(GOTMaterial.IRON);
-		essosPolearm = new GOTItemPolearm(GOTMaterial.IRON);
+		essosPolearm = new GOTItemPoleaxe(GOTMaterial.IRON);
 		essosSpear = new GOTItemSpear(GOTMaterial.IRON);
 		essosSword = new GOTItemSword(GOTMaterial.IRON);
 		euronDagger = new GOTItemLegendaryDagger(GOTMaterial.VALYRIAN_TOOL);
@@ -2710,7 +2710,7 @@ public class GOTRegistry {
 		westerosPike = new GOTItemPike(GOTMaterial.IRON);
 		westerosSpear = new GOTItemSpear(GOTMaterial.IRON);
 		westerosSword = new GOTItemSword(GOTMaterial.IRON);
-		westerosPolearm = new GOTItemPolearm(GOTMaterial.IRON);
+		westerosPolearm = new GOTItemPoleaxe(GOTMaterial.IRON);
 		westerosLongsword = new GOTItemLongsword(GOTMaterial.IRON);
 		westerosGreatsword = new GOTItemGreatsword(GOTMaterial.IRON);
 		westkingBoots = new GOTItemArmor(GOTMaterial.WESTKING, 3).setCreativeTab(GOTCreativeTabs.tabStory);
@@ -2729,7 +2729,7 @@ public class GOTRegistry {
 		wildlingDagger = new GOTItemDagger(GOTMaterial.IRON);
 		wildlingDaggerPoisoned = new GOTItemDagger(GOTMaterial.IRON, GOTItemSword.HitEffect.POISON);
 		wildlingHammer = new GOTItemHammer(GOTMaterial.IRON);
-		wildlingPolearm = new GOTItemPolearm(GOTMaterial.IRON);
+		wildlingPolearm = new GOTItemPoleaxe(GOTMaterial.IRON);
 		wildlingSpear = new GOTItemSpear(GOTMaterial.IRON);
 		wildlingSword = new GOTItemSword(GOTMaterial.IRON);
 		dragonGlassBattleaxe = new GOTItemBattleaxe(GOTMaterial.DRAGON_GLASS);

@@ -31,6 +31,7 @@ public class GOTCoreBlockingSystem {
 
         registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 1.0, 0.5);
 
+        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 0.7, 0.6);
         registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 0.7, 0.6);
 
         registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 0.7, 0.6);
