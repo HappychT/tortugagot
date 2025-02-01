@@ -33,16 +33,16 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemSword.class, 0.6897f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemBattleaxe.class, 0.60f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemArrynClaymore.class, 0.629f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemRiverlandsTrident.class, 0.48f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemRiverlandsTrident.class, 0.45f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemIronBornAxe.class, 0.545f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemReachPike.class, 0.30f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemStormlandsHammer.class, 0.3f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemStormlandsHammer.class, 0.32f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemDornePolearm.class, 0.54f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldSpear.class, 0.54f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldPike.class, 0.3f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemDagger.class, 1.5f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemSpear.class, 0.65f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearm.class, 0.667f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearm.class, 0.49f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemPolearmLong.class, 0.38f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemLance.class, 0.5f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemHammer.class, 0.45f);
@@ -66,7 +66,7 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeReach(GOTItemShieldPike.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemDagger.class, 0.75f);
 		GOTWeaponStats.registerMeleeReach(GOTItemSpear.class, 1.3f);
-		GOTWeaponStats.registerMeleeReach(GOTItemPolearm.class, 1.5f);
+		GOTWeaponStats.registerMeleeReach(GOTItemPolearm.class, 1.2f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPolearmLong.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemLance.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemHammer.class, 1.0f);
@@ -93,7 +93,7 @@ public class GOTWeaponStats {
 		return GOTWeaponStats.getAttackTimeWithBase(itemstack, basePlayerMeleeTime);
 	}
 
-	public static int getAttackTimeWithBase(ItemStack itemstack, int baseTime) {
+	public static float getUnroundAttackTimeWithBase(ItemStack itemstack, int baseTime) {
 		float time = baseTime;
 		Float factor = (Float) GOTWeaponStats.getClassOrItemProperty(itemstack, meleeSpeed);
 		if (factor != null) {
@@ -101,7 +101,11 @@ public class GOTWeaponStats {
 		}
 		time /= GOTEnchantmentHelper.calcMeleeSpeedFactor(itemstack);
 		time = Math.max(time, 1.0f);
-		return Math.round(time);
+		return time;
+	}
+
+	public static int getAttackTimeWithBase(ItemStack itemstack, int baseTime) {
+		return Math.round(getUnroundAttackTimeWithBase(itemstack, baseTime));
 	}
 
 	public static int getBaseExtraKnockback(ItemStack itemstack) {
@@ -174,7 +178,7 @@ public class GOTWeaponStats {
 
 	public static float getMeleeSpeed(ItemStack itemstack) {
 		int base = basePlayerMeleeTime;
-		return 1.0f / ((float) GOTWeaponStats.getAttackTimeWithBase(itemstack, base) / (float) base);
+		return (float) base / (float) GOTWeaponStats.getUnroundAttackTimeWithBase(itemstack, base);
 	}
 
 	public static float getRangedDamageFactor(ItemStack itemstack, boolean launchSpeedOnly) {

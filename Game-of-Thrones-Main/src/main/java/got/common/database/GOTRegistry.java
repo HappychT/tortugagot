@@ -2710,7 +2710,7 @@ public class GOTRegistry {
 		westerosPike = new GOTItemPike(GOTMaterial.IRON);
 		westerosSpear = new GOTItemSpear(GOTMaterial.IRON);
 		westerosSword = new GOTItemSword(GOTMaterial.IRON);
-		westerosPolearm = new GOTItemPolearm(GOTMaterial.IRON).addWeaponDamage(0.25f);
+		westerosPolearm = new GOTItemPolearm(GOTMaterial.IRON);
 		westerosLongsword = new GOTItemLongsword(GOTMaterial.IRON);
 		westerosGreatsword = new GOTItemGreatsword(GOTMaterial.IRON);
 		westkingBoots = new GOTItemArmor(GOTMaterial.WESTKING, 3).setCreativeTab(GOTCreativeTabs.tabStory);
