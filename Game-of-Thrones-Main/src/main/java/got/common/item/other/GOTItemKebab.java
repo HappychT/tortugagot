@@ -6,7 +6,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -29,7 +28,7 @@ public class GOTItemKebab extends GOTItemFood {
 	@Override
 	public ItemStack onEaten(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		if (!world.isRemote && world.rand.nextInt(100) == 0) {
-			entityplayer.addChatMessage(new ChatComponentTranslation("got.chat.goodkebab"));
+			entityplayer.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("got.chat.goodkebab")));
 			entityplayer.addPotionEffect(new PotionEffect(effectID, duration * 10));
 			return super.onEaten(itemstack, world, entityplayer);
 		}

@@ -51,6 +51,10 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldReachPike.class, 0.25f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldRiverlandsTrident.class, 0.35f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemLeaderBattleaxe.class, 0.45f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemThiefKnife.class, 1.5f);
+        GOTWeaponStats.registerMeleeSpeed(GOTItemDamnedCaptainSaber.class, 0.69f);
+        GOTWeaponStats.registerMeleeSpeed(GOTItemGiantClub.class, 0.2f);
+		
 		GOTWeaponStats.registerMeleeReach(GOTItemLeaderBattleaxe.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPoleaxe.class, 1.2f);
 		GOTWeaponStats.registerMeleeReach(GOTItemArrynClaymore.class, 1.04f);
@@ -73,8 +77,12 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeReach(GOTItemLance.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemHammer.class, 1.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemNorthGreatSword.class, 1.1f);
+		GOTWeaponStats.registerMeleeReach(GOTItemThiefKnife.class, 0.75f);
+        GOTWeaponStats.registerMeleeReach(GOTItemGiantClub.class, 1.3f);
+		
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemHammer.class, 1);
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemLance.class, 1);
+		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemGiantClub.class, 1);		
 	}
 
 	public static int getArmorProtection(ItemStack itemstack) {

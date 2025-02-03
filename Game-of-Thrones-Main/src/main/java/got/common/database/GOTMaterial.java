@@ -70,6 +70,8 @@ public class GOTMaterial {
 	public static ArmorMaterial YITI = EnumHelper.addArmorMaterial("GOT_YITI", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial YITI_FRONTIER = EnumHelper.addArmorMaterial("GOT_YITI_FRONTIER", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial YITI_SAMURAI = EnumHelper.addArmorMaterial("GOT_YITI_SAMURAI", 60, new int[] { 2, 7, 6, 3 }, 9);
+	public static ArmorMaterial THIEF = EnumHelper.addArmorMaterial("GOT_THIEF", 37, new int[] { 2, 7, 4, 2 }, 9);
+    public static ArmorMaterial FIRST_PEOPLE = EnumHelper.addArmorMaterial("GOT_FIRST_PEOPLE", 625, new int[] { 3, 8, 6, 3 }, 9);
 
 	public static ToolMaterial BRONZE_TOOL = EnumHelper.addToolMaterial("GOT_BRONZE_TOOL", 2, 500, 5.0F, 1.5F, 10);
 	public static ToolMaterial IRON = EnumHelper.addToolMaterial("GOT_IRON", 2, 625, 6.0F, 2.0F, 14);
@@ -86,6 +88,11 @@ public class GOTMaterial {
 	public static ToolMaterial SILVER_TOOL = EnumHelper.addToolMaterial("GOT_SILVER_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial VALYRIAN_TOOL = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL", 4, 6000, 9.0F, 5.0F, 8);
 	public static ToolMaterial ASSHAI_TOOL = EnumHelper.addToolMaterial("GOT_ASSHAI_TOOL", 2, 625, 6.0F, 2.0F, 14);
+	public static ToolMaterial THIEF_TOOL = EnumHelper.addToolMaterial("GOT_THIEF_TOOL", 2, 625, 6.0F, 2.0F, 14);
+    public static ToolMaterial CORSAIR = EnumHelper.addToolMaterial("GOT_CORSAIR", 2, 625, 6.0F, 4.0F, 14);
+    public static ToolMaterial FIRST_PEOPLE_WEAPON = EnumHelper.addToolMaterial("GOT_FIRST_PEOPLE_WEAPON", 4, 6000, 9.0F, 5.5F, 8);
+    public static ToolMaterial THIEF_KNIFE = EnumHelper.addToolMaterial("GOT_THIEF_TOOL", 2, 625, 6.0F, 2.0F, 14);
+    public static ToolMaterial GIANT_CLUB = EnumHelper.addToolMaterial("GOT_GIANT_CLUB", 2, 250, 6.0F, 2.0F, 14);
 	public static ItemArmor.ArmorMaterial getArmorMaterialByName(String name) {
 		return ItemArmor.ArmorMaterial.valueOf(name);
 	}

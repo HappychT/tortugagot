@@ -7,33 +7,35 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 
-public class CustomPotion extends Potion {
+public class GOTCustomPotion extends Potion {
     private ResourceLocation texture;
 
-    public CustomPotion(int id, boolean isBad, int fluidColor, ResourceLocation tex, String namePot) {
+    public GOTCustomPotion(int id, boolean isBad, int fluidColor, String namePot) {
+        this(id, isBad, fluidColor, new ResourceLocation("got", "textures/potion/" + namePot + ".png"), "got.potion." + namePot);
+    }
+
+    public GOTCustomPotion(int id, boolean isBad, int fluidColor, ResourceLocation tex, String namePot) {
         super(id, isBad, fluidColor);
-        this.setPotionName(namePot);
-        texture = tex;
+        setPotionName(namePot);
+        this.texture = tex;
     }
 
     @Override
     public boolean hasStatusIcon()
     {
-        Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+        Minecraft.getMinecraft().renderEngine.bindTexture(this.texture);
         return true;
     }
 
     public ResourceLocation getIcon() {
 
-        return texture;
+        return this.texture;
     }
 
     @Override
     public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-
-        mc.renderEngine.bindTexture(texture);
+        mc.renderEngine.bindTexture(this.texture);
         drawTexturedRect(x + 6, y + 7, 0, 0, 18, 18, 18, 18);
-
     }
 
     public static void drawTexturedRect(int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight)
@@ -49,15 +51,17 @@ public class CustomPotion extends Potion {
         tessellator.draw();
     }
 
+    @Override
     public Potion setIconIndex(int par1, int par2)
     {
         super.setIconIndex(par1, par2);
         return this;
     }
 
+    @Override
     @SideOnly(value= Side.CLIENT)
     public int getStatusIconIndex() {
-        Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+        Minecraft.getMinecraft().renderEngine.bindTexture(this.texture);
         return super.getStatusIconIndex();
     }
 }

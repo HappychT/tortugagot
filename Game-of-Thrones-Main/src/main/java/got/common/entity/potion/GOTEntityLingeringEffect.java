@@ -1,16 +1,18 @@
-package got.common.entity.other;
+package got.common.entity.potion;
 
 import java.util.List;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import got.common.database.GOTRegistry;
-import got.common.item.weapon.GOTItemLingeringPotion;
+import got.common.item.potions.GOTItemLingeringPotion;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.*;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 
 public class GOTEntityLingeringEffect extends Entity implements IEntityAdditionalSpawnData {

@@ -106,6 +106,10 @@ public class GOTCommonProxy implements IGuiHandler {
 	public int getChestRenderID() {
 		return 0;
 	}
+	
+	public void addFXPotion(World p_72706_1_, ItemStack stack, int p_72706_2_, int p_72706_3_, int p_72706_4_, int p_72706_5_, int p_72706_6_) {
+
+    }
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer entityplayer, World world, int i, int j, int k) {

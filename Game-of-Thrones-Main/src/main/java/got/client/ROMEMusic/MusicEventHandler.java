@@ -1,8 +1,14 @@
 package got.client.ROMEMusic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import got.common.registers.EffectRegister;
+import got.common.database.GOTEffects;
 import got.common.util.Zone;
 import got.common.util.ZoneLib;
 import net.minecraft.client.Minecraft;
@@ -13,12 +19,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 // Music system developed and delivered by Hason
 // Affiliated with Kyber Empire Solution
@@ -47,21 +47,21 @@ public class MusicEventHandler {
         // Музыка добавляется как звуковый файл в формате .ogg, в sounds.json и здесь. При желании можно добавить любые проверки и требования для того, чтобы музыка играла - возможностей много, хоть ввести музыку, которая будет играть в зависимости от выбранной фракции или заработанной ачивки.
 
         // Add your menu music
-        menuMusic.add(new ROMEMusicTrack("got", "custom_menu1", 0, () -> true));
-        menuMusic.add(new ROMEMusicTrack("got", "custom_menu2", 0, () -> true));
+        this.menuMusic.add(new ROMEMusicTrack("got", "custom_menu1", 0, () -> true));
+        this.menuMusic.add(new ROMEMusicTrack("got", "custom_menu2", 0, () -> true));
 
         // Add your standard music
-        standardMusic.put(new ResourceLocation("got", "combatmusic_1"), new ROMEMusicTrack("got", "combatmusic_1", 1, this::combatLogCheck));
-        standardMusic.put(new ResourceLocation("got", "combatmusic_2"), new ROMEMusicTrack("got", "combatmusic_2", 1, this::combatLogCheck));
-        standardMusic.put(new ResourceLocation("got", "combatmusic_3"), new ROMEMusicTrack("got", "combatmusic_3", 1, this::combatLogCheck));
-        standardMusic.put(new ResourceLocation("got", "ambient_1"), new ROMEMusicTrack("got", "ambient_1", 0, () -> true));
-        standardMusic.put(new ResourceLocation("got", "ambient_2"), new ROMEMusicTrack("got", "ambient_2", 0, () -> true));
-        standardMusic.put(new ResourceLocation("got", "ambient_3"), new ROMEMusicTrack("got", "ambient_3", 0, () -> true));
-        standardMusic.put(new ResourceLocation("got", "ambient_4"), new ROMEMusicTrack("got", "ambient_4", 0, () -> true));
-        standardMusic.put(new ResourceLocation("got", "ambient_5"), new ROMEMusicTrack("got", "ambient_5", 0, () -> true));
-        standardMusic.put(new ResourceLocation("got", "calm_tavern_music"), new ROMEMusicTrack("got", "calm_tavern_music", 2, () -> calmZoneCheck(new Zone(-216, 96,464,-190,114,446))));
-        standardMusic.put(new ResourceLocation("got", "ambient_void"), new ROMEMusicTrack("got", "ambient_void", 2, () -> calmZoneCheck(new Zone(30000, 40,-5600,29750,105,-5729))));
-        standardMusic.put(new ResourceLocation("got", "dragon_boss_combat_music"), new ROMEMusicTrack("got", "dragon_boss_combat_music", 2, () -> combatLogZoneCheck(new Zone(-279,60,464,-305,102,434))));
+        this.standardMusic.put(new ResourceLocation("got", "combatmusic_1"), new ROMEMusicTrack("got", "combatmusic_1", 1, this::combatLogCheck));
+        this.standardMusic.put(new ResourceLocation("got", "combatmusic_2"), new ROMEMusicTrack("got", "combatmusic_2", 1, this::combatLogCheck));
+        this.standardMusic.put(new ResourceLocation("got", "combatmusic_3"), new ROMEMusicTrack("got", "combatmusic_3", 1, this::combatLogCheck));
+        this.standardMusic.put(new ResourceLocation("got", "ambient_1"), new ROMEMusicTrack("got", "ambient_1", 0, () -> true));
+        this.standardMusic.put(new ResourceLocation("got", "ambient_2"), new ROMEMusicTrack("got", "ambient_2", 0, () -> true));
+        this.standardMusic.put(new ResourceLocation("got", "ambient_3"), new ROMEMusicTrack("got", "ambient_3", 0, () -> true));
+        this.standardMusic.put(new ResourceLocation("got", "ambient_4"), new ROMEMusicTrack("got", "ambient_4", 0, () -> true));
+        this.standardMusic.put(new ResourceLocation("got", "ambient_5"), new ROMEMusicTrack("got", "ambient_5", 0, () -> true));
+        this.standardMusic.put(new ResourceLocation("got", "calm_tavern_music"), new ROMEMusicTrack("got", "calm_tavern_music", 2, () -> calmZoneCheck(new Zone(-216, 96,464,-190,114,446))));
+        this.standardMusic.put(new ResourceLocation("got", "ambient_void"), new ROMEMusicTrack("got", "ambient_void", 2, () -> calmZoneCheck(new Zone(30000, 40,-5600,29750,105,-5729))));
+        this.standardMusic.put(new ResourceLocation("got", "dragon_boss_combat_music"), new ROMEMusicTrack("got", "dragon_boss_combat_music", 2, () -> combatLogZoneCheck(new Zone(-279,60,464,-305,102,434))));
     }
 
     @SubscribeEvent
@@ -80,7 +80,7 @@ public class MusicEventHandler {
     public void onJoin(EntityJoinWorldEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
         if(event.entity instanceof EntityPlayer && event.entity == mc.thePlayer) {
-            List<ISound> soundsToStop = new ArrayList<>(playingSounds);
+            List<ISound> soundsToStop = new ArrayList<>(this.playingSounds);
             for (ISound sound : soundsToStop) {
                 stopMusic((ROMEMusicTrack) sound);
             }
@@ -94,36 +94,36 @@ public class MusicEventHandler {
 
         ROMEMusicTrack hiTrack = getHighestPriorityTrack();
 
-        if(currentTrack != null && mc.getSoundHandler().isSoundPlaying(currentTrack) && currentTrack.getPriority() < hiTrack.getPriority() ) {
-            stopMusic(currentTrack);
+        if(this.currentTrack != null && mc.getSoundHandler().isSoundPlaying(this.currentTrack) && this.currentTrack.getPriority() < hiTrack.getPriority() ) {
+            stopMusic(this.currentTrack);
             if(!mc.getSoundHandler().isSoundPlaying(hiTrack)) {
                 playMusic(hiTrack);
             }
         }
 
         if(!(mc.currentScreen instanceof GuiMainMenu)) {
-            for (ROMEMusicTrack track : menuMusic) {
+            for (ROMEMusicTrack track : this.menuMusic) {
                 if (mc.getSoundHandler().isSoundPlaying(track)) {
                     mc.getSoundHandler().stopSound(track);
                 }
             }
         }
 
-        if(currentTrack != null && mc.getSoundHandler().isSoundPlaying(currentTrack) && !currentTrack.checkCondition()) {
-            stopMusic(currentTrack);
+        if(this.currentTrack != null && mc.getSoundHandler().isSoundPlaying(this.currentTrack) && !this.currentTrack.checkCondition()) {
+            stopMusic(this.currentTrack);
         }
 
 
         if (mc.currentScreen instanceof GuiMainMenu) {
             // Play a random track from the menu music list
-            if(!menuMusic.contains(currentTrack) || !mc.getSoundHandler().isSoundPlaying(currentTrack)) {
-                stopMusic(currentTrack);
-                playMusic(menuMusic.get(new Random().nextInt(menuMusic.size())));
+            if(!this.menuMusic.contains(this.currentTrack) || !mc.getSoundHandler().isSoundPlaying(this.currentTrack)) {
+                stopMusic(this.currentTrack);
+                playMusic(this.menuMusic.get(new Random().nextInt(this.menuMusic.size())));
             }
         } else {
 
             // Get all tracks whose condition is met
-            List<ROMEMusicTrack> validTracks = standardMusic.values().stream()
+            List<ROMEMusicTrack> validTracks = this.standardMusic.values().stream()
                     .filter(ROMEMusicTrack::checkCondition)
                     .collect(Collectors.toList());
 
@@ -140,7 +140,7 @@ public class MusicEventHandler {
                         .collect(Collectors.toList());
 
                 // Play a random track from the highest priority tracks
-                if((currentTrack == null || !mc.getSoundHandler().isSoundPlaying(currentTrack)) && mc.thePlayer != null) {
+                if((this.currentTrack == null || !mc.getSoundHandler().isSoundPlaying(this.currentTrack)) && mc.thePlayer != null) {
 
                     playMusic(highestPriorityTracks.get(new Random().nextInt(highestPriorityTracks.size())));
                 }
@@ -150,24 +150,24 @@ public class MusicEventHandler {
     }
 
     private void playMusic(ROMEMusicTrack music) {
-        if (music != null && !playingSounds.contains(music)) {
-            currentTrack = music;
-            if (!Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(currentTrack)) {
+        if (music != null && !this.playingSounds.contains(music)) {
+            this.currentTrack = music;
+            if (!Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(this.currentTrack)) {
                 Minecraft.getMinecraft().getSoundHandler().stopSounds();
-                Minecraft.getMinecraft().getSoundHandler().playSound(currentTrack);
-                playingSounds.add(music);
+                Minecraft.getMinecraft().getSoundHandler().playSound(this.currentTrack);
+                this.playingSounds.add(music);
             }
         }
     }
 
     private void stopMusic(ROMEMusicTrack music) {
         Minecraft.getMinecraft().getSoundHandler().stopSound(music);
-        currentTrack = null;
-        playingSounds.remove(music);
+        this.currentTrack = null;
+        this.playingSounds.remove(music);
     }
 
     public List<ISound> getPlayingSounds() {
-        return playingSounds;
+        return this.playingSounds;
     }
 
     private boolean calmZoneCheck(Zone z) {
@@ -191,15 +191,14 @@ public class MusicEventHandler {
     }
 
     private boolean combatLogCheck() {
-        if (Minecraft.getMinecraft().thePlayer != null && Minecraft.getMinecraft().thePlayer.isPotionActive(EffectRegister.COMBATLOG_POTIONID)) {
+        if (Minecraft.getMinecraft().thePlayer != null && Minecraft.getMinecraft().thePlayer.isPotionActive(GOTEffects.combatLog.id))
             return true;
-        }
         return false;
     }
 
     private ROMEMusicTrack getHighestPriorityTrack() {
         // Get all tracks whose condition is met
-        List<ROMEMusicTrack> validTracks = standardMusic.values().stream()
+        List<ROMEMusicTrack> validTracks = this.standardMusic.values().stream()
                 .filter(ROMEMusicTrack::checkCondition)
                 .collect(Collectors.toList());
 
@@ -217,12 +216,11 @@ public class MusicEventHandler {
 
             // Return a random track from the highest priority tracks
             return highestPriorityTracks.get(new Random().nextInt(highestPriorityTracks.size()));
-        } else {
+        } else
             // If no conditions are met, return a random track
-            return standardMusic.values().stream()
-                    .skip(new Random().nextInt(standardMusic.size()))
+            return this.standardMusic.values().stream()
+                    .skip(new Random().nextInt(this.standardMusic.size()))
                     .findFirst()
                     .orElse(null);
-        }
     }
 }
