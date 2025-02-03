@@ -118,7 +118,7 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
         }
     }
 
-    @Override
+    /*@Override
     public void setLoaded(ItemStack itemstack, ItemStack ammo) {
         if (itemstack != null && itemstack.getItem() instanceof GOTItemCrossbow) {
             NBTTagCompound nbt = itemstack.getTagCompound();
@@ -137,7 +137,7 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
                 nbt.removeTag("GOTCrossbowLoaded");
             }
         }
-    }
+    }*/
 
     @Override
     public boolean shouldConsumeBolt(ItemStack itemstack, EntityPlayer entityplayer) {
