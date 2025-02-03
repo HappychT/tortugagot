@@ -53,6 +53,7 @@ public class GOTLoader {
 
 	public static void preInit() {
 		GOTConfig.setupAndLoad();
+		GOTEffects.registerPotions();
 		GOTRegistry.assignContent();
 		GOTRegistry.assignMetadata();
 		GOTRegistry.registerBlocks();
@@ -62,7 +63,6 @@ public class GOTLoader {
 		GOTBiome.preInit();
 		GOTShields.preInit();
 		GOTCapes.preInit();
-		GOTEffects.registerPotions();
 		GOTPotionChanges.preInit();
 	}
 
