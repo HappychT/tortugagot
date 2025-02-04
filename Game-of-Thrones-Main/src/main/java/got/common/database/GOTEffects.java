@@ -15,7 +15,7 @@ import net.minecraft.util.ResourceLocation;
 public class GOTEffects {
 
     public static Potion killingPoison;
-    public static Potion combatLog;
+    public static GOTPotionCombatlog combatLog;
     public static Potion bleeding;
     public static Potion antidote;
     public static Potion nauseaResistance;

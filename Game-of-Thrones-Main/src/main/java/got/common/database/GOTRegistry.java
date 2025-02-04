@@ -1778,6 +1778,7 @@ public class GOTRegistry {
     public static Item smoke;
 
     public static void assignContent() {
+        GOTEffects.registerPotions();
         planks1 = new GOTBlockPlanks1();
         planks2 = new GOTBlockPlanks2();
         planks3 = new GOTBlockPlanks3();

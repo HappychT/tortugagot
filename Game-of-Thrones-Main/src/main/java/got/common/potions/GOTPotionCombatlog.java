@@ -2,13 +2,15 @@ package got.common.potions;
 
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.MinecraftForge;
 
-public class GOTPotionCombatlog extends GOTCustomPotion {
+public class GOTPotionCombatlog extends Potion {
 
     public GOTPotionCombatlog(int id) {
-        super(id, false, 9388224, "combatLog");
+        super(id, false, 9388224);
+        setPotionName("potion.got.combatLogPotion");
         MinecraftForge.EVENT_BUS.register(this);
     }
 

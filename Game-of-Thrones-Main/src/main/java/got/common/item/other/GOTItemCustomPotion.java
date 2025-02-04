@@ -1,6 +1,7 @@
 package got.common.item.other;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import scala.actors.threadpool.Arrays;
 
 public class GOTItemCustomPotion extends Item {
     private List<PotionEffect> effectCache = new ArrayList<PotionEffect>();
