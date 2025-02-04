@@ -41,7 +41,7 @@ public class GOTItemJewelryActive extends Item {
         if (stack.stackTagCompound.getInteger("timer") == 0) {
             if(!world.isRemote) {
                 for(PotionEffect effect : this.effects) {
-                    effect.setPotionDurationMax(false);
+                    // effect.setPotionDurationMax(false);
                     player.addPotionEffect(effect);
                 }
                 if(!player.capabilities.isCreativeMode)

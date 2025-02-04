@@ -62,7 +62,6 @@ public class GOTLoader {
 		GOTBiome.preInit();
 		GOTShields.preInit();
 		GOTCapes.preInit();
-		GOTEffects.registerPotions();
 		GOTPotionChanges.preInit();
 	}
 
