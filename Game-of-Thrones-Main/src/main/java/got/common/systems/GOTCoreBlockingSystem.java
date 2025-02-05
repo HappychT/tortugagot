@@ -1,14 +1,25 @@
 package got.common.systems;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import got.common.database.GOTEffects;
 import got.common.item.tool.GOTItemAxe;
-import got.common.item.weapon.*;
-import got.common.registers.EffectRegister;
+import got.common.item.weapon.GOTItemBattleaxe;
+import got.common.item.weapon.GOTItemDagger;
+import got.common.item.weapon.GOTItemDornePolearm;
+import got.common.item.weapon.GOTItemHammer;
+import got.common.item.weapon.GOTItemPolearm;
+import got.common.item.weapon.GOTItemPoleaxe;
+import got.common.item.weapon.GOTItemShieldPike;
+import got.common.item.weapon.GOTItemShieldReachPike;
+import got.common.item.weapon.GOTItemShieldRiverlandsTrident;
+import got.common.item.weapon.GOTItemShieldSpear;
+import got.common.item.weapon.GOTItemStormlandsHammer;
+import got.common.item.weapon.GOTItemSword;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.Potion;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class GOTCoreBlockingSystem {
     private static final Map<Class<?>, WeaponBlockData> weaponBlockDataMap = new HashMap<>();
@@ -42,9 +53,8 @@ public class GOTCoreBlockingSystem {
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {
         WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(35.0f, 35.0f, 0.5, 0.3));
-        if (player.isPotionActive(EffectRegister.exhaustion) || player.isPotionActive(Potion.digSlowdown)) {
+        if (player.isPotionActive(GOTEffects.exhaustion) || player.isPotionActive(Potion.digSlowdown))
             return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaMissPercent());
-        }
         return data;
     }
 
@@ -62,19 +72,19 @@ public class GOTCoreBlockingSystem {
         }
 
         public float getLeftBlockAngle() {
-            return leftBlockAngle;
+            return this.leftBlockAngle;
         }
 
         public float getRightBlockAngle() {
-            return rightBlockAngle;
+            return this.rightBlockAngle;
         }
 
         public double getStaminaHitPercent() {
-            return staminaHitPercent;
+            return this.staminaHitPercent;
         }
 
         public double getStaminaMissPercent() {
-            return staminaMissPercent;
+            return this.staminaMissPercent;
         }
     }
 }

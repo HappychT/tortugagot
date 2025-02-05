@@ -1,7 +1,9 @@
-package got.common.item.other;
+package got.common.item.potions;
 
+import got.common.item.other.GOTItemMug;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.*;
+import net.minecraft.item.ItemPotion;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class GOTItemPotion extends ItemPotion {

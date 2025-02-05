@@ -60,7 +60,7 @@ public class BlockServerHandler {
     }
 
     public boolean isBlocking(EntityPlayer player) {
-        return (player.isUsingItem()) && (player.getHeldItem() != null) && (player.getHeldItem().getItem() instanceof ItemSword) && player.isBlocking();
+        return player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword && player.isBlocking();
     }
 
     private boolean isDamageBlocked(EntityPlayer player, DamageSource source, float[] blockAngles) {

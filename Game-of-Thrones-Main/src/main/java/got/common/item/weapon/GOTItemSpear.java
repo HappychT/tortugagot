@@ -69,7 +69,7 @@ public class GOTItemSpear extends GOTItemPolearm {
 		world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
 		if (!world.isRemote) {
 			world.spawnEntityInWorld(spear);
-			StaminaServerHandler.drainStaminaByPercent(2, entityplayer);
+            StaminaServerHandler.drainStaminaByPercent(2, entityplayer);
 		}
 		if (!entityplayer.capabilities.isCreativeMode) {
 			--itemstack.stackSize;

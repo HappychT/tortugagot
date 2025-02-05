@@ -2,13 +2,13 @@ package got.common.handlers;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import got.common.database.GOTEffects;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
 import got.common.network.base.PacketDispatcher;
 import got.common.network.serverToClient.PacketSendBounceCooldown;
 import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
 import got.common.network.serverToClient.PacketSendStamina;
-import got.common.registers.EffectRegister;
 import got.rome.ExtendedPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -33,14 +33,12 @@ public class StaminaServerHandler {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
 
-        if (event.phase != TickEvent.Phase.START) {
+        if (event.phase != TickEvent.Phase.START)
             return;
-        }
 
         EntityPlayer player = event.player;
-        if (player.worldObj.isRemote) {
+        if (player.worldObj.isRemote)
             return;
-        }
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
         boolean isRunning = player.isSprinting();
@@ -69,11 +67,13 @@ public class StaminaServerHandler {
             extendedPlayer.setStandingStillCooldown(extendedPlayer.getStandingStillCooldown() - 1);
         }
 
-        if (player.isPotionActive(EffectRegister.rest)) {
-            if (player.getCurrentArmor(0) != null && GOTEnchantmentHelper.hasEnchant(player.getCurrentArmor(0), GOTEnchantment.restBuff))// Resting potion effect stamina regen, stacks with normal regen
+        if (player.isPotionActive(GOTEffects.rest)) {
+            if (player.getCurrentArmor(0) != null && GOTEnchantmentHelper.hasEnchant(player.getCurrentArmor(0), GOTEnchantment.restBuff)) { // Resting potion effect stamina regen, stacks with normal regen
                 regainStamina(15, player);
-            else
+            }
+            else { // Resting potion effect stamina regen, stacks with normal regen
                 regainStamina(REGAIN_RATE / 10, player); // May be too OP, adjust to your liking
+            }
         }
 
         if (!isMoving && player.onGround && !isJumping && extendedPlayer.getStandingStillCooldown() == 0) {
@@ -92,16 +92,16 @@ public class StaminaServerHandler {
         }
 
         if (extendedPlayer.getStamina() == 0) {
-            if (player.isPotionActive(EffectRegister.secondBreath) && extendedPlayer.getSecondBreathCooldown() == 0) {
+            if (player.isPotionActive(GOTEffects.secondBreath) && extendedPlayer.getSecondBreathCooldown() == 0) {
                 regainStamina((int) (MAX_STAMINA * 0.1), player);
-                player.removePotionEffect(EffectRegister.secondBreath.id);
+                player.removePotionEffect(GOTEffects.secondBreath.id);
                 extendedPlayer.setSecondBreathCooldown(SECONDBREATH_COOLDWON);
                 PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
             } else {
                 player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 0, true));
                 // Oops, I added my own effect accidentally, but you can use whatever suits your needs, mine does not effect the dig speed, only attack speed and block degrees
                 // But I've added requested functionality anyway to the vanilla potion effect
-                //.addPotionEffect(new PotionEffect(EffectRegister.exhaustion.id, 20, 0, true));
+                //.addPotionEffect(new PotionEffect(GOTEffects.exhaustion.id, 20, 0, true));
                 player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 20, 0, true));
             }
         } else {
@@ -114,19 +114,16 @@ public class StaminaServerHandler {
     }
 
     public void handleBounceRequest(EntityPlayer player, int direction) {
-        if (!player.onGround) {
+        if (!player.onGround)
             return;
-        }
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
 
-        if (extendedPlayer.getBounceCooldown() > 0) {
+        if (extendedPlayer.getBounceCooldown() > 0)
             return;
-        }
 
-        if (extendedPlayer.getStamina() < (MAX_STAMINA * (BOUNCE_PERCENT / 100.0))) {
+        if (extendedPlayer.getStamina() < (MAX_STAMINA * (BOUNCE_PERCENT / 100.0)))
             return;
-        }
 
         if (direction != 0) {
             executeBounce(player, direction);
@@ -172,12 +169,11 @@ public class StaminaServerHandler {
     }
 
     public static void drainStamina(int amount, EntityPlayer player) {
-        if(player.capabilities.isCreativeMode) {
+        if(player.capabilities.isCreativeMode)
             return;
-        }
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
-        int dexterityLevel = player.getActivePotionEffect(EffectRegister.dexterity) != null ? player.getActivePotionEffect(EffectRegister.dexterity).getAmplifier() + 1 : 0;
+        int dexterityLevel = player.getActivePotionEffect(GOTEffects.dexterity) != null ? player.getActivePotionEffect(GOTEffects.dexterity).getAmplifier() + 1 : 0;
         double reductionFactor = 1.0 - (0.1 * Math.min(dexterityLevel, 3));
         int adjustedAmount = (int) (amount * reductionFactor);
         extendedPlayer.setStamina(Math.max(0, extendedPlayer.getStamina() - adjustedAmount));
@@ -185,12 +181,11 @@ public class StaminaServerHandler {
     }
 
     public static void drainStaminaByPercent(double percent, EntityPlayer player) {
-        if(player.capabilities.isCreativeMode) {
+        if(player.capabilities.isCreativeMode)
             return;
-        }
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
-        int dexterityLevel = player.getActivePotionEffect(EffectRegister.dexterity) != null ? player.getActivePotionEffect(EffectRegister.dexterity).getAmplifier() + 1 : 0;
+        int dexterityLevel = player.getActivePotionEffect(GOTEffects.dexterity) != null ? player.getActivePotionEffect(GOTEffects.dexterity).getAmplifier() + 1 : 0;
         double reductionFactor = 1.0 - (0.1 * Math.min(dexterityLevel, 3));
         int amountToDrain = (int) Math.round((MAX_STAMINA * (percent / 100.0) * reductionFactor));
         extendedPlayer.setStamina(Math.max(0, extendedPlayer.getStamina() - amountToDrain));
@@ -207,9 +202,8 @@ public class StaminaServerHandler {
     public void onLivingHurt(LivingHurtEvent event) {
         if (event.entity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.entity;
-            if(player.worldObj.isRemote) {
+            if(player.worldObj.isRemote)
                 return;
-            }
             DamageSource source = event.source;
 
             if (source == DamageSource.fall) {
@@ -223,9 +217,8 @@ public class StaminaServerHandler {
     @SubscribeEvent
     public void onArrowLoose(ArrowLooseEvent event) {
         EntityPlayer player = event.entityPlayer;
-        if(player.worldObj.isRemote) {
+        if(player.worldObj.isRemote)
             return;
-        }
         drainStaminaByPercent(0.4, player);
     }
 

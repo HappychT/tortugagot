@@ -2,8 +2,6 @@ package got.common.item.other;
 
 
 import got.common.database.GOTCreativeTabs;
-import got.common.potions.CustomPotion;
-import got.common.registers.EffectRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;

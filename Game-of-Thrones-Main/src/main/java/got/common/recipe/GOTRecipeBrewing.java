@@ -100,5 +100,6 @@ public class GOTRecipeBrewing {
 		GOTRecipeBrewing.addBrewingRecipe(new ItemStack(GOTRegistry.mugBrandy, BARREL_CAPACITY), GOTRegistry.grapeRed, GOTRegistry.grapeRed, GOTRegistry.grapeRed, GOTRegistry.grapeRed, GOTRegistry.plum, GOTRegistry.plum);
 		GOTRecipeBrewing.addBrewingRecipe(new ItemStack(GOTRegistry.mugPoppyMilk, BARREL_CAPACITY), Blocks.red_flower, Blocks.red_flower, Blocks.red_flower, Blocks.red_flower, Blocks.red_flower, Blocks.red_flower);
 		GOTRecipeBrewing.addBrewingRecipe(new ItemStack(GOTRegistry.mugWildFire, BARREL_CAPACITY), GOTRegistry.wildFireJar, GOTRegistry.wildFireJar, GOTRegistry.wildFireJar, GOTRegistry.wildFireJar, GOTRegistry.wildFireJar, GOTRegistry.wildFireJar);
+		GOTRecipeBrewing.addBrewingRecipe(new ItemStack(GOTRegistry.mugBerserk, BARREL_CAPACITY), Blocks.red_mushroom, Blocks.red_mushroom, Blocks.red_mushroom, Blocks.brown_mushroom, Blocks.brown_mushroom, GOTRegistry.salt);
 	}
 }

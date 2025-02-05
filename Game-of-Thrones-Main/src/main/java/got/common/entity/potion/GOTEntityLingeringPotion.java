@@ -1,4 +1,4 @@
-package got.common.entity.other;
+package got.common.entity.potion;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;

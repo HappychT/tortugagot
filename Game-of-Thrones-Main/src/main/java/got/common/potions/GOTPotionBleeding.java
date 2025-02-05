@@ -1,19 +1,18 @@
 package got.common.potions;
 
-import got.common.network.GOTPacketHandler;
-import got.common.network.LOTRPacketParticleFX;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BleedingPotion extends CustomPotion {
+import got.common.network.GOTPacketHandler;
+import got.common.network.LOTRPacketParticleFX;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
 
-    private Map<EntityLivingBase, Integer> movementCooldowns = new HashMap<>();
+public class GOTPotionBleeding extends GOTCustomPotion {
+
+    private Map<EntityLivingBase, Integer> movementCooldowns = new HashMap<EntityLivingBase, Integer>();
 
     private static final int COOLDOWN_TICKS = 10;
 
@@ -21,23 +20,23 @@ public class BleedingPotion extends CustomPotion {
     private static final int TICK_HISTORY_SIZE = 40; // Store the last 40 ticks of motion data
 
     // Map to store motionX history for each entity
-    private Map<EntityLivingBase, List<Double>> motionXHistory = new HashMap<>();
+    private Map<EntityLivingBase, List<Double>> motionXHistory = new HashMap<EntityLivingBase, List<Double>>();
 
 
-    public BleedingPotion(int id, boolean isBad, int fluidColor, ResourceLocation tex, String namePot) {
-        super(id, isBad, fluidColor, tex, namePot);
+    public GOTPotionBleeding(int id) {
+        super(id, true, 8171463, "bleeding");
     }
 
     public boolean isJumping(EntityLivingBase entity) {
         return entity.motionY > 0;
     }
 
-    private Map<EntityLivingBase, Double[]> lastPositions = new HashMap<>();
+    private Map<EntityLivingBase, Double[]> lastPositions = new HashMap<EntityLivingBase, Double[]>();
 
 
     public boolean isMoving(EntityLivingBase entity) {
         // Get or initialize the motionX history list for the entity
-        List<Double> history = motionXHistory.computeIfAbsent(entity, k -> new ArrayList<>());
+        List<Double> history = this.motionXHistory.computeIfAbsent(entity, k -> new ArrayList<>());
 
         // Add the current motionX to the history list
         history.add(entity.motionX);
@@ -52,9 +51,8 @@ public class BleedingPotion extends CustomPotion {
         int endCheckIndex = Math.max(0, history.size() - 20);    // Check up to the last 20 ticks
 
         for (int i = startCheckIndex; i < endCheckIndex; i++) {
-            if (history.get(i) != 0.0) {
+            if (history.get(i) != 0.0)
                 return true;
-            }
         }
 
         return false;
@@ -63,9 +61,9 @@ public class BleedingPotion extends CustomPotion {
     @Override
     public void performEffect(EntityLivingBase entity, int amplifier) {
         if (isMoving(entity) || isJumping(entity)) {
-        	//if(entity.getRNG().nextFloat() < 0.1f) {
-        		entity.attackEntityFrom(DamageSource.generic, DAMAGE_AMOUNT * (amplifier + 1));
-        	//}
+            //if(entity.getRNG().nextFloat() < 0.1f) {
+            entity.attackEntityFrom(DamageSource.generic, DAMAGE_AMOUNT * (amplifier + 1));
+            //}
 
             if (!entity.worldObj.isRemote) {
                 double offset = 0.2D;

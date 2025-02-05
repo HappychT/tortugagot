@@ -62,14 +62,13 @@ public class GOTLoader {
 		GOTBiome.preInit();
 		GOTShields.preInit();
 		GOTCapes.preInit();
-		GOTPoisonedDrinks.preInit();
 		GOTPotionChanges.preInit();
 	}
 
 	@SideOnly(Side.CLIENT)
 	public static void preInitClient() {
-//		if (GOTModChecker.hasNEI()) {
-//			NEIGOTIntegrator.registerRecipes();
-//		}
+	//		if (GOTModChecker.hasNEI()) {
+	//			NEIGOTIntegrator.registerRecipes();
+	//		}
 	}
 }

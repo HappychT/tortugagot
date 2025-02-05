@@ -2,19 +2,19 @@ package got.common.item;
 
 import java.util.UUID;
 
+import got.common.database.GOTEffects;
 import got.common.item.other.GOTItemMug;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.*;
+import net.minecraft.potion.PotionEffect;
 
 public class GOTPoisonedDrinks {
 	public static int POISON_DURATION = 3000;
-	public static Potion killingPoison;
 
 	public static void addPoisonEffect(EntityPlayer entityplayer, ItemStack itemstack) {
 		int duration = 300;
-		entityplayer.addPotionEffect(new PotionEffect(GOTPoisonedDrinks.killingPoison.id, duration));
+		entityplayer.addPotionEffect(new PotionEffect(GOTEffects.killingPoison.id, duration));
 	}
 
 	public static boolean canPlayerSeePoisoned(ItemStack itemstack, EntityPlayer entityplayer) {
@@ -45,10 +45,6 @@ public class GOTPoisonedDrinks {
 			return itemstack.getTagCompound().getBoolean("PoisonDrink");
 		}
 		return false;
-	}
-
-	public static void preInit() {
-		killingPoison = new GOTPotionPoisonKilling();
 	}
 
 	public static void setDrinkPoisoned(ItemStack itemstack, boolean flag) {
