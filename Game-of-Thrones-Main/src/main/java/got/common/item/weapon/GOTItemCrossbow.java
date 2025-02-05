@@ -308,7 +308,7 @@ public class GOTItemCrossbow extends ItemBow {
 		}
 	}
 
-	private void setChargeTime(ItemStack itemstack, long chargeTime) {
+	protected void setChargeTime(ItemStack itemstack, long chargeTime) {
 		NBTTagCompound nbt = itemstack.getTagCompound();
 		if (nbt == null) {
 			nbt = new NBTTagCompound();
@@ -317,7 +317,7 @@ public class GOTItemCrossbow extends ItemBow {
 		nbt.setLong("GOTCrossbowChargeTime", chargeTime);
 	}
 
-	private long getChargeTime(ItemStack itemstack) {
+	protected long getChargeTime(ItemStack itemstack) {
 		NBTTagCompound nbt = itemstack.getTagCompound();
 		if (nbt == null) {
 			return 0;
