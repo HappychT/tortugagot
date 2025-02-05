@@ -1600,10 +1600,9 @@ public class GOTEventHandler implements IFuelHandler {
                 int k = MathHelper.floor_double(entity.posZ);
                 BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
                 boolean standartColdBiome = biome instanceof GOTBiome && biome.temperature == 0.0f;
-                boolean isOpenAir = world.canBlockSeeTheSky(i, j, k);
                 boolean altitudeColdBiome = biome instanceof GOTBiome && ((GOTBiome) biome).getClimateType() != null && ((GOTBiome) biome).getClimateType().isAltitudeZone() && j >= 140;
                 boolean noLightSource = world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) < 10;
-                if(!entity.isPotionActive(GOTEffects.frostResistance) && (standartColdBiome || altitudeColdBiome) && (isOpenAir || inWater) && noLightSource) {
+                if(!entity.isPotionActive(GOTEffects.frostResistance) && (standartColdBiome || altitudeColdBiome) && (world.isRaining() || inWater) && noLightSource) {
                     int frostChance = 50;
                     int frostProtection = 0;
                     for (int l = 0; l < 4; l++) {
