@@ -11,6 +11,7 @@ import got.common.handlers.StaminaServerHandler;
 import got.common.recipe.GOTRecipe;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.enchantment.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,6 +22,7 @@ public class GOTItemCrossbow extends ItemBow {
 	public double boltDamageFactor;
 	public Item.ToolMaterial crossbowMaterial;
 	public int crossbowPullTime;
+	public int crossbowDischargeTime;
 	@SideOnly(value = Side.CLIENT)
 	public IIcon[] crossbowPullIcons;
 
@@ -31,6 +33,7 @@ public class GOTItemCrossbow extends ItemBow {
 		setMaxStackSize(1);
 		boltDamageFactor = 1.0f + Math.max(0.0f, (crossbowMaterial.getDamageVsEntity() - 2.0f) * 0.1f);
 		crossbowPullTime = 50;
+		crossbowDischargeTime = 200;
 	}
 
 	@SideOnly(value = Side.CLIENT)
@@ -153,6 +156,7 @@ public class GOTItemCrossbow extends ItemBow {
 				if (!world.isRemote) {
 					world.spawnEntityInWorld(bolt);
 					StaminaServerHandler.drainStaminaByPercent(0.8, entityplayer);
+					setChargeTime(itemstack, 0);
 				}
 				world.playSoundAtEntity(entityplayer, "got:item.crossbow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
 				itemstack.damageItem(1, entityplayer);
@@ -188,6 +192,7 @@ public class GOTItemCrossbow extends ItemBow {
 				}
 				if (!world.isRemote) {
 					setLoaded(itemstack, boltItem.copy());
+					setChargeTime(itemstack, entityplayer.worldObj.getTotalWorldTime());
 				}
 			}
 			entityplayer.clearItemInUse();
@@ -287,5 +292,36 @@ public class GOTItemCrossbow extends ItemBow {
 
 	public static boolean isLoaded(ItemStack itemstack) {
 		return GOTItemCrossbow.getLoaded(itemstack) != null;
+	}
+
+	@Override
+	public void onUpdate(ItemStack itemstack, World world, Entity entity, int itemSlot, boolean isSelected) {
+		ItemStack ammo = GOTItemCrossbow.getLoaded(itemstack);
+		if (ammo != null && entity instanceof EntityPlayer) {
+			EntityPlayer entityplayer = (EntityPlayer) entity;
+			long chargeTime = getChargeTime(itemstack);
+			if (chargeTime > 0 && world.getTotalWorldTime() - chargeTime >= crossbowDischargeTime) {
+				ammo.stackSize = 1;
+				entityplayer.inventory.addItemStackToInventory(ammo);
+				setLoaded(itemstack, null);
+			}
+		}
+	}
+
+	private void setChargeTime(ItemStack itemstack, long chargeTime) {
+		NBTTagCompound nbt = itemstack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+			itemstack.setTagCompound(nbt);
+		}
+		nbt.setLong("GOTCrossbowChargeTime", chargeTime);
+	}
+
+	private long getChargeTime(ItemStack itemstack) {
+		NBTTagCompound nbt = itemstack.getTagCompound();
+		if (nbt == null) {
+			return 0;
+		}
+		return nbt.getLong("GOTCrossbowChargeTime");
 	}
 }

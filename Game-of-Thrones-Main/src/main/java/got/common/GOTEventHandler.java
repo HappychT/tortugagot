@@ -270,7 +270,7 @@ public class GOTEventHandler implements IFuelHandler {
             source.getSourceOfDamage();
         }
     }
-
+    /*
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         EntityPlayer entityplayer = event.player;
@@ -292,7 +292,7 @@ public class GOTEventHandler implements IFuelHandler {
                     );
         }
     }
-
+    */
     @SubscribeEvent
     public void getBlockDrops(BlockEvent.HarvestDropsEvent event) {
         EntityPlayer entityplayer = event.harvester;

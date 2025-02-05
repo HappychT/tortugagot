@@ -15,7 +15,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.StatCollector;
-import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 
 public class GOTItemJewelryActive extends Item {
@@ -60,10 +59,17 @@ public class GOTItemJewelryActive extends Item {
         else {
             if(!world.isRemote) {
                 player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("got.jewelry.desc.cooldown")
-                        + ' ' + StringUtils.ticksToElapsedTime(stack.stackTagCompound.getInteger("timer"))));
+                        + ' ' + ticksToElapsedTime(stack.stackTagCompound.getInteger("timer"))));
             }
         }
         return stack;
+    }
+
+    protected static String ticksToElapsedTime(int ticks) {
+        int seconds = ticks / 20;
+        int minutes = seconds / 60;
+        seconds %= 60;
+        return seconds < 10 ? minutes + ":0" + seconds : minutes + ":" + seconds;
     }
 
     @Override
