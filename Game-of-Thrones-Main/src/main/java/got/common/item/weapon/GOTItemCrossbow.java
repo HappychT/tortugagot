@@ -322,6 +322,9 @@ public class GOTItemCrossbow extends ItemBow {
 		if (nbt == null) {
 			return 0;
 		}
-		return nbt.getLong("GOTCrossbowChargeTime");
+		if (nbt.hasKey("GOTCrossbowChargeTime")) {
+			return nbt.getLong("GOTCrossbowChargeTime");
+		}
+		return 0;
 	}
 }
