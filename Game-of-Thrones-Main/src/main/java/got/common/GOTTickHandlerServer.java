@@ -147,6 +147,14 @@ public class GOTTickHandlerServer {
                 entityplayer.removePotionEffect(GOTEffects.freeze.id);
             }
 
+            if(entityplayer.isPotionActive(GOTEffects.antidote) && entityplayer.isPotionActive(GOTEffects.killingPoison)) {
+                entityplayer.removePotionEffect(GOTEffects.killingPoison.id);
+            }
+
+            if(entityplayer.isPotionActive(GOTEffects.antidote) && entityplayer.isPotionActive(Potion.poison)) {
+                entityplayer.removePotionEffect(Potion.poison.id);
+            }
+
             if(entityplayer.inventory.hasItem(GOTRegistry.rabbitPaw)) {
                 entityplayer.addPotionEffect(new PotionEffect(Potion.jump.id, 40));
             }

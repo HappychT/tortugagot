@@ -1328,11 +1328,12 @@ public class GOTEventHandler implements IFuelHandler {
         if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance)) {
             GOTDamage.doFrostDamage((EntityPlayerMP) entity);
         }
-        if (event.source.getEntity() instanceof EntityPlayer) {
+        if (attacker instanceof EntityPlayer) {
             if (entity instanceof  EntityPlayer) {
                 PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
                 effect.setCurativeItems(Lists.newArrayList());
                 entity.addPotionEffect(effect);
+                attacker.addPotionEffect(effect);
             }
         }
         if (!world.isRemote) {

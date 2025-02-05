@@ -1,11 +1,9 @@
 package got.common.database;
 
 import got.common.potions.GOTCustomPotion;
-import got.common.potions.GOTPotionAntidote;
 import got.common.potions.GOTPotionBleeding;
 import got.common.potions.GOTPotionCombatlog;
 import got.common.potions.GOTPotionFreeze;
-import got.common.potions.GOTPotionNauseaResistance;
 import got.common.potions.GOTPotionPoisonKilling;
 import got.common.potions.GOTPotionRage;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -42,10 +40,10 @@ public class GOTEffects {
         bleeding = new GOTPotionBleeding(idCounter);
         registerPotion(bleeding);
 
-        antidote = new GOTPotionAntidote(idCounter);
+        antidote = new GOTCustomPotion(idCounter, false, 4960121, "antidote");
         registerPotion(antidote);
 
-        nauseaResistance = new GOTPotionNauseaResistance(idCounter);
+        nauseaResistance = new GOTCustomPotion(idCounter, false, 8999288, "nauseaResistance");
         registerPotion(nauseaResistance);
 
         frostResistance = new GOTCustomPotion(idCounter, false, 0, "frostResistance");
