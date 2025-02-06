@@ -873,10 +873,10 @@ public class GOTTickHandlerClient {
                 event.setCanceled(true);
                 return;
             }
-            if (event.type == RenderGameOverlayEvent.ElementType.ALL && enchantingDisabled && ((EntityPlayer) entityClientPlayerMP).ridingEntity == null) {
+            /* if (event.type == RenderGameOverlayEvent.ElementType.ALL && enchantingDisabled && ((EntityPlayer) entityClientPlayerMP).ridingEntity == null) {
                 GuiIngameForge.left_height -= 6;
                 GuiIngameForge.right_height -= 6;
-            }
+            }*/
             if (event.type == RenderGameOverlayEvent.ElementType.ARMOR) {
                 event.setCanceled(true);
                 ScaledResolution resolution = event.resolution;
