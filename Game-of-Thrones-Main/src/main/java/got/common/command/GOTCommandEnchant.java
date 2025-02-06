@@ -24,28 +24,32 @@ public class GOTCommandEnchant extends CommandBase {
                 return CommandBase.getListOfStringsMatchingLastWord(args, "add", "remove", "clear");
             case 3:
                 ItemStack itemstack;
-                if ("add".equals(args[1])) {
+                try {
                     EntityPlayerMP entityplayer2 = CommandBase.getPlayer(sender, args[0]);
-                    ItemStack itemstack2 = entityplayer2.getHeldItem();
-                    if (itemstack2 != null) {
+                    if ("add".equals(args[1])) {
+                        ItemStack itemstack2 = entityplayer2.getHeldItem();
+                        if (itemstack2 != null) {
+                            ArrayList<String> enchNames = new ArrayList<>();
+                            for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
+                                if (!ench.canApply(itemstack2, false)) {
+                                    continue;
+                                }
+                                enchNames.add(ench.enchantName);
+                            }
+                            return CommandBase.getListOfStringsMatchingLastWord(args, enchNames.toArray(new String[0]));
+                        }
+                    } else if ("remove".equals(args[1]) && (itemstack = CommandBase.getPlayer(sender, args[0]).getHeldItem()) != null) {
                         ArrayList<String> enchNames = new ArrayList<>();
                         for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-                            if (GOTEnchantmentHelper.hasEnchant(itemstack2, ench) || !ench.canApply(itemstack2, false) || !GOTEnchantmentHelper.checkEnchantCompatible(itemstack2, ench)) {
+                            if (!GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
                                 continue;
                             }
                             enchNames.add(ench.enchantName);
                         }
                         return CommandBase.getListOfStringsMatchingLastWord(args, enchNames.toArray(new String[0]));
                     }
-                } else if ("remove".equals(args[1]) && (itemstack = CommandBase.getPlayer(sender, args[0]).getHeldItem()) != null) {
-                    ArrayList<String> enchNames = new ArrayList<>();
-                    for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-                        if (!GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
-                            continue;
-                        }
-                        enchNames.add(ench.enchantName);
-                    }
-                    return CommandBase.getListOfStringsMatchingLastWord(args, enchNames.toArray(new String[0]));
+                } catch (Exception e) {
+                    return Collections.emptyList();
                 }
                 break;
         }
@@ -84,8 +88,8 @@ public class GOTCommandEnchant extends CommandBase {
                 String enchName = args[2];
                 GOTEnchantment ench = GOTEnchantment.getEnchantmentByName(enchName);
                 if (ench != null) {
-                    if (!GOTEnchantmentHelper.hasEnchant(itemstack, ench) && ench.canApply(itemstack, false) && GOTEnchantmentHelper.checkEnchantCompatible(itemstack, ench)) {
-                        GOTEnchantmentHelper.setHasEnchant(itemstack, ench);
+                    if (ench.canApply(itemstack, false)) {
+                        GOTEnchantmentHelper.addEnchant(itemstack, ench);
                         if(ench == GOTEnchantment.valyrianSeal) {
                             if(itemstack.hasTagCompound()) {
                                 itemstack.getTagCompound().setDouble("sealChance", 1.0);
