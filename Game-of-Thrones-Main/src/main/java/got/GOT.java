@@ -22,12 +22,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import got.common.GOTCommonProxy;
-import got.common.GOTEventHandler;
-import got.common.GOTGuiMessageTypes;
-import got.common.GOTLevelData;
-import got.common.GOTPlayerData;
-import got.common.GOTTickHandlerServer;
+import got.common.*;
 import got.common.block.leaves.GOTBlockLeavesBase;
 import got.common.block.leaves.GOTBlockLeavesVanilla1;
 import got.common.block.leaves.GOTBlockLeavesVanilla2;
@@ -180,6 +175,7 @@ public class GOT {
 
     @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(new GOTSoulBoundEvents());
         MinecraftForge.EVENT_BUS.register(AttackHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(StaminaServerHandler.INSTANCE);
         FMLCommonHandler.instance().bus().register(StaminaServerHandler.INSTANCE);
