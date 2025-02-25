@@ -260,45 +260,9 @@ public class GOT {
         GOTLoader.onInit();
         
     	MinecraftForge.EVENT_BUS.register(this);
-    }
-    @SubscribeEvent
-    public void onPlayerNameFormat(PlayerEvent.NameFormat event) {
-        String originalName = event.displayname;
-        event.displayname = getPrefix(originalName) +" " +   getTag(originalName) +  event.displayname;
-
-
+    	coreFaction.init(event);
     }
 
-    @SubscribeEvent
-    public void onChatMessage(ClientChatReceivedEvent event) {
-        String message = event.message.getUnformattedText();
-        if (message.startsWith("<")) {
-            int endIndex = message.indexOf('>');
-            if (endIndex != -1) {
-                String playerName = message.substring(1, endIndex);
-                String newMessage = getPrefix(playerName) +" " + getTag(playerName) + playerName + "§f:" + message.substring(endIndex + 1);
-                
-               event.message = new ChatComponentText(newMessage);
-            }
-        }
-    }
-	
-    public String getPrefix(String name) {
-    	for(Faction faction : PacketInfoFactions.getFactions().values()) {
-			if(faction.getPlayers().containsKey(name)) {
-				return faction.getPlayers().get(name);
-			}
-		}
-		return "";
-    }
-	public String getTag(String name) {
-		for(Faction faction : PacketInfoFactions.getFactions().values()) {
-			if(faction.getPlayers().containsKey(name)) {
-				return faction.getColorTag();
-			}
-		}
-		return "";
-	}
 	
 	
     @Mod.EventHandler
@@ -377,6 +341,7 @@ public class GOT {
         for (CommandBase element : command) {
             event.registerServerCommand(element);
         }
+        coreFaction.serverStarting(event);
     }
 
     @Mod.EventHandler

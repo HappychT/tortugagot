@@ -2,7 +2,6 @@ package brain.factions;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Faction {
@@ -13,8 +12,9 @@ public class Faction {
 	private HashMap<String, Long> applications;
 	private HashMap<String, Long> mutePlayer;
 	private String colorTag;
+	private Location home;
 	
-	public Faction(String ID, String leaderName, String assestantName, HashMap<String, String> players, HashMap<String, Long> applications, HashMap<String, Long> mutePlayer, String colorTag) {
+	public Faction(String ID, String leaderName, String assestantName, HashMap<String, String> players, HashMap<String, Long> applications, HashMap<String, Long> mutePlayer, String colorTag, Location home) {
 		this.ID = ID;
 		this.leaderName = leaderName;
 		this.assistantName = assestantName;
@@ -22,8 +22,8 @@ public class Faction {
 		this.applications = applications;
 		this.mutePlayer = mutePlayer;
 		this.colorTag = colorTag;
+		this.home = home;
 	}
-	
 	public String getAssistantName() {
 		return assistantName;
 	}
@@ -65,5 +65,13 @@ public class Faction {
 	
 	public String getColorTag() {
 		return colorTag;
+	}
+	
+	public Location getHome() {
+		return home;
+	}
+	
+	public void setHome(Location home) {
+		this.home = home;
 	}
 }

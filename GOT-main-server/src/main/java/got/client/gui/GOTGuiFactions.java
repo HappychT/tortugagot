@@ -486,7 +486,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 					GuiApi.glScissor(x, y+10, width*4, pageHeight - 40, false);
 					for (int k = 0; k < playerList.getList().size() ; k++) {
 						playerList.getList().get(k).draw(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10);
-						if(isClicked( x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10) && !prefixField.getVisible() && status != GroupStatus.Player) {
+						if(isClicked( x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10) && !prefixField.getVisible()) {
 							prefixEditName = playerList.getElement(k).getPlayerName();
 							prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName()));
 							prefixField.setVisible(true);

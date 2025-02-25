@@ -30,34 +30,28 @@ public class PacketInfoFactions implements IMessage {
 	// CLIENT
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		int size = buf.readInt();
-		for (int i = 0; i < size; i++) {
-			String id = ByteBufUtils.readUTF8String(buf);
-			String leadername = ByteBufUtils.readUTF8String(buf);
-			String assistantName = ByteBufUtils.readUTF8String(buf);
-			
-			HashMap<String, String> players = new HashMap<>();
-			int sizePlayer = buf.readInt();
-
-			for (int j = 0; j < sizePlayer; j++) {
-				players.put(ByteBufUtils.readUTF8String(buf), ByteBufUtils.readUTF8String(buf));
-			}
-			
-			HashMap<String, Long> applications = new HashMap<String, Long>();
-			int sizeApplic = buf.readInt();
-			for (int j = 0; j < sizeApplic; j++) {
-				applications.put(ByteBufUtils.readUTF8String(buf), 0L);
-			}
-			
-			factions.put(id, new Faction(id, leadername, assistantName, players, applications, null, ByteBufUtils.readUTF8String(buf)));
-		}
+		
 
 	}
 
 	// SERVER
 	@Override
 	public void toBytes(ByteBuf buf) {
-		
+		buf.writeInt(GOT.coreFaction.factions.size());
+		for(Faction faction : GOT.coreFaction.factions.values()) {
+			ByteBufUtils.writeUTF8String(buf, faction.getID());
+			ByteBufUtils.writeUTF8String(buf, faction.getLeaderName());
+			ByteBufUtils.writeUTF8String(buf, faction.getAssistantName());
+			
+			buf.writeInt(faction.getPlayers().size());
+			for(Map.Entry<String, String> map : faction.getPlayers().entrySet()) {
+				 ByteBufUtils.writeUTF8String(buf, map.getKey());
+				 ByteBufUtils.writeUTF8String(buf, map.getValue());
+			}
+			buf.writeInt(faction.getApplications().size());
+			faction.getApplications().keySet().forEach((x) -> ByteBufUtils.writeUTF8String(buf, x));
+			ByteBufUtils.writeUTF8String(buf, faction.getColorTag());
+		}
 	}
 
 	public static HashMap<String, Faction> getFactions() {
