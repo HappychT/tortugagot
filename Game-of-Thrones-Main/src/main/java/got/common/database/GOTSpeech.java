@@ -86,7 +86,8 @@ public class GOTSpeech {
 		if (MinecraftServer.getServer() == null) {
 			return;
 		}
-		for (ICommandSender player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+		List<EntityPlayerMP> list = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+		for (ICommandSender player : list) {
 			player.addChatMessage(message);
 		}
 	}

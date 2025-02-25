@@ -11,6 +11,9 @@ import java.util.UUID;
 
 import com.google.common.base.CaseFormat;
 
+import brain.factions.CoreFaction;
+import brain.factions.Faction;
+import brain.factions.network.PacketInfoFactions;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModContainer;
@@ -20,9 +23,16 @@ import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import got.common.*;
+import got.common.GOTCommonProxy;
+import got.common.GOTEventHandler;
+import got.common.GOTGuiMessageTypes;
+import got.common.GOTLevelData;
+import got.common.GOTPlayerData;
+import got.common.GOTSoulBoundEvents;
+import got.common.GOTTickHandlerServer;
 import got.common.block.leaves.GOTBlockLeavesBase;
 import got.common.block.leaves.GOTBlockLeavesVanilla1;
 import got.common.block.leaves.GOTBlockLeavesVanilla2;
@@ -130,6 +140,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Teleporter;
@@ -138,8 +149,10 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
 @Mod(modid = "got", dependencies = "required-after:geckolib3")
@@ -172,7 +185,7 @@ public class GOT {
         devs.add("188e4e9c-8c67-443d-9b6c-a351076a43e3");
         devs.add("f8cc9b45-509a-4034-8740-0b84ce7e4492");
     }
-
+    public static CoreFaction coreFaction = new CoreFaction();
     @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new GOTSoulBoundEvents());
@@ -245,8 +258,49 @@ public class GOT {
         GOTRegistry.blockGem.setHarvestLevel(pickaxe, 0, 8);
         GOTRegistry.redClay.setHarvestLevel(shovel, 0);
         GOTLoader.onInit();
+        
+    	MinecraftForge.EVENT_BUS.register(this);
+    }
+    @SubscribeEvent
+    public void onPlayerNameFormat(PlayerEvent.NameFormat event) {
+        String originalName = event.displayname;
+        event.displayname = getPrefix(originalName) +" " +   getTag(originalName) +  event.displayname;
+
+
     }
 
+    @SubscribeEvent
+    public void onChatMessage(ClientChatReceivedEvent event) {
+        String message = event.message.getUnformattedText();
+        if (message.startsWith("<")) {
+            int endIndex = message.indexOf('>');
+            if (endIndex != -1) {
+                String playerName = message.substring(1, endIndex);
+                String newMessage = getPrefix(playerName) +" " + getTag(playerName) + playerName + "§f:" + message.substring(endIndex + 1);
+                
+               event.message = new ChatComponentText(newMessage);
+            }
+        }
+    }
+	
+    public String getPrefix(String name) {
+    	for(Faction faction : PacketInfoFactions.getFactions().values()) {
+			if(faction.getPlayers().containsKey(name)) {
+				return faction.getPlayers().get(name);
+			}
+		}
+		return "";
+    }
+	public String getTag(String name) {
+		for(Faction faction : PacketInfoFactions.getFactions().values()) {
+			if(faction.getPlayers().containsKey(name)) {
+				return faction.getColorTag();
+			}
+		}
+		return "";
+	}
+	
+	
     @Mod.EventHandler
     public void onMissingMappings(FMLMissingMappingsEvent event) {
         for (FMLMissingMappingsEvent.MissingMapping mapping : event.get()) {
@@ -392,6 +446,7 @@ public class GOT {
         Blocks.dragon_egg.setCreativeTab(GOTCreativeTabs.tabStory);
         proxy.onPreload();
         GOTBlockIronBank.preInit();
+        coreFaction.preInit(event);
     }
 
     //	@SideOnly(Side.CLIENT)

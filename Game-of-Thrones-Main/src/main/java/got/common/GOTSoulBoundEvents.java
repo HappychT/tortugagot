@@ -22,7 +22,7 @@ import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 public class GOTSoulBoundEvents {
-    private Map<String, ItemStack[]> itemsToRestore = new HashMap<String, ItemStack[]>();
+    private final Map<String, ItemStack[]> itemsToRestore = new HashMap<String, ItemStack[]>();
     private static final double killBoostForSeal = 0.0001;
 
     @SubscribeEvent
@@ -76,7 +76,8 @@ public class GOTSoulBoundEvents {
                         itemsPerPlayer[mainIndex + armor.length] = mainItem;
                         restore = true;
                         double chance = mainItem.getTagCompound().getDouble("sealChance");
-                        mainItem.getTagCompound().setDouble("sealChance", chance -= 0.1);
+                        chance = Math.max(0, chance - 0.1);
+                        mainItem.getTagCompound().setDouble("sealChance", chance);
                     }
                 }
             }
@@ -91,7 +92,8 @@ public class GOTSoulBoundEvents {
                         itemsPerPlayer[armorIndex] = armorItem;
                         restore = true;
                         double chance = armorItem.getTagCompound().getDouble("sealChance");
-                        armorItem.getTagCompound().setDouble("sealChance", chance -= 0.1);
+                        chance = Math.max(0, chance - 0.1);
+                        armorItem.getTagCompound().setDouble("sealChance", chance);
                     }
                 }
             }

@@ -1,6 +1,8 @@
 package got.common.network;
 
+import brain.factions.network.PacketMessage;
 import cpw.mods.fml.common.network.simpleimpl.*;
+import got.GOT;
 import got.common.*;
 import got.common.faction.GOTFaction;
 import io.netty.buffer.ByteBuf;
@@ -35,9 +37,13 @@ public class GOTPacketPledgeSet implements IMessage {
 			GOTPlayerData pd = GOTLevelData.getData(entityplayer);
 			GOTFaction fac = packet.pledgeFac;
 			if (fac == null) {
-				pd.revokePledgeFaction(entityplayer, true);
+				// Отвергает
+				GOT.coreFaction.brainChannel.sendToServer(new PacketMessage("quet"));
+				//pd.revokePledgeFaction(entityplayer, true);
 			} else if (pd.canPledgeTo(fac) && pd.canMakeNewPledge()) {
-				pd.setPledgeFaction(fac);
+				//Присягает
+				GOT.coreFaction.brainChannel.sendToServer(new PacketMessage("sendApplication#" + fac.codeName()));
+				//pd.setPledgeFaction(fac);
 			}
 			return null;
 		}
