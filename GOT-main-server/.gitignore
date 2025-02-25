@@ -1,0 +1,16 @@
+
+.classpath
+.gradle
+.project
+.settings
+bin
+build/libs
+build/classes
+build/resources
+build/sources
+build/taskLogs
+build/tmp
+eclipse
+lotr
+unreleased
+out
