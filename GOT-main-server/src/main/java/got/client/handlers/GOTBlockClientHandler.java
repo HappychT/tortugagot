@@ -31,9 +31,9 @@ public class GOTBlockClientHandler {
 
         if (BlockServerHandler.INSTANCE.isBlocking(player) && true) { // Put true instead of false to enable the block angle overlay debug feature
             float[] blockAngles = {GOTCoreBlockingSystem.getBlockData(player.getHeldItem().getItem().getClass(), player).getLeftBlockAngle(), GOTCoreBlockingSystem.getBlockData(player.getHeldItem().getItem().getClass(), player).getRightBlockAngle()};
-            if(GOTConfig.enableBlockArc) {
-                renderBlockAngleOverlay(blockAngles);
-            }
+            // if(GOTConfig.enableBlockArc) {
+            //    renderBlockAngleOverlay(blockAngles);
+            // }
         }
     }
 

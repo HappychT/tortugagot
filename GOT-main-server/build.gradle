@@ -15,7 +15,7 @@ apply plugin: 'forge'
 
 version = "1.0"
 group= "com.yourname.modid"
-archivesBaseName = "Game of Thrones Build"
+archivesBaseName = "Game of Thrones Build server"
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
