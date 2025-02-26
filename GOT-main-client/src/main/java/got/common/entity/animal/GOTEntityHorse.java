@@ -249,7 +249,7 @@ public class GOTEntityHorse extends EntityHorse implements GOTNPCMount {
 			return false;
 		}
 		ItemStack itemstack = entityplayer.getHeldItem();
-		if (itemstack.getItem() == Item.getItemFromBlock(Blocks.chest)) {
+		if (itemstack != null && itemstack.getItem() == Item.getItemFromBlock(Blocks.chest)) {
 			return false;
 		}
 		if (itemstack != null && isBreedingItem(itemstack) && getGrowingAge() == 0 && !isInLove() && isTame()) {
