@@ -65,9 +65,10 @@ public class PacketMessage implements IMessage {
 		}
 		return null;
 	}
-	
-	public static <K, V> Map<V, K> invertMap(Map<K, V> map){
-	    return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+	public static <K, V> Map<V, K> invertMap(Map<K, V> map) {
+		return map.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (existing, replacement) -> existing));
 	}
 	
 	public static boolean checkAplic(String name) {	
@@ -227,11 +228,21 @@ public class PacketMessage implements IMessage {
 				}
 			} else if(args[0].equalsIgnoreCase("setHome")) {
 				if (faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
+					long cooldownRemaining = faction.getLastSetHomeTime() + TimeUnit.DAYS.toMillis(1) - System.currentTimeMillis();
+					if (cooldownRemaining > 0) {
+						long hours = TimeUnit.MILLISECONDS.toHours(cooldownRemaining);
+						long minutes = TimeUnit.MILLISECONDS.toMinutes(cooldownRemaining) % 60;
+						player.addChatMessage(new ChatComponentText("§aВы можете поставить точку дома только через " + hours + " ч. " + minutes + " мин.!"));
+						return null;
+					}
+
 					faction.setHome(new Location(player.dimension, player.posX, player.posY, player.posZ));
+					faction.setLastSetHomeTime(System.currentTimeMillis());
 					GOT.coreFaction.saveFactions();
 					GOT.coreFaction.initFactions();
 					GOT.coreFaction.sendAllGui();
-					player.addChatMessage(new ChatComponentText("§aТочка дома для всей фракции установлена!"));	
+					player.addChatMessage(new ChatComponentText("§aТочка дома для всей фракции установлена!"));
+					return null;
 				}
 			} else if(args[0].equalsIgnoreCase("home")) {
 				if(faction.getHome() == null) {

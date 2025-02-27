@@ -23,6 +23,8 @@ import com.google.gson.reflect.TypeToken;
 import brain.factions.network.PacketInfoFactions;
 import brain.factions.network.PacketMessage;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -41,13 +43,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.event.ServerChatEvent;
 
+@Mod(modid = "faction", name = "faction", acceptableRemoteVersions = "*")
 public class CoreFaction {
 	public static Gson GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 	public static File configFolder;
 
 	public static HashMap<String, Faction> factions;
 	public static SimpleNetworkWrapper brainChannel = new SimpleNetworkWrapper("brainchannel");
-
+	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		configFolder = new File(event.getModConfigurationDirectory(), "BrainFaction");
 		if (!configFolder.exists()) {
@@ -58,12 +61,13 @@ public class CoreFaction {
 
 	}
 
+	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		initFactions();
 		MinecraftForge.EVENT_BUS.register(this);
 		FMLCommonHandler.instance().bus().register(this);
 	}
-	
+	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(new LeaderCommand());
 		event.registerServerCommand(new CheckPlayerCommand());
@@ -118,7 +122,7 @@ public class CoreFaction {
 		for(Faction faction : factions.values()) {
 			for(Iterator<Map.Entry<String, Long>> p = faction.getApplications().entrySet().iterator(); p.hasNext();) {
 				 Map.Entry<String, Long> entry = p.next();
-				 if(System.currentTimeMillis() >= entry.getValue() + TimeUnit.DAYS.toMillis(7)) {
+				 if(System.currentTimeMillis() >= entry.getValue() + TimeUnit.DAYS.toMillis(3)) {
 					 p.remove();
 				 }
 			}
@@ -170,7 +174,7 @@ public class CoreFaction {
 				for (int i = 0; i < GOTFaction.values().length; i++) {
 					String factionName = GOTFaction.values()[i].codeName();
 					String[] colorTag = {"§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f"};
-					factions.put(factionName, new Faction(factionName, "", "", new HashMap<>(), new HashMap<>(), new HashMap<>(), colorTag[new Random().nextInt(colorTag.length)], null));
+					factions.put(factionName, new Faction(factionName, "", "", new HashMap<>(), new HashMap<>(), new HashMap<>(), colorTag[new Random().nextInt(colorTag.length)], null, 0));
 				}
 				saveFactions();
 			} catch (IOException e) {

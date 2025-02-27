@@ -13,8 +13,9 @@ public class Faction {
 	private HashMap<String, Long> mutePlayer;
 	private String colorTag;
 	private Location home;
+	private long lastSetHomeTime;
 	
-	public Faction(String ID, String leaderName, String assestantName, HashMap<String, String> players, HashMap<String, Long> applications, HashMap<String, Long> mutePlayer, String colorTag, Location home) {
+	public Faction(String ID, String leaderName, String assestantName, HashMap<String, String> players, HashMap<String, Long> applications, HashMap<String, Long> mutePlayer, String colorTag, Location home, long lastSetHomeTime) {
 		this.ID = ID;
 		this.leaderName = leaderName;
 		this.assistantName = assestantName;
@@ -23,6 +24,7 @@ public class Faction {
 		this.mutePlayer = mutePlayer;
 		this.colorTag = colorTag;
 		this.home = home;
+		this.lastSetHomeTime = lastSetHomeTime;
 	}
 	public String getAssistantName() {
 		return assistantName;
@@ -63,6 +65,13 @@ public class Faction {
 		return mutePlayer;
 	}
 	
+	public void setLastSetHomeTime(long lastSetHomeTime) {
+		this.lastSetHomeTime = lastSetHomeTime;
+	}
+	
+	public long getLastSetHomeTime() {
+		return lastSetHomeTime;
+	}
 	public String getColorTag() {
 		return colorTag;
 	}
