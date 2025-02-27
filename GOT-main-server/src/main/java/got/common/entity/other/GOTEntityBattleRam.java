@@ -1,5 +1,6 @@
 package got.common.entity.other;
 
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,7 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
-public class GOTEntityBattleRam extends EntityLiving {
+public class GOTEntityBattleRam extends EntityCreature {
     public GOTEntityBattleRam(World world) {
         super(world);
         setSize(4.0F, 3.4F);
