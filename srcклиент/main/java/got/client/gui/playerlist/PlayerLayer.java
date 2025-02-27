@@ -55,7 +55,9 @@ public class PlayerLayer {
 	}
 	
 	public void drawHover(GOTGuiFactions gui, float x, float y, float w, float h) {
-	
+		if(gui.prefixField.getVisible()) {
+			return;
+		}
 		if( gui.getStatus() == GroupStatus.Owner && gui.isEdit && gui.isHover(gui.guiLeft - 5 , gui.height/2-38, 142 , 90)) {
 			GL11.glPushMatrix();
 			GL11.glColor4f(1, 1, 1, 1);
@@ -80,13 +82,13 @@ public class PlayerLayer {
 			GL11.glPushMatrix();
 			GL11.glColor4f(1, 1, 1, 1);
 			GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/plus.png"), x + w - 10 * 5.25,y + 2, 5, 5);
-			if (gui.isClicked(x + w - 10 * (int)5.25,y + 2, 5, 5)) {
+			if (gui.isClicked(x + w - 10 * (int)5.25,y + 2, 5, 5) && !gui.prefixField.getVisible()) {
 				GOT.coreFaction.brainChannel.sendToServer(new PacketMessage("applicat#" + playerName + "#1"));
 				gui.setClicked(false);
 			}
 			
 			GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/kick.png"), x + w - 10 * 4.25,y + 3.5, 5, 1);
-			if (gui.isClicked( x + w - 10 * (int) 4.25,y + (int)3.5, 5, 5)) {
+			if (gui.isClicked( x + w - 10 * (int) 4.25,y + (int)3.5, 5, 5) && !gui.prefixField.getVisible()) {
 				GOT.coreFaction.brainChannel.sendToServer(new PacketMessage("applicat#" + playerName + "#-1"));
 				gui.setClicked(false);
 			}

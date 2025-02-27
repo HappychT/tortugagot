@@ -82,17 +82,17 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public Map<GOTFaction, Float> playerAlignmentMap;
 	public boolean isPledging;
 	public boolean isUnpledging;
-	
+
 	public static GuiScrollingList<PlayerLayer> playerList;
 	public static GuiScrollingList<PlayerLayer> applicationList;
-	
+
 	public static GroupStatus status = GroupStatus.Player;
 	public static boolean isEdit;
 	public static int MX;
 	public static int MY;
 	protected static boolean isClicked;
 	public static GuiTextField prefixField;
-	
+
 	public GOTGuiFactions() {
 		xSize = pageWidth;
 		currentScroll = 0.0f;
@@ -110,18 +110,18 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		isPledging = false;
 		isUnpledging = false;
 		mapDrawGui = new GOTGuiMap();
-		
+
 		playerList = new GuiScrollingList<>(0);
 		applicationList = new GuiScrollingList<>(0);
 		isEdit = false;
 	}
-	
+
 
 	@Override
 	public void actionPerformed(GuiButton button) {
 		if (button.enabled) {
 			if (button == buttonRegions) {
-				
+
 				List<GOTDimension.DimensionRegion> regionList = GOTGuiFactions.currentDimension.dimensionRegions;
 				if (!regionList.isEmpty()) {
 					int i = regionList.indexOf(currentRegion);
@@ -202,7 +202,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public void drawButtonHoveringText(List list, int i, int j) {
 		func_146283_a(list, i, j);
 	}
-	
+
 	public boolean isApplication() {
 		for(PlayerLayer f : applicationList.getElements()) {
 			if(f.getPlayerName().equals(mc.thePlayer.getDisplayName())) {
@@ -211,6 +211,10 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		}
 		return false;
 	}
+
+	public static long lastTeleportTime = 0; // Время последней телепортации
+	private static final long COOLDOWN_TIME = 10 * 1000; // 10 секунд в миллисекундах
+
 	@Override
 	public void drawScreen(int i, int j, float f) {
 		MX = i;
@@ -218,7 +222,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		List desc;
 		int stringWidth;
 		GOTPlayerData clientPD = GOTLevelData.getData(mc.thePlayer);
-	
+
 		boolean mouseOverWarCrimes = false;
 		if (!isPledging && !isUnpledging) {
 			buttonPagePrev.enabled = currentPage.prev() != null;
@@ -240,7 +244,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 					buttonPledge.isBroken = false;
 					buttonPledge.visible = clientPD.getPledgeFaction() == null && currentFaction.isPlayableAlignmentFaction() && clientPD.getAlignment(currentFaction) >= 0.0f;
 					buttonPledge.enabled = buttonPledge.visible && clientPD.hasPledgeAlignment(currentFaction);
-					
+
 					if(!isApplication()) {
 					//	buttonPledge.enabled = true;
 						String desc1 = StatCollector.translateToLocal("got.gui.factions.pledge");
@@ -251,7 +255,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 						GL11.glTranslated(0, 0, 100);
 						GL11.glColor4f(1, 1, 1, 1);
 						fontRendererObj.drawString("Заявка отправлена", guiLeft +50, guiTop + pageHeight/2+80, new Color(220, 220, 220, 150).getRGB());
-						GL11.glTranslated(0, 0, -100);	
+						GL11.glTranslated(0, 0, -100);
 					}
 				}
 			} else {
@@ -346,7 +350,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			}
 			x = guiLeft + pageBorderLeft;
 			y = guiTop + pageY + pageBorderTop;
-		
+
 			if (!isPledging && !isUnpledging) {
 				int index;
 				switch (currentPage) {
@@ -414,16 +418,26 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 							int px = buttonPledge.xPosition + buttonPledge.width + 8;
 							int py = buttonPledge.yPosition + buttonPledge.height / 2 - fontRendererObj.FONT_HEIGHT / 2;
 							fontRendererObj.drawString("Вы в этой фракции", px, py, 16711680);
-							
+
 							GuiApi.drawRect( width/2, buttonPledge.yPosition + 15, 15, 15, (isHover( width/2, buttonPledge.yPosition + 15, 15, 15)) ?new Color(0, 0, 0, 30).getRGB() :new Color(0, 0, 0, 40).getRGB() );
 							GL11.glColor4f(1, 1, 1, 1);
 							GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/home.png"), width/2, buttonPledge.yPosition + 15, 15, 15);
 							if (isHover(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
 								GOTTickHandlerClient.drawAlignmentText(fontRendererObj, MX+10, MY+10, "Телепортация домой", 1.0f);
 								if(isClicked(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
-									CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
-									Minecraft.getMinecraft().displayGuiScreen(null);
-									setClicked(false);
+									long currentTime = System.currentTimeMillis();
+
+
+									if (System.currentTimeMillis() > COOLDOWN_TIME + lastTeleportTime) {
+										CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
+										Minecraft.getMinecraft().displayGuiScreen(null);
+										setClicked(false);
+										lastTeleportTime = currentTime;
+									} else {
+										Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Кулдаун: " +
+												((COOLDOWN_TIME - (currentTime - lastTeleportTime)) / 1000 + " секунд осталось.")));
+										setClicked(false);
+									}
 								}
 							}
 							if(status != GroupStatus.Player) {
@@ -436,7 +450,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 								}
 							}
 						}
-						
+
 					}
 					break;
 				case RANKS:
@@ -471,16 +485,16 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 						y += fontRendererObj.FONT_HEIGHT;
 					}
 					break;
-					
-					
+
+
 				case Playerlist:
 					if (status != GroupStatus.Player) {
-						fontRendererObj.drawString("Заяки [" + applicationList.getList().size()+"]" ,x + pageWidth/2 + 40, y, 8019267);
+						fontRendererObj.drawString("Заявки [" + applicationList.getList().size()+"]" ,x + pageWidth/2 + 40, y, 8019267);
 						applicationList.drawScreen(MX, MY, j);
 					}
 					fontRendererObj.drawString("Участники " + playerList.getList().size() ,x , y, 8019267);
 					playerList.drawScreen(MX, MY, f);
-				
+
 					GL11.glPushMatrix();
 					GL11.glEnable(GL11.GL_SCISSOR_TEST);
 					GuiApi.glScissor(x, y+10, width*4, pageHeight - 40, false);
@@ -488,7 +502,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 						playerList.getList().get(k).draw(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10);
 						if(isClicked( x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10) && !prefixField.getVisible() && status != GroupStatus.Player) {
 							prefixEditName = playerList.getElement(k).getPlayerName();
-							prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName()));
+							prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName().replace("&", "§")));
 							prefixField.setVisible(true);
 							setClicked(false);
 						}
@@ -505,7 +519,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 					}
 					GL11.glDisable(GL11.GL_SCISSOR_TEST);
 					// Draw Edit Button
-			
+
 					if (status != GroupStatus.Player) {
 						GuiApi.drawRect(x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6,(isEdit) ? new Color(255, 255, 255, 180).getRGB(): new Color(255, 255, 255, 80).getRGB());
 						GL11.glColor4f(1, 1, 1, 1);
@@ -518,11 +532,11 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 							}
 						}
 					}
-					
+
 					GL11.glPopMatrix();
-				
+
 					break;
-			
+
 				}
 				if (scrollPaneAlliesEnemies.hasScrollBar) {
 					scrollPaneAlliesEnemies.drawScrollBar();
@@ -633,7 +647,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		final int mouseX = MX;
 		final int mouseY = MY;
 		return mouseX >= xx && mouseX < xx1 + xx && mouseY >= yy && mouseY < yy1 + yy && this.isClicked;
-	} 
+	}
 
 	public static void setClicked(boolean isClicked) {
 		GOTGuiFactions.isClicked = isClicked;
@@ -651,22 +665,22 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		GuiApi.drawRect(x,y, width, height, new Color(0, 0, 0, 180).getRGB());
 		GuiApi.drawScaleText("Установить префикс", x + 11, y +3, 0.8f, true, 0xFFffffff);
 		prefixField.drawTextBox();
-		
+
 		GuiApi.drawRect(x + 9, y + height- 12, 25, 10, (isHover(x + 9, y + height- 12, 25, 10) ?new Color(0, 0, 0, 180).getRGB()  : new Color(0, 0, 0, 120).getRGB() ));
 		GuiApi.drawScaleText("Ок", x + 19, y + height- 11, 0.8f, true, 0xFFffffff);
 		if(isClicked(x + 9, y + height- 12, 25, 10)) {
-			CoreFaction.brainChannel.sendToServer(new PacketMessage("setPrefix#" + prefixEditName.replace(" ", "") + "#" + prefixField.getText().replace("#", "")));
+			CoreFaction.brainChannel.sendToServer(new PacketMessage("setPrefix#" + prefixEditName.replace(" ", "") + "#" + prefixField.getText().replace("#", "").replace("&", "§")));
 			prefixField.setVisible(false);
 			setClicked(false);
 		}
-		
+
 		GuiApi.drawRect(x + 46, y + height- 12, 25, 10, (isHover(x + 46, y + height- 12, 25, 10) ?new Color(0, 0, 0, 180).getRGB()  : new Color(0, 0, 0, 120).getRGB() ));
 		GuiApi.drawScaleText("Отмена", x + 20+30, y + height- 11, 0.8f, true, 0xFFffffff);
 		if(isClicked(x + 46, y + height- 12, 25, 10)) {
 			prefixField.setVisible(false);
 			setClicked(false);
 		}
-		
+
 	}
 	@Override
 	public void handleMouseInput() {
@@ -677,7 +691,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		if(applicationList.isHover() || playerList.isHover()) {
 			return;
 		}
-		
+
 		if (k != 0 ) {
 			k = Integer.signum(k);
 			if (scrollPaneAlliesEnemies.hasScrollBar && scrollPaneAlliesEnemies.mouseOver) {
@@ -734,9 +748,9 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			GOTPacketClientMQEvent packet = new GOTPacketClientMQEvent(GOTPacketClientMQEvent.ClientMQEvent.FACTIONS);
 			GOTPacketHandler.networkWrapper.sendToServer(packet);
 		}
-		
+
 		playerList = new GuiScrollingList<>(guiLeft - 5 , height/2-38, 142 , 90, 10);
-		applicationList  = new GuiScrollingList<>(guiLeft + pageWidth/2+25 , height/2-38, 85 , 90, 10);   	
+		applicationList  = new GuiScrollingList<>(guiLeft + pageWidth/2+25 , height/2-38, 85 , 90, 10);
 		setFactionInfo(currentFaction.codeName());
 		prefixField = new GuiTextField(fontRendererObj, width/2-30, height/2-5, 60, 10);
 		prefixField.setVisible(false);
@@ -775,10 +789,10 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		} else {
 			status = GroupStatus.Player;
 		}
-		
+
 	}
-	
-	
+
+
 	@Override
 	public void keyTyped(char c, int i) {
 		prefixField.textboxKeyTyped(c, i);
@@ -800,7 +814,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			}
 		}
 		super.keyTyped(c, i);
-		
+
 	}
 
 	public void setCurrentScrollFromFaction() {
@@ -902,7 +916,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			scrollPaneAlliesEnemies.hasScrollBar = false;
 		}
 		scrollPaneAlliesEnemies.mouseDragScroll(i, j);
-	
+
 	}
 
 	@Override
@@ -964,7 +978,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		applicationList.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_);
 		super.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
 	}
-	
+
 	public static String getPrefix(Faction faction, String player) {
 		for(Map.Entry<String, String> fac: faction.getPlayers().entrySet()) {
 			if(fac.getKey().equals(player)) {
@@ -973,7 +987,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		}
 		return "";
 	}
-	
+
 
 	protected void mouseClicked(int x, int y, int b) {
 		super.mouseClicked(x, y, b);
@@ -984,11 +998,11 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		playerList.mouseClicked(x, y, b);
 		applicationList.mouseClicked(x, y, b);
 	}
-	
+
 	public static GroupStatus getStatus() {
 		return status;
 	}
-	
+
 	public boolean useFullPageTexture() {
 		return isPledging || isUnpledging || currentPage == Page.RANKS;
 	}
@@ -1017,15 +1031,15 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			return Page.values()[i];
 		}
 	}
-	
+
 	class Timing extends Thread
     {
         private int timer;
-        
+
         public Timing(final int timer) {
             this.timer = timer;
         }
-        
+
         @Override
         public void run() {
             try {
@@ -1038,6 +1052,6 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
             this.interrupt();
         }
     }
-	
+
 
 }

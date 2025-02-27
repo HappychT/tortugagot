@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.common.base.CaseFormat;
 
@@ -26,6 +28,8 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import got.common.GOTCommonProxy;
 import got.common.GOTEventHandler;
 import got.common.GOTGuiMessageTypes;
@@ -264,11 +268,11 @@ public class GOT {
     @SubscribeEvent
     public void onPlayerNameFormat(PlayerEvent.NameFormat event) {
         String originalName = event.displayname;
-        event.displayname = getPrefix(originalName) +" " +   getTag(originalName) +  event.displayname;
+        event.displayname = getTag(originalName) +  event.displayname;
 
 
     }
-
+    /*
     @SubscribeEvent
     public void onChatMessage(ClientChatReceivedEvent event) {
         String message = event.message.getUnformattedText();
@@ -279,6 +283,43 @@ public class GOT {
                 String newMessage = getPrefix(playerName) +" " + getTag(playerName) + playerName + "§f:" + message.substring(endIndex + 1);
                 
                event.message = new ChatComponentText(newMessage);
+            }
+        }
+    }*/
+
+    @SubscribeEvent
+    public void onChatMessage(ClientChatReceivedEvent event) {
+        String message = event.message.getUnformattedText();
+
+
+        if (message.startsWith("<")) {
+            int endIndex = message.indexOf('>');
+            if (endIndex != -1) {
+                String playerName = message.substring(1, endIndex);
+                String newMessage = getPrefix(playerName) + " " + getTag(playerName) + playerName
+                        + "§f:" + message.substring(endIndex + 1);
+                event.message = new ChatComponentText(newMessage);
+            }
+        } else if (message.startsWith("[")) {
+            Pattern pattern = Pattern.compile("^((\\[[^\\]]+\\]\\s*)+)");
+            Matcher matcher = pattern.matcher(message);
+            if (matcher.find()) {
+
+                String bracketGroups = matcher.group(1);
+
+                String remainder = message.substring(matcher.end());
+
+                int colonIndex = remainder.indexOf(':');
+                if (colonIndex != -1) {
+                    String playerName = remainder.substring(0, colonIndex).trim();
+
+                    String newNamePart = getPrefix(playerName) + " " + getTag(playerName) + playerName;
+                    String newMessage = bracketGroups + "" + newNamePart + "§f:"
+                            + remainder.substring(colonIndex + 1);
+
+
+                    event.message = new ChatComponentText(newMessage);
+                }
             }
         }
     }
@@ -446,14 +487,15 @@ public class GOT {
         Blocks.dragon_egg.setCreativeTab(GOTCreativeTabs.tabStory);
         proxy.onPreload();
         GOTBlockIronBank.preInit();
-        coreFaction.preInit(event);
+        //coreFaction.preInit(event);
     }
 
-    //	@SideOnly(Side.CLIENT)
-    //	@Mod.EventHandler
-    //	public void preloadClient(FMLPreInitializationEvent event) {
+    @SideOnly(Side.CLIENT)
+    @Mod.EventHandler
+    public void preloadClient(FMLPreInitializationEvent event) {
     //		GOTLoader.preInitClient();
-    //	}
+        coreFaction.preInit(event);
+    }
 
     public static boolean canDropLoot(World world) {
         return world.getGameRules().getGameRuleBooleanValue("doMobLoot");

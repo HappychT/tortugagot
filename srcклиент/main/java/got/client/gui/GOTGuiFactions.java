@@ -211,6 +211,10 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		}
 		return false;
 	}
+	
+	public static long lastTeleportTime = 0; // Время последней телепортации
+	private static final long COOLDOWN_TIME = 10 * 1000; // 10 секунд в миллисекундах
+	
 	@Override
 	public void drawScreen(int i, int j, float f) {
 		MX = i;
@@ -420,10 +424,20 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 							GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/home.png"), width/2, buttonPledge.yPosition + 15, 15, 15);
 							if (isHover(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
 								GOTTickHandlerClient.drawAlignmentText(fontRendererObj, MX+10, MY+10, "Телепортация домой", 1.0f);
-								if(isClicked(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
-									CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
-									Minecraft.getMinecraft().displayGuiScreen(null);
-									setClicked(false);
+								if (isClicked(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
+								    long currentTime = System.currentTimeMillis();
+
+
+								    if (System.currentTimeMillis() > COOLDOWN_TIME + lastTeleportTime) {
+								        CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
+								        Minecraft.getMinecraft().displayGuiScreen(null);
+								        setClicked(false);
+								        lastTeleportTime = currentTime;
+								    } else {
+								        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Кулдаун: " + 
+								            ((COOLDOWN_TIME - (currentTime - lastTeleportTime)) / 1000 + " секунд осталось.")));
+								        setClicked(false);
+								    }
 								}
 							}
 							if(status != GroupStatus.Player) {
@@ -475,7 +489,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 					
 				case Playerlist:
 					if (status != GroupStatus.Player) {
-						fontRendererObj.drawString("Заяки [" + applicationList.getList().size()+"]" ,x + pageWidth/2 + 40, y, 8019267);
+						fontRendererObj.drawString("Заявки [" + applicationList.getList().size()+"]" ,x + pageWidth/2 + 40, y, 8019267);
 						applicationList.drawScreen(MX, MY, j);
 					}
 					fontRendererObj.drawString("Участники " + playerList.getList().size() ,x , y, 8019267);
@@ -488,7 +502,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 						playerList.getList().get(k).draw(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10);
 						if(isClicked( x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10) && !prefixField.getVisible() && status != GroupStatus.Player) {
 							prefixEditName = playerList.getElement(k).getPlayerName();
-							prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName()));
+							prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName()).replace("§", "&"));
 							prefixField.setVisible(true);
 							setClicked(false);
 						}
@@ -655,7 +669,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		GuiApi.drawRect(x + 9, y + height- 12, 25, 10, (isHover(x + 9, y + height- 12, 25, 10) ?new Color(0, 0, 0, 180).getRGB()  : new Color(0, 0, 0, 120).getRGB() ));
 		GuiApi.drawScaleText("Ок", x + 19, y + height- 11, 0.8f, true, 0xFFffffff);
 		if(isClicked(x + 9, y + height- 12, 25, 10)) {
-			CoreFaction.brainChannel.sendToServer(new PacketMessage("setPrefix#" + prefixEditName.replace(" ", "") + "#" + prefixField.getText().replace("#", "")));
+			CoreFaction.brainChannel.sendToServer(new PacketMessage("setPrefix#" + prefixEditName.replace(" ", "") + "#" + prefixField.getText().replace("#", "").replace("&", "§")));
 			prefixField.setVisible(false);
 			setClicked(false);
 		}
