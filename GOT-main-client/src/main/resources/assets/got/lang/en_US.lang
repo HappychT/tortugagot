@@ -1,6 +1,9 @@
 ﻿
 attribute.name.generic.movementSpeedAir=Speed (Air)
 got.warning=Вы не можете использовать данное снаряжение
+got.lance.warning=Можно использовать только верхом на лошади
+got.lance.dmginfo=Сокрушающий кавалерию: +3 урона по лошадям
+item.got.blockAngle=Угол блока:
 color.black=Black
 color.blue=Blue
 color.brown=Brown

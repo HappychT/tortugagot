@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import got.common.entity.animal.GOTEntityHorse;
+import net.minecraft.entity.passive.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -168,11 +170,6 @@ import net.minecraft.entity.item.EntityMinecartTNT;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityCow;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.passive.EntityWaterMob;
-import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -1423,6 +1420,10 @@ public class GOTEventHandler implements IFuelHandler {
             if (GOTEnchantmentHelper.hasMeleeOrRangedEnchant(event.source, GOTEnchantment.chill)) {
                 GOTEnchantmentWeaponSpecial.doChillAttack(entity);
             }
+        }
+
+        if (attacker instanceof EntityPlayer && attacker.getHeldItem() != null && attacker.getHeldItem().getItem() == GOTRegistry.westerosLance && entity instanceof EntityHorse) {
+            event.ammount += 3;
         }
     }
 

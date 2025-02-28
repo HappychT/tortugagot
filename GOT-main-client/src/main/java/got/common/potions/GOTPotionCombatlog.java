@@ -6,10 +6,10 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.MinecraftForge;
 
-public class GOTPotionCombatlog extends Potion {
+public class GOTPotionCombatlog extends GOTCustomPotion {
 
     public GOTPotionCombatlog(int id) {
-        super(id, false, 9388224);
+        super(id, false, 9388224, "combatLogPotion");
         setPotionName("potion.got.combatLogPotion");
         MinecraftForge.EVENT_BUS.register(this);
     }

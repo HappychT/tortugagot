@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import got.common.item.weapon.*;
+import got.common.systems.GOTCoreBlockingSystem;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.ItemSword;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -56,10 +60,6 @@ import got.common.item.GOTPoisonedDrinks;
 import got.common.item.GOTWeaponStats;
 import got.common.item.other.GOTItemBanner;
 import got.common.item.other.GOTItemOwnership;
-import got.common.item.weapon.GOTItemBow;
-import got.common.item.weapon.GOTItemCrossbow;
-import got.common.item.weapon.GOTItemSarbacane;
-import got.common.item.weapon.GOTItemSpear;
 import got.common.network.base.PacketDispatcher;
 import got.common.network.clientToServer.PacketSendAttackCooldown;
 import got.common.quest.IPickpocketable;
@@ -170,6 +170,9 @@ public class GOTTickHandlerClient {
     public boolean cancelItemHighlight;
     public ItemStack lastHighlightedItemstack;
     public String highlightedItemstackName;
+    public Class<? extends Item> itemClass = null;
+    public int leftAngle = 0;
+    public int rightAngle = 0;
 
     public GOTTickHandlerClient() {
         FMLCommonHandler.instance().bus().register(this);
@@ -191,6 +194,7 @@ public class GOTTickHandlerClient {
             name = GOTEnchantmentHelper.getFullEnchantedName(itemstack, name);
             tooltip.set(0, name);
         }
+
         if(enchantments.contains(GOTEnchantment.valyrianSeal)) {
             if(itemstack.hasTagCompound()) {
                 tooltip.add(StatCollector.translateToLocal("got.sealChance.name") + " - " + String.valueOf(itemstack.getTagCompound().getDouble("sealChance") * 100.0) + "%");
@@ -220,7 +224,21 @@ public class GOTTickHandlerClient {
             }
             if (dmgIndex >= 0) {
                 List<String> newTooltip = new ArrayList<>();
+                if (itemstack.getItemUseAction() == EnumAction.block) {
+                    itemClass = itemstack.getItem().getClass();
+                    GOTCoreBlockingSystem.WeaponBlockData data = GOTCoreBlockingSystem.getBlockData(itemClass, entityplayer);
+                    leftAngle = (int) data.getLeftBlockAngle();
+                    rightAngle = (int) data.getRightBlockAngle();
+                }
                 for (int j = 0; j <= dmgIndex - 1; j++) {
+                    if (j == 1 && itemstack.getItemUseAction() == EnumAction.block) {
+                        if (!tooltip.get(j).isEmpty()) {
+                            newTooltip.add(tooltip.get(j));
+                            newTooltip.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.got.blockAngle") + " " + leftAngle + "|" + rightAngle);
+                            continue;
+                        }
+                        newTooltip.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.got.blockAngle") + " " + leftAngle + "|" + rightAngle);
+                    }
                     newTooltip.add(tooltip.get(j));
                 }
                 float meleeDamage = GOTWeaponStats.getMeleeDamageBonus(itemstack);
