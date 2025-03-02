@@ -146,6 +146,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
@@ -289,39 +290,60 @@ public class GOT {
 
     @SubscribeEvent
     public void onChatMessage(ClientChatReceivedEvent event) {
-        String message = event.message.getUnformattedText();
+        //	event.message = new ChatComponentText("[G] [И] Player317: 2121");
+        IChatComponent originalMessage = event.message;
+        String formattedMessage = originalMessage.getFormattedText();
+        String unformattedMessage = originalMessage.getUnformattedText();
 
-
-        if (message.startsWith("<")) {
-            int endIndex = message.indexOf('>');
+        if (unformattedMessage.startsWith("<")) {
+            int endIndex = unformattedMessage.indexOf('>');
             if (endIndex != -1) {
-                String playerName = message.substring(1, endIndex);
-                String newMessage = getPrefix(playerName) + " " + getTag(playerName) + playerName
-                        + "§f:" + message.substring(endIndex + 1);
-                event.message = new ChatComponentText(newMessage);
+                String playerName = unformattedMessage.substring(1, endIndex);
+
+                // Получаем префикс и тег
+                String prefix = getPrefix(playerName);
+                String tag = getTag(playerName);
+
+
+                ChatComponentText newChat = new ChatComponentText("");
+
+
+                newChat.appendSibling(originalMessage);
+
+                newChat.getSiblings().add(0, new ChatComponentText(prefix + " " + tag));
+
+                event.message = newChat;
             }
-        } else if (message.startsWith("[")) {
+        } else if (unformattedMessage.startsWith("[")) {
             Pattern pattern = Pattern.compile("^((\\[[^\\]]+\\]\\s*)+)");
-            Matcher matcher = pattern.matcher(message);
+            Matcher matcher = pattern.matcher(unformattedMessage);
             if (matcher.find()) {
-
-                String bracketGroups = matcher.group(1);
-
-                String remainder = message.substring(matcher.end());
+                String bracketGroups = matcher.group(1); // Группы в []
+                String remainder = unformattedMessage.substring(matcher.end()); // Остальная часть
 
                 int colonIndex = remainder.indexOf(':');
                 if (colonIndex != -1) {
                     String playerName = remainder.substring(0, colonIndex).trim();
 
-                    String newNamePart = getPrefix(playerName) + " " + getTag(playerName) + playerName;
-                    String newMessage = bracketGroups + "" + newNamePart + "§f:"
-                            + remainder.substring(colonIndex + 1);
+                    String prefix = getPrefix(playerName);
+                    String tag = getTag(playerName);
 
 
-                    event.message = new ChatComponentText(newMessage);
+                    ChatComponentText newChat = new ChatComponentText(bracketGroups);
+
+
+                    newChat.appendSibling(new ChatComponentText(prefix + " " + tag));
+
+                    int formattedNameIndex = formattedMessage.indexOf(playerName, bracketGroups.length());
+                    if (formattedNameIndex != -1) {
+                        newChat.appendSibling(new ChatComponentText(formattedMessage.substring(formattedNameIndex)));
+                    }
+
+                    event.message = newChat;
                 }
             }
         }
+
     }
 	
     public String getPrefix(String name) {

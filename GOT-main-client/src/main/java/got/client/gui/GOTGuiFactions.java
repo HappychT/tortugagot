@@ -669,7 +669,11 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		GuiApi.drawRect(x + 9, y + height- 12, 25, 10, (isHover(x + 9, y + height- 12, 25, 10) ?new Color(0, 0, 0, 180).getRGB()  : new Color(0, 0, 0, 120).getRGB() ));
 		GuiApi.drawScaleText("Ок", x + 19, y + height- 11, 0.8f, true, 0xFFffffff);
 		if(isClicked(x + 9, y + height- 12, 25, 10)) {
+			if(prefixField.getText().equals("")) {
+				prefixField.setText(" ");
+			}
 			CoreFaction.brainChannel.sendToServer(new PacketMessage("setPrefix#" + prefixEditName.replace(" ", "") + "#" + prefixField.getText().replace("#", "").replace("&", "§")));
+
 			prefixField.setVisible(false);
 			setClicked(false);
 		}
