@@ -2,6 +2,9 @@ package got.client.render.other;
 
 import java.util.*;
 
+import got.common.item.weapon.GOTItemShieldPike;
+import got.common.item.weapon.GOTItemShieldRiverlandsTrident;
+import got.common.item.weapon.GOTItemShieldSpear;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -101,6 +104,7 @@ public class GOTRenderPlayer {
 		double d3 = MathHelper.sin(f6 * 3.1415927f / 180.0f);
 		double d4 = -MathHelper.cos(f6 * 3.1415927f / 180.0f);
 		float f7 = (float) d1 * 10.0f;
+		boolean flag = false;
 		if (f7 < -6.0f) {
 			f7 = -6.0f;
 		}
@@ -117,7 +121,11 @@ public class GOTRenderPlayer {
 		if (entityplayer.isSneaking()) {
 			f7 += 25.0f;
 		}
-		if (shield != null) {
+		if (entityplayer.getHeldItem() != null && (entityplayer.getHeldItem().getItem() instanceof GOTItemShieldPike || entityplayer.getHeldItem().getItem() instanceof GOTItemShieldRiverlandsTrident || entityplayer.getHeldItem().getItem() instanceof GOTItemShieldSpear)) {
+			flag = true;
+			GOTRenderShield.renderShield(GOTShields.SHIELD_WEAPON, entityplayer, event.renderer.modelBipedMain);
+		}
+		if (shield != null && !flag) {
 			if (!entityplayer.isInvisible()) {
 				GOTRenderShield.renderShield(shield, entityplayer, event.renderer.modelBipedMain);
 			} else if (!entityplayer.isInvisibleToPlayer(mc.thePlayer)) {

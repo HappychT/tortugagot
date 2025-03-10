@@ -216,7 +216,7 @@ public class GOTItemCustomPotion extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack p_77624_1_, EntityPlayer p_77624_2_, List p_77624_3_, boolean p_77624_4_) {
+    public void addInformation(ItemStack p_77624_1_, EntityPlayer p_77624_2_, List<String> p_77624_3_, boolean p_77624_4_) {
         List<PotionEffect> list = getEffects(p_77624_1_);
         HashMultimap<String, AttributeModifier> hashmultimap = HashMultimap.create();
         if (list != null && !list.isEmpty()) {

@@ -164,7 +164,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 				}
 			} else if (button == buttonPledgeConfirm) {
 				GOTPacketPledgeSet packet = new GOTPacketPledgeSet(currentFaction);
-			//	GOTPacketHandler.networkWrapper.sendToServer(packet);
+				//	GOTPacketHandler.networkWrapper.sendToServer(packet);
 				EntityClientPlayerMP entityplayer = Minecraft.getMinecraft().thePlayer;
 				GOTPlayerData pd = GOTLevelData.getData(entityplayer);
 				GOTFaction fac = packet.pledgeFac;
@@ -238,7 +238,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 					buttonPledge.isBroken = buttonPledge.func_146115_a();
 					buttonPledge.enabled = true;
 					buttonPledge.visible = true;
-			//		buttonPledge.setDisplayLines(StatCollector.translateToLocal("got.gui.factions.unpledge"));
+					//		buttonPledge.setDisplayLines(StatCollector.translateToLocal("got.gui.factions.unpledge"));
 					buttonPledge.setDisplayLines("Покинуть фракцию");
 				} else {
 					buttonPledge.isBroken = false;
@@ -246,7 +246,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 					buttonPledge.enabled = buttonPledge.visible && clientPD.hasPledgeAlignment(currentFaction);
 
 					if(!isApplication()) {
-					//	buttonPledge.enabled = true;
+						//	buttonPledge.enabled = true;
 						String desc1 = StatCollector.translateToLocal("got.gui.factions.pledge");
 						String desc2 = StatCollector.translateToLocalFormatted("got.gui.factions.pledgeReq", GOTAlignmentValues.formatAlignForDisplay(currentFaction.getPledgeAlignment()));
 						buttonPledge.setDisplayLines("Подать заявку", desc2);
@@ -354,188 +354,188 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			if (!isPledging && !isUnpledging) {
 				int index;
 				switch (currentPage) {
-				case ALLIES:
-				case ENEMIES:
-					int avgBgColor = GOTTextures.computeAverageFactionPageColor(factionsTexture, 20, 20, 120, 80);
-					int[] minMax = scrollPaneAlliesEnemies.getMinMaxIndices(currentAlliesEnemies, numDisplayedAlliesEnemies);
-					for (index = minMax[0]; index <= minMax[1]; ++index) {
-						Object listObj = currentAlliesEnemies.get(index);
-						if (listObj instanceof GOTFactionRelations.Relation) {
-							GOTFactionRelations.Relation rel = (GOTFactionRelations.Relation) listObj;
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.relationHeader", rel.getDisplayName());
-							fontRendererObj.drawString(s, x, y, 8019267);
-						} else if (listObj instanceof GOTFaction) {
-							GOTFaction fac = (GOTFaction) listObj;
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.list", fac.factionName());
-							fontRendererObj.drawString(s, x, y, GOTTextures.findContrastingColor(fac.getFactionColor(), avgBgColor));
-						}
-						y += fontRendererObj.FONT_HEIGHT;
-					}
-					break;
-				case FRONT:
-					if (isOtherPlayer) {
-						s = StatCollector.translateToLocalFormatted("got.gui.factions.pageOther", otherPlayerName);
-						fontRendererObj.drawString(s, x, y, 8019267);
-						y += fontRendererObj.FONT_HEIGHT * 2;
-					}
-					String alignmentInfo = StatCollector.translateToLocal("got.gui.factions.alignment");
-					fontRendererObj.drawString(alignmentInfo, x, y, 8019267);
-					String alignmentString = GOTAlignmentValues.formatAlignForDisplay(alignment);
-					GOTTickHandlerClient.drawAlignmentText(fontRendererObj, x += fontRendererObj.getStringWidth(alignmentInfo) + 5, y, alignmentString, 1.0f);
-
-					x = guiLeft + pageBorderLeft;
-					GOTFactionRank curRank = currentFaction.getRank(alignment);
-					String rankName = curRank.getFullNameWithGender(clientPD);
-					fontRendererObj.drawString(rankName, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
-					y += fontRendererObj.FONT_HEIGHT * 2;
-					if (!isOtherPlayer) {
-						GOTFactionData factionData = clientPD.getFactionData(currentFaction);
-						if (alignment >= 0.0f) {
-							float conq;
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.data.enemiesKilled", factionData.getEnemiesKilled());
-							fontRendererObj.drawString(s, x, y, 8019267);
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.data.trades", factionData.getTradeCount());
-							fontRendererObj.drawString(s, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.data.hires", factionData.getHireCount());
-							fontRendererObj.drawString(s, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.data.miniquests", factionData.getMiniQuestsCompleted());
-							fontRendererObj.drawString(s, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
+					case ALLIES:
+					case ENEMIES:
+						int avgBgColor = GOTTextures.computeAverageFactionPageColor(factionsTexture, 20, 20, 120, 80);
+						int[] minMax = scrollPaneAlliesEnemies.getMinMaxIndices(currentAlliesEnemies, numDisplayedAlliesEnemies);
+						for (index = minMax[0]; index <= minMax[1]; ++index) {
+							Object listObj = currentAlliesEnemies.get(index);
+							if (listObj instanceof GOTFactionRelations.Relation) {
+								GOTFactionRelations.Relation rel = (GOTFactionRelations.Relation) listObj;
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.relationHeader", rel.getDisplayName());
+								fontRendererObj.drawString(s, x, y, 8019267);
+							} else if (listObj instanceof GOTFaction) {
+								GOTFaction fac = (GOTFaction) listObj;
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.list", fac.factionName());
+								fontRendererObj.drawString(s, x, y, GOTTextures.findContrastingColor(fac.getFactionColor(), avgBgColor));
+							}
 							y += fontRendererObj.FONT_HEIGHT;
-							if (clientPD.isPledgedTo(currentFaction) && (conq = factionData.getConquestEarned()) != 0.0f) {
-								int conqInt = Math.round(conq);
-								s = StatCollector.translateToLocalFormatted("got.gui.factions.data.conquest", conqInt);
+						}
+						break;
+					case FRONT:
+						if (isOtherPlayer) {
+							s = StatCollector.translateToLocalFormatted("got.gui.factions.pageOther", otherPlayerName);
+							fontRendererObj.drawString(s, x, y, 8019267);
+							y += fontRendererObj.FONT_HEIGHT * 2;
+						}
+						String alignmentInfo = StatCollector.translateToLocal("got.gui.factions.alignment");
+						fontRendererObj.drawString(alignmentInfo, x, y, 8019267);
+						String alignmentString = GOTAlignmentValues.formatAlignForDisplay(alignment);
+						GOTTickHandlerClient.drawAlignmentText(fontRendererObj, x += fontRendererObj.getStringWidth(alignmentInfo) + 5, y, alignmentString, 1.0f);
+
+						x = guiLeft + pageBorderLeft;
+						GOTFactionRank curRank = currentFaction.getRank(alignment);
+						String rankName = curRank.getFullNameWithGender(clientPD);
+						fontRendererObj.drawString(rankName, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
+						y += fontRendererObj.FONT_HEIGHT * 2;
+						if (!isOtherPlayer) {
+							GOTFactionData factionData = clientPD.getFactionData(currentFaction);
+							if (alignment >= 0.0f) {
+								float conq;
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.data.enemiesKilled", factionData.getEnemiesKilled());
+								fontRendererObj.drawString(s, x, y, 8019267);
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.data.trades", factionData.getTradeCount());
+								fontRendererObj.drawString(s, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.data.hires", factionData.getHireCount());
+								fontRendererObj.drawString(s, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.data.miniquests", factionData.getMiniQuestsCompleted());
+								fontRendererObj.drawString(s, x, y += fontRendererObj.FONT_HEIGHT, 8019267);
+								y += fontRendererObj.FONT_HEIGHT;
+								if (clientPD.isPledgedTo(currentFaction) && (conq = factionData.getConquestEarned()) != 0.0f) {
+									int conqInt = Math.round(conq);
+									s = StatCollector.translateToLocalFormatted("got.gui.factions.data.conquest", conqInt);
+									fontRendererObj.drawString(s, x, y, 8019267);
+									y += fontRendererObj.FONT_HEIGHT;
+								}
+							}
+							if (alignment <= 0.0f) {
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.data.npcsKilled", factionData.getNPCsKilled());
 								fontRendererObj.drawString(s, x, y, 8019267);
 								y += fontRendererObj.FONT_HEIGHT;
 							}
-						}
-						if (alignment <= 0.0f) {
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.data.npcsKilled", factionData.getNPCsKilled());
-							fontRendererObj.drawString(s, x, y, 8019267);
-							y += fontRendererObj.FONT_HEIGHT;
-						}
-						if (buttonPledge.visible && clientPD.isPledgedTo(currentFaction)) {
-							s = StatCollector.translateToLocal("got.gui.factions.pledged");
-							int px = buttonPledge.xPosition + buttonPledge.width + 8;
-							int py = buttonPledge.yPosition + buttonPledge.height / 2 - fontRendererObj.FONT_HEIGHT / 2;
-							fontRendererObj.drawString("Вы в этой фракции", px, py, 16711680);
+							if (buttonPledge.visible && clientPD.isPledgedTo(currentFaction)) {
+								s = StatCollector.translateToLocal("got.gui.factions.pledged");
+								int px = buttonPledge.xPosition + buttonPledge.width + 8;
+								int py = buttonPledge.yPosition + buttonPledge.height / 2 - fontRendererObj.FONT_HEIGHT / 2;
+								fontRendererObj.drawString("Вы в этой фракции", px, py, 16711680);
 
-							GuiApi.drawRect( width/2, buttonPledge.yPosition + 15, 15, 15, (isHover( width/2, buttonPledge.yPosition + 15, 15, 15)) ?new Color(0, 0, 0, 30).getRGB() :new Color(0, 0, 0, 40).getRGB() );
-							GL11.glColor4f(1, 1, 1, 1);
-							GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/home.png"), width/2, buttonPledge.yPosition + 15, 15, 15);
-							if (isHover(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
-								GOTTickHandlerClient.drawAlignmentText(fontRendererObj, MX+10, MY+10, "Телепортация домой", 1.0f);
-								if(isClicked(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
-									long currentTime = System.currentTimeMillis();
+								GuiApi.drawRect( width/2, buttonPledge.yPosition + 15, 15, 15, (isHover( width/2, buttonPledge.yPosition + 15, 15, 15)) ?new Color(0, 0, 0, 30).getRGB() :new Color(0, 0, 0, 40).getRGB() );
+								GL11.glColor4f(1, 1, 1, 1);
+								GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/home.png"), width/2, buttonPledge.yPosition + 15, 15, 15);
+								if (isHover(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
+									GOTTickHandlerClient.drawAlignmentText(fontRendererObj, MX+10, MY+10, "Телепортация домой", 1.0f);
+									if (isClicked(width / 2, buttonPledge.yPosition + 15, 15, 15)) {
+										long currentTime = System.currentTimeMillis();
 
 
-									if (System.currentTimeMillis() > COOLDOWN_TIME + lastTeleportTime) {
-										CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
-										Minecraft.getMinecraft().displayGuiScreen(null);
-										setClicked(false);
-										lastTeleportTime = currentTime;
-									} else {
-										Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Кулдаун: " +
-												((COOLDOWN_TIME - (currentTime - lastTeleportTime)) / 1000 + " секунд осталось.")));
+										if (System.currentTimeMillis() > COOLDOWN_TIME + lastTeleportTime) {
+											CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
+											Minecraft.getMinecraft().displayGuiScreen(null);
+											setClicked(false);
+											lastTeleportTime = currentTime;
+										} else {
+											Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Кулдаун: " +
+													((COOLDOWN_TIME - (currentTime - lastTeleportTime)) / 1000 + " секунд осталось.")));
+											setClicked(false);
+										}
+									}
+								}
+								if(status != GroupStatus.Player) {
+									GuiApi.drawRect( buttonPledge.xPosition+buttonPledge.width + 8, buttonPledge.yPosition + 21, 64, 10, (isHover( buttonPledge.xPosition+buttonPledge.width + 8, buttonPledge.yPosition + 21, 64, 10)) ?new Color(0, 0, 0, 30).getRGB() :new Color(0, 0, 0, 40).getRGB() );
+									GL11.glColor4f(1, 1, 1, 1);
+									GuiApi.drawScaleText("Установить точку дома фракции", buttonPledge.xPosition+buttonPledge.width + 11, buttonPledge.yPosition + 24, 0.5f, true, 8019267);
+									if(isClicked( buttonPledge.xPosition+buttonPledge.width + 8, buttonPledge.yPosition + 21, 64, 10)) {
+										CoreFaction.brainChannel.sendToServer(new PacketMessage("setHome"));
 										setClicked(false);
 									}
 								}
 							}
-							if(status != GroupStatus.Player) {
-								GuiApi.drawRect( buttonPledge.xPosition+buttonPledge.width + 8, buttonPledge.yPosition + 21, 64, 10, (isHover( buttonPledge.xPosition+buttonPledge.width + 8, buttonPledge.yPosition + 21, 64, 10)) ?new Color(0, 0, 0, 30).getRGB() :new Color(0, 0, 0, 40).getRGB() );
-								GL11.glColor4f(1, 1, 1, 1);
-								GuiApi.drawScaleText("Установить точку дома фракции", buttonPledge.xPosition+buttonPledge.width + 11, buttonPledge.yPosition + 24, 0.5f, true, 8019267);
-								if(isClicked( buttonPledge.xPosition+buttonPledge.width + 8, buttonPledge.yPosition + 21, 64, 10)) {
-									CoreFaction.brainChannel.sendToServer(new PacketMessage("setHome"));
+
+						}
+						break;
+					case RANKS:
+						GOTFactionRank curRank1 = currentFaction.getRank(clientPD);
+						int[] minMax1 = scrollPaneAlliesEnemies.getMinMaxIndices(currentAlliesEnemies, numDisplayedAlliesEnemies);
+						for (index = minMax1[0]; index <= minMax1[1]; ++index) {
+							Object listObj = currentAlliesEnemies.get(index);
+							if (listObj instanceof String) {
+								s = (String) listObj;
+								fontRendererObj.drawString(s, x, y, 8019267);
+							} else if (listObj instanceof GOTFactionRank) {
+								GOTFactionRank rank = (GOTFactionRank) listObj;
+								String rankName1 = rank.getShortNameWithGender(clientPD);
+								String rankAlign = GOTAlignmentValues.formatAlignForDisplay(rank.alignment);
+								if (rank == GOTFactionRank.RANK_ENEMY) {
+									rankAlign = "-";
+								}
+								boolean hiddenRankName = false;
+								if (!clientPD.isPledgedTo(currentFaction) && rank.alignment > currentFaction.getPledgeAlignment() && rank.alignment > currentFaction.getRankAbove(curRank1).alignment) {
+									hiddenRankName = true;
+								}
+								if (hiddenRankName) {
+									rankName1 = StatCollector.translateToLocal("got.gui.factions.rank?");
+								}
+								s = StatCollector.translateToLocalFormatted("got.gui.factions.listRank", rankName1, rankAlign);
+								if (rank == curRank1) {
+									GOTTickHandlerClient.drawAlignmentText(fontRendererObj, x, y, s, 1.0f);
+								} else {
+									fontRendererObj.drawString(s, x, y, 8019267);
+								}
+							}
+							y += fontRendererObj.FONT_HEIGHT;
+						}
+						break;
+
+
+					case Playerlist:
+						if (status != GroupStatus.Player) {
+							fontRendererObj.drawString("Заявки [" + applicationList.getList().size()+"]" ,x + pageWidth/2 + 40, y, 8019267);
+							applicationList.drawScreen(MX, MY, j);
+						}
+						fontRendererObj.drawString("Участники " + playerList.getList().size() ,x , y, 8019267);
+						playerList.drawScreen(MX, MY, f);
+
+						GL11.glPushMatrix();
+						GL11.glEnable(GL11.GL_SCISSOR_TEST);
+						GuiApi.glScissor(x, y+10, width*4, pageHeight - 40, false);
+						for (int k = 0; k < playerList.getList().size() ; k++) {
+							playerList.getList().get(k).draw(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10);
+							if(isClicked( x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10) && !prefixField.getVisible() && status != GroupStatus.Player) {
+								prefixEditName = playerList.getElement(k).getPlayerName();
+								prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName()).replace("§", "&"));
+								prefixField.setVisible(true);
+								setClicked(false);
+							}
+						}
+						renderPrefixSet();
+						if (status != GroupStatus.Player ) {
+							for (int k = 0; k < applicationList.getList().size() ; k++) {
+								applicationList.getList().get(k).drawApplicationPlayer(this, x + pageWidth/2 + 15, y + 10 +10*k - applicationList.getScrollOffset(), 115, 5);
+							}
+						}
+						// Draw Hover List
+						for (int k = 0; k < playerList.getList().size() ; k++) {
+							playerList.getList().get(k).drawHover(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 5);
+						}
+						GL11.glDisable(GL11.GL_SCISSOR_TEST);
+						// Draw Edit Button
+
+						if (status != GroupStatus.Player) {
+							GuiApi.drawRect(x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6,(isEdit) ? new Color(255, 255, 255, 180).getRGB(): new Color(255, 255, 255, 80).getRGB());
+							GL11.glColor4f(1, 1, 1, 1);
+							GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/edit.png"), x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6);
+							if (isHover(x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6)) {
+								GOTTickHandlerClient.drawAlignmentText(fontRendererObj, MX, MY, "Редактировать", 1.0f);
+								if (isClicked(x + pageWidth / 2 + 16, y + pageHeight - 28, 6,6)) {
+									isEdit = (isEdit == false ? true : false);
 									setClicked(false);
 								}
 							}
 						}
 
-					}
-					break;
-				case RANKS:
-					GOTFactionRank curRank1 = currentFaction.getRank(clientPD);
-					int[] minMax1 = scrollPaneAlliesEnemies.getMinMaxIndices(currentAlliesEnemies, numDisplayedAlliesEnemies);
-					for (index = minMax1[0]; index <= minMax1[1]; ++index) {
-						Object listObj = currentAlliesEnemies.get(index);
-						if (listObj instanceof String) {
-							s = (String) listObj;
-							fontRendererObj.drawString(s, x, y, 8019267);
-						} else if (listObj instanceof GOTFactionRank) {
-							GOTFactionRank rank = (GOTFactionRank) listObj;
-							String rankName1 = rank.getShortNameWithGender(clientPD);
-							String rankAlign = GOTAlignmentValues.formatAlignForDisplay(rank.alignment);
-							if (rank == GOTFactionRank.RANK_ENEMY) {
-								rankAlign = "-";
-							}
-							boolean hiddenRankName = false;
-							if (!clientPD.isPledgedTo(currentFaction) && rank.alignment > currentFaction.getPledgeAlignment() && rank.alignment > currentFaction.getRankAbove(curRank1).alignment) {
-								hiddenRankName = true;
-							}
-							if (hiddenRankName) {
-								rankName1 = StatCollector.translateToLocal("got.gui.factions.rank?");
-							}
-							s = StatCollector.translateToLocalFormatted("got.gui.factions.listRank", rankName1, rankAlign);
-							if (rank == curRank1) {
-								GOTTickHandlerClient.drawAlignmentText(fontRendererObj, x, y, s, 1.0f);
-							} else {
-								fontRendererObj.drawString(s, x, y, 8019267);
-							}
-						}
-						y += fontRendererObj.FONT_HEIGHT;
-					}
-					break;
+						GL11.glPopMatrix();
 
-
-				case Playerlist:
-					if (status != GroupStatus.Player) {
-						fontRendererObj.drawString("Заявки [" + applicationList.getList().size()+"]" ,x + pageWidth/2 + 40, y, 8019267);
-						applicationList.drawScreen(MX, MY, j);
-					}
-					fontRendererObj.drawString("Участники " + playerList.getList().size() ,x , y, 8019267);
-					playerList.drawScreen(MX, MY, f);
-
-					GL11.glPushMatrix();
-					GL11.glEnable(GL11.GL_SCISSOR_TEST);
-					GuiApi.glScissor(x, y+10, width*4, pageHeight - 40, false);
-					for (int k = 0; k < playerList.getList().size() ; k++) {
-						playerList.getList().get(k).draw(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10);
-						if(isClicked( x, y + 10 +10*k - playerList.getScrollOffset(), 115, 10) && !prefixField.getVisible() && status != GroupStatus.Player) {
-							prefixEditName = playerList.getElement(k).getPlayerName();
-							prefixField.setText(getPrefix(PacketInfoFactions.getFactions().get(currentFaction.codeName()), playerList.getElement(k).getPlayerName().replace("&", "§")));
-							prefixField.setVisible(true);
-							setClicked(false);
-						}
-					}
-					renderPrefixSet();
-					if (status != GroupStatus.Player ) {
-						for (int k = 0; k < applicationList.getList().size() ; k++) {
-							applicationList.getList().get(k).drawApplicationPlayer(this, x + pageWidth/2 + 15, y + 10 +10*k - applicationList.getScrollOffset(), 115, 5);
-						}
-					}
-					// Draw Hover List
-					for (int k = 0; k < playerList.getList().size() ; k++) {
-						playerList.getList().get(k).drawHover(this, x, y + 10 +10*k - playerList.getScrollOffset(), 115, 5);
-					}
-					GL11.glDisable(GL11.GL_SCISSOR_TEST);
-					// Draw Edit Button
-
-					if (status != GroupStatus.Player) {
-						GuiApi.drawRect(x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6,(isEdit) ? new Color(255, 255, 255, 180).getRGB(): new Color(255, 255, 255, 80).getRGB());
-						GL11.glColor4f(1, 1, 1, 1);
-						GuiApi.drawTexturedQuadFitBLEND(new ResourceLocation("got", "textures/icons/edit.png"), x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6);
-						if (isHover(x + pageWidth / 2 + 16, y + pageHeight - 28, 6, 6)) {
-							GOTTickHandlerClient.drawAlignmentText(fontRendererObj, MX, MY, "Редактировать", 1.0f);
-							if (isClicked(x + pageWidth / 2 + 16, y + pageHeight - 28, 6,6)) {
-								isEdit = (isEdit == false ? true : false);
-								setClicked(false);
-							}
-						}
-					}
-
-					GL11.glPopMatrix();
-
-					break;
+						break;
 
 				}
 				if (scrollPaneAlliesEnemies.hasScrollBar) {
@@ -852,56 +852,56 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		}
 		if (currentPage == Page.ALLIES || currentPage == Page.ENEMIES || currentPage == Page.RANKS) {
 			switch (currentPage) {
-			case ALLIES:
-				List<GOTFaction> friends;
-				currentAlliesEnemies = new ArrayList<>();
-				List<GOTFaction> allies = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.ALLY);
-				if (!allies.isEmpty()) {
-					currentAlliesEnemies.add(GOTFactionRelations.Relation.ALLY);
-					currentAlliesEnemies.addAll(allies);
-				}
-				if (!(friends = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.FRIEND)).isEmpty()) {
-					if (!currentAlliesEnemies.isEmpty()) {
-						currentAlliesEnemies.add(null);
+				case ALLIES:
+					List<GOTFaction> friends;
+					currentAlliesEnemies = new ArrayList<>();
+					List<GOTFaction> allies = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.ALLY);
+					if (!allies.isEmpty()) {
+						currentAlliesEnemies.add(GOTFactionRelations.Relation.ALLY);
+						currentAlliesEnemies.addAll(allies);
 					}
-					currentAlliesEnemies.add(GOTFactionRelations.Relation.FRIEND);
-					currentAlliesEnemies.addAll(friends);
-				}
-				break;
-			case ENEMIES:
-				List<GOTFaction> enemies;
-				currentAlliesEnemies = new ArrayList<>();
-				List<GOTFaction> mortals = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.MORTAL_ENEMY);
-				if (!mortals.isEmpty()) {
-					currentAlliesEnemies.add(GOTFactionRelations.Relation.MORTAL_ENEMY);
-					currentAlliesEnemies.addAll(mortals);
-				}
-				if (!(enemies = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.ENEMY)).isEmpty()) {
-					if (!currentAlliesEnemies.isEmpty()) {
-						currentAlliesEnemies.add(null);
+					if (!(friends = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.FRIEND)).isEmpty()) {
+						if (!currentAlliesEnemies.isEmpty()) {
+							currentAlliesEnemies.add(null);
+						}
+						currentAlliesEnemies.add(GOTFactionRelations.Relation.FRIEND);
+						currentAlliesEnemies.addAll(friends);
 					}
-					currentAlliesEnemies.add(GOTFactionRelations.Relation.ENEMY);
-					currentAlliesEnemies.addAll(enemies);
-				}
-				break;
-			case RANKS:
-				currentAlliesEnemies = new ArrayList<>();
-				currentAlliesEnemies.add(StatCollector.translateToLocal("got.gui.factions.rankHeader"));
-				if (GOTLevelData.getData(mc.thePlayer).getAlignment(currentFaction) <= 0.0f) {
-					currentAlliesEnemies.add(GOTFactionRank.RANK_ENEMY);
-				}
-				GOTFactionRank rank = GOTFactionRank.RANK_NEUTRAL;
-				do {
-					currentAlliesEnemies.add(rank);
-					GOTFactionRank nextRank = currentFaction.getRankAbove(rank);
-					if (nextRank == null || nextRank.isDummyRank() || currentAlliesEnemies.contains(nextRank)) {
-						break;
+					break;
+				case ENEMIES:
+					List<GOTFaction> enemies;
+					currentAlliesEnemies = new ArrayList<>();
+					List<GOTFaction> mortals = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.MORTAL_ENEMY);
+					if (!mortals.isEmpty()) {
+						currentAlliesEnemies.add(GOTFactionRelations.Relation.MORTAL_ENEMY);
+						currentAlliesEnemies.addAll(mortals);
 					}
-					rank = nextRank;
-				} while (true);
-				break;
-			default:
-				break;
+					if (!(enemies = currentFaction.getOthersOfRelation(GOTFactionRelations.Relation.ENEMY)).isEmpty()) {
+						if (!currentAlliesEnemies.isEmpty()) {
+							currentAlliesEnemies.add(null);
+						}
+						currentAlliesEnemies.add(GOTFactionRelations.Relation.ENEMY);
+						currentAlliesEnemies.addAll(enemies);
+					}
+					break;
+				case RANKS:
+					currentAlliesEnemies = new ArrayList<>();
+					currentAlliesEnemies.add(StatCollector.translateToLocal("got.gui.factions.rankHeader"));
+					if (GOTLevelData.getData(mc.thePlayer).getAlignment(currentFaction) <= 0.0f) {
+						currentAlliesEnemies.add(GOTFactionRank.RANK_ENEMY);
+					}
+					GOTFactionRank rank = GOTFactionRank.RANK_NEUTRAL;
+					do {
+						currentAlliesEnemies.add(rank);
+						GOTFactionRank nextRank = currentFaction.getRankAbove(rank);
+						if (nextRank == null || nextRank.isDummyRank() || currentAlliesEnemies.contains(nextRank)) {
+							break;
+						}
+						rank = nextRank;
+					} while (true);
+					break;
+				default:
+					break;
 			}
 			scrollPaneAlliesEnemies.hasScrollBar = false;
 			numDisplayedAlliesEnemies = currentAlliesEnemies.size();
@@ -1037,25 +1037,25 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	}
 
 	class Timing extends Thread
-    {
-        private int timer;
+	{
+		private int timer;
 
-        public Timing(final int timer) {
-            this.timer = timer;
-        }
+		public Timing(final int timer) {
+			this.timer = timer;
+		}
 
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(this.timer);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            GOTGuiFactions.isClicked = false;
-            this.interrupt();
-        }
-    }
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(this.timer);
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			GOTGuiFactions.isClicked = false;
+			this.interrupt();
+		}
+	}
 
 
 }

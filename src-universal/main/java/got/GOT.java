@@ -263,8 +263,8 @@ public class GOT {
         GOTRegistry.blockGem.setHarvestLevel(pickaxe, 0, 8);
         GOTRegistry.redClay.setHarvestLevel(shovel, 0);
         GOTLoader.onInit();
-        
-    	MinecraftForge.EVENT_BUS.register(this);
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
     @SubscribeEvent
     public void onPlayerNameFormat(PlayerEvent.NameFormat event) {
@@ -273,7 +273,7 @@ public class GOT {
 
 
     }
-/*
+    /*
     @SubscribeEvent
     public void onChatMessage(ClientChatReceivedEvent event) {
         String message = event.message.getUnformattedText();
@@ -282,89 +282,88 @@ public class GOT {
             if (endIndex != -1) {
                 String playerName = message.substring(1, endIndex);
                 String newMessage = getPrefix(playerName) +" " + getTag(playerName) + playerName + "§f:" + message.substring(endIndex + 1);
-                
+
                event.message = new ChatComponentText(newMessage);
             }
         }
     }*/
-    
 
     @SubscribeEvent
     public void onChatMessage(ClientChatReceivedEvent event) {
-    //	event.message = new ChatComponentText("[G] [И] Player317: 2121"); 
-    	 IChatComponent originalMessage = event.message; 
-         String formattedMessage = originalMessage.getFormattedText(); 
-         String unformattedMessage = originalMessage.getUnformattedText();
+        //	event.message = new ChatComponentText("[G] [И] Player317: 2121");
+        IChatComponent originalMessage = event.message;
+        String formattedMessage = originalMessage.getFormattedText();
+        String unformattedMessage = originalMessage.getUnformattedText();
 
-         if (unformattedMessage.startsWith("<")) { 
-             int endIndex = unformattedMessage.indexOf('>');
-             if (endIndex != -1) {
-                 String playerName = unformattedMessage.substring(1, endIndex);
+        if (unformattedMessage.startsWith("<")) {
+            int endIndex = unformattedMessage.indexOf('>');
+            if (endIndex != -1) {
+                String playerName = unformattedMessage.substring(1, endIndex);
 
-                 // Получаем префикс и тег
-                 String prefix = getPrefix(playerName);
-                 String tag = getTag(playerName);
+                // Получаем префикс и тег
+                String prefix = getPrefix(playerName);
+                String tag = getTag(playerName);
 
-  
-                 ChatComponentText newChat = new ChatComponentText("");
 
-               
-                 newChat.appendSibling(originalMessage);
+                ChatComponentText newChat = new ChatComponentText("");
 
-                 newChat.getSiblings().add(0, new ChatComponentText(prefix + " " + tag));
 
-                 event.message = newChat;
-             }
-         } else if (unformattedMessage.startsWith("[")) { 
-             Pattern pattern = Pattern.compile("^((\\[[^\\]]+\\]\\s*)+)");
-             Matcher matcher = pattern.matcher(unformattedMessage);
-             if (matcher.find()) {
-                 String bracketGroups = matcher.group(1); // Группы в []
-                 String remainder = unformattedMessage.substring(matcher.end()); // Остальная часть
+                newChat.appendSibling(originalMessage);
 
-                 int colonIndex = remainder.indexOf(':');
-                 if (colonIndex != -1) {
-                     String playerName = remainder.substring(0, colonIndex).trim();
+                newChat.getSiblings().add(0, new ChatComponentText(prefix + " " + tag));
 
-                     String prefix = getPrefix(playerName);
-                     String tag = getTag(playerName);
+                event.message = newChat;
+            }
+        } else if (unformattedMessage.startsWith("[")) {
+            Pattern pattern = Pattern.compile("^((\\[[^\\]]+\\]\\s*)+)");
+            Matcher matcher = pattern.matcher(unformattedMessage);
+            if (matcher.find()) {
+                String bracketGroups = matcher.group(1); // Группы в []
+                String remainder = unformattedMessage.substring(matcher.end()); // Остальная часть
 
- 
-                     ChatComponentText newChat = new ChatComponentText(bracketGroups);
+                int colonIndex = remainder.indexOf(':');
+                if (colonIndex != -1) {
+                    String playerName = remainder.substring(0, colonIndex).trim();
 
-          
-                     newChat.appendSibling(new ChatComponentText(prefix + " " + tag));
+                    String prefix = getPrefix(playerName);
+                    String tag = getTag(playerName);
 
-                     int formattedNameIndex = formattedMessage.indexOf(playerName, bracketGroups.length());
-                     if (formattedNameIndex != -1) {
-                         newChat.appendSibling(new ChatComponentText(formattedMessage.substring(formattedNameIndex)));
-                     }
 
-                     event.message = newChat;
-                 }
-             }
-         }
-         
+                    ChatComponentText newChat = new ChatComponentText(bracketGroups);
+
+
+                    newChat.appendSibling(new ChatComponentText(prefix + " " + tag));
+
+                    int formattedNameIndex = formattedMessage.indexOf(playerName, bracketGroups.length());
+                    if (formattedNameIndex != -1) {
+                        newChat.appendSibling(new ChatComponentText(formattedMessage.substring(formattedNameIndex)));
+                    }
+
+                    event.message = newChat;
+                }
+            }
+        }
+
     }
-	
+
     public String getPrefix(String name) {
-    	for(Faction faction : PacketInfoFactions.getFactions().values()) {
-			if(faction.getPlayers().containsKey(name)) {
-				return faction.getPlayers().get(name);
-			}
-		}
-		return "";
+        for(Faction faction : PacketInfoFactions.getFactions().values()) {
+            if(faction.getPlayers().containsKey(name)) {
+                return faction.getPlayers().get(name);
+            }
+        }
+        return "";
     }
-	public String getTag(String name) {
-		for(Faction faction : PacketInfoFactions.getFactions().values()) {
-			if(faction.getPlayers().containsKey(name)) {
-				return faction.getColorTag();
-			}
-		}
-		return "";
-	}
-	
-	
+    public String getTag(String name) {
+        for(Faction faction : PacketInfoFactions.getFactions().values()) {
+            if(faction.getPlayers().containsKey(name)) {
+                return faction.getColorTag();
+            }
+        }
+        return "";
+    }
+
+
     @Mod.EventHandler
     public void onMissingMappings(FMLMissingMappingsEvent event) {
         for (FMLMissingMappingsEvent.MissingMapping mapping : event.get()) {
@@ -510,15 +509,15 @@ public class GOT {
         Blocks.dragon_egg.setCreativeTab(GOTCreativeTabs.tabStory);
         proxy.onPreload();
         GOTBlockIronBank.preInit();
-        
+        //coreFaction.preInit(event);
     }
 
-    	@SideOnly(Side.CLIENT)
-    	@Mod.EventHandler
-    	public void preloadClient(FMLPreInitializationEvent event) {
-    	//	GOTLoader.preInitClient();
-    		coreFaction.preInit(event);
-    	}
+    @SideOnly(Side.CLIENT)
+    @Mod.EventHandler
+    public void preloadClient(FMLPreInitializationEvent event) {
+        //		GOTLoader.preInitClient();
+        coreFaction.preInit(event);
+    }
 
     public static boolean canDropLoot(World world) {
         return world.getGameRules().getGameRuleBooleanValue("doMobLoot");

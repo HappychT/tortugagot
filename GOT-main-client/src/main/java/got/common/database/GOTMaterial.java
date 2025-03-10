@@ -72,7 +72,6 @@ public class GOTMaterial {
 	public static ArmorMaterial YITI_SAMURAI = EnumHelper.addArmorMaterial("GOT_YITI_SAMURAI", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial THIEF = EnumHelper.addArmorMaterial("GOT_THIEF", 37, new int[] { 2, 7, 4, 2 }, 9);
     public static ArmorMaterial FIRST_PEOPLE = EnumHelper.addArmorMaterial("GOT_FIRST_PEOPLE", 625, new int[] { 3, 8, 6, 3 }, 9);
-
 	public static ToolMaterial BRONZE_TOOL = EnumHelper.addToolMaterial("GOT_BRONZE_TOOL", 2, 500, 5.0F, 1.5F, 10);
 	public static ToolMaterial IRON = EnumHelper.addToolMaterial("GOT_IRON", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial DRAGON_GLASS = EnumHelper.addToolMaterial("GOT_DRAGONGLASS", 2, 625, 6.0F, 2.0F, 14);

@@ -33,7 +33,7 @@ public class GOTItemCrossbow extends ItemBow {
 		setMaxStackSize(1);
 		boltDamageFactor = 1.0f + Math.max(0.0f, (crossbowMaterial.getDamageVsEntity() - 2.0f) * 0.1f);
 		crossbowPullTime = 50;
-		crossbowDischargeTime = 200;
+		crossbowDischargeTime = 1200;
 	}
 
 	@SideOnly(value = Side.CLIENT)

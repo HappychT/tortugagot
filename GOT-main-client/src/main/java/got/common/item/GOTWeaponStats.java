@@ -55,6 +55,8 @@ public class GOTWeaponStats {
         GOTWeaponStats.registerMeleeSpeed(GOTItemDamnedCaptainSaber.class, 0.69f);
         GOTWeaponStats.registerMeleeSpeed(GOTItemGiantClub.class, 0.2f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemCavalryLance.class, 0.35f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemValyrianShieldHalbert.class, 0.3f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemValyrianShieldSpear.class, 0.54f);
 		
 		GOTWeaponStats.registerMeleeReach(GOTItemLeaderBattleaxe.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPoleaxe.class, 1.2f);
@@ -71,7 +73,7 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeReach(GOTItemSword.class, 0.957f);
 		GOTWeaponStats.registerMeleeReach(GOTItemShieldSpear.class, 1.3f);
 		GOTWeaponStats.registerMeleeReach(GOTItemShieldPike.class, 2.0f);
-		GOTWeaponStats.registerMeleeReach(GOTItemDagger.class, 0.75f);
+		GOTWeaponStats.registerMeleeReach(GOTItemDagger.class, 0.5f);
 		GOTWeaponStats.registerMeleeReach(GOTItemSpear.class, 1.3f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPolearm.class, 1.5f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPolearmLong.class, 2.0f);
@@ -80,6 +82,8 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeReach(GOTItemNorthGreatSword.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemThiefKnife.class, 0.75f);
         GOTWeaponStats.registerMeleeReach(GOTItemGiantClub.class, 1.3f);
+		GOTWeaponStats.registerMeleeReach(GOTItemValyrianShieldHalbert.class, 2.0f);
+		GOTWeaponStats.registerMeleeReach(GOTItemValyrianShieldSpear.class, 1.3f);
 		
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemHammer.class, 1);
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemLance.class, 1);

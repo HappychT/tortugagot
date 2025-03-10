@@ -584,8 +584,8 @@ public enum GOTFaction {
             if (fac != WHITE_WALKER && fac != UNALIGNED && fac != HOSTILE) {
                 fac.addRank(10.0f, "guest").makeTitle().makeAchievement(); // �����
                 fac.addRank(50.0f, "friend").makeTitle().makeAchievement(); // ����
-                fac.addRank(500.0f, "defender").setPledgeRank().makeTitle().makeAchievement(); // ��������
-                fac.addRank(550.0f, "hero").makeTitle().makeAchievement(); // �����
+                fac.addRank(100.0f, "defender").makeTitle().makeAchievement(); // ��������
+                fac.addRank(500.0f, "hero").setPledgeRank().makeTitle().makeAchievement(); // �����
                 fac.addRank(1000.0f, "leader").makeTitle().makeAchievement(); // �����
             }
         }

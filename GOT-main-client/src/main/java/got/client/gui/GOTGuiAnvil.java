@@ -156,11 +156,12 @@ public class GOTGuiAnvil extends GuiContainer {
 		float z;
 		Object tooltip;
 		ItemStack inputItem = theAnvil.invInput.getStackInSlot(0);
-		boolean canReforge = inputItem != null && GOTEnchantmentHelper.isReforgeable(inputItem) && theAnvil.reforgeCost > 0;
+		ItemStack inputItem1 = theAnvil.invInput.getStackInSlot(1);
+		boolean canReforge = inputItem != null && inputItem1 == null && GOTEnchantmentHelper.isReforgeable(inputItem) && theAnvil.reforgeCost > 0;
 		if(theAnvil.isTrader) {
 			canReforge = false;
 		}
-		boolean canEngrave = inputItem != null && GOTEnchantmentHelper.isReforgeable(inputItem) && theAnvil.engraveOwnerCost > 0;
+		boolean canEngrave = inputItem != null && inputItem1 == null && GOTEnchantmentHelper.isReforgeable(inputItem) && theAnvil.engraveOwnerCost > 0;
 		buttonReforge.visible = buttonReforge.enabled = canReforge;
 		buttonEngraveOwner.enabled = canEngrave && theAnvil.canEngraveNewOwner(inputItem, mc.thePlayer);
 		buttonEngraveOwner.visible = buttonEngraveOwner.enabled;

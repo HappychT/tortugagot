@@ -10,7 +10,7 @@ public class GOTPotionCombatlog extends Potion {
 
     public GOTPotionCombatlog(int id) {
         super(id, false, 9388224);
-        setPotionName("potion.got.combatLogPotion");
+        setPotionName("got.potion.combatLogPotion");
         MinecraftForge.EVENT_BUS.register(this);
     }
 

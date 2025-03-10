@@ -7,7 +7,6 @@ import got.common.database.*;
 import got.common.enchant.GOTEnchantmentCombining;
 import got.common.entity.GOTEntity;
 import got.common.faction.GOTFaction;
-import got.common.item.GOTPoisonedDrinks;
 import got.common.quest.GOTMiniQuestFactory;
 import got.common.recipe.*;
 import got.common.tileentity.GOTTileEntityRegistry;
@@ -16,8 +15,6 @@ import got.common.world.biome.GOTBiome;
 import got.common.world.map.*;
 import got.common.world.structure.GOTStructure;
 import got.common.world.structure.other.GOTStructureScan;
-import integrator.NEIGOTIntegrator;
-import net.minecraft.client.Minecraft;
 
 public class GOTLoader {
 
@@ -53,6 +50,7 @@ public class GOTLoader {
 
 	public static void preInit() {
 		GOTConfig.setupAndLoad();
+//		GOTEffects.registerPotions();
 		GOTRegistry.assignContent();
 		GOTRegistry.assignMetadata();
 		GOTRegistry.registerBlocks();

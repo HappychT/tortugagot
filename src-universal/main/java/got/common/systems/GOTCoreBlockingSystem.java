@@ -29,26 +29,26 @@ public class GOTCoreBlockingSystem {
     }
 
     public static void registerWeapons() {
-        registerWeapon(GOTItemSword.class, 35.0f, 35.0f, 0.5, 0.3);
-        registerWeapon(ItemSword.class, 35.0f, 35.0f, 0.5, 0.3);
+        registerWeapon(GOTItemSword.class, 35.0f, 35.0f, 6.0, 3.6);
+        registerWeapon(ItemSword.class, 35.0f, 35.0f, 6.0, 3.6);
 
-        registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 0.8, 0.6);
-        registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 0.8, 0.6);
+        registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 9.6, 7.2);
+        registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 9.6, 7.2);
 
-        registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 0.6, 0.4);
-        registerWeapon(GOTItemBattleaxe.class, 28.0f, 28.0f, 0.6, 0.4);
+        registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 7.2, 4.8);
+        registerWeapon(GOTItemBattleaxe.class, 28.0f, 28.0f, 7.2, 4.8);
 
-        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 0.4, 0.2);
+        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 4.8, 2.4);
 
-        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 1.0, 0.5);
+        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 12.0, 0.5);
 
-        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 0.7, 0.6);
-        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 0.7, 0.6);
+        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 8.4, 7.2);
+        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 8.4, 7.2);
 
-        registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 0.7, 0.6);
-        registerWeapon(GOTItemShieldPike.class, 40.0f, 40.0f, 0.8, 0.6);
-        registerWeapon(GOTItemShieldReachPike.class, 40.0f, 40.0f, 0.8, 0.6);
-        registerWeapon(GOTItemShieldRiverlandsTrident.class, 40.0f, 40.0f, 0.8, 0.6);
+        registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 8.4, 7.2);
+        registerWeapon(GOTItemShieldPike.class, 40.0f, 40.0f, 9.6, 7.2);
+        registerWeapon(GOTItemShieldReachPike.class, 40.0f, 40.0f, 9.6, 7.2);
+        registerWeapon(GOTItemShieldRiverlandsTrident.class, 40.0f, 40.0f, 9.6, 7.2);
     }
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {

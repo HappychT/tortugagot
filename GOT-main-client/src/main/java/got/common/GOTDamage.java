@@ -1,5 +1,6 @@
 package got.common;
 
+import got.common.database.GOTEffects;
 import got.common.network.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
@@ -15,7 +16,7 @@ public class GOTDamage {
 	}
 
 	public static void doFrostDamage(EntityPlayerMP entityplayer) {
-		GOTPacketEnvironmentOverlay packet = new GOTPacketEnvironmentOverlay(GOTPacketEnvironmentOverlay.Overlay.FROST);
-		GOTPacketHandler.networkWrapper.sendTo(packet, entityplayer);
+			GOTPacketEnvironmentOverlay packet = new GOTPacketEnvironmentOverlay(GOTPacketEnvironmentOverlay.Overlay.FROST);
+			GOTPacketHandler.networkWrapper.sendTo(packet, entityplayer);
 	}
 }

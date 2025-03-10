@@ -9,7 +9,8 @@ import net.minecraft.world.World;
 public class GOTItemCrossbowFirstPeople extends GOTItemCrossbow {
 
     public GOTItemCrossbowFirstPeople() {
-        super(GOTMaterial.FIRST_PEOPLE_WEAPON);
+        super(GOTMaterial.IRON);
+        boltDamageFactor = 1.6f;
         setMaxDamage(7000);
     }
 

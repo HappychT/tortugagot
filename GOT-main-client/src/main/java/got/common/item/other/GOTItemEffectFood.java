@@ -31,8 +31,8 @@ public class GOTItemEffectFood extends GOTItemFood {
 
     @Override
     public ItemStack onEaten(ItemStack itemstack, World world, EntityPlayer entityplayer){
-        entityplayer.addPotionEffect(new PotionEffect(effectID, duration));
-        if (isStew) {
+        entityplayer.addPotionEffect(new PotionEffect(this.effectID, this.duration));
+        if (this.isStew) {
             super.onEaten(itemstack, world, entityplayer);
             return new ItemStack(Items.bowl);
         }

@@ -54,6 +54,7 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemThiefKnife.class, 1.5f);
         GOTWeaponStats.registerMeleeSpeed(GOTItemDamnedCaptainSaber.class, 0.69f);
         GOTWeaponStats.registerMeleeSpeed(GOTItemGiantClub.class, 0.2f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemCavalryLance.class, 0.35f);
 		
 		GOTWeaponStats.registerMeleeReach(GOTItemLeaderBattleaxe.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPoleaxe.class, 1.2f);

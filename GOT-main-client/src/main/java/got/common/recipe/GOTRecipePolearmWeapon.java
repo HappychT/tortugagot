@@ -103,6 +103,14 @@ public class GOTRecipePolearmWeapon implements IRecipe {
             result = new ItemStack(GOTRegistry.shieldRiverlandsTrident);
             result.setTagCompound(nbt);
         }
+        if (weaponCopy.getItem() == GOTRegistry.valyrianSpear) {
+            result = new ItemStack(GOTRegistry.shieldValyrianSpear);
+            result.setTagCompound(nbt);
+        }
+        if (weaponCopy.getItem() == GOTRegistry.valyrianHalberd) {
+            result = new ItemStack(GOTRegistry.shieldValyrianHalberd);
+            result.setTagCompound(nbt);
+        }
         return result;
     }
 

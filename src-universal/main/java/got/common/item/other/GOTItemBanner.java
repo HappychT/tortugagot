@@ -25,8 +25,6 @@ public class GOTItemBanner extends Item {
 	@SideOnly(value = Side.CLIENT)
 	public IIcon iconOverlay;
 
-
-
 	public GOTItemBanner() {
 		setCreativeTab(GOTCreativeTabs.tabBanner);
 		setMaxStackSize(64);

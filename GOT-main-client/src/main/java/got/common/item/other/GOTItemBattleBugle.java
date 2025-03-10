@@ -35,7 +35,7 @@ public class GOTItemBattleBugle extends Item {
     public ItemStack onEaten(ItemStack itemstack, World world, EntityPlayer entityplayer) {
         if(!world.isRemote) {
             GOTFaction fac = GOTLevelData.getData(entityplayer).getPledgeFaction();
-            entityplayer.addPotionEffect(effect);
+            entityplayer.addPotionEffect(new PotionEffect(effect));
 
             if(fac != null) {
                 List<EntityPlayer> list = world.getEntitiesWithinAABB(EntityPlayer.class, entityplayer.boundingBox.copy().expand(2.5, 2.5, 2.5));
@@ -44,7 +44,7 @@ public class GOTItemBattleBugle extends Item {
                     for(EntityPlayer otherPlayer : list) {
                         GOTFaction playerFac = GOTLevelData.getData(otherPlayer).getPledgeFaction();
                         if(playerFac == fac || playerFac.isAlly(fac)) {
-                            otherPlayer.addPotionEffect(effect);
+                            otherPlayer.addPotionEffect(new PotionEffect(effect));
                         } else {
                             otherPlayer.removePotionEffect(GOTEffects.combatSpirit.id);
                         }

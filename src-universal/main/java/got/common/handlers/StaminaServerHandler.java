@@ -26,7 +26,7 @@ public class StaminaServerHandler {
 
     private static final int BOUNCE_RANGE = 1; // The range for the bounce, change to your liking
     private static final int BOUNCE_PERCENT = 3; // The percentage of stamina to drain when bouncing, change to your liking
-    private static final int REGAIN_RATE = 100; // The rate at which stamina is regained, change to your liking
+    private static final int REGAIN_RATE = 33; // The rate at which stamina is regained, change to your liking
     private static final int STANDING_STILL_COOLDOWN = 25; // The cooldown before stamina regen, when standing in-place, change to your liking
     private static final int SECONDBREATH_COOLDWON = 6000;
 
@@ -52,14 +52,15 @@ public class StaminaServerHandler {
         boolean isMoving = currentPosX != previousPosX || currentPosZ != previousPosZ;
 
         if (isMoving) {
-            if (isRunning) {
-                drainStaminaByPercent(0.025, player);
-            }
+//            if (isRunning) {
+//                drainStaminaByPercent(0.025, player);
+//            }
+            regainStamina(10, player);
             extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
         }
 
         if (isJumping) {
-            drainStaminaByPercent(0.3, player);
+            drainStaminaByPercent(0.15, player);
             extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
         }
 
@@ -69,10 +70,10 @@ public class StaminaServerHandler {
 
         if (player.isPotionActive(GOTEffects.rest)) {
             if (player.getCurrentArmor(0) != null && GOTEnchantmentHelper.hasEnchant(player.getCurrentArmor(0), GOTEnchantment.restBuff)) { // Resting potion effect stamina regen, stacks with normal regen
-                regainStamina(15, player);
+                regainStamina(30, player);
             }
             else { // Resting potion effect stamina regen, stacks with normal regen
-                regainStamina(REGAIN_RATE / 10, player); // May be too OP, adjust to your liking
+                regainStamina(20, player); // May be too OP, adjust to your liking
             }
         }
 
@@ -91,14 +92,14 @@ public class StaminaServerHandler {
             PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
         }
 
-        if (extendedPlayer.getStamina() == 0) {
+        if (extendedPlayer.getStamina() == MAX_STAMINA * 0.1) {
             if (player.isPotionActive(GOTEffects.secondBreath) && extendedPlayer.getSecondBreathCooldown() == 0) {
-                regainStamina((int) (MAX_STAMINA * 0.1), player);
+                regainStamina((int) (MAX_STAMINA * 0.15), player);
                 player.removePotionEffect(GOTEffects.secondBreath.id);
                 extendedPlayer.setSecondBreathCooldown(SECONDBREATH_COOLDWON);
                 PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
             } else {
-                player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 0, true));
+                player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1, true));
                 // Oops, I added my own effect accidentally, but you can use whatever suits your needs, mine does not effect the dig speed, only attack speed and block degrees
                 // But I've added requested functionality anyway to the vanilla potion effect
                 //.addPotionEffect(new PotionEffect(GOTEffects.exhaustion.id, 20, 0, true));

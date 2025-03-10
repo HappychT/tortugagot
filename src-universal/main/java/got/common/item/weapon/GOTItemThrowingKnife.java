@@ -46,7 +46,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
     }
 
     @Override
-    public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List list, boolean flag) {
+    public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> list, boolean flag) {
         list.add(StatCollector.translateToLocal("got.item.throwing_knife.info"));
 
         PotionEffect potion = this.effectType == 0 ? new PotionEffect(Potion.poison.id, 5 * 20) : new PotionEffect(GOTEffects.bleeding.id, 3 * 20);
