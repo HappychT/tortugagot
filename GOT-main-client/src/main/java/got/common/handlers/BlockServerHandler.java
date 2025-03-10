@@ -4,26 +4,16 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import got.common.database.GOTEffects;
 import got.common.entity.other.GOTEntityCrossbowBolt;
-import got.common.entity.other.GOTEntityProjectileBase;
-import got.common.entity.other.GOTEntitySpear;
-import got.common.entity.other.GOTEntityThrowingKnife;
 import got.common.item.weapon.GOTItemShieldPike;
-import got.common.item.weapon.GOTItemShieldReachPike;
 import got.common.item.weapon.GOTItemShieldSpear;
 import got.common.systems.GOTCoreBlockingSystem;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemSword;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import org.lwjgl.Sys;
 
 import java.util.Random;
 
@@ -42,7 +32,7 @@ public class BlockServerHandler {
             if(event.source.getEntity() instanceof EntityPlayer) {
                 EntityPlayer attacker = (EntityPlayer) event.source.getEntity();
                 if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() instanceof ItemSword) {
-                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), attacker).getStaminaMissPercent() / 5.0, attacker);
+                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), attacker).getStaminaAttackPercent() / 5.0, attacker);
                 }
             }
         }
@@ -56,7 +46,7 @@ public class BlockServerHandler {
         if (event.source.getEntity() instanceof EntityPlayer) {
             EntityPlayer attacker = (EntityPlayer) event.source.getEntity();
             if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() instanceof ItemSword) {
-                StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaMissPercent(), attacker);
+                StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaAttackPercent(), attacker);
             }
             if (isBlocking(player)) {
                 float[] blockAngles = {

@@ -13,8 +13,8 @@ import net.minecraft.potion.Potion;
 public class GOTCoreBlockingSystem {
     private static final Map<Class<?>, WeaponBlockData> weaponBlockDataMap = new HashMap<>();
 
-    public static void registerWeapon(Class<?> weaponClass, float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaMissPercent) {
-        weaponBlockDataMap.put(weaponClass, new WeaponBlockData(leftBlockAngle, rightBlockAngle, staminaHitPercent, staminaMissPercent));
+    public static void registerWeapon(Class<?> weaponClass, float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaAttackPercent) {
+        weaponBlockDataMap.put(weaponClass, new WeaponBlockData(leftBlockAngle, rightBlockAngle, staminaHitPercent, staminaAttackPercent));
     }
 
     public static void registerWeapons() {
@@ -46,7 +46,7 @@ public class GOTCoreBlockingSystem {
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {
         WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(35.0f, 35.0f, 6.0, 3.6));
         if (player.isPotionActive(GOTEffects.exhaustion) || player.isPotionActive(Potion.digSlowdown))
-            return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaMissPercent());
+            return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaAttackPercent());
         return data;
     }
 
@@ -54,13 +54,13 @@ public class GOTCoreBlockingSystem {
         private final float leftBlockAngle;
         private final float rightBlockAngle;
         private final double staminaHitPercent;
-        private final double staminaMissPercent;
+        private final double staminaAttackPercent;
 
-        public WeaponBlockData(float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaMissPercent) {
+        public WeaponBlockData(float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaAttackPercent) {
             this.leftBlockAngle = leftBlockAngle;
             this.rightBlockAngle = rightBlockAngle;
             this.staminaHitPercent = staminaHitPercent;
-            this.staminaMissPercent = staminaMissPercent;
+            this.staminaAttackPercent = staminaAttackPercent;
         }
 
         public float getLeftBlockAngle() {
@@ -75,8 +75,8 @@ public class GOTCoreBlockingSystem {
             return this.staminaHitPercent;
         }
 
-        public double getStaminaMissPercent() {
-            return this.staminaMissPercent;
+        public double getStaminaAttackPercent() {
+            return this.staminaAttackPercent;
         }
     }
 }
