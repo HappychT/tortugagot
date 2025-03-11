@@ -10,6 +10,7 @@ import got.common.entity.animal.GOTEntityHorse;
 import got.common.handlers.BlockServerHandler;
 import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
 import got.common.systems.GOTCoreBlockingSystem;
+import got.common.world.biome.GOTClimateType;
 import net.minecraft.block.*;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.passive.*;
@@ -1302,7 +1303,7 @@ public class GOTEventHandler implements IFuelHandler {
         }
 
         if(entity.isPotionActive(GOTEffects.rage)) {
-            event.ammount += event.ammount * 0.35f;
+            event.ammount += event.ammount * 0.5f;
         }
 
         if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !(((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance) || entity.isPotionActive(GOTEffects.antiEffect.id))) {
@@ -1587,10 +1588,10 @@ public class GOTEventHandler implements IFuelHandler {
                 int j = MathHelper.floor_double(entity.boundingBox.minY);
                 int k = MathHelper.floor_double(entity.posZ);
                 BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
-                boolean standartColdBiome = biome instanceof GOTBiome && biome.temperature == 0.0f;
+                boolean winterBiome = biome instanceof GOTBiome && ((GOTBiome) biome).getClimateType() == GOTClimateType.WINTER;
                 boolean altitudeColdBiome = biome instanceof GOTBiome && ((GOTBiome) biome).getClimateType() != null && ((GOTBiome) biome).getClimateType().isAltitudeZone() && j >= 140;
                 boolean noLightSource = world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) < 10;
-                if(!entity.isPotionActive(GOTEffects.frostResistance) && (standartColdBiome || altitudeColdBiome) && (world.isRaining() || inWater) && noLightSource) {
+                if(!entity.isPotionActive(GOTEffects.frostResistance) && (winterBiome || altitudeColdBiome) && inWater && noLightSource) {
                     int frostChance = 50;
                     int frostProtection = 0;
                     for (int l = 0; l < 4; l++) {

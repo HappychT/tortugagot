@@ -3126,8 +3126,8 @@ public class GOTRegistry {
         mugBerserk = new GOTItemMug(3.0f).setDrinkStats(6, 0.6f).addPotionEffect(GOTEffects.rage.id, 5);
         mugNightWatch = new GOTItemMugNightWatch();
         firstPeopleCrossbow = new GOTItemCrossbowFirstPeople();
-        battleHornStrength = new GOTItemBattleHorn(new PotionEffect(Potion.damageBoost.id, 2 * 60 * 20));
-        battleHornSpeed = new GOTItemBattleHorn(new PotionEffect(Potion.moveSpeed.id, 2 * 60 * 20));
+        battleHornStrength = new GOTItemBattleHorn(new PotionEffect(Potion.damageBoost.id, 6 * 60 * 20));
+        battleHornSpeed = new GOTItemBattleHorn(new PotionEffect(Potion.moveSpeed.id, 6 * 60 * 20));
         amuletCatEye = new GOTItemJewelryActive(100).addPotionEffect(GOTEffects.catEye.id, 3 * 60);
         firstPeopleBow = new GOTItemBow(GOTMaterial.FIRST_PEOPLE_WEAPON, 1.8).setDrawTime(22).setMaxDamage(7000);
         battleHornThenns = new GOTItemBattleHorn(new PotionEffect(GOTEffects.rage.id, 30 * 20)).setMaxDamage(150);
