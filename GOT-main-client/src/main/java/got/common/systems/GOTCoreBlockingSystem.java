@@ -18,8 +18,8 @@ public class GOTCoreBlockingSystem {
     }
 
     public static void registerWeapons() {
-        registerWeapon(GOTItemSword.class, 35.0f, 35.0f, 1.5, 1.8);
-        registerWeapon(ItemSword.class, 35.0f, 35.0f, 1.5, 1.8);
+        registerWeapon(GOTItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
+        registerWeapon(ItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
         registerWeapon(GOTItemArrynClaymore.class, 32.0f, 32.0f, 1.5, 1.8);
 
         registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 2.4, 3.6);
@@ -44,7 +44,7 @@ public class GOTCoreBlockingSystem {
     }
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {
-        WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(35.0f, 35.0f, 6.0, 3.6));
+        WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(30.0f, 30.0f, 6.0, 3.6));
         if (player.isPotionActive(GOTEffects.exhaustion) || player.isPotionActive(Potion.digSlowdown))
             return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaAttackPercent());
         return data;

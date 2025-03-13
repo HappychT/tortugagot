@@ -1,4 +1,4 @@
-package brain.factions;
+package brain.factions.servers;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,15 +64,14 @@ public class Faction {
 	public HashMap<String, Long> getMutePlayer() {
 		return mutePlayer;
 	}
-
+	
 	public void setLastSetHomeTime(long lastSetHomeTime) {
 		this.lastSetHomeTime = lastSetHomeTime;
 	}
-
+	
 	public long getLastSetHomeTime() {
 		return lastSetHomeTime;
 	}
-	
 	public String getColorTag() {
 		return colorTag;
 	}
