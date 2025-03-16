@@ -1311,7 +1311,7 @@ public class GOTEventHandler implements IFuelHandler {
         }
 
         if (attacker instanceof EntityPlayer) {
-            if (entity instanceof  EntityPlayer) {
+            if (entity instanceof EntityPlayer) {
                 PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
                 effect.setCurativeItems(Lists.newArrayList());
                 entity.addPotionEffect(effect);
