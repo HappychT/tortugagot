@@ -5,9 +5,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import brain.factions.Faction;
-import brain.factions.FreeTeleporter;
-import brain.factions.Location;
+import brain.factions.servers.CoreFaction;
+import brain.factions.servers.Faction;
+import brain.factions.servers.FreeTeleporter;
+import brain.factions.servers.Location;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -58,21 +59,21 @@ public class PacketMessage implements IMessage {
 	}
 	
 	public static Faction getCurrentFaction(String name) {
-		for(Faction fac : GOT.coreFaction.factions.values()) {
+		for(Faction fac : CoreFaction.factions.values()) {
 			if(fac.getPlayers().containsKey(name)) {
 				return fac;
 			}
 		}
 		return null;
 	}
-
+	
 	public static <K, V> Map<V, K> invertMap(Map<K, V> map) {
-		return map.entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (existing, replacement) -> existing));
+	    return map.entrySet().stream()
+	              .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (existing, replacement) -> existing));
 	}
 	
 	public static boolean checkAplic(String name) {	
-		for(Faction fac : GOT.coreFaction.factions.values()) {
+		for(Faction fac : CoreFaction.factions.values()) {
 			if(fac.getApplications().containsKey(name)) {
 				return true;
 			}
@@ -81,8 +82,8 @@ public class PacketMessage implements IMessage {
 	}
 	
 	public static Faction getFaction(String id) {
-		if (GOT.coreFaction.factions.containsKey(id)) {
-			return GOT.coreFaction.factions.get(id);
+		if (CoreFaction.factions.containsKey(id)) {
+			return CoreFaction.factions.get(id);
 		}
 		return null;
 	}
@@ -93,7 +94,7 @@ public class PacketMessage implements IMessage {
 		public IMessage onMessage(PacketMessage packet, MessageContext ctx) {
 			String[] args = message.split("#");
 			EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-			GOT.coreFaction.initFactions();
+			CoreFaction.initFactions();
 
 			if(args[0].equalsIgnoreCase("sendApplication")) {
 				Faction faction = getFaction(args[1]);
@@ -119,15 +120,17 @@ public class PacketMessage implements IMessage {
 				}
 				
 				faction.getApplications().put(player.getDisplayName(), System.currentTimeMillis());
-				GOT.coreFaction.saveFactions();
-				GOT.coreFaction.initFactions();
-				GOT.coreFaction.sendAllGui();
-				player.addChatMessage(new ChatComponentText("§aЗаявка успешно отправлена!"));	
-				if(getPlayer(faction.getLeaderName()) != null) {
-					getPlayer(faction.getLeaderName()).addChatMessage(new ChatComponentText("§aУ ВАС НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ В ФРАКЦИЮ!"));	
-				} else if(getPlayer(faction.getAssistantName()) != null) {
-					getPlayer(faction.getAssistantName()).addChatMessage(new ChatComponentText("§aУ ВАС НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ В ФРАКЦИЮ!"));	
+				CoreFaction.saveFactions();
+				CoreFaction.initFactions();
+				CoreFaction.sendAllGui();
+				player.addChatMessage(new ChatComponentText("§aЗаявка успешно отправлена!"));
+				if (getPlayer(faction.getLeaderName()) != null) {
+					getPlayer(faction.getLeaderName()).addChatMessage(new ChatComponentText("§aУ ВАС НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ В ФРАКЦИЮ!"));
+				} else if (getPlayer(faction.getAssistantName()) != null) {
+					getPlayer(faction.getAssistantName()).addChatMessage(new ChatComponentText("§aУ ВАС НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ В ФРАКЦИЮ!"));
+
 				}
+
 				return null;
 			} else if(args[0].equalsIgnoreCase("quet")) {
 				Faction faction = getCurrentFaction(player.getDisplayName());
@@ -142,9 +145,9 @@ public class PacketMessage implements IMessage {
 				GOTPlayerData pd = GOTLevelData.getData(player);
 				
 				pd.revokePledgeFaction(player, true);
-				GOT.coreFaction.saveFactions();
-				GOT.coreFaction.initFactions();
-				GOT.coreFaction.sendAllGui();
+				CoreFaction.saveFactions();
+				CoreFaction.initFactions();
+				CoreFaction.sendAllGui();
 				return null;
 			}
 			
@@ -192,9 +195,9 @@ public class PacketMessage implements IMessage {
 					break;
 				}
 				
-				GOT.coreFaction.saveFactions();
-				GOT.coreFaction.initFactions();
-				GOT.coreFaction.sendAllGui();
+				CoreFaction.saveFactions();
+				CoreFaction.initFactions();
+				CoreFaction.sendAllGui();
 				return null;
 			} else if(args[0].equalsIgnoreCase("applicat")) {
 				if (faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
@@ -221,28 +224,28 @@ public class PacketMessage implements IMessage {
 					default:
 						break;
 					}
-					GOT.coreFaction.saveFactions();
-					GOT.coreFaction.initFactions();
-					GOT.coreFaction.sendAllGui();
+					CoreFaction.saveFactions();
+					CoreFaction.initFactions();
+					CoreFaction.sendAllGui();
 					return null;
 				}
 			} else if(args[0].equalsIgnoreCase("setHome")) {
 				if (faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
 					long cooldownRemaining = faction.getLastSetHomeTime() + TimeUnit.DAYS.toMillis(1) - System.currentTimeMillis();
 					if (cooldownRemaining > 0) {
-						long hours = TimeUnit.MILLISECONDS.toHours(cooldownRemaining);
-						long minutes = TimeUnit.MILLISECONDS.toMinutes(cooldownRemaining) % 60;
-						player.addChatMessage(new ChatComponentText("§aВы можете поставить точку дома только через " + hours + " ч. " + minutes + " мин.!"));
-						return null;
+					    long hours = TimeUnit.MILLISECONDS.toHours(cooldownRemaining);
+					    long minutes = TimeUnit.MILLISECONDS.toMinutes(cooldownRemaining) % 60;
+					    player.addChatMessage(new ChatComponentText("§aВы можете поставить точку дома только через " + hours + " ч. " + minutes + " мин.!"));
+					    return null; 
 					}
 
 					faction.setHome(new Location(player.dimension, player.posX, player.posY, player.posZ));
 					faction.setLastSetHomeTime(System.currentTimeMillis());
-					GOT.coreFaction.saveFactions();
-					GOT.coreFaction.initFactions();
-					GOT.coreFaction.sendAllGui();
+					CoreFaction.saveFactions();
+					CoreFaction.initFactions();
+					CoreFaction.sendAllGui();
 					player.addChatMessage(new ChatComponentText("§aТочка дома для всей фракции установлена!"));
-					return null;
+					return null; 
 				}
 			} else if(args[0].equalsIgnoreCase("home")) {
 				if(faction.getHome() == null) {
@@ -256,9 +259,9 @@ public class PacketMessage implements IMessage {
 					String name = args[1];
 					if(faction.getPlayers().containsKey(name)) {
 						faction.getPlayers().put(name, args[2]);
-						GOT.coreFaction.saveFactions();
-						GOT.coreFaction.initFactions();
-						GOT.coreFaction.sendAllGui();
+						CoreFaction.saveFactions();
+						CoreFaction.initFactions();
+						CoreFaction.sendAllGui();
 					}
 				}
 			}

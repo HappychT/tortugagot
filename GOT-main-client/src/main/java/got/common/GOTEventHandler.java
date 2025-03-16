@@ -5,8 +5,18 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import got.common.entity.animal.GOTEntityHorse;
+import got.common.handlers.BlockServerHandler;
+import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
+import got.common.systems.GOTCoreBlockingSystem;
+import got.common.world.biome.GOTClimateType;
+import net.minecraft.block.*;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.passive.*;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.event.entity.player.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -137,23 +147,6 @@ import got.common.world.biome.sothoryos.GOTBiomeYeen;
 import got.common.world.biome.variant.GOTBiomeVariantStorage;
 import got.rome.ExtendedPlayer;
 import integrator.NEIGOTIntegratorConfig;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAnvil;
-import net.minecraft.block.BlockBed;
-import net.minecraft.block.BlockButton;
-import net.minecraft.block.BlockCake;
-import net.minecraft.block.BlockCauldron;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockEnderChest;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockFire;
-import net.minecraft.block.BlockJukebox;
-import net.minecraft.block.BlockLever;
-import net.minecraft.block.BlockLog;
-import net.minecraft.block.BlockTrapDoor;
-import net.minecraft.block.BlockWeb;
-import net.minecraft.block.BlockWorkbench;
-import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.Material;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -227,19 +220,9 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.minecart.MinecartInteractEvent;
-import net.minecraftforge.event.entity.player.ArrowNockEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.BonemealEvent;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.FillBucketEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.HarvestCheck;
 import net.minecraftforge.event.entity.player.PlayerEvent.StartTracking;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
-import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
@@ -1021,7 +1004,7 @@ public class GOTEventHandler implements IFuelHandler {
     }
 
     @SubscribeEvent
-    public void onItemUseTick(PlayerUseItemEvent.Tick event) {
+    public void onItemUseStart(PlayerUseItemEvent.Start event) {
         EntityPlayer entityplayer = event.entityPlayer;
         World world = entityplayer.worldObj;
         ItemStack itemstack = event.item;
@@ -1036,7 +1019,7 @@ public class GOTEventHandler implements IFuelHandler {
                 event.setCanceled(true);
             }
         }
-
+        
     }
 
     @SubscribeEvent
@@ -1303,7 +1286,8 @@ public class GOTEventHandler implements IFuelHandler {
         }
     }
 
-    @SubscribeEvent
+
+    @SubscribeEvent(receiveCanceled = true)
     public void onLivingHurt(LivingHurtEvent event) {
         EntityLivingBase entity = event.entityLiving;
         EntityLivingBase attacker;
@@ -1318,21 +1302,23 @@ public class GOTEventHandler implements IFuelHandler {
             event.ammount -= event.ammount * 0.15f;
         }
 
-        if(attacker != null && attacker.isPotionActive(GOTEffects.rage)) {
-            event.ammount += event.ammount * 0.35f;
+        if(entity.isPotionActive(GOTEffects.rage)) {
+            event.ammount += event.ammount * 0.5f;
         }
 
-        if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance)) {
+        if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !(((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance) || entity.isPotionActive(GOTEffects.antiEffect.id))) {
             GOTDamage.doFrostDamage((EntityPlayerMP) entity);
         }
+
         if (attacker instanceof EntityPlayer) {
-            if (entity instanceof  EntityPlayer) {
+            if (entity instanceof EntityPlayer) {
                 PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
                 effect.setCurativeItems(Lists.newArrayList());
                 entity.addPotionEffect(effect);
                 attacker.addPotionEffect(effect);
             }
         }
+
         if (!world.isRemote) {
             int preMaxHurtResTime = entity.maxHurtResistantTime;
             int maxHurtResTime = 20;
@@ -1378,39 +1364,41 @@ public class GOTEventHandler implements IFuelHandler {
                 } else if (weapon.getItem() instanceof ItemSword) {
                     material = GOTMaterial.getToolMaterialByName(((ItemSword) weapon.getItem()).getToolMaterialName());
                 }
-                if (material != null && material == GOTMaterial.ASSHAI_TOOL && !world.isRemote) {
+                if (material != null && material == GOTMaterial.ASSHAI_TOOL && !entity.isPotionActive(GOTEffects.antiEffect.id) && !world.isRemote) {
                     entity.addPotionEffect(new PotionEffect(Potion.wither.id, 160));
                 }
             }
         }
-        if (event.source.getSourceOfDamage() instanceof GOTEntityArrowPoisoned && !world.isRemote) {
-            GOTItemSword.applyStandardPoison(entity);
-        }
-        if (event.source.getSourceOfDamage() instanceof GOTEntityArrowFire && !world.isRemote) {
-            GOTItemSword.applyStandardFire(entity);
-        }
 
-        if (event.source.getSourceOfDamage() instanceof GOTEntityArrowSerrated && !world.isRemote) {
-            if(world.rand.nextInt(100) <= 3) {
-                entity.addPotionEffect(new PotionEffect(GOTEffects.bleeding.id, 80));
-            }
-        }
-
-        if (event.source.getSourceOfDamage() instanceof GOTEntityThrowingKnife && !world.isRemote) {
-            int effect = ((GOTEntityThrowingKnife)event.source.getSourceOfDamage()).effectType;
+        if (event.source.getSourceOfDamage() instanceof GOTEntityThrowingKnife && !entity.isPotionActive(GOTEffects.antiEffect.id) && !world.isRemote) {
+            int effect = ((GOTEntityThrowingKnife) event.source.getSourceOfDamage()).effectType;
             int chance = world.rand.nextInt(20);
-            if(chance == 0 || chance == 1 || chance == 2) {
-                if(effect == 0) {
+            if (chance == 0 || chance == 1 || chance == 2) {
+                if (effect == 0) {
                     entity.addPotionEffect(new PotionEffect(Potion.poison.id, 100));
-                } else if(effect == 1) {
+                } else if (effect == 1) {
                     entity.addPotionEffect(new PotionEffect(GOTEffects.bleeding.id, 60));
                 }
             }
         }
 
-        if (event.source.getSourceOfDamage() instanceof GOTEntityThiefKnife && !world.isRemote) {
+        if (event.source.getSourceOfDamage() instanceof GOTEntitySpear.GOTEntityThiefKnife && !entity.isPotionActive(GOTEffects.antiEffect.id) && !world.isRemote) {
             entity.addPotionEffect(new PotionEffect(GOTEffects.bleeding.id, 60));
         }
+
+        if (event.source.getSourceOfDamage() instanceof GOTEntityArrowPoisoned && !entity.isPotionActive(GOTEffects.antiEffect.id) &&  !world.isRemote) {
+            GOTItemSword.applyStandardPoison(entity);
+        }
+        if (event.source.getSourceOfDamage() instanceof GOTEntityArrowFire && !entity.isPotionActive(GOTEffects.antiEffect.id) && !world.isRemote) {
+            GOTItemSword.applyStandardFire(entity);
+        }
+
+        if (event.source.getSourceOfDamage() instanceof GOTEntityArrowSerrated && !entity.isPotionActive(GOTEffects.antiEffect.id) && !world.isRemote) {
+            if(world.rand.nextInt(100) <= 3) {
+                entity.addPotionEffect(new PotionEffect(GOTEffects.bleeding.id, 80));
+            }
+        }
+
 
         if (!world.isRemote) {
             if (GOTEnchantmentHelper.hasMeleeOrRangedEnchant(event.source, GOTEnchantment.fire)) {
@@ -1600,10 +1588,10 @@ public class GOTEventHandler implements IFuelHandler {
                 int j = MathHelper.floor_double(entity.boundingBox.minY);
                 int k = MathHelper.floor_double(entity.posZ);
                 BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
-                boolean standartColdBiome = biome instanceof GOTBiome && biome.temperature == 0.0f;
+                boolean winterBiome = biome instanceof GOTBiome && ((GOTBiome) biome).getClimateType() == GOTClimateType.WINTER;
                 boolean altitudeColdBiome = biome instanceof GOTBiome && ((GOTBiome) biome).getClimateType() != null && ((GOTBiome) biome).getClimateType().isAltitudeZone() && j >= 140;
                 boolean noLightSource = world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) < 10;
-                if(!entity.isPotionActive(GOTEffects.frostResistance) && (standartColdBiome || altitudeColdBiome) && (world.isRaining() || inWater) && noLightSource) {
+                if(!entity.isPotionActive(GOTEffects.frostResistance) && (winterBiome || altitudeColdBiome) && inWater && noLightSource) {
                     int frostChance = 50;
                     int frostProtection = 0;
                     for (int l = 0; l < 4; l++) {
@@ -1726,6 +1714,7 @@ public class GOTEventHandler implements IFuelHandler {
         dragon.getReproductionHelper().setBreederName(evt.entityPlayer.getCommandSenderName());
         dragon.getLifeStageHelper().setLifeStage(GOTDragonLifeStage.EGG);
         world.spawnEntityInWorld(dragon);
+
     }
 
     @SubscribeEvent

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import got.common.network.*;
+import got.common.network.GOTPacketLeader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -43,36 +45,6 @@ import got.common.fellowship.GOTFellowshipData;
 import got.common.fellowship.GOTFellowshipInvite;
 import got.common.item.other.GOTItemArmor;
 import got.common.item.weapon.GOTItemCrossbowBolt;
-import got.common.network.GOTPacketAchievement;
-import got.common.network.GOTPacketAchievementRemove;
-import got.common.network.GOTPacketAlignmentBonus;
-import got.common.network.GOTPacketBrokenPledge;
-import got.common.network.GOTPacketCWPSharedHideClient;
-import got.common.network.GOTPacketCWPSharedUnlockClient;
-import got.common.network.GOTPacketCreateCWPClient;
-import got.common.network.GOTPacketDeleteCWPClient;
-import got.common.network.GOTPacketFTBounceClient;
-import got.common.network.GOTPacketFTScreen;
-import got.common.network.GOTPacketFTTimer;
-import got.common.network.GOTPacketFactionData;
-import got.common.network.GOTPacketFellowship;
-import got.common.network.GOTPacketFellowshipAcceptInviteResult;
-import got.common.network.GOTPacketFellowshipRemove;
-import got.common.network.GOTPacketHandler;
-import got.common.network.GOTPacketLoginPlayerData;
-import got.common.network.GOTPacketMenuPrompt;
-import got.common.network.GOTPacketMessage;
-import got.common.network.GOTPacketMiniquest;
-import got.common.network.GOTPacketMiniquestRemove;
-import got.common.network.GOTPacketMiniquestTrackClient;
-import got.common.network.GOTPacketOptions;
-import got.common.network.GOTPacketPledge;
-import got.common.network.GOTPacketRenameCWPClient;
-import got.common.network.GOTPacketShareCWPClient;
-import got.common.network.GOTPacketTitle;
-import got.common.network.GOTPacketUpdateViewingFaction;
-import got.common.network.GOTPacketWaypointRegion;
-import got.common.network.GOTPacketWaypointUseCount;
 import got.common.quest.GOTMiniQuest;
 import got.common.quest.GOTMiniQuestEvent;
 import got.common.quest.GOTMiniQuestWelcome;
@@ -126,6 +98,7 @@ public class GOTPlayerData {
     public boolean hideAlignment;
     public Set<GOTFaction> takenAlignmentRewards = EnumSet.noneOf(GOTFaction.class);
     public GOTFaction pledgeFaction;
+    public GOTFaction leaderFaction;
     public int pledgeKillCooldown;
     public int pledgeBreakCooldown;
     public int pledgeBreakCooldownStart;
@@ -2842,6 +2815,14 @@ public class GOTPlayerData {
             GOTPacketPledge packet = new GOTPacketPledge(fac);
             GOTPacketHandler.networkWrapper.sendTo((IMessage) packet, (EntityPlayerMP) entityplayer);
         }
+    }
+    
+    public void setLeaderFaction(GOTFaction faction) {
+        this.leaderFaction = faction;
+        markDirty();
+        EntityPlayer entityplayer = getPlayer();
+        GOTPacketLeader packet = new GOTPacketLeader(faction);
+        GOTPacketHandler.networkWrapper.sendTo((IMessage) packet, (EntityPlayerMP) entityplayer);
     }
 
     public void setRegionLastViewedFaction(GOTDimension.DimensionRegion region, GOTFaction fac) {

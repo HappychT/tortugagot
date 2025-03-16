@@ -3,6 +3,7 @@ package got.common.entity.other;
 import got.common.item.weapon.GOTItemSpear;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -47,5 +48,13 @@ public class GOTEntitySpear extends GOTEntityProjectileBase {
         public GOTEntityThiefKnife(World world, ItemStack item, double d, double d1, double d2) {
             super(world, item, d, d1, d2);
         }
+
+        @Override
+        public void onUpdate() {
+            super.onUpdate();
+            if (this.inGround)
+                setDead();
+        }
+
     }
 }

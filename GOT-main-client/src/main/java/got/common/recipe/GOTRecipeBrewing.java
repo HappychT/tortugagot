@@ -5,6 +5,7 @@ import java.util.*;
 import got.common.database.GOTRegistry;
 import net.minecraft.init.*;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 

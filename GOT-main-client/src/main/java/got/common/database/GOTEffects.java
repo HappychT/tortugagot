@@ -23,6 +23,7 @@ public class GOTEffects {
     public static Potion combatSpirit;
     public static Potion inversion;
     public static Potion freeze;
+    public static Potion antiEffect;
 
     public static Potion rest;
     public static Potion dexterity;
@@ -75,6 +76,9 @@ public class GOTEffects {
 
         exhaustion = new GOTCustomPotion(idCounter, true, 8171463, new ResourceLocation("got", "textures/potions/exhaustion.png"), "got.potion.exhaustion");
         registerPotion(exhaustion);
+
+        antiEffect = new GOTCustomPotion(idCounter, false, 4960121, "antiEffect");
+        registerPotion(antiEffect);
     }
 
     private static void registerPotion(Potion pot) {

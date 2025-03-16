@@ -23,7 +23,7 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
     public ExtendedPlayer(EntityPlayer player) {
         this.player = player;
         this.attackCooldown = 0;
-        this.stamina = 100;
+        this.stamina = 9900;
         this.standingStillCooldown = 0; // Initialize the new field
         this.secondBreathCooldown = 0;
         this.previousPosX = player.posX; // Initialize the previous X position

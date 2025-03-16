@@ -75,10 +75,10 @@ public class GOTItemSword extends ItemSword implements GOTMaterialFinder {
         itemstack.damageItem(1, user);
         if (this.effect == HitEffect.NONE)
             return true;
-        if (this.effect == HitEffect.POISON) {
+        if (this.effect == HitEffect.POISON && !hitEntity.isPotionActive(GOTEffects.antiEffect.id)) {
             applyStandardPoison(hitEntity);
         }
-        if (this.effect == HitEffect.FIRE) {
+        if (this.effect == HitEffect.FIRE && !hitEntity.isPotionActive(GOTEffects.antiEffect.id)) {
             applyStandardFire(hitEntity);
         }
 
@@ -95,6 +95,7 @@ public class GOTItemSword extends ItemSword implements GOTMaterialFinder {
             return itemstack;
         return super.onItemRightClick(itemstack, world, entityplayer);
     }
+
 
     @SideOnly(value = Side.CLIENT)
     @Override

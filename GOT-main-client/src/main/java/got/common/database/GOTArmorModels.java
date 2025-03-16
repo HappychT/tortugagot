@@ -2,6 +2,10 @@ package got.common.database;
 
 import java.util.*;
 
+import got.client.model.thiefArmor.GOTModelThiefBoots;
+import got.client.model.thiefArmor.GOTModelThiefChestplate;
+import got.client.model.thiefArmor.GOTModelThiefHelmet;
+import got.client.model.thiefArmor.GOTModelThiefLeggings;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -160,6 +164,11 @@ public class GOTArmorModels {
 			map.put(GOTRegistry.woodPlate, new GOTModelPlateHead());
 			map.put(GOTRegistry.yitiHelmetSamurai, new GOTModelYiTiHelmet(1.0f, false));
 			map.put(GOTRegistry.yitiHelmetShogune, new GOTModelYiTiHelmet(1.0f, true));
+			map.put(GOTRegistry.firstPeopleHelmet, new GOTModelWingedHelmet(1.0f));
+			map.put(GOTRegistry.thiefHelmet, new GOTModelThiefHelmet());
+			map.put(GOTRegistry.thiefChestplate, new GOTModelThiefChestplate());
+			map.put(GOTRegistry.thiefLeggings, new GOTModelThiefLeggings());
+			map.put(GOTRegistry.thiefBoots, new GOTModelThiefBoots());
 			for (ModelBiped armorModel : map.values()) {
 				copyModelRotations(armorModel, key);
 			}

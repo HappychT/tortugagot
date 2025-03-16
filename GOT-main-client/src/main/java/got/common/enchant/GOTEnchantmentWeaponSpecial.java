@@ -60,7 +60,7 @@ public class GOTEnchantmentWeaponSpecial extends GOTEnchantment {
     }
 
     public static void doChillAttack(EntityLivingBase entity) {
-        if (entity instanceof EntityPlayerMP) {
+        if (entity instanceof EntityPlayerMP && !entity.isPotionActive(GOTEffects.antiEffect.id)) {
             GOTDamage.doFrostDamage((EntityPlayerMP) entity);
         }
 

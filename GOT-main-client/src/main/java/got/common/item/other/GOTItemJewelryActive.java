@@ -22,26 +22,39 @@ public class GOTItemJewelryActive extends Item {
     public static int timer = 200;
 
     public GOTItemJewelryActive(int duration) {
+        setMaxStackSize(1);
         setCreativeTab(GOTCreativeTabs.tabMisc);
         setMaxDamage(duration);
     }
 
-    public GOTItemJewelryActive addPotionEffect(Potion potion, int seconds) {
-        this.effects.add(new PotionEffect(potion.id, seconds * 20));
+    public GOTItemJewelryActive addPotionEffect(int i, int seconds) {
+        this.effects.add(new PotionEffect(i, seconds * 20));
+        return this;
+    }
+
+    public GOTItemJewelryActive addPotionEffect(int i, int seconds, int ampl) {
+        this.effects.add(new PotionEffect(i, seconds * 20, ampl));
         return this;
     }
 
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        if (!stack.hasTagCompound()) {
-            stack.stackTagCompound = new NBTTagCompound();
-            stack.stackTagCompound.setInteger("timer", 0);
+//        if (!stack.hasTagCompound()) {
+//            stack.stackTagCompound = new NBTTagCompound();
+//            stack.stackTagCompound.setInteger("timer", 0);
+//        }
+
+        NBTTagCompound nbt = stack.getTagCompound();
+        if (nbt == null) {
+            nbt = new NBTTagCompound();
+            stack.setTagCompound(nbt);
+            nbt.setInteger("timer", 0);
         }
-        if (stack.stackTagCompound.getInteger("timer") == 0) {
+
+        if (nbt.getInteger("timer") == 0) {
             if(!world.isRemote) {
                 for(PotionEffect effect : this.effects) {
-                    // effect.setPotionDurationMax(false);
-                    player.addPotionEffect(effect);
+                    player.addPotionEffect(new PotionEffect(effect));
                 }
                 if(!player.capabilities.isCreativeMode)
                 {
@@ -53,13 +66,13 @@ public class GOTItemJewelryActive extends Item {
                     }
                     stack.damageItem(1, player);
                 }
-                stack.stackTagCompound.setInteger("timer", timer);
+                nbt.setInteger("timer", timer);
             }
         }
         else {
             if(!world.isRemote) {
                 player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("got.jewelry.desc.cooldown")
-                        + ' ' + ticksToElapsedTime(stack.stackTagCompound.getInteger("timer"))));
+                        + ' ' + ticksToElapsedTime(nbt.getInteger("timer"))));
             }
         }
         return stack;
@@ -74,12 +87,14 @@ public class GOTItemJewelryActive extends Item {
 
     @Override
     public void onUpdate(ItemStack stack, World world, Entity entity, int meta, boolean b) {
-        if (!stack.hasTagCompound()) {
-            stack.stackTagCompound = new NBTTagCompound();
-            stack.stackTagCompound.setInteger("timer", 0);
+        NBTTagCompound nbt = stack.getTagCompound();
+        if (nbt == null) {
+            nbt = new NBTTagCompound();
+            stack.setTagCompound(nbt);
+            nbt.setInteger("timer", 0);
         }
-        if (stack.stackTagCompound.getInteger("timer") > 0) {
-            stack.stackTagCompound.setInteger("timer", stack.stackTagCompound.getInteger("timer") - 1);
+        if (nbt.getInteger("timer") > 0) {
+            nbt.setInteger("timer", nbt.getInteger("timer") - 1);
         }
     }
 

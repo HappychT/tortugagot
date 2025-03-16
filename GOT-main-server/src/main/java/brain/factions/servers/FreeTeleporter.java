@@ -1,4 +1,4 @@
-package brain.factions;
+package brain.factions.servers;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;

@@ -5,18 +5,7 @@ import java.util.Map;
 
 import got.common.database.GOTEffects;
 import got.common.item.tool.GOTItemAxe;
-import got.common.item.weapon.GOTItemBattleaxe;
-import got.common.item.weapon.GOTItemDagger;
-import got.common.item.weapon.GOTItemDornePolearm;
-import got.common.item.weapon.GOTItemHammer;
-import got.common.item.weapon.GOTItemPolearm;
-import got.common.item.weapon.GOTItemPoleaxe;
-import got.common.item.weapon.GOTItemShieldPike;
-import got.common.item.weapon.GOTItemShieldReachPike;
-import got.common.item.weapon.GOTItemShieldRiverlandsTrident;
-import got.common.item.weapon.GOTItemShieldSpear;
-import got.common.item.weapon.GOTItemStormlandsHammer;
-import got.common.item.weapon.GOTItemSword;
+import got.common.item.weapon.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.Potion;
@@ -24,37 +13,40 @@ import net.minecraft.potion.Potion;
 public class GOTCoreBlockingSystem {
     private static final Map<Class<?>, WeaponBlockData> weaponBlockDataMap = new HashMap<>();
 
-    public static void registerWeapon(Class<?> weaponClass, float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaMissPercent) {
-        weaponBlockDataMap.put(weaponClass, new WeaponBlockData(leftBlockAngle, rightBlockAngle, staminaHitPercent, staminaMissPercent));
+    public static void registerWeapon(Class<?> weaponClass, float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaAttackPercent) {
+        weaponBlockDataMap.put(weaponClass, new WeaponBlockData(leftBlockAngle, rightBlockAngle, staminaHitPercent, staminaAttackPercent));
     }
 
     public static void registerWeapons() {
-        registerWeapon(GOTItemSword.class, 35.0f, 35.0f, 0.5, 0.3);
-        registerWeapon(ItemSword.class, 35.0f, 35.0f, 0.5, 0.3);
+        registerWeapon(GOTItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
+        registerWeapon(ItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
+        registerWeapon(GOTItemArrynClaymore.class, 32.0f, 32.0f, 1.5, 1.8);
 
-        registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 0.8, 0.6);
-        registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 0.8, 0.6);
+        registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 2.4, 3.6);
+        registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 2.4, 3.6);
+        
+        registerWeapon(GOTItemIronBornAxe.class, 28.0f, 28.0f, 1.8, 2.4);
+        registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 1.8, 2.4);
+        registerWeapon(GOTItemBattleaxe.class, 28.0f, 28.0f, 1.8, 2.4);
 
-        registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 0.6, 0.4);
-        registerWeapon(GOTItemBattleaxe.class, 28.0f, 28.0f, 0.6, 0.4);
+        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 1.2, 1.2);
 
-        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 0.4, 0.2);
+        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 3.0, 3.0);
 
-        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 1.0, 0.5);
-
-        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 0.7, 0.6);
-        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 0.7, 0.6);
-
-        registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 0.7, 0.6);
-        registerWeapon(GOTItemShieldPike.class, 40.0f, 40.0f, 0.8, 0.6);
-        registerWeapon(GOTItemShieldReachPike.class, 40.0f, 40.0f, 0.8, 0.6);
-        registerWeapon(GOTItemShieldRiverlandsTrident.class, 40.0f, 40.0f, 0.8, 0.6);
+        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 2.1, 3.6);
+        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 2.1, 3.6);
+        registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 2.1, 3.6);
+        registerWeapon(GOTItemShieldPike.class, 40.0f, 40.0f, 2.4, 3.6);
+        registerWeapon(GOTItemShieldReachPike.class, 40.0f, 40.0f, 2.4, 3.6);
+        registerWeapon(GOTItemShieldRiverlandsTrident.class, 40.0f, 40.0f, 2.4, 3.6);
+        registerWeapon(GOTItemValyrianShieldHalbert.class, 40.0f, 40.0f, 2.4, 3.7);
+        registerWeapon(GOTItemValyrianShieldSpear.class, 40.0f, 40.0f, 2.4, 3.6);
     }
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {
-        WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(35.0f, 35.0f, 0.5, 0.3));
+        WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(30.0f, 30.0f, 6.0, 3.6));
         if (player.isPotionActive(GOTEffects.exhaustion) || player.isPotionActive(Potion.digSlowdown))
-            return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaMissPercent());
+            return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaAttackPercent());
         return data;
     }
 
@@ -62,13 +54,13 @@ public class GOTCoreBlockingSystem {
         private final float leftBlockAngle;
         private final float rightBlockAngle;
         private final double staminaHitPercent;
-        private final double staminaMissPercent;
+        private final double staminaAttackPercent;
 
-        public WeaponBlockData(float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaMissPercent) {
+        public WeaponBlockData(float leftBlockAngle, float rightBlockAngle, double staminaHitPercent, double staminaAttackPercent) {
             this.leftBlockAngle = leftBlockAngle;
             this.rightBlockAngle = rightBlockAngle;
             this.staminaHitPercent = staminaHitPercent;
-            this.staminaMissPercent = staminaMissPercent;
+            this.staminaAttackPercent = staminaAttackPercent;
         }
 
         public float getLeftBlockAngle() {
@@ -83,8 +75,8 @@ public class GOTCoreBlockingSystem {
             return this.staminaHitPercent;
         }
 
-        public double getStaminaMissPercent() {
-            return this.staminaMissPercent;
+        public double getStaminaAttackPercent() {
+            return this.staminaAttackPercent;
         }
     }
 }

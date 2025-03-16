@@ -224,16 +224,16 @@ public class GOTContainerAnvil extends Container {
     public boolean hasMaterialOrCoinAmount(int cost) {
         if (this.isTrader)
             return GOTItemCoin.getInventoryValue(this.thePlayer, false) >= cost;
-            ItemStack inputItem = this.invInput.getStackInSlot(0);
-            ItemStack materialItem = this.invInput.getStackInSlot(2);
-            if (materialItem != null)
-                return isRepairMaterial(inputItem, materialItem) && materialItem.stackSize >= cost;
-                return false;
+        ItemStack inputItem = this.invInput.getStackInSlot(0);
+        ItemStack materialItem = this.invInput.getStackInSlot(2);
+        if (materialItem != null)
+            return isRepairMaterial(inputItem, materialItem) && materialItem.stackSize >= cost;
+        return false;
     }
 
     public boolean isRepairMaterial(ItemStack inputItem, ItemStack materialItem) {
 
-        if (this.invInput.getStackInSlot(1) != null && this.invInput.getStackInSlot(1).getItem() instanceof GOTItemModifierTemplate && (inputItem.getItem() instanceof GOTItemSword || inputItem.getItem() instanceof GOTMaterialFinder || inputItem.getItem() instanceof GOTItemArmor || inputItem.getItem() instanceof GOTItemCrossbow))
+        if (this.invInput.getStackInSlot(1) != null && this.invInput.getStackInSlot(1).getItem() instanceof GOTItemModifierTemplate)
             return materialItem.getItem() == GOTRegistry.alloySteelIngot;
 
         if (inputItem.getItem().getIsRepairable(inputItem, materialItem))
@@ -611,6 +611,11 @@ public class GOTContainerAnvil extends Container {
                 ArrayList<GOTEnchantment> outputMods = new ArrayList<>(inputModifiers);
                 List<GOTEnchantment> combinerMods = GOTEnchantmentHelper.getEnchantList(combinerItem);
                 if (combinerItemEnchant != null) {
+                    if (!combinerItemEnchant.canApply(inputItem, false)) {
+                        this.invOutput.setInventorySlotContents(0, null);
+                        this.materialCost = 0;
+                        return;
+                    }
                     combinerMods.add(combinerItemEnchant);
                 }
                 for (GOTEnchantment combinerMod : combinerMods) {

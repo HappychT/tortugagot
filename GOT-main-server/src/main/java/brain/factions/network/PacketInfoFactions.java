@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import brain.factions.Faction;
+import brain.factions.servers.CoreFaction;
+import brain.factions.servers.Faction;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -37,8 +38,8 @@ public class PacketInfoFactions implements IMessage {
 	// SERVER
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(GOT.coreFaction.factions.size());
-		for(Faction faction : GOT.coreFaction.factions.values()) {
+		buf.writeInt(CoreFaction.factions.size());
+		for(Faction faction : CoreFaction.factions.values()) {
 			ByteBufUtils.writeUTF8String(buf, faction.getID());
 			ByteBufUtils.writeUTF8String(buf, faction.getLeaderName());
 			ByteBufUtils.writeUTF8String(buf, faction.getAssistantName());

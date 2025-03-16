@@ -1,4 +1,4 @@
-package brain.factions;
+package brain.factions.servers;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,7 @@ public class CheckPlayerCommand extends CommandBase {
 
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
-		GOT.coreFaction.checkPlayers();
+		CoreFaction.checkPlayers();
 		sender.addChatMessage(new ChatComponentText("§aУспешно!"));
 		return;
 	}

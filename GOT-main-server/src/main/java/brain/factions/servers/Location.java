@@ -1,4 +1,4 @@
-package brain.factions;
+package brain.factions.servers;
 
 public class Location {
 	private int worldID;

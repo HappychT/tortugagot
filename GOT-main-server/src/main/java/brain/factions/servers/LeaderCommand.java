@@ -1,10 +1,11 @@
-package brain.factions;
+package brain.factions.servers;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import brain.factions.Faction;
 import brain.factions.network.PacketMessage;
 import got.GOT;
 import got.common.GOTLevelData;
@@ -44,10 +45,10 @@ public class LeaderCommand extends CommandBase {
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
 		if(args.length >= 2) {
-			GOT.coreFaction.initFactions();
+			CoreFaction.initFactions();
 			String playerName = args[0];
 			String factionID = args[1];
-			Faction faction = PacketMessage.getFaction(factionID);
+			brain.factions.servers.Faction faction = PacketMessage.getFaction(factionID);
 			
 			if(faction == null) {
 				sender.addChatMessage(new ChatComponentText("§eДанной фракции не существует!"));
@@ -72,16 +73,16 @@ public class LeaderCommand extends CommandBase {
 			GOTFaction fac = GOTFaction.forName(factionID);
 			pd.setPledgeFaction(fac);
 			
-			GOT.coreFaction.saveFactions();
-			GOT.coreFaction.initFactions();
-			GOT.coreFaction.sendAllGui();
+			CoreFaction.saveFactions();
+			CoreFaction.initFactions();
+			CoreFaction.sendAllGui();
 			sender.addChatMessage(new ChatComponentText("§aУспешно!"));
 			return;	
 		}
 	}
 	
 	public Object[] checkLeader(String name) {
-		for(Faction fac : GOT.coreFaction.factions.values()) {
+		for(brain.factions.servers.Faction fac : CoreFaction.factions.values()) {
 			if(fac.getLeaderName().equals(name)) {
 				return new Object[] { true, fac.getID()};
 			}

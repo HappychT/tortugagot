@@ -6,6 +6,7 @@ import got.common.dispense.GOTDispenseSpear;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
 import got.common.entity.other.GOTEntitySpear.GOTEntityThiefKnife;
+import got.common.handlers.StaminaServerHandler;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -85,6 +86,7 @@ public class GOTItemThiefKnife extends GOTItemSpear {
         world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
         if (!world.isRemote) {
             world.spawnEntityInWorld(knife);
+            StaminaServerHandler.drainStaminaByPercent(2, entityplayer);
         }
         if (!entityplayer.capabilities.isCreativeMode) {
             itemstack.damageItem(itemstack.getMaxDamage() / 8, entityplayer);

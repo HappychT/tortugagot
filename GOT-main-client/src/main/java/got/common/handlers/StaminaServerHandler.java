@@ -5,6 +5,10 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import got.common.database.GOTEffects;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
+import got.common.item.weapon.GOTItemBow;
+import got.common.item.weapon.GOTItemCrossbow;
+import got.common.item.weapon.GOTItemShieldPike;
+import got.common.item.weapon.GOTItemShieldSpear;
 import got.common.network.base.PacketDispatcher;
 import got.common.network.serverToClient.PacketSendBounceCooldown;
 import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
@@ -24,9 +28,10 @@ public class StaminaServerHandler {
 
     public static final int MAX_STAMINA = 10000; // Maximum stamina, increase if needed
 
-    private static final int BOUNCE_RANGE = 1; // The range for the bounce, change to your liking
-    private static final int BOUNCE_PERCENT = 3; // The percentage of stamina to drain when bouncing, change to your liking
-    private static final int REGAIN_RATE = 100; // The rate at which stamina is regained, change to your liking
+    private static final int BOUNCE_RANGE = 4; // The range for the bounce, change to your liking
+    private static final int BOUNCE_PERCENT = 8; // The percentage of stamina to drain when bouncing, change to your liking
+    private static final int STANDING_REGAIN_RATE = 100; // The rate at which stamina is regained, change to your liking
+    private static final int WALKING_REGAIN_RATE = 30;
     private static final int STANDING_STILL_COOLDOWN = 25; // The cooldown before stamina regen, when standing in-place, change to your liking
     private static final int SECONDBREATH_COOLDWON = 6000;
 
@@ -53,13 +58,16 @@ public class StaminaServerHandler {
 
         if (isMoving) {
             if (isRunning) {
-                drainStaminaByPercent(0.025, player);
+                drainStaminaByPercent(0.01, player);
+                extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
+            } else if (!player.isBlocking()) {
+                regainStamina(WALKING_REGAIN_RATE, player);
             }
             extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
         }
 
         if (isJumping) {
-            drainStaminaByPercent(0.3, player);
+            drainStaminaByPercent(0.15, player);
             extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
         }
 
@@ -69,15 +77,14 @@ public class StaminaServerHandler {
 
         if (player.isPotionActive(GOTEffects.rest)) {
             if (player.getCurrentArmor(0) != null && GOTEnchantmentHelper.hasEnchant(player.getCurrentArmor(0), GOTEnchantment.restBuff)) { // Resting potion effect stamina regen, stacks with normal regen
-                regainStamina(15, player);
-            }
-            else { // Resting potion effect stamina regen, stacks with normal regen
-                regainStamina(REGAIN_RATE / 10, player); // May be too OP, adjust to your liking
+                regainStamina(30, player);
+            } else { // Resting potion effect stamina regen, stacks with normal regen
+                regainStamina(20, player); // May be too OP, adjust to your liking
             }
         }
 
         if (!isMoving && player.onGround && !isJumping && extendedPlayer.getStandingStillCooldown() == 0) {
-            regainStamina(REGAIN_RATE, player);
+            regainStamina(STANDING_REGAIN_RATE, player);
         }
 
         // Decrease bounce cooldown
@@ -91,18 +98,23 @@ public class StaminaServerHandler {
             PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
         }
 
-        if (extendedPlayer.getStamina() == 0) {
+        if (extendedPlayer.getStamina() <= MAX_STAMINA * 0.1) {
             if (player.isPotionActive(GOTEffects.secondBreath) && extendedPlayer.getSecondBreathCooldown() == 0) {
-                regainStamina((int) (MAX_STAMINA * 0.1), player);
+                regainStamina((int) (MAX_STAMINA * 0.15), player);
                 player.removePotionEffect(GOTEffects.secondBreath.id);
                 extendedPlayer.setSecondBreathCooldown(SECONDBREATH_COOLDWON);
                 PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
             } else {
-                player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 0, true));
+                player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1, true));
                 // Oops, I added my own effect accidentally, but you can use whatever suits your needs, mine does not effect the dig speed, only attack speed and block degrees
                 // But I've added requested functionality anyway to the vanilla potion effect
                 //.addPotionEffect(new PotionEffect(GOTEffects.exhaustion.id, 20, 0, true));
                 player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 20, 0, true));
+                if (player.isInWater()) {
+                    player.motionY = 0;
+                    player.jumpMovementFactor = 0.0F;
+                    System.out.println("po idee not plavat");
+                }
             }
         } else {
             //player.removePotionEffect(Potion.moveSlowdown.id);
@@ -122,7 +134,10 @@ public class StaminaServerHandler {
         if (extendedPlayer.getBounceCooldown() > 0)
             return;
 
-        if (extendedPlayer.getStamina() < (MAX_STAMINA * (BOUNCE_PERCENT / 100.0)))
+        if (player.getHeldItem() != null && (player.getHeldItem().getItem() instanceof GOTItemShieldSpear || player.getHeldItem().getItem() instanceof GOTItemShieldPike))
+            return;
+
+        if (extendedPlayer.getStamina() <= (MAX_STAMINA * 0.1))
             return;
 
         if (direction != 0) {
@@ -131,6 +146,7 @@ public class StaminaServerHandler {
     }
 
     private void executeBounce(EntityPlayer player, int direction) {
+
         double bounceRange = BOUNCE_RANGE; // Example bounce range
         double motionX = 0;
         double motionZ = 0;
@@ -153,11 +169,10 @@ public class StaminaServerHandler {
 
         // Apply motion over a few ticks for smoothness
         int duration = 5; // Number of ticks over which to apply the motion
-        for (int i = 0; i < duration; i++) {
-            player.motionX += motionX / duration;
-            player.motionZ += motionZ / duration;
-            player.motionY += motionY / duration;
-        }
+        player.motionX += motionX / duration;
+        player.motionZ += motionZ / duration;
+        player.motionY += motionY;
+
         player.velocityChanged = true; // Ensure the server updates the player's velocity
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
@@ -169,7 +184,7 @@ public class StaminaServerHandler {
     }
 
     public static void drainStamina(int amount, EntityPlayer player) {
-        if(player.capabilities.isCreativeMode)
+        if (player.capabilities.isCreativeMode)
             return;
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
@@ -181,7 +196,7 @@ public class StaminaServerHandler {
     }
 
     public static void drainStaminaByPercent(double percent, EntityPlayer player) {
-        if(player.capabilities.isCreativeMode)
+        if (player.capabilities.isCreativeMode)
             return;
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
@@ -197,12 +212,12 @@ public class StaminaServerHandler {
         extendedPlayer.setStamina(Math.min(MAX_STAMINA, extendedPlayer.getStamina() + amount));
         PacketDispatcher.sendTo(new PacketSendStamina(extendedPlayer.getStamina()), (EntityPlayerMP) player);
     }
-
+    /*
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent event) {
         if (event.entity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.entity;
-            if(player.worldObj.isRemote)
+            if (player.worldObj.isRemote)
                 return;
             DamageSource source = event.source;
 
@@ -212,14 +227,14 @@ public class StaminaServerHandler {
                 drainStaminaByPercent(0.33, player);
             }
         }
-    }
+    }*/
 
     @SubscribeEvent
     public void onArrowLoose(ArrowLooseEvent event) {
         EntityPlayer player = event.entityPlayer;
-        if(player.worldObj.isRemote)
+        if (player.worldObj.isRemote)
             return;
-        drainStaminaByPercent(0.4, player);
-    }
+        drainStaminaByPercent(3, player);
 
+    }
 }

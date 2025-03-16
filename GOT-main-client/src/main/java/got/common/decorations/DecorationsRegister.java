@@ -10,7 +10,6 @@ import net.minecraft.util.ResourceLocation;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class DecorationsRegister {
 

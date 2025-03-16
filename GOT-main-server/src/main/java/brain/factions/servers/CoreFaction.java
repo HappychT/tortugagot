@@ -1,9 +1,8 @@
-package brain.factions;
+package brain.factions.servers;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import brain.factions.network.PacketInfoFactions;
-import brain.factions.network.PacketMessage;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -30,18 +28,14 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.UsernameCache;
-import net.minecraftforge.event.ServerChatEvent;
 
 @Mod(modid = "faction", name = "faction", acceptableRemoteVersions = "*")
 public class CoreFaction {
@@ -49,16 +43,15 @@ public class CoreFaction {
 	public static File configFolder;
 
 	public static HashMap<String, Faction> factions;
-	public static SimpleNetworkWrapper brainChannel = new SimpleNetworkWrapper("brainchannel");
-
+	//public static SimpleNetworkWrapper brainChannel = new SimpleNetworkWrapper("brainchannel");
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		configFolder = new File(event.getModConfigurationDirectory(), "BrainFaction");
 		if (!configFolder.exists()) {
 			configFolder.mkdir();
 		}
-		brainChannel.registerMessage(new PacketMessage.Handler(), PacketMessage.class, 0, Side.SERVER);
-		brainChannel.registerMessage(new PacketInfoFactions.Handler(), PacketInfoFactions.class, 1, Side.CLIENT);
+		//brainChannel.registerMessage(new PacketMessage.Handler(), PacketMessage.class, 0, Side.SERVER);
+		//brainChannel.registerMessage(new PacketInfoFactions.Handler(), PacketInfoFactions.class, 1, Side.CLIENT);
 
 	}
 
@@ -68,7 +61,6 @@ public class CoreFaction {
 		MinecraftForge.EVENT_BUS.register(this);
 		FMLCommonHandler.instance().bus().register(this);
 	}
-
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(new LeaderCommand());
@@ -137,7 +129,7 @@ public class CoreFaction {
 	public void join(PlayerLoggedInEvent e) {
 		initFactions();
 		EntityPlayerMP player = (EntityPlayerMP) e.player;
-		brainChannel.sendTo(new PacketInfoFactions(), player);
+		brain.factions.CoreFaction.brainChannel.sendTo(new PacketInfoFactions(), player);
 		
 		for(Faction faction : factions.values()) {
 			if(faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
@@ -150,10 +142,10 @@ public class CoreFaction {
 		}
 	}
 
-	public void sendAllGui() {
+	public static void sendAllGui() {
 		List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 		for(EntityPlayerMP player : players) {
-			brainChannel.sendTo(new PacketInfoFactions(), player);
+			brain.factions.CoreFaction.brainChannel.sendTo(new PacketInfoFactions(), player);
 		}
 	}
 	

@@ -9,12 +9,12 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class GOTRenderBattleRam extends Render {
+public class GOTRenderBattleRam extends RenderLiving {
     public static ResourceLocation TEXTURE = new ResourceLocation("got:textures/model/battle_ram.png");
     public ModelBase model = new GOTModelBattleRam();
 
     public GOTRenderBattleRam() {
-        renderManager = RenderManager.instance;
+        super(new GOTModelBattleRam(), 0.5F);
         shadowSize = 1.0f;
     }
 

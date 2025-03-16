@@ -1,36 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ff32ce85-376b-4d83-b92c-93002536a66c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/brain/factions/CoreFaction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/brain/factions/Faction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/brain/factions/network/PacketInfoFactions.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/brain/factions/network/PacketMessage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/client/gui/playerlist/PlayerLayer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/client/gui/utils/GuiApi.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/client/gui/utils/GuiScrollingList.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/down.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/edit.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/home.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/kick.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/list.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/minus.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/plus.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/resources/assets/got/textures/icons/up.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/GOT.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/GOT.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/client/gui/GOTGuiFactions.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/client/gui/GOTGuiFactions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/GOTSoulBoundEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/GOTSoulBoundEvents.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/database/GOTSpeech.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/database/GOTSpeech.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/other/GOTItemBuckshot.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/other/GOTItemBuckshot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/other/GOTItemCustomPotion.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/other/GOTItemCustomPotion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/potions/GOTItemLingeringPotion.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/potions/GOTItemLingeringPotion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/potions/GOTItemSmoke.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/potions/GOTItemSmoke.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/potions/GOTItemSplashPotionExtra.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/potions/GOTItemSplashPotionExtra.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/weapon/GOTItemThrowingBomb.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/weapon/GOTItemThrowingBomb.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/weapon/GOTItemThrowingKnife.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/item/weapon/GOTItemThrowingKnife.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/network/GOTPacketPledgeSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/network/GOTPacketPledgeSet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/quest/GOTMiniQuestBounty.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game-of-Thrones-Main/src/main/java/got/common/quest/GOTMiniQuestBounty.java" afterDir="false" />
-    </list>
+    <list default="true" id="ff32ce85-376b-4d83-b92c-93002536a66c" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,9 +10,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2tYE5deOe3o9euN7xCA1tbVWN6u" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -51,7 +22,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "faction__merge",
+    "git-widget-placeholder": "faction__fix",
     "kotlin-language-version-configured": "true"
   }
 }]]></component>

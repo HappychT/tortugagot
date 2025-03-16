@@ -21,6 +21,7 @@ public class GOTItemBattleHorn extends Item {
     public GOTItemBattleHorn(PotionEffect effect, double radius) {
         setCreativeTab(GOTCreativeTabs.tabMisc);
         setMaxDamage(50);
+        setMaxStackSize(1);
         this.effect = effect;
         this.radius = radius;
     }
@@ -41,11 +42,11 @@ public class GOTItemBattleHorn extends Item {
             List<EntityPlayer> list = world.getEntitiesWithinAABB(EntityPlayer.class,
                     entityplayer.boundingBox.copy().expand(this.radius, this.radius, this.radius)
                     );
-            entityplayer.addPotionEffect(this.effect);
+            entityplayer.addPotionEffect(new PotionEffect(this.effect));
 
             if(list != null) {
                 for(EntityPlayer otherPlayer : list) {
-                    otherPlayer.addPotionEffect(this.effect);
+                    otherPlayer.addPotionEffect(new PotionEffect(this.effect));
                 }
             }
 
