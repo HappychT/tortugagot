@@ -42,6 +42,6 @@ public class GOTRenderBattleRam extends RenderLiving {
     }
 
     public void setupTranslation(double x, double y, double z) {
-        GL11.glTranslatef((float) x, (float) y + 0.375f, (float) z);
+        GL11.glTranslatef((float) x, (float) y + 1.5f, (float) z);
     }
 }

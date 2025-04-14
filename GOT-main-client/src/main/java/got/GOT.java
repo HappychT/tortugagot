@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import brain.factions.network.PacketMessage;
 import com.google.common.base.CaseFormat;
 
 import brain.factions.CoreFaction;
@@ -30,6 +31,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import got.client.gui.GOTGuiFactions;
 import got.common.GOTCommonProxy;
 import got.common.GOTEventHandler;
 import got.common.GOTGuiMessageTypes;
@@ -92,6 +94,7 @@ import got.common.command.GOTCommandWaypoints;
 import got.common.command.GOTCommandWeather;
 import got.common.database.GOTAchievement;
 import got.common.database.GOTCreativeTabs;
+import got.common.database.GOTEffects;
 import got.common.database.GOTRegistry;
 import got.common.decorations.DecorationsRegister;
 import got.common.entity.GOTEntity;
@@ -123,6 +126,8 @@ import got.common.world.map.GOTWaypoint;
 import got.common.world.structure.GOTStructure;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandTime;
 import net.minecraft.command.IEntitySelector;
@@ -146,6 +151,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Teleporter;
@@ -157,6 +163,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -363,6 +370,60 @@ public class GOT {
         return "";
     }
 
+    public static boolean tpRequest = false;
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
+        if (event.entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) event.entity;
+            if (tpRequest) {
+                if (player.motionX != 0 || player.motionZ != 0) {
+                    player.addChatMessage(new ChatComponentText("Вы должны стоять на месте для телепортации!"));
+                    tpRequest = false;
+                }
+            }
+            if (player.isPotionActive(GOTEffects.combatLog)) {
+                tpRequest = false;
+            }
+        }
+    }
+
+    private static final long TELEPORT_DELAY = 8000;
+    @SideOnly(Side.CLIENT)
+    public static void requestTeleport() {
+        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+
+        if (player == null) return;
+
+        if (tpRequest) {
+            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Телепортация уже запрошена!"));
+            return;
+        }
+        tpRequest=true;
+        if (player.isPotionActive(GOTEffects.combatLog)) {
+            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Вы не можете телепортироваться, так как находитесь в бою!"));
+            return;
+        }
+
+        GOTGuiFactions.lastTeleportTime = System.currentTimeMillis();
+        player.addChatMessage(new ChatComponentText(EnumChatFormatting.YELLOW + "Телепортация запрошена! Стойте на месте в течение 8 секунд..."));
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(TELEPORT_DELAY);
+                if (tpRequest) {
+                    if (player.isPotionActive(Potion.blindness.id)) {
+                        player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Вы не можете телепортироваться, так как находитесь в бою!"));
+                    } else {
+                        CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
+                    }
+                    tpRequest = false;
+                }
+
+            } catch (InterruptedException e) {
+            }
+        }).start();
+    }
 
     @Mod.EventHandler
     public void onMissingMappings(FMLMissingMappingsEvent event) {
