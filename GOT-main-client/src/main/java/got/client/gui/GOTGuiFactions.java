@@ -429,13 +429,15 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 
 
 										if (System.currentTimeMillis() > COOLDOWN_TIME + lastTeleportTime) {
-											CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
+											GOT.tpRequest = false;
+											GOT.requestTeleport();
 											Minecraft.getMinecraft().displayGuiScreen(null);
 											setClicked(false);
 											lastTeleportTime = currentTime;
 										} else {
 											Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Кулдаун: " +
 													((COOLDOWN_TIME - (currentTime - lastTeleportTime)) / 1000 + " секунд осталось.")));
+											GOT.tpRequest = false;
 											setClicked(false);
 										}
 									}

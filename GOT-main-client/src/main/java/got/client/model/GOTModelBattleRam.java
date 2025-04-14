@@ -61,7 +61,7 @@ public class GOTModelBattleRam extends ModelBase {
         textureHeight = 512;
 
         Structure = new ModelRenderer(this);
-        Structure.setRotationPoint(-0.5163F, -2.9232F - 19.0F, 0.0167F);
+        Structure.setRotationPoint(-0.5163F, -2.9232F, 0.0167F);
         Structure.cubeList.add(new ModelBox(Structure, 44, 112, -23.9837F, 19.4232F, -37.4167F, 2, 2, 2, 0.0F));
         Structure.cubeList.add(new ModelBox(Structure, 152, 0, 22.0163F, 19.4232F, -37.4167F, 2, 2, 2, 0.0F));
         Structure.cubeList.add(new ModelBox(Structure, 40, 149, 22.0163F, 19.4232F, -1.0167F, 2, 2, 2, 0.0F));
@@ -142,7 +142,7 @@ public class GOTModelBattleRam extends ModelBase {
         Structure_r6.cubeList.add(new ModelBox(Structure_r6, 0, 100, -4.5F, -12.0F, 17.0F, 32, 4, 2, 0.0F));
 
         Ram = new ModelRenderer(this);
-        Ram.setRotationPoint(-0.4733F, 8.4233F - 19.0F, 1.2587F);
+        Ram.setRotationPoint(-0.4733F, 8.4233F, 1.2587F);
         Ram.cubeList.add(new ModelBox(Ram, 137, 79, -3.5267F, -3.6233F, -46.0587F, 7, 7, 85, 0.0F));
         Ram.cubeList.add(new ModelBox(Ram, 157, 92, -4.0267F, -4.1233F, -32.5587F, 8, 8, 2, 0.0F));
         Ram.cubeList.add(new ModelBox(Ram, 0, 149, -4.0267F, -4.1233F, -45.0587F, 8, 8, 2, 0.0F));
@@ -303,7 +303,7 @@ public class GOTModelBattleRam extends ModelBase {
         RamHead_r15.cubeList.add(new ModelBox(RamHead_r15, 157, 124, 0.0F, -1.5F, -2.0F, 3, 4, 4, 0.0F));
 
         FirstDuoRopes = new ModelRenderer(this);
-        FirstDuoRopes.setRotationPoint(-0.4F, -10.0F - 19.0F, -35.0F);
+        FirstDuoRopes.setRotationPoint(-0.4F, -10.0F, -35.0F);
 
 
         Rope1 = new ModelRenderer(this);
@@ -329,7 +329,7 @@ public class GOTModelBattleRam extends ModelBase {
         Rope4_r1.cubeList.add(new ModelBox(Rope4_r1, 78, 61, -0.5F, -8.0F, 0.0F, 1, 16, 0, 0.0F));
 
         SecondDuoRopes = new ModelRenderer(this);
-        SecondDuoRopes.setRotationPoint(-0.4F, -10.0F - 19.0F, 0.0F);
+        SecondDuoRopes.setRotationPoint(-0.4F, -10.0F, 0.0F);
 
 
         Rope2 = new ModelRenderer(this);
@@ -355,7 +355,7 @@ public class GOTModelBattleRam extends ModelBase {
         Rope5_r1.cubeList.add(new ModelBox(Rope5_r1, 78, 147, -0.5F, -8.0F, 0.0F, 1, 16, 0, 0.0F));
 
         ThirdDuoRopes = new ModelRenderer(this);
-        ThirdDuoRopes.setRotationPoint(-0.4F, -10.0F - 19.0F, 35.0F);
+        ThirdDuoRopes.setRotationPoint(-0.4F, -10.0F, 35.0F);
 
 
         Rope3 = new ModelRenderer(this);
@@ -382,7 +382,7 @@ public class GOTModelBattleRam extends ModelBase {
         Rope6_r1.cubeList.add(new ModelBox(Rope6_r1, 78, 164, -0.5F, -8.0F, 0.0F, 1, 16, 0, 0.0F));
 
         Wheel1 = new ModelRenderer(this);
-        Wheel1.setRotationPoint(22.0F, 17.5F - 19.0F, 36.6F);
+        Wheel1.setRotationPoint(22.0F, 17.5F, 36.6F);
         Wheel1.cubeList.add(new ModelBox(Wheel1, 169, 65, -1.0F, -2.5F, -7.5F, 2, 5, 1, 0.0F));
         Wheel1.cubeList.add(new ModelBox(Wheel1, 171, 109, -1.0F, -4.5F, -6.5F, 2, 9, 1, 0.0F));
         Wheel1.cubeList.add(new ModelBox(Wheel1, 130, 164, -1.0F, -5.5F, -5.5F, 2, 11, 1, 0.0F));
@@ -394,7 +394,7 @@ public class GOTModelBattleRam extends ModelBase {
         Wheel1.cubeList.add(new ModelBox(Wheel1, 175, 75, -1.0F, -2.5F, 6.5F, 2, 5, 1, 0.0F));
 
         Wheel2 = new ModelRenderer(this);
-        Wheel2.setRotationPoint(22.0F, 17.5F - 19.0F, 0.0F);
+        Wheel2.setRotationPoint(22.0F, 17.5F, 0.0F);
         Wheel2.cubeList.add(new ModelBox(Wheel2, 177, 56, -1.0F, -2.5F, -7.5F, 2, 5, 1, 0.0F));
         Wheel2.cubeList.add(new ModelBox(Wheel2, 175, 65, -1.0F, -4.5F, -6.5F, 2, 9, 1, 0.0F));
         Wheel2.cubeList.add(new ModelBox(Wheel2, 171, 0, -1.0F, -5.5F, -5.5F, 2, 11, 1, 0.0F));
@@ -406,7 +406,7 @@ public class GOTModelBattleRam extends ModelBase {
         Wheel2.cubeList.add(new ModelBox(Wheel2, 177, 109, -1.0F, -2.5F, 6.5F, 2, 5, 1, 0.0F));
 
         Wheel3 = new ModelRenderer(this);
-        Wheel3.setRotationPoint(22.0F, 17.5F - 19.0F, -36.4F);
+        Wheel3.setRotationPoint(22.0F, 17.5F, -36.4F);
         Wheel3.cubeList.add(new ModelBox(Wheel3, 178, 171, -1.0F, -2.5F, 6.5F, 2, 5, 1, 0.0F));
         Wheel3.cubeList.add(new ModelBox(Wheel3, 175, 139, -1.0F, -4.5F, 5.5F, 2, 9, 1, 0.0F));
         Wheel3.cubeList.add(new ModelBox(Wheel3, 136, 171, -1.0F, -5.5F, 4.5F, 2, 11, 1, 0.0F));
@@ -418,7 +418,7 @@ public class GOTModelBattleRam extends ModelBase {
         Wheel3.cubeList.add(new ModelBox(Wheel3, 178, 177, -1.0F, -2.5F, -7.5F, 2, 5, 1, 0.0F));
 
         Wheel4 = new ModelRenderer(this);
-        Wheel4.setRotationPoint(-23.0F, 17.5F - 19.0F, 36.6F);
+        Wheel4.setRotationPoint(-23.0F, 17.5F, 36.6F);
         Wheel4.cubeList.add(new ModelBox(Wheel4, 154, 171, -1.0F, -5.5F, 4.5F, 2, 11, 1, 0.0F));
         Wheel4.cubeList.add(new ModelBox(Wheel4, 177, 0, -1.0F, -4.5F, 5.5F, 2, 9, 1, 0.0F));
         Wheel4.cubeList.add(new ModelBox(Wheel4, 98, 164, -1.0F, -6.5F, 2.5F, 2, 13, 2, 0.0F));
@@ -430,7 +430,7 @@ public class GOTModelBattleRam extends ModelBase {
         Wheel4.cubeList.add(new ModelBox(Wheel4, 6, 179, -1.0F, -2.5F, 6.5F, 2, 5, 1, 0.0F));
 
         Wheel5 = new ModelRenderer(this);
-        Wheel5.setRotationPoint(-23.0F, 17.5F - 19.0F, 0.0F);
+        Wheel5.setRotationPoint(-23.0F, 17.5F, 0.0F);
         Wheel5.cubeList.add(new ModelBox(Wheel5, 24, 179, -1.0F, -2.5F, 6.5F, 2, 5, 1, 0.0F));
         Wheel5.cubeList.add(new ModelBox(Wheel5, 173, 24, -1.0F, -5.5F, 4.5F, 2, 11, 1, 0.0F));
         Wheel5.cubeList.add(new ModelBox(Wheel5, 177, 82, -1.0F, -4.5F, 5.5F, 2, 9, 1, 0.0F));
@@ -442,7 +442,7 @@ public class GOTModelBattleRam extends ModelBase {
         Wheel5.cubeList.add(new ModelBox(Wheel5, 179, 20, -1.0F, -2.5F, -7.5F, 2, 5, 1, 0.0F));
 
         Wheel6 = new ModelRenderer(this);
-        Wheel6.setRotationPoint(-23.0F, 17.5F - 19.0F, -36.4F);
+        Wheel6.setRotationPoint(-23.0F, 17.5F, -36.4F);
         Wheel6.cubeList.add(new ModelBox(Wheel6, 18, 179, -1.0F, -2.5F, 6.5F, 2, 5, 1, 0.0F));
         Wheel6.cubeList.add(new ModelBox(Wheel6, 177, 46, -1.0F, -4.5F, 5.5F, 2, 9, 1, 0.0F));
         Wheel6.cubeList.add(new ModelBox(Wheel6, 166, 171, -1.0F, -5.5F, 4.5F, 2, 11, 1, 0.0F));
