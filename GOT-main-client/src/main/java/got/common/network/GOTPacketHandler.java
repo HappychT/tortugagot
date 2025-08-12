@@ -157,6 +157,8 @@ public class GOTPacketHandler {
 		networkWrapper.registerMessage(GOTPacketWaypointRegion.Handler.class, GOTPacketWaypointRegion.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketWaypointUseCount.Handler.class, GOTPacketWaypointUseCount.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketWeaponFX.Handler.class, GOTPacketWeaponFX.class, id++, Side.CLIENT);
+
+		networkWrapper.registerMessage(PacketSyncWeaponHitCount.Handler.class, PacketSyncWeaponHitCount.class, id++, Side.CLIENT);
 	}
 
 	public static NetworkRegistry.TargetPoint nearEntity(Entity entity, double range) {

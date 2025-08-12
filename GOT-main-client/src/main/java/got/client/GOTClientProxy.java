@@ -1,10 +1,7 @@
 package got.client;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.UUID;
 
 import org.lwjgl.opengl.GL11;
 
@@ -182,6 +179,8 @@ public class GOTClientProxy extends GOTCommonProxy {
     public int ropeRenderID;
     public int chainRenderID;
     public int trapdoorRenderID;
+
+    public static final Map<Item, Integer> weaponHitCounts = new HashMap<>();
 
     @Override
     public void addMapPlayerLocation(GameProfile player, double posX, double posZ) {

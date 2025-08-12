@@ -9,6 +9,7 @@ import got.GOT;
 import got.common.enchant.GOTEnchantmentHelper;
 import got.common.enchant.GOTEnchantmentRangedDamage;
 import got.common.item.weapon.*;
+import got.common.item.weapon.cswords.*;
 import net.minecraft.enchantment.*;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -57,7 +58,32 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemCavalryLance.class, 0.35f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemValyrianShieldHalbert.class, 0.3f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemValyrianShieldSpear.class, 0.54f);
-		
+
+		GOTWeaponStats.registerMeleeSpeed(ItemLightbringer.class, 0.50f);
+		GOTWeaponStats.registerMeleeSpeed(ItemNightKingSword.class, 0.60f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemDecoyClaymore.class, 0.65f);
+		GOTWeaponStats.registerMeleeReach(ItemDecoyClaymore.class, 1.04f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemBaratheonHammer.class, 0.35f);
+		GOTWeaponStats.registerMeleeReach(ItemBaratheonHammer.class, 1.20f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemIceStarkSword.class, 0.25f);
+		GOTWeaponStats.registerMeleeReach(ItemIceStarkSword.class, 1.30f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemPoisonedSandBlade.class, 0.54f);
+		GOTWeaponStats.registerMeleeReach(ItemPoisonedSandBlade.class, 1.45f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemSyrioForelSword.class, 0.69f);
+		GOTWeaponStats.registerMeleeReach(ItemSyrioForelSword.class, 0.96f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemStunningHammer.class, 0.45f);
+		GOTWeaponStats.registerMeleeReach(ItemStunningHammer.class, 1.00f);
+		GOTWeaponStats.registerMeleeExtraKnockback(ItemStunningHammer.class, 1);
+
+		GOTWeaponStats.registerMeleeReach(ItemNightKingSword.class, 1.10f);
+		GOTWeaponStats.registerMeleeReach(ItemLightbringer.class, 1.15f);
+
 		GOTWeaponStats.registerMeleeReach(GOTItemLeaderBattleaxe.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemPoleaxe.class, 1.2f);
 		GOTWeaponStats.registerMeleeReach(GOTItemArrynClaymore.class, 1.04f);

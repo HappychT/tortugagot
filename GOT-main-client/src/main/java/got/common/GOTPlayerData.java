@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import got.common.network.*;
-import got.common.network.GOTPacketLeader;
+import got.common.GOTPacketLeader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 

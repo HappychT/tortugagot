@@ -6,6 +6,7 @@ import java.util.Map;
 import got.common.database.GOTEffects;
 import got.common.item.tool.GOTItemAxe;
 import got.common.item.weapon.*;
+import got.common.item.weapon.cswords.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.Potion;
@@ -21,7 +22,15 @@ public class GOTCoreBlockingSystem {
         registerWeapon(GOTItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
         registerWeapon(ItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
         registerWeapon(GOTItemArrynClaymore.class, 32.0f, 32.0f, 1.5, 1.8);
+        registerWeapon(ItemLightbringer.class, 35.0f, 35.0f, 1.8, 2.0);
+        registerWeapon(ItemNightKingSword.class, 35.0f, 35.0f, 2.5, 3.0);
+        registerWeapon(ItemIceStarkSword.class, 35.0f, 35.0f, 2.0, 2.5);
+        registerWeapon(ItemPoisonedSandBlade.class, 15.0f, 90.0f, 1.5, 2.2);
+        registerWeapon(ItemSyrioForelSword.class, 30.0f, 30.0f, 1.5, 1.8);
+        registerWeapon(ItemStunningHammer.class, 20.0f, 20.0f, 2, 2.5);
+        registerWeapon(ItemDecoyClaymore.class, 38.0f, 38.0f, 1.8, 2.0);
 
+        registerWeapon(ItemBaratheonHammer.class, 15.0f, 15.0f, 3, 3.5);
         registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 2.4, 3.6);
         registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 2.4, 3.6);
         

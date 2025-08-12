@@ -25,6 +25,9 @@ public class GOTEffects {
     public static Potion freeze;
     public static Potion antiEffect;
 
+    public static Potion neurotoxin;
+    public static Potion staminaLock;
+
     public static Potion rest;
     public static Potion dexterity;
     public static Potion secondBreath;
@@ -40,6 +43,13 @@ public class GOTEffects {
 
         bleeding = new GOTPotionBleeding(idCounter);
         registerPotion(bleeding);
+
+        neurotoxin = new GOTCustomPotion(idCounter, true, 8171463, "neurotoxin");
+        registerPotion(neurotoxin);
+
+        staminaLock = new GOTCustomPotion(idCounter, true, 8171463, "staminaLock");
+        registerPotion(staminaLock);
+
 
         antidote = new GOTCustomPotion(idCounter, false, 4960121, "antidote");
         registerPotion(antidote);

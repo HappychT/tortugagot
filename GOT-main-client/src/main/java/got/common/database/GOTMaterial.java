@@ -92,6 +92,16 @@ public class GOTMaterial {
     public static ToolMaterial FIRST_PEOPLE_WEAPON = EnumHelper.addToolMaterial("GOT_FIRST_PEOPLE_WEAPON", 4, 6000, 9.0F, 5.5F, 8);
     public static ToolMaterial THIEF_KNIFE = EnumHelper.addToolMaterial("GOT_THIEF_TOOL", 2, 625, 6.0F, 2.0F, 14);
     public static ToolMaterial GIANT_CLUB = EnumHelper.addToolMaterial("GOT_GIANT_CLUB", 2, 250, 6.0F, 2.0F, 14);
+
+	public static ToolMaterial LIGHTBRINGER = EnumHelper.addToolMaterial("LIGHTBRINGER", 2, 10000, 6.0F, 1.0F, 14);
+	public static ToolMaterial NIGHTKING = EnumHelper.addToolMaterial("NIGHTKING", 2, 10000, 6.0F, 0.0F, 14);
+	public static ToolMaterial BARATHEONHAMMER = EnumHelper.addToolMaterial("BARATHEONHAMMER", 2, 10000, 6.0F, -3.5F, 14);
+	public static ToolMaterial STUNNINGHAMMER = EnumHelper.addToolMaterial("STUNNINGHAMMER", 2, 10000, 6.0F, -1.5F, 14);
+	public static ToolMaterial ICESTARK = EnumHelper.addToolMaterial("ICESTARK", 2, 10000, 6.0F, 4.0F, 14);
+	public static ToolMaterial POISONEDGE = EnumHelper.addToolMaterial("POISONEDGE", 2, 10000, 6.0F, 1.0F, 14);
+	public static ToolMaterial SYRIO = EnumHelper.addToolMaterial("SYRIO", 2, 10000, 6.0F, 1.0F, 14);
+	public static ToolMaterial DECOYCLAYMORE = EnumHelper.addToolMaterial("DECOYCLAYMORE", 2, 10000, 6.0F, 0.0F, 14);
+
 	public static ItemArmor.ArmorMaterial getArmorMaterialByName(String name) {
 		return ItemArmor.ArmorMaterial.valueOf(name);
 	}

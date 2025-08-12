@@ -277,6 +277,7 @@ import got.common.item.tool.GOTItemHoe;
 import got.common.item.tool.GOTItemPickaxe;
 import got.common.item.tool.GOTItemShovel;
 import got.common.item.weapon.*;
+import got.common.item.weapon.cswords.*;
 import got.common.itemreg.GOTItems;
 import got.common.tileentity.GOTTileEntitySignCarved;
 import got.common.tileentity.GOTTileEntitySignCarvedValyrian;
@@ -1723,6 +1724,16 @@ public class GOTRegistry {
     public static Item toxinBomb;
     public static Item smoke;
 
+    public static Item lightbringersec;
+    public static Item nightkingSword;
+    public static Item baratheonHammer;
+    public static Item stunningHammer;
+    public static Item iceStarkSword;
+    public static Item poisonedSandBlade;
+    public static Item syrioForelSword;
+    public static Item decoyClaymore;
+
+
     public static void assignContent() {
         GOTEffects.registerPotions();
         planks1 = new GOTBlockPlanks1();
@@ -3152,6 +3163,15 @@ public class GOTRegistry {
         blindingBomb = new GOTItemThrowingBomb(new double[] {4.0, 4.0, 4.0}, 3.0f, new PotionEffect(Potion.blindness.id, 5 * 20));
         toxinBomb = new GOTItemToxinBomb(new PotionEffect(Potion.poison.id, 5 * 20));
         smoke = new GOTItemSmoke(new PotionEffect(Potion.blindness.id, 15 * 20));
+
+        stunningHammer = new ItemStunningHammer(GOTMaterial.STUNNINGHAMMER);
+        baratheonHammer = new ItemBaratheonHammer(GOTMaterial.BARATHEONHAMMER);
+        lightbringersec = new ItemLightbringer(GOTMaterial.LIGHTBRINGER);
+        iceStarkSword = new ItemIceStarkSword(GOTMaterial.ICESTARK);
+        nightkingSword = new ItemNightKingSword(GOTMaterial.NIGHTKING);
+        decoyClaymore = new ItemDecoyClaymore(GOTMaterial.DECOYCLAYMORE);
+        poisonedSandBlade = new ItemPoisonedSandBlade(GOTMaterial.POISONEDGE);
+        syrioForelSword = new ItemSyrioForelSword(GOTMaterial.SYRIO);
     }
 
     public static void assignMetadata() {
@@ -4674,5 +4694,14 @@ public class GOTRegistry {
         registerItem(blindingBomb, "blindingBomb");
         registerItem(toxinBomb, "toxinBomb");
         registerItem(smoke, "smoke");
+
+        registerItem(stunningHammer, "stunningHammer");
+        registerItem(lightbringersec, "lightbringersec");
+        registerItem(nightkingSword, "nightkingSwordsec");
+        registerItem(baratheonHammer, "baratheonHammer");
+        registerItem(iceStarkSword, "iceStarkSword");
+        registerItem(poisonedSandBlade, "poisonedSandBlade");
+        registerItem(syrioForelSword, "syrioForelSword");
+        registerItem(decoyClaymore, "decoyClaymore");
     }
 }

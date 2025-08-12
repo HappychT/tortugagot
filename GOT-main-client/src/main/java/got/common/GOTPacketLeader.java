@@ -1,4 +1,4 @@
-package got.common.network;
+package got.common;
 
 import cpw.mods.fml.common.network.simpleimpl.*;
 import got.GOT;

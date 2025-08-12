@@ -3,6 +3,7 @@ package got.common.handlers;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import got.common.database.GOTEffects;
+import got.common.database.GOTRegistry;
 import got.common.entity.other.GOTEntityCrossbowBolt;
 import got.common.item.weapon.GOTItemShieldPike;
 import got.common.item.weapon.GOTItemShieldSpear;
@@ -68,6 +69,12 @@ public class BlockServerHandler {
                     }
                     if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() instanceof ItemSword) {
                         StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), player).getStaminaHitPercent() / 5.0, player);
+                    }
+                    if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() == GOTRegistry.syrioForelSword) {
+                        StaminaServerHandler.drainStaminaByPercent(3.0, player);
+
+                        int amountToRegain = (int) (StaminaServerHandler.MAX_STAMINA * 0.03);
+                        StaminaServerHandler.regainStamina(amountToRegain, attacker);
                     }
                 }
 

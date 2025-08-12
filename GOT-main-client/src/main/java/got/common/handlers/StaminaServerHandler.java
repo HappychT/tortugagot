@@ -44,7 +44,9 @@ public class StaminaServerHandler {
         EntityPlayer player = event.player;
         if (player.worldObj.isRemote)
             return;
-
+        if (player.isPotionActive(GOTEffects.staminaLock)) {
+            return;
+        }
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
         boolean isRunning = player.isSprinting();
         boolean isJumping = player.motionY > 0 && !player.onGround;
