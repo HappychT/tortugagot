@@ -3,6 +3,7 @@ package got.client;
 import java.util.*;
 import java.util.Map.Entry;
 
+import got.client.handlers.ClientEventHandler;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.authlib.GameProfile;
@@ -575,6 +576,9 @@ public class GOTClientProxy extends GOTCommonProxy {
         MinecraftForge.EVENT_BUS.register(GOTClientStaminaHandler.INSTANCE);
         FMLCommonHandler.instance().bus().register(new GOTEntityElephant3DViewer());
         FMLCommonHandler.instance().bus().register(new GOTKeyHandler(GOTPacketHandler.networkWrapper));
+
+        MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
+
     }
     public static void bindItemRender(Block block, TileEntity tile, DecorationRenderer tesr){
         Item blockItem = ItemBlock.getItemFromBlock(block);
