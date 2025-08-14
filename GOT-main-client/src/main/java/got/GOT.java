@@ -387,7 +387,8 @@ public class GOT {
             }
         }
     }
-
+    
+/*
     private static final long TELEPORT_DELAY = 8000;
     @SideOnly(Side.CLIENT)
     public static void requestTeleport() {
@@ -423,7 +424,7 @@ public class GOT {
             } catch (InterruptedException e) {
             }
         }).start();
-    }
+    } */
 
     @Mod.EventHandler
     public void onMissingMappings(FMLMissingMappingsEvent event) {
