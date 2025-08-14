@@ -430,7 +430,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 
 										if (System.currentTimeMillis() > COOLDOWN_TIME + lastTeleportTime) {
 											GOT.tpRequest = false;
-											GOT.requestTeleport();
+											//GOT.requestTeleport();
 											Minecraft.getMinecraft().displayGuiScreen(null);
 											setClicked(false);
 											lastTeleportTime = currentTime;
