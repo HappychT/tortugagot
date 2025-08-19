@@ -1,0 +1,71 @@
+
+buildscript {
+	repositories {
+		mavenCentral()
+        maven {
+            name = "github"
+            url = "https://github.com/juanmuscaria/maven/raw/master"
+        }
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:[1.2-1.4.6-SNAPSHOT,)'
+        classpath 'tech.justagod:cutter:2.1.0-SNAPSHOT'
+    }
+}
+apply plugin: 'cutter'
+apply plugin: 'forge'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+version = "1.0"
+group= "com.yourname.modid"
+archivesBaseName = "Game of Thrones"
+
+minecraft {
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    runDir = "eclipse"
+	srcCompat = JavaVersion.VERSION_1_8
+    targetCompat = JavaVersion.VERSION_1_8
+}
+
+cutter {
+    annotation = "brain.factions.Annot"
+    def serverSide = side 'server'
+    def clientSide = side 'client'
+    builds {
+        client {
+            targetSides = [clientSide]
+            primalSides = [clientSide, serverSide]
+        }
+        server {
+            targetSides = [serverSide]
+            primalSides = [clientSide, serverSide]
+        }
+    }
+}
+
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'got.coremod.GOTLoadingPlugin'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
+    }
+}
+
+processResources
+{
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
