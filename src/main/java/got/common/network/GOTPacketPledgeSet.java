@@ -38,11 +38,11 @@ public class GOTPacketPledgeSet implements IMessage {
 			GOTFaction fac = packet.pledgeFac;
 			if (fac == null) {
 				// Отвергает
-				GOT.coreFaction.brainChannel.sendToServer(new PacketMessage("quet"));
+				brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketMessage("quet"));
 				//pd.revokePledgeFaction(entityplayer, true);
 			} else if (pd.canPledgeTo(fac) && pd.canMakeNewPledge()) {
 				//Присягает
-				GOT.coreFaction.brainChannel.sendToServer(new PacketMessage("sendApplication#" + fac.codeName()));
+				brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketMessage("sendApplication#" + fac.codeName()));
 				//pd.setPledgeFaction(fac);
 			}
 			return null;

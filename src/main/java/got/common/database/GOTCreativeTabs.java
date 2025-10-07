@@ -17,6 +17,7 @@ public class GOTCreativeTabs extends CreativeTabs {
 	public static GOTCreativeTabs tabStory = new GOTCreativeTabs("story");
 	public static GOTCreativeTabs tabSpawn = new GOTCreativeTabs("spawning");
 	public static GOTCreativeTabs tabBanner = new GOTCreativeTabs("banner");
+	public static GOTCreativeTabs tabResources = new GOTCreativeTabs("resources");
 	public ItemStack theIcon;
 
 	public GOTCreativeTabs(String label) {
@@ -52,5 +53,6 @@ public class GOTCreativeTabs extends CreativeTabs {
 		GOTCreativeTabs.tabStory.theIcon = new ItemStack(GOTRegistry.bane);
 		GOTCreativeTabs.tabSpawn.theIcon = new ItemStack(GOTRegistry.spawnEgg, 1, 248);
 		GOTCreativeTabs.tabBanner.theIcon = new ItemStack(GOTRegistry.bannerTab);
+		GOTCreativeTabs.tabResources.theIcon = new ItemStack(GOTRegistry.treasureSilver);
 	}
 }

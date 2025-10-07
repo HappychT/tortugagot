@@ -21,6 +21,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
 public class StaminaServerHandler {
 
@@ -35,6 +36,8 @@ public class StaminaServerHandler {
     private static final int STANDING_STILL_COOLDOWN = 25; // The cooldown before stamina regen, when standing in-place, change to your liking
     private static final int SECONDBREATH_COOLDWON = 6000;
 
+    //fixim bag
+    private static final int ACTION_REGEN_DELAY = 20;
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
 
@@ -48,56 +51,54 @@ public class StaminaServerHandler {
             return;
         }
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
-        boolean isRunning = player.isSprinting();
-        boolean isJumping = player.motionY > 0 && !player.onGround;
 
-        double currentPosX = player.posX;
-        double currentPosZ = player.posZ;
-        double previousPosX = extendedPlayer.getPreviousPosX();
-        double previousPosZ = extendedPlayer.getPreviousPosZ();
 
-        boolean isMoving = currentPosX != previousPosX || currentPosZ != previousPosZ;
-
-        if (isMoving) {
-            if (isRunning) {
-                drainStaminaByPercent(0.01, player);
-                extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
-            } else if (!player.isBlocking()) {
-                regainStamina(WALKING_REGAIN_RATE, player);
-            }
-            extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
-        }
-
-        if (isJumping) {
-            drainStaminaByPercent(0.15, player);
-            extendedPlayer.setStandingStillCooldown(STANDING_STILL_COOLDOWN);
-        }
-
-        if (extendedPlayer.getStandingStillCooldown() > 0 && !isMoving && !isJumping) {
+        if (extendedPlayer.getStandingStillCooldown() > 0) {
             extendedPlayer.setStandingStillCooldown(extendedPlayer.getStandingStillCooldown() - 1);
         }
-
-        if (player.isPotionActive(GOTEffects.rest)) {
-            if (player.getCurrentArmor(0) != null && GOTEnchantmentHelper.hasEnchant(player.getCurrentArmor(0), GOTEnchantment.restBuff)) { // Resting potion effect stamina regen, stacks with normal regen
-                regainStamina(30, player);
-            } else { // Resting potion effect stamina regen, stacks with normal regen
-                regainStamina(20, player); // May be too OP, adjust to your liking
-            }
-        }
-
-        if (!isMoving && player.onGround && !isJumping && extendedPlayer.getStandingStillCooldown() == 0) {
-            regainStamina(STANDING_REGAIN_RATE, player);
-        }
-
-        // Decrease bounce cooldown
         if (extendedPlayer.getBounceCooldown() > 0) {
             extendedPlayer.setBounceCooldown(extendedPlayer.getBounceCooldown() - 1);
             PacketDispatcher.sendTo(new PacketSendBounceCooldown(extendedPlayer.getBounceCooldown()), (EntityPlayerMP) player);
         }
-
         if (extendedPlayer.getSecondBreathCooldown() > 0) {
             extendedPlayer.setSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown() - 1);
             PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
+        }
+
+        boolean isRunning = player.isSprinting();
+        boolean isJumping = player.motionY > 0 && !player.onGround && !player.isInWater();
+        double currentPosX = player.posX;
+        double currentPosZ = player.posZ;
+        double previousPosX = extendedPlayer.getPreviousPosX();
+        double previousPosZ = extendedPlayer.getPreviousPosZ();
+        boolean isMoving = currentPosX != previousPosX || currentPosZ != previousPosZ;
+
+        boolean didAction = false;
+
+        if (isMoving && isRunning) {
+            drainStaminaByPercent(0.01, player);
+            extendedPlayer.setStandingStillCooldown(ACTION_REGEN_DELAY);
+            didAction = true;
+        }
+
+        if (isJumping) {
+            drainStaminaByPercent(0.15, player);
+            extendedPlayer.setStandingStillCooldown(ACTION_REGEN_DELAY);
+            didAction = true;
+        }
+
+
+        if (!didAction && extendedPlayer.getStandingStillCooldown() == 0) {
+            if (player.isPotionActive(GOTEffects.rest)) {
+                int restAmount = player.getCurrentArmor(0) != null && GOTEnchantmentHelper.hasEnchant(player.getCurrentArmor(0), GOTEnchantment.restBuff) ? 30 : 20;
+                regainStamina(restAmount, player);
+            }
+
+            if (isMoving && !isRunning && !player.isBlocking()) {
+                regainStamina(WALKING_REGAIN_RATE, player);
+            } else if (!isMoving && player.onGround) {
+                regainStamina(STANDING_REGAIN_RATE, player);
+            }
         }
 
         if (extendedPlayer.getStamina() <= MAX_STAMINA * 0.1) {
@@ -108,23 +109,16 @@ public class StaminaServerHandler {
                 PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
             } else {
                 player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1, true));
-                // Oops, I added my own effect accidentally, but you can use whatever suits your needs, mine does not effect the dig speed, only attack speed and block degrees
-                // But I've added requested functionality anyway to the vanilla potion effect
-                //.addPotionEffect(new PotionEffect(GOTEffects.exhaustion.id, 20, 0, true));
                 player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 20, 0, true));
                 if (player.isInWater()) {
                     player.motionY = 0;
                     player.jumpMovementFactor = 0.0F;
-                    System.out.println("po idee not plavat");
                 }
             }
-        } else {
-            //player.removePotionEffect(Potion.moveSlowdown.id);
         }
 
         extendedPlayer.setPreviousPosX(currentPosX);
         extendedPlayer.setPreviousPosZ(currentPosZ);
-
     }
 
     public void handleBounceRequest(EntityPlayer player, int direction) {
@@ -146,7 +140,15 @@ public class StaminaServerHandler {
             executeBounce(player, direction);
         }
     }
-
+    @SubscribeEvent
+    public void onPlayerAttack(AttackEntityEvent event) {
+        EntityPlayer player = event.entityPlayer;
+        if (player.worldObj.isRemote) {
+            return;
+        }
+        ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
+        extendedPlayer.setStandingStillCooldown(ACTION_REGEN_DELAY);
+    }
     private void executeBounce(EntityPlayer player, int direction) {
 
         double bounceRange = BOUNCE_RANGE; // Example bounce range
@@ -237,6 +239,7 @@ public class StaminaServerHandler {
         if (player.worldObj.isRemote)
             return;
         drainStaminaByPercent(3, player);
-
+        ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
+        extendedPlayer.setStandingStillCooldown(ACTION_REGEN_DELAY);
     }
 }

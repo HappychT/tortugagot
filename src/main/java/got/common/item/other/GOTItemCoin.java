@@ -111,6 +111,15 @@ public class GOTItemCoin extends Item {
 		return GOTItemCoin.getSingleItemValue(itemstack, allowStolen) * itemstack.stackSize;
 	}
 
+	public static int getHighestCoinType(int coins) {
+		for (int i = values.length - 1; i >= 0; --i) {
+			if (coins >= values[i]) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
 	public static void giveCoins(int coins, EntityPlayer entityplayer) {
 		int i;
 		int value;

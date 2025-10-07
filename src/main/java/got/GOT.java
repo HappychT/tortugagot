@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import brain.factions.network.PacketMessage;
+import brain.factions.servers.CoreFaction;
 import com.google.common.base.CaseFormat;
 
-import brain.factions.CoreFaction;
 import brain.factions.Faction;
 import brain.factions.network.PacketInfoFactions;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -31,7 +28,6 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import got.client.gui.GOTGuiFactions;
 import got.common.GOTCommonProxy;
 import got.common.GOTEventHandler;
 import got.common.GOTGuiMessageTypes;
@@ -39,6 +35,8 @@ import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.GOTSoulBoundEvents;
 import got.common.GOTTickHandlerServer;
+import got.common.block.factionblocks.BlockStructureHeart;
+import got.common.block.factionblocks.TileEntityStructureHeart;
 import got.common.block.leaves.GOTBlockLeavesBase;
 import got.common.block.leaves.GOTBlockLeavesVanilla1;
 import got.common.block.leaves.GOTBlockLeavesVanilla2;
@@ -128,8 +126,6 @@ import got.common.world.map.GOTWaypoint;
 import got.common.world.structure.GOTStructure;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandTime;
 import net.minecraft.command.IEntitySelector;
@@ -153,8 +149,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
@@ -162,7 +156,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -184,6 +177,8 @@ public class GOT {
     public static GOTTickHandlerServer tickHandler;
     public static WorldType worldTypeGOT;
     public static WorldType worldTypeGOTClassic;
+    public static Block blockStructureHeart;
+
     public static String langsName = "\u0420\u0443\u0441\u0441\u043A\u0438\u0439 (ru), \u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430 (uk), English (en), Fran\u00E7ais (fr), Deutsch (de), Polska (pl), T\u00FCrk\u00E7e (tr), \u4E2D\u6587 (zh)";
     static {
         devs.add("76ae4f2f-e70a-4680-b7cd-3100fa8b567b");
@@ -201,7 +196,6 @@ public class GOT {
         devs.add("188e4e9c-8c67-443d-9b6c-a351076a43e3");
         devs.add("f8cc9b45-509a-4034-8740-0b84ce7e4492");
     }
-    public static CoreFaction coreFaction = new CoreFaction();
     @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new AccessoryEventHandler());
@@ -276,7 +270,9 @@ public class GOT {
         GOTRegistry.blockGem.setHarvestLevel(pickaxe, 0, 8);
         GOTRegistry.redClay.setHarvestLevel(shovel, 0);
         GOTLoader.onInit();
-
+        blockStructureHeart = new BlockStructureHeart();
+        GameRegistry.registerBlock(blockStructureHeart, "structureHeart");
+        GameRegistry.registerTileEntity(TileEntityStructureHeart.class, "tileStructureHeart");
         MinecraftForge.EVENT_BUS.register(this);
     }
     @SubscribeEvent
@@ -359,13 +355,13 @@ public class GOT {
 //
 //    }
 
-    public String getPrefix(String name) {
+    public Faction.PlayerData getPrefix(String name) {
         for(Faction faction : PacketInfoFactions.getFactions().values()) {
             if(faction.getPlayers().containsKey(name)) {
                 return faction.getPlayers().get(name);
             }
         }
-        return "";
+        return null;
     }
     public String getTag(String name) {
         for(Faction faction : PacketInfoFactions.getFactions().values()) {
@@ -585,7 +581,7 @@ public class GOT {
     @Mod.EventHandler
     public void preloadClient(FMLPreInitializationEvent event) {
         //		GOTLoader.preInitClient();
-        coreFaction.preInit(event);
+        // coreFaction.preInit(event);
     }
 
     public static boolean canDropLoot(World world) {

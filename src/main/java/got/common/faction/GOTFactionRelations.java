@@ -257,5 +257,9 @@ public class GOTFactionRelations {
 			return names;
 		}
 	}
-
+	public static boolean areFactionsHostile(GOTFaction f1, GOTFaction f2) {
+		if (f1 == null || f2 == null) return false;
+		Relation rel = getRelations(f1, f2);
+		return rel == Relation.ENEMY || rel == Relation.MORTAL_ENEMY;
+	}
 }

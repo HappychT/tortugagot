@@ -1,10 +1,11 @@
 package got.common.network;
 
-import java.util.*;
-
-import com.google.common.base.Charsets;
-
-import cpw.mods.fml.common.network.simpleimpl.*;
+import java.util.HashMap;
+import java.util.Map;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import got.GOT;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
@@ -12,13 +13,16 @@ import io.netty.buffer.ByteBuf;
 
 public class GOTPacketAlignmentSee implements IMessage {
 	public String username;
+	public String factionName;
 	public Map<GOTFaction, Float> alignmentMap = new HashMap<>();
 
 	public GOTPacketAlignmentSee() {
 	}
 
 	public GOTPacketAlignmentSee(String name, GOTPlayerData pd) {
-		username = name;
+		this.username = name;
+		GOTFaction pledgedFaction = pd.getPledgeFaction();
+		this.factionName = pledgedFaction != null ? pledgedFaction.codeName() : "";
 		for (GOTFaction f : GOTFaction.getPlayableAlignmentFactions()) {
 			float al = pd.getAlignment(f);
 			alignmentMap.put(f, al);
@@ -27,37 +31,38 @@ public class GOTPacketAlignmentSee implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf data) {
-		byte length = data.readByte();
-		ByteBuf nameBytes = data.readBytes(length);
-		username = nameBytes.toString(Charsets.UTF_8);
-		byte factionID = 0;
-		while ((factionID = data.readByte()) >= 0) {
-			GOTFaction f = GOTFaction.forID(factionID);
+		username = ByteBufUtils.readUTF8String(data);
+		factionName = ByteBufUtils.readUTF8String(data);
+		int mapSize = data.readInt();
+		alignmentMap = new HashMap<>();
+		for (int i = 0; i < mapSize; i++) {
+			String facName = ByteBufUtils.readUTF8String(data);
 			float alignment = data.readFloat();
-			alignmentMap.put(f, alignment);
+			GOTFaction f = GOTFaction.forName(facName);
+			if (f != null) {
+				alignmentMap.put(f, alignment);
+			}
 		}
 	}
 
 	@Override
 	public void toBytes(ByteBuf data) {
-		byte[] nameBytes = username.getBytes(Charsets.UTF_8);
-		data.writeByte(nameBytes.length);
-		data.writeBytes(nameBytes);
+		ByteBufUtils.writeUTF8String(data, username);
+		ByteBufUtils.writeUTF8String(data, factionName);
+		data.writeInt(alignmentMap.size());
 		for (Map.Entry<GOTFaction, Float> entry : alignmentMap.entrySet()) {
 			GOTFaction f = entry.getKey();
 			float alignment = entry.getValue();
-			data.writeByte(f.ordinal());
+			ByteBufUtils.writeUTF8String(data, f.codeName());
 			data.writeFloat(alignment);
 		}
-		data.writeByte(-1);
 	}
 
 	public static class Handler implements IMessageHandler<GOTPacketAlignmentSee, IMessage> {
 		@Override
 		public IMessage onMessage(GOTPacketAlignmentSee packet, MessageContext context) {
-			GOT.proxy.displayAlignmentSee(packet.username, packet.alignmentMap);
+			GOT.proxy.displayAlignmentSee(packet.username, packet.factionName, packet.alignmentMap);
 			return null;
 		}
 	}
-
 }

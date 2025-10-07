@@ -79,9 +79,12 @@ public class ItemLightbringer extends GOTItemGreatsword {
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List list, boolean flag) {
         super.addInformation(itemstack, entityplayer, list, flag);
-        list.add(EnumChatFormatting.RED + "Драконье Пламя" + EnumChatFormatting.WHITE + " – каждая третья атака поджигает цель.");
+        list.add(EnumChatFormatting.GRAY + "");
         list.add(EnumChatFormatting.GRAY + "Легендарный меч, выкованный в крови любимой,");
-        list.add(EnumChatFormatting.GRAY + "предвещающий пришествие Принца, что был обещан.");
+        list.add(EnumChatFormatting.GRAY + "предвещающий пришествие обещанного Принца.");
+        list.add(EnumChatFormatting.GRAY + "");
+        list.add(EnumChatFormatting.RED + "Драконье Пламя" + EnumChatFormatting.WHITE + " – каждая третья атака поджигает цель.");
+
     }
 
     @Override

@@ -47,7 +47,7 @@ public class GOTCommonProxy implements IGuiHandler {
 	public void clientReceiveSpeech(GOTEntityNPC npc, String speech) {
 	}
 
-	public void displayAlignmentSee(String username, Map<GOTFaction, Float> alignments) {
+	public void displayAlignmentSee(String username, String factionName, Map<GOTFaction, Float> alignments) {
 	}
 
 	public void displayBannerGui(GOTEntityBanner banner) {
