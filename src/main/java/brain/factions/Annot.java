@@ -3,11 +3,7 @@ package brain.factions;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Annot {
-    Side[] value();
+public class Annot {
+    public static final boolean SERVER = false;
 
-    enum Side {
-        CLIENT, SERVER
-    }
 }

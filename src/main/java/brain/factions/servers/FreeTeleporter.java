@@ -9,10 +9,8 @@ import net.minecraft.world.WorldServer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-import static brain.factions.Annot.Side.SERVER;
 
-@Annot(SERVER)
-public class FreeTeleporter extends Teleporter {
+ public class FreeTeleporter extends Teleporter {
 	WorldServer world;
 	double x, y, z;
 

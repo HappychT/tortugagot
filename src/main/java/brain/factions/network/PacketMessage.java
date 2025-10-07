@@ -5,30 +5,24 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import brain.factions.Annot;
-import brain.factions.servers.CoreFaction;
-import brain.factions.servers.Faction;
-import brain.factions.servers.FreeTeleporter;
-import brain.factions.servers.Location;
+import brain.factions.Faction;
+import brain.factions.servers.*;
+import brain.factions.structures.FactionStructureManager;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import got.GOT;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.UsernameCache;
 
-import static brain.factions.Annot.Side.SERVER;
-
 public class PacketMessage implements IMessage {
-	private static String message;
+	private String message;
 
 	public PacketMessage() {
 
@@ -38,20 +32,16 @@ public class PacketMessage implements IMessage {
 		this.message = message;
 	}
 
-	// CLIENT
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		message = ByteBufUtils.readUTF8String(buf);
-
 	}
 
-	// SERVER
 	@Override
 	public void toBytes(ByteBuf buf) {
 		ByteBufUtils.writeUTF8String(buf, message);
 	}
 
-	@Annot(SERVER)
 	public static EntityPlayerMP getPlayer(String name) {
 		for(EntityPlayerMP player : (List<EntityPlayerMP>) MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
 			if(player.getDisplayName().equals(name)) {
@@ -60,7 +50,7 @@ public class PacketMessage implements IMessage {
 		}
 		return null;
 	}
-	@Annot(SERVER)
+
 	public static Faction getCurrentFaction(String name) {
 		for(Faction fac : CoreFaction.factions.values()) {
 			if(fac.getPlayers().containsKey(name)) {
@@ -69,12 +59,12 @@ public class PacketMessage implements IMessage {
 		}
 		return null;
 	}
-	@Annot(SERVER)
+
 	public static <K, V> Map<V, K> invertMap(Map<K, V> map) {
 		return map.entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (existing, replacement) -> existing));
 	}
-	@Annot(SERVER)
+
 	public static boolean checkAplic(String name) {
 		for(Faction fac : CoreFaction.factions.values()) {
 			if(fac.getApplications().containsKey(name)) {
@@ -83,7 +73,7 @@ public class PacketMessage implements IMessage {
 		}
 		return false;
 	}
-	@Annot(SERVER)
+
 	public static Faction getFaction(String id) {
 		if (CoreFaction.factions.containsKey(id)) {
 			return CoreFaction.factions.get(id);
@@ -93,12 +83,21 @@ public class PacketMessage implements IMessage {
 
 
 	public static class Handler implements IMessageHandler<PacketMessage, IMessage> {
-		@Annot(SERVER)
 		public IMessage onMessage(PacketMessage packet, MessageContext ctx) {
-			String[] args = message.split("#");
+			String[] args = packet.message.split("#");
 			EntityPlayerMP player = ctx.getServerHandler().playerEntity;
 			CoreFaction.initFactions();
 
+			if (args[0].equalsIgnoreCase("requestStructures")) {
+				CoreFaction.brainChannel.sendTo(new PacketFactionStructures(FactionStructureManager.structureSlots), player);
+				return null;
+			}
+			else if (args[0].equalsIgnoreCase("requestBarracksPlayers")) {
+				String factionID = args[1];
+				List<BarracksManager.PlayerProfile> barracksPlayers = BarracksManager.getBarracksPlayers(factionID);
+				brain.factions.servers.CoreFaction.brainChannel.sendTo(new PacketBarracksPlayers(barracksPlayers), player);
+				return null;
+			}
 			if(args[0].equalsIgnoreCase("sendApplication")) {
 				Faction faction = getFaction(args[1]);
 				if(faction == null ) {
@@ -131,7 +130,6 @@ public class PacketMessage implements IMessage {
 					getPlayer(faction.getLeaderName()).addChatMessage(new ChatComponentText("§aУ ВАС НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ В ФРАКЦИЮ!"));
 				} else if (getPlayer(faction.getAssistantName()) != null) {
 					getPlayer(faction.getAssistantName()).addChatMessage(new ChatComponentText("§aУ ВАС НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ В ФРАКЦИЮ!"));
-
 				}
 
 				return null;
@@ -163,7 +161,7 @@ public class PacketMessage implements IMessage {
 					return null;
 				}
 				String upprovePlayer = args[1];
-				int typeRove = Integer.parseInt(args[2]); // 1 повысить   -1 понизить 0 кикнуть
+				int typeRove = Integer.parseInt(args[2]);
 				if(!faction.getPlayers().containsKey(upprovePlayer)) {
 					return null;
 				}
@@ -177,9 +175,8 @@ public class PacketMessage implements IMessage {
 						if(faction.getAssistantName().equals(upprovePlayer)) {
 							faction.setAssistantName("");
 						}
-						GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer)); // get offline player
+						GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer));
 						pd.revokePledgeFaction(player, true);
-
 						break;
 					case 1:
 						if(faction.getLeaderName().equals((upprovePlayer))) {
@@ -192,7 +189,6 @@ public class PacketMessage implements IMessage {
 						if (faction.getAssistantName().equals(upprovePlayer)) {
 							faction.setAssistantName("");
 						}
-
 						break;
 					default:
 						break;
@@ -203,20 +199,29 @@ public class PacketMessage implements IMessage {
 				CoreFaction.sendAllGui();
 				return null;
 			} else if(args[0].equalsIgnoreCase("applicat")) {
-				if (faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
+				if (faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_ACCEPT_APPLICATIONS)) {
 
 					String upprovePlayer = args[1];
-					int typeRove = Integer.parseInt(args[2]); // 1 принять -1 отклонить
+					int typeRove = Integer.parseInt(args[2]);
 					if (!faction.getApplications().containsKey(upprovePlayer)) {
 						return null;
 					}
 
 					switch (typeRove) {
 						case 1:
-							faction.getApplications().remove(upprovePlayer);
-							faction.getPlayers().put(upprovePlayer, "");
+							if (faction.isInWarState()) {
+								long cost = StructureManager.config.warStateRecruitmentCost;
+								if (faction.getTreasury() < cost) {
+									player.addChatMessage(new ChatComponentText("§cНедостаточно средств в казне для принятия новобранца во время войны! Требуется: " + cost));
+									return null;
+								}
+								faction.setTreasury(faction.getTreasury() - cost);
+								player.addChatMessage(new ChatComponentText("§eСписан налог за вербовку: " + cost));
+							}
 
-							GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer)); // get offline player																				// player
+							faction.getApplications().remove(upprovePlayer);
+							faction.getPlayers().put(upprovePlayer, new Faction.PlayerData("", System.currentTimeMillis(), "Игрок"));
+							GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer));
 							GOTFaction fac = GOTFaction.forName(faction.getID());
 							pd.setPledgeFaction(fac);
 							break;
@@ -255,13 +260,15 @@ public class PacketMessage implements IMessage {
 					player.addChatMessage(new ChatComponentText("§eРуководители пока не поставили точку дома!"));
 					return null;
 				}
-				FreeTeleporter.sendToDimensionWithoutPortal(player, faction.getHome().getWorldID(), faction.getHome().getX(), faction.getHome().getY(), faction.getHome().getZ());
+				TeleportHandler.startTeleport(player, faction.getHome());
 				return null;
 			} else if(args[0].equalsIgnoreCase("setPrefix")) {
 				if (faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
 					String name = args[1];
 					if(faction.getPlayers().containsKey(name)) {
-						faction.getPlayers().put(name, args[2]);
+						Faction.PlayerData pData = faction.getPlayers().get(name);
+						pData.setPrefix(args[2]);
+						faction.getPlayers().put(name, pData);
 						CoreFaction.saveFactions();
 						CoreFaction.initFactions();
 						CoreFaction.sendAllGui();

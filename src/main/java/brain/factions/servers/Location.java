@@ -2,7 +2,6 @@ package brain.factions.servers;
 import brain.factions.Annot;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-@Annot(Annot.Side.SERVER)
 public class Location {
 	private int worldID;
 	private double x;

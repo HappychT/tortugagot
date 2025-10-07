@@ -1,6 +1,7 @@
 package got.client.gui.utils;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +43,7 @@ public class GuiScrollingList<T> {
 
     private boolean dragging;
     private float dragged, mouseYOffset;
-  
+
     protected CopyOnWriteArrayList<T> elementData;
 
     public GuiScrollingList(float listEntryHeight){
@@ -77,15 +78,15 @@ public class GuiScrollingList<T> {
     public void onEntryClicked(T entry, float index, int mouseX, int mouseY, int button){}
 
     public void drawEntry(T entry, int index, float x2, float currentY, boolean hovered){
-     }
+    }
 
     public void setPos(float x, float y, float w, float h) {
-    	this.x = x;
-    	this.y = y;
-    	this.width = w;
-    	this.height = height;
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = height;
     }
-    
+
     public void drawEntryForeground(T entry, int index, float x2, float currentY, boolean hovered){}
 
     public int getSize(){
@@ -111,41 +112,41 @@ public class GuiScrollingList<T> {
             }
             T entry = getElement(hoverIndex);
             if(entry != null){
-                onEntryClicked(entry, hoverIndex, mouseX, mouseY, button); 
+                onEntryClicked(entry, hoverIndex, mouseX, mouseY, button);
             }
         }else{
             if(canLoseFocus){
                 selected = -1;
             }
         }
-      
+
         float start = getContentSize() - height;
         if(start > 0){
-        	float scrollBarXStart = x + width + sliderOffset;
-        	float scrollBarXEnd = scrollBarXStart + sliderWidth;
+            float scrollBarXStart = x + width + sliderOffset;
+            float scrollBarXEnd = scrollBarXStart + sliderWidth;
             float length = 100;
-  
+
             float end = scrollOffset * (height - length) / start + y;
-  
+
             if(end < y){
                 end = y;
             }
-          
+
             if(mouseX > scrollBarXStart && mouseY >= end && mouseX < scrollBarXEnd && mouseY < end + length){
                 dragging = true;
                 mouseYOffset = mouseY;
             }
         }
     }
-  
+
     public boolean isHover() {
-		return mouseX >= x && mouseX < x + width+25 && mouseY >= y && mouseY < y + height+10;
-	}
-    
+        return mouseX >= x && mouseX < x + width+25 && mouseY >= y && mouseY < y + height+10;
+    }
+
     public void mouseClickMove(int mouseX, int mouseY, int button){
-    	if(!isHover()) {
-    		return;
-    	}
+        if(!isHover()) {
+            return;
+        }
         if(dragging){
             scrollOffset += (mouseY - mouseYOffset) * (getContentSize() / height);
             if(scrollOffset > getContentSize() - height){
@@ -157,7 +158,7 @@ public class GuiScrollingList<T> {
             mouseYOffset = mouseY;
         }
     }
-  
+
     public void mouseReleased(int mouseX, int mouseY, int button){
         dragging = false;
     }
@@ -174,7 +175,7 @@ public class GuiScrollingList<T> {
                 scrollOffset = (int)Math.max(Math.min(scrollOffset + (delta * scrollSpeed), maxScrollOffset), 0);
             }
         }
-       
+
     }
 
     public void updateScreen(){
@@ -205,10 +206,10 @@ public class GuiScrollingList<T> {
         }
 
         float start = getContentSize() - height;
-    
+
         if(start > 0){
-        	
-        	float length = height * height / getContentSize();
+
+            float length = height * height / getContentSize();
 
             if(length < 3){
                 length = 3;
@@ -218,7 +219,7 @@ public class GuiScrollingList<T> {
                 length = height - 3;
             }
 
-        	
+
             float end = scrollOffset * (height - length) / start + y;
 
             if(end < y){
@@ -246,29 +247,29 @@ public class GuiScrollingList<T> {
             currentY += entryHeight;
         }
     }
-    
-	public static void drawRect(double left, double top, double right, double bottom, int color) {
-		right = left + right;
-		bottom = top + bottom;
 
-		float f3 = (color >> 24 & 0xFF) / 255.0f;
-		float f4 = (color >> 16 & 0xFF) / 255.0f;
-		float f5 = (color >> 8 & 0xFF) / 255.0f;
-		float f6 = (color & 0xFF) / 255.0f;
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		GL11.glPushMatrix();
-		GL11.glEnable(3042);
-		GL11.glDisable(3553);
-		GL11.glColor4f(f4, f5, f6, f3);
-		tessellator.addVertex(left, bottom, 0.0);
-		tessellator.addVertex(right, bottom, 0.0);
-		tessellator.addVertex(right, top, 0.0);
-		tessellator.addVertex(left, top, 0.0);
-		tessellator.draw();
-		GL11.glEnable(3553);
-		GL11.glPopMatrix();
-	}
+    public static void drawRect(double left, double top, double right, double bottom, int color) {
+        right = left + right;
+        bottom = top + bottom;
+
+        float f3 = (color >> 24 & 0xFF) / 255.0f;
+        float f4 = (color >> 16 & 0xFF) / 255.0f;
+        float f5 = (color >> 8 & 0xFF) / 255.0f;
+        float f6 = (color & 0xFF) / 255.0f;
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        GL11.glPushMatrix();
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glColor4f(f4, f5, f6, f3);
+        tessellator.addVertex(left, bottom, 0.0);
+        tessellator.addVertex(right, bottom, 0.0);
+        tessellator.addVertex(right, top, 0.0);
+        tessellator.addVertex(left, top, 0.0);
+        tessellator.draw();
+        GL11.glEnable(3553);
+        GL11.glPopMatrix();
+    }
 
     public void cleanUp(){
         hoverIndex = -1;
@@ -309,7 +310,7 @@ public class GuiScrollingList<T> {
         return elementData.remove(index);
     }
 
-   
+
 
     public boolean addElement(T element){
         return elementData.add(element);
@@ -327,7 +328,7 @@ public class GuiScrollingList<T> {
         return index >= 0 && index < elementData.size() ? elementData.get(index) : null;
     }
 
-   
+
     public T getSelectedElement(){
         return getElement((int) selected);
     }
@@ -337,7 +338,7 @@ public class GuiScrollingList<T> {
     }
 
     @SuppressWarnings("rawtypes")
-	public GuiScrollingList setScrollSpeed(float speed){
+    public GuiScrollingList setScrollSpeed(float speed){
         scrollSpeed = speed;
         return this;
     }
@@ -525,12 +526,16 @@ public class GuiScrollingList<T> {
     public float getMouseY(){
         return mouseY;
     }
-    
+
     public void setElementData(CopyOnWriteArrayList<T> elementData) {
-		this.elementData = elementData;
-	}
-    
+        this.elementData = elementData;
+    }
+
+    public void setElements(List<T> elements) {
+        this.elementData = new CopyOnWriteArrayList<>(elements);
+    }
+
     public List<T> getList(){
-    	return elementData;
+        return elementData;
     }
 }
