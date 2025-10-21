@@ -281,6 +281,7 @@ public class PacketFactionManage implements IMessage {
                 brain.factions.servers.CollectionGoal goal = goalOpt.get();
                 if (goal.isComplete()) {
                     faction.setTreasury(faction.getTreasury() + goal.getCurrentAmount());
+                    faction.logTreasuryTransaction("Завершение сбора: " + goal.getName(), goal.getCurrentAmount());
                     faction.getCollectionGoals().remove(goal);
                     player.addChatMessage(new ChatComponentText("§aСбор '" + goalName + "' завершен, средства переведены в казну."));
                     CoreFaction.saveFactions();
@@ -411,15 +412,17 @@ public class PacketFactionManage implements IMessage {
         private void handleTreasury(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
             long amount = message.l_data1;
             String goalName = message.s_data2;
+            String playerName = player.getCommandSenderName();
 
             if (message.s_data1.equals("withdraw")) {
-                if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_MANAGE_TREASURY)) {
-                    player.addChatMessage(new ChatComponentText("§cУ вас нет прав на управление казной."));
+                if (!faction.playerHasPermission(playerName, Faction.Permission.CAN_USE_TREASURY)) {
+                    player.addChatMessage(new ChatComponentText("§cУ вас нет прав на снятие средств."));
                     return;
                 }
                 if (goalName.isEmpty()) {
                     if (faction.getTreasury() >= amount) {
                         faction.setTreasury(faction.getTreasury() - amount);
+                        faction.logTreasuryTransaction(playerName, -amount);
                         GOTItemCoin.giveCoins((int)amount, player);
                         player.addChatMessage(new ChatComponentText("§aВы сняли " + amount + " из казны."));
                     } else {
@@ -432,6 +435,7 @@ public class PacketFactionManage implements IMessage {
                             .ifPresent(g -> {
                                 if (g.getCurrentAmount() >= amount) {
                                     g.addAmount(-amount);
+                                    g.logTransaction(playerName, -amount);
                                     GOTItemCoin.giveCoins((int)amount, player);
                                     player.addChatMessage(new ChatComponentText("§aВы сняли " + amount + " из сбора '" + g.getName() + "'."));
                                 } else {
@@ -453,10 +457,12 @@ public class PacketFactionManage implements IMessage {
                     GOTItemCoin.takeCoins((int)amount, player);
                     if (goalName.isEmpty()) {
                         faction.setTreasury(faction.getTreasury() + amount);
+                        faction.logTreasuryTransaction(playerName, amount);
                         player.addChatMessage(new ChatComponentText("§aВы пожертвовали " + amount + " в казну."));
                     } else {
                         goalOpt.ifPresent(g -> {
                             g.addAmount(amount);
+                            g.logTransaction(playerName, amount);
                             player.addChatMessage(new ChatComponentText("§aВы пожертвовали " + amount + " в сбор '" + g.getName() + "'."));
                         });
                     }

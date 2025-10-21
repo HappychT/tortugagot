@@ -1,12 +1,5 @@
 package brain.factions.network;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import brain.factions.Faction;
 import brain.factions.servers.CollectionGoal;
 import brain.factions.servers.CoreFaction;
@@ -19,6 +12,13 @@ import got.client.gui.faction.GOTGuiFactions;
 import got.common.faction.GOTFactionRelations;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PacketInfoFactions implements IMessage {
 	private static final HashMap<String, Faction> factions = new HashMap<>();
@@ -52,7 +52,7 @@ public class PacketInfoFactions implements IMessage {
 
 			HashMap<String, Faction.Title> titles = new HashMap<>();
 			int titlesSize = buf.readInt();
-			for(int j = 0; j < titlesSize; j++) {
+			for (int j = 0; j < titlesSize; j++) {
 				String titleName = ByteBufUtils.readUTF8String(buf);
 				int hierarchy = buf.readInt();
 				long permissions = buf.readLong();
@@ -69,18 +69,33 @@ public class PacketInfoFactions implements IMessage {
 			}
 			long lastSetHomeTime = buf.readLong();
 
+			Faction faction = new Faction(id, leadername, assistantName, players, applications, new HashMap<>(), colorTag, home, lastSetHomeTime, capitalName, treasury, titles);
+
+			int treasuryHistorySize = buf.readInt();
+			for (int k = 0; k < treasuryHistorySize; k++) {
+				String transPlayer = ByteBufUtils.readUTF8String(buf);
+				long transAmount = buf.readLong();
+				long transTimestamp = buf.readLong();
+				faction.getTreasuryHistory().add(new CollectionGoal.Transaction(transPlayer, transAmount, transTimestamp));
+			}
+
 			int goalsSize = buf.readInt();
-			List<CollectionGoal> goals = new ArrayList<>();
-			for(int j = 0; j < goalsSize; j++){
+			for (int j = 0; j < goalsSize; j++) {
 				String goalName = ByteBufUtils.readUTF8String(buf);
 				long target = buf.readLong();
 				long current = buf.readLong();
-				goals.add(new CollectionGoal(goalName, target, current));
+				CollectionGoal goal = new CollectionGoal(goalName, target, current);
+
+				int historySize = buf.readInt();
+				for (int k = 0; k < historySize; k++) {
+					String transPlayer = ByteBufUtils.readUTF8String(buf);
+					long transAmount = buf.readLong();
+					long transTimestamp = buf.readLong();
+					goal.getHistory().add(new CollectionGoal.Transaction(transPlayer, transAmount, transTimestamp));
+				}
+				faction.getCollectionGoals().add(goal);
 			}
 
-			Faction faction = new Faction(id, leadername, assistantName, players, applications, new HashMap<>(), colorTag, home, lastSetHomeTime, capitalName, treasury, titles);
-
-			faction.getCollectionGoals().addAll(goals);
 
 			int proposalsSize = buf.readInt();
 			for (int j = 0; j < proposalsSize; j++) {
@@ -153,6 +168,16 @@ public class PacketInfoFactions implements IMessage {
 			}
 			buf.writeLong(faction.getLastSetHomeTime());
 
+			List<CollectionGoal.Transaction> treasuryHistory = faction.getTreasuryHistory();
+			buf.writeInt(treasuryHistory != null ? treasuryHistory.size() : 0);
+			if (treasuryHistory != null) {
+				for (CollectionGoal.Transaction trans : treasuryHistory) {
+					ByteBufUtils.writeUTF8String(buf, trans.getPlayerName());
+					buf.writeLong(trans.getAmount());
+					buf.writeLong(trans.getTimestamp());
+				}
+			}
+
 			List<CollectionGoal> goals = faction.getCollectionGoals();
 			buf.writeInt(goals != null ? goals.size() : 0);
 			if (goals != null) {
@@ -160,8 +185,19 @@ public class PacketInfoFactions implements IMessage {
 					ByteBufUtils.writeUTF8String(buf, goal.getName() != null ? goal.getName() : "");
 					buf.writeLong(goal.getTargetAmount());
 					buf.writeLong(goal.getCurrentAmount());
+
+					List<CollectionGoal.Transaction> history = goal.getHistory();
+					buf.writeInt(history != null ? history.size() : 0);
+					if (history != null) {
+						for (CollectionGoal.Transaction trans : history) {
+							ByteBufUtils.writeUTF8String(buf, trans.getPlayerName());
+							buf.writeLong(trans.getAmount());
+							buf.writeLong(trans.getTimestamp());
+						}
+					}
 				}
 			}
+
 
 			Map<String, Faction.Proposal> proposals = faction.getProposals();
 			buf.writeInt(proposals != null ? proposals.size() : 0);

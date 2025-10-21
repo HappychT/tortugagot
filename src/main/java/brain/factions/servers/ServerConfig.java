@@ -28,6 +28,7 @@ public class ServerConfig {
     public Map<Integer, Integer> structureBreakCounts = new HashMap<>();
     public Map<Integer, Integer> fortressBarracksCapacity = new HashMap<>();
 
+    public String raidTimeResourcePoints;
     public ServerConfig(File file) {
         this.config = new Configuration(file);
         syncConfig();
@@ -46,6 +47,7 @@ public class ServerConfig {
         warTaxPerMember = config.getInt("warTaxPerMember", "costs", 250, 0, 10000, "Ежедневный военный налог за каждого участника фракции.");
         provisionCostPerBarracksSlot = config.getInt("provisionCostPerBarracksSlot", "costs", 500, 1, 100000, "Стоимость одного слота в казарме (в единицах продовольствия).");
 
+        raidTimeResourcePoints = config.getString("raidTimeResourcePoints", "general", "18:00-20:00", "Время рейда для ресурсных точек (HH:mm-HH:mm).");
 
         for (int i = 1; i <= maxStructureLevel; i++) {
             upgradeCost.put(i, config.getInt("upgradeCostLevel" + i, "costs", 5000 * i, 100, 1000000, "Стоимость улучшения до уровня " + i));

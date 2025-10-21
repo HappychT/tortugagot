@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -41,16 +42,21 @@ public class TimedEventsHandler {
 
     private void checkRaidTime() {
         LocalDateTime now = LocalDateTime.now();
-        int hour = now.getHour();
 
-        boolean shouldBeRaidTime = (hour >= 18 && hour < 20);
+        try {
+            String[] time = StructureManager.config.raidTimeResourcePoints.split("-");
+            LocalTime start = LocalTime.parse(time[0]);
+            LocalTime end = LocalTime.parse(time[1]);
+            boolean shouldBeRaidTime = !now.toLocalTime().isBefore(start) && now.toLocalTime().isBefore(end);
 
-        if (shouldBeRaidTime && !StructureManager.isRaidTime) {
-            StructureManager.isRaidTime = true;
-            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§4[!] Началось время рейдов! Структуры врагов уязвимы!"));
-        } else if (!shouldBeRaidTime && StructureManager.isRaidTime) {
-            StructureManager.isRaidTime = false;
-            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§a[!] Время рейдов окончено! Структуры в безопасности."));
+            if (shouldBeRaidTime && !StructureManager.isRaidTime) {
+                StructureManager.isRaidTime = true;
+                MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§4[!] Началось время рейдов! Структуры врагов уязвимы!"));
+            } else if (!shouldBeRaidTime && StructureManager.isRaidTime) {
+                StructureManager.isRaidTime = false;
+                MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§a[!] Время рейдов окончено! Структуры в безопасности."));
+            }
+        } catch (Exception e) {
         }
     }
 

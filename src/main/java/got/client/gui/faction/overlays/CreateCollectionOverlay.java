@@ -2,6 +2,7 @@ package got.client.gui.faction.overlays;
 
 import brain.factions.network.PacketFactionCreateCollection;
 import got.client.gui.faction.GOTGuiFactions;
+import got.client.gui.faction.GuiCustomButton;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import org.apache.commons.lang3.StringUtils;
@@ -20,8 +21,8 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
     public void initGui(List<GuiButton> buttonList) {
         int overlayWidth = 300;
         int overlayHeight = 150;
-        int overlayX = parent.getGuiLeft() + (parent.getXSize() - overlayWidth) / 2;
-        int overlayY = parent.getGuiTop() + (parent.getYSize() - overlayHeight) / 2;
+        int overlayX = (parent.getBaseWidth() - overlayWidth) / 2;
+        int overlayY = (parent.getBaseHeight() - overlayHeight) / 2;
 
         int fieldWidth = 200;
         int fieldX = overlayX + (overlayWidth - fieldWidth) / 2;
@@ -31,8 +32,8 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
 
         int buttonWidth = 100;
         int buttonsY = overlayY + 110;
-        buttonConfirmCollection = new GuiButton(12, overlayX + (overlayWidth / 2) - buttonWidth - 2, buttonsY, buttonWidth, 20, "Подтвердить");
-        buttonCancelCollection = new GuiButton(13, overlayX + (overlayWidth / 2) + 2, buttonsY, buttonWidth, 20, "Отмена");
+        buttonConfirmCollection = new GuiCustomButton(12, overlayX + (overlayWidth / 2) - buttonWidth - 2, buttonsY, buttonWidth, 20, "Подтвердить");
+        buttonCancelCollection = new GuiCustomButton(13, overlayX + (overlayWidth / 2) + 2, buttonsY, buttonWidth, 20, "Отмена");
 
 
         buttonList.add(buttonConfirmCollection);
@@ -44,11 +45,11 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
         int overlayWidth = 300;
         int overlayHeight = 150;
-        int overlayX = parent.getGuiLeft() + (parent.getXSize() - overlayWidth) / 2;
-        int overlayY = parent.getGuiTop() + (parent.getYSize() - overlayHeight) / 2;
+        int overlayX = (parent.getBaseWidth() - overlayWidth) / 2;
+        int overlayY = (parent.getBaseHeight() - overlayHeight) / 2;
 
         parent.drawPanel(overlayX, overlayY, overlayWidth, overlayHeight);
 
@@ -74,7 +75,7 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
                 long amount = Long.parseLong(this.collectionAmountField.getText());
                 if (amount > 0) {
                     brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketFactionCreateCollection(name, amount));
-                    parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, false);
+                    parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
                 } else {
                     this.collectionAmountField.setText("§cСумма должна быть > 0!");
                 }
@@ -82,12 +83,12 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
                 this.collectionAmountField.setText("§cНеверное число!");
             }
         } else if (button == buttonCancelCollection) {
-            parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, false);
+            parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
         }
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         collectionNameField.mouseClicked(mouseX, mouseY, button);
         collectionAmountField.mouseClicked(mouseX, mouseY, button);
     }
@@ -103,15 +104,10 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
         }
     }
 
-    @Override
-    public void update() {
+    @Override public void update() {
         collectionNameField.updateCursorCounter();
         collectionAmountField.updateCursorCounter();
     }
-
     @Override public void handleMouseInput() {}
-    @Override
-    public boolean isTextFieldFocused() {
-        return collectionNameField.isFocused() || collectionAmountField.isFocused();
-    }
+    @Override public boolean isTextFieldFocused() { return collectionNameField.isFocused() || collectionAmountField.isFocused(); }
 }

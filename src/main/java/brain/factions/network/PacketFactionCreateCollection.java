@@ -12,7 +12,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 
-
 public class PacketFactionCreateCollection implements IMessage {
     private String name;
     private long amount;
@@ -38,17 +37,17 @@ public class PacketFactionCreateCollection implements IMessage {
 
     public static class Handler implements IMessageHandler<PacketFactionCreateCollection, IMessage> {
         @Override
-
         public IMessage onMessage(PacketFactionCreateCollection message, MessageContext ctx) {
-            if (Annot.SERVER) {
+            if (ctx.getServerHandler() != null && ctx.getServerHandler().playerEntity != null) {
                 EntityPlayerMP player = ctx.getServerHandler().playerEntity;
                 Faction faction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
 
                 if (faction != null) {
-                    boolean hasPermission = faction.getLeaderName().equals(player.getCommandSenderName()) || faction.getAssistantName().equals(player.getCommandSenderName());
+                    boolean hasPermission = faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_MANAGE_TREASURY);
 
                     if (hasPermission) {
                         CollectionGoal newGoal = new CollectionGoal(message.name, message.amount);
+                        newGoal.logTransaction(player.getCommandSenderName(), 0);
                         faction.getCollectionGoals().add(newGoal);
                         CoreFaction.saveFactions();
                         CoreFaction.sendAllGui();

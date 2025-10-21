@@ -8,6 +8,7 @@ public class FactionStructureSlot {
     public int mapX;
     public int mapY;
     public String initial_faction;
+    public String for_fraction;
     public int price;
     public String structureFile;
 

@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface IPageRenderer extends IGuiComponent {
     void initGui(List<GuiButton> buttonList);
-    void drawScreen(int mouseX, int mouseY, float partialTicks);
+    void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks);
     void actionPerformed(GuiButton button);
-    void mouseClicked(int mouseX, int mouseY, int button);
+    void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button);
     void keyTyped(char c, int key);
     void handleMouseInput();
     void onOpened();

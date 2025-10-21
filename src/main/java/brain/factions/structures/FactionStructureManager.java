@@ -156,9 +156,9 @@ public class FactionStructureManager {
         return null;
     }
 
-    public static FactionStructureSlot getStructureByCoords(int x, int y, int z) {
+    public static FactionStructureSlot getStructureByCoords(int x, int z) {
         for (FactionStructureSlot slot : structureSlots) {
-            if (slot.xCoord == x && slot.yCoord == y && slot.zCoord == z) {
+            if (slot.xCoord == x && slot.zCoord == z) {
                 return slot;
             }
         }

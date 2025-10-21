@@ -19,6 +19,7 @@ public class Faction {
 	private String colorTag;
 	private String capitalName;
 	private long treasury;
+	private List<CollectionGoal.Transaction> treasuryHistory;
 	private List<CollectionGoal> collectionGoals;
 	private HashMap<String, Title> titles;
 	private Map<String, Proposal> proposals;
@@ -27,7 +28,6 @@ public class Faction {
 	private long warTaxOwed;
 	private int unpaidWarTaxDays;
 	private String mainFortressId;
-
 
 	private Location home;
 	private long lastSetHomeTime;
@@ -44,6 +44,7 @@ public class Faction {
 		this.lastSetHomeTime = lastSetHomeTime;
 		this.capitalName = capitalName;
 		this.treasury = treasury;
+		this.treasuryHistory = new ArrayList<>();
 		this.collectionGoals = new ArrayList<>();
 		this.titles = titles;
 		this.proposals = new HashMap<>();
@@ -51,6 +52,17 @@ public class Faction {
 		this.warTaxOwed = 0;
 		this.unpaidWarTaxDays = 0;
 		this.mainFortressId = "";
+	}
+
+	public void logTreasuryTransaction(String playerName, long amount) {
+		if (this.treasuryHistory == null) {
+			this.treasuryHistory = new ArrayList<>();
+		}
+		this.treasuryHistory.add(new CollectionGoal.Transaction(playerName, amount, System.currentTimeMillis()));
+	}
+
+	public List<CollectionGoal.Transaction> getTreasuryHistory() {
+		return treasuryHistory;
 	}
 
 	public boolean playerHasPermission(String playerName, Permission perm) {

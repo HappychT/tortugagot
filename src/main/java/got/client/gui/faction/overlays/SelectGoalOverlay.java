@@ -34,9 +34,9 @@ public class SelectGoalOverlay implements IOverlayRenderer {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        int overlayX = parent.getGuiLeft() + parent.getXSize() / 2;
-        int overlayY = parent.getGuiTop() + parent.getYSize() / 2;
+    public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
+        int overlayX = parent.getBaseWidth() / 2;
+        int overlayY = parent.getBaseHeight() / 2;
         int width = 220;
         int height = 180;
         int left = overlayX - width / 2;
@@ -47,7 +47,7 @@ public class SelectGoalOverlay implements IOverlayRenderer {
 
         int entryY = top + 30;
         for (String goalName : goalNames) {
-            if (parent.isHover(overlayX - 100, entryY, 200, 20)) {
+            if (parent.isHover(overlayX - 100, entryY, 200, 20, scaledMouseX, scaledMouseY)) {
                 Gui.drawRect(overlayX - 100, entryY, overlayX + 100, entryY + 20, 0x50FFFFFF);
             }
             parent.drawCenteredString(goalName, overlayX, entryY + 6, 0xFFFFFF);
@@ -56,14 +56,14 @@ public class SelectGoalOverlay implements IOverlayRenderer {
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         if (button == 0) {
-            int overlayX = parent.getGuiLeft() + parent.getXSize() / 2;
-            int top = parent.getGuiTop() + (parent.getYSize() - 180) / 2;
+            int overlayX = parent.getBaseWidth() / 2;
+            int top = (parent.getBaseHeight() - 180) / 2;
 
             int entryY = top + 30;
             for (String goalName : goalNames) {
-                if (parent.isHover(overlayX - 100, entryY, 200, 20)) {
+                if (parent.isHover(overlayX - 100, entryY, 200, 20, scaledMouseX, scaledMouseY)) {
                     TreasuryActionOverlay treasuryOverlay = (TreasuryActionOverlay) parent.getOverlay(GOTGuiFactions.Overlay.TREASURY_ACTION);
                     treasuryOverlay.setActionType(actionType);
                     treasuryOverlay.treasuryGoalTarget = goalName.equals("Основная казна") ? "" : goalName;

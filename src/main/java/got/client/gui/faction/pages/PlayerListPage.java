@@ -2,12 +2,14 @@ package got.client.gui.faction.pages;
 
 import brain.factions.Faction;
 import brain.factions.network.PacketFactionManage;
-import got.GOT;
 import got.client.gui.faction.GOTGuiFactions;
+import got.client.gui.faction.GuiCustomButton;
 import got.client.gui.utils.GuiApi;
 import got.client.utils.UtilO;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.MathHelper;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import java.awt.Color;
 import java.util.*;
@@ -39,16 +41,11 @@ public class PlayerListPage implements IPageRenderer {
 
     @Override
     public void initGui(List<GuiButton> buttonList) {
-        int left = parent.getGuiLeft();
-        int top = parent.getGuiTop();
-        int xSize = parent.getXSize();
-
-        buttonManageTitles = new GuiButton(16, left + xSize - 170, top + 40, 150, 20, "Управление титулами");
-        buttonTitleHierarchy = new GuiButton(17, left + xSize - 170, top + 65, 150, 20, "Иерархия титулов");
-        buttonApplications = new GuiButton(18, left + xSize - 170, top + 90, 150, 20, "Заявки");
-
-        buttonPlayerKick = new GuiButton(100, 0, 0, 100, 20, "Выгнать");
-        buttonPlayerSetTitle = new GuiButton(101, 0, 0, 100, 20, "Назначить титул");
+        buttonManageTitles = new GuiCustomButton(16, 0, 0, 150, 20, "Управление титулами");
+        buttonTitleHierarchy = new GuiCustomButton(17, 0, 0, 150, 20, "Иерархия титулов");
+        buttonApplications = new GuiCustomButton(18, 0, 0, 150, 20, "Заявки");
+        buttonPlayerKick = new GuiCustomButton(100, 0, 0, 100, 20, "Выгнать");
+        buttonPlayerSetTitle = new GuiCustomButton(101, 0, 0, 100, 20, "Назначить титул");
 
         buttonList.add(buttonManageTitles);
         buttonList.add(buttonTitleHierarchy);
@@ -58,14 +55,23 @@ public class PlayerListPage implements IPageRenderer {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        parent.drawCenteredString("Список Участников", parent.width / 2, parent.getGuiTop() + 15, 0xFFFFFF);
+    public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
+        parent.drawCenteredString("Список Участников", parent.getBaseWidth() / 2, 15, 0xFFFFFF);
 
         Faction factionData = parent.getFactionData();
         boolean isLeader = parent.isPlayerLeader();
+        int xSize = parent.getBaseWidth();
 
+        buttonManageTitles.xPosition = xSize - 170;
+        buttonManageTitles.yPosition = 40;
         buttonManageTitles.visible = isLeader;
+
+        buttonTitleHierarchy.xPosition = xSize - 170;
+        buttonTitleHierarchy.yPosition = 65;
         buttonTitleHierarchy.visible = isLeader;
+
+        buttonApplications.xPosition = xSize - 170;
+        buttonApplications.yPosition = 90;
         buttonApplications.visible = isLeader;
 
         if (factionData != null) {
@@ -73,35 +79,41 @@ public class PlayerListPage implements IPageRenderer {
             buttonApplications.enabled = !factionData.getApplications().isEmpty();
         }
 
-        int x = parent.getGuiLeft() + 25;
-        int y = parent.getGuiTop() + 40;
-        int listWidth = parent.getXSize() - 200;
-        int listHeight = parent.getYSize() - 80;
+        positionContextMenuButtons();
+
+        int listX = 25;
+        int listY = 40;
+        int listWidth = parent.getBaseWidth() - 200;
+        int listHeight = parent.getBaseHeight() - 80;
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GuiApi.glScissor(x, y, listWidth, listHeight, false);
+        GuiApi.glScissor(
+                parent.getGuiLeft() + (int)(listX * parent.getScaleFactor()),
+                parent.getGuiTop() + (int)(listY * parent.getScaleFactor()),
+                (int)(listWidth * parent.getScaleFactor()),
+                (int)(listHeight * parent.getScaleFactor()),
+                true
+        );
 
         int totalHeight = sortedPlayers.size() * 20;
-        int scrollOffset = (int)(scroll * (totalHeight - listHeight));
+        int scrollOffset = (totalHeight > listHeight) ? (int)(scroll * (totalHeight - listHeight)) : 0;
 
         for (int i = 0; i < sortedPlayers.size(); i++) {
-            int currentY = y + i * 20 - scrollOffset;
-            if (currentY + 20 < y || currentY > y + listHeight) continue;
+            int currentY = listY + i * 20 - scrollOffset;
+            if (currentY + 20 < listY || currentY > listY + listHeight) continue;
 
             Map.Entry<String, Faction.PlayerData> entry = sortedPlayers.get(i);
 
-            if (parent.isHover(x, currentY, listWidth, 20)) {
-                Gui.drawRect(x, currentY, x + listWidth, currentY + 20, 0x50FFFFFF);
+            if (parent.isHover(listX, currentY, listWidth, 20, scaledMouseX, scaledMouseY)) {
+                Gui.drawRect(listX, currentY, listX + listWidth, currentY + 20, 0x50FFFFFF);
             }
-            parent.drawString(entry.getKey() + " (" + entry.getValue().getTitle() + ")", x + 5, currentY + 6, 0xFFFFFF);
-            parent.getFontRenderer().drawString("Вступил: " + parent.getDateFormat().format(new Date(entry.getValue().getJoinDate())), x + listWidth - 120, currentY + 6, 0xAAAAAA);
+            parent.drawString(entry.getKey() + " (" + entry.getValue().getTitle() + ")", listX + 5, currentY + 6, 0xFFFFFF);
+            parent.getFontRenderer().drawString("Вступил: " + parent.getDateFormat().format(new Date(entry.getValue().getJoinDate())), listX + listWidth - 120, currentY + 6, 0xAAAAAA);
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
-
-        drawPlayerContextMenu();
     }
 
-    private void drawPlayerContextMenu() {
+    public void drawPlayerContextMenuAfterButtons(int mouseX, int mouseY) {
         if (parent.contextMenuObject instanceof String) {
             String playerName = (String) parent.contextMenuObject;
             int x = parent.contextMenuX;
@@ -113,7 +125,18 @@ public class PlayerListPage implements IPageRenderer {
             if (y + menuHeight > parent.getGuiTop() + parent.getYSize()) y -= menuHeight;
 
             UtilO.drawRoundedRectangle(x, y, menuWidth, menuHeight, 5, new Color(20, 20, 20, 220).getRGB(), 0);
-            parent.drawCenteredString(playerName, x + menuWidth / 2, y + 5, 0xFFFFFF);
+            parent.getFontRenderer().drawString(playerName, x + (menuWidth - parent.getFontRenderer().getStringWidth(playerName)) / 2, y + 5, 0xFFFFFF);
+        }
+    }
+
+    private void positionContextMenuButtons() {
+        if (parent.contextMenuObject instanceof String) {
+            int x = parent.contextMenuX;
+            int y = parent.contextMenuY;
+            int menuWidth = 110;
+
+            if (x + menuWidth > parent.getGuiLeft() + parent.getXSize()) x -= menuWidth;
+            if (y + 70 > parent.getGuiTop() + parent.getYSize()) y -= 70;
 
             buttonPlayerKick.xPosition = x + 5;
             buttonPlayerKick.yPosition = y + 20;
@@ -122,6 +145,9 @@ public class PlayerListPage implements IPageRenderer {
             buttonPlayerSetTitle.xPosition = x + 5;
             buttonPlayerSetTitle.yPosition = y + 42;
             buttonPlayerSetTitle.visible = parent.isPlayerLeader();
+        } else {
+            buttonPlayerKick.visible = false;
+            buttonPlayerSetTitle.visible = false;
         }
     }
 
@@ -146,38 +172,53 @@ public class PlayerListPage implements IPageRenderer {
         }
     }
 
+    private boolean isMouseOverButton(GuiButton button, int mouseX, int mouseY) {
+        if (button == null || !button.visible) return false;
+        return mouseX >= button.xPosition && mouseY >= button.yPosition && mouseX < button.xPosition + button.width && mouseY < button.yPosition + button.height;
+    }
+
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
-        if (button == 1 && parent.contextMenuObject == null) {
-            int listX = parent.getGuiLeft() + 25;
-            int listY = parent.getGuiTop() + 40;
-            int listWidth = parent.getXSize() - 200;
-            int listHeight = parent.getYSize() - 80;
+    public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
+        if (button == 1 && parent.contextMenuObject == null && parent.isPlayerLeader()) {
+            int listX = 25;
+            int listY = 40;
+            int listWidth = parent.getBaseWidth() - 200;
+            int listHeight = parent.getBaseHeight() - 80;
 
-            if (parent.isHover(listX, listY, listWidth, listHeight)) {
+            if (parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)) {
                 int totalHeight = sortedPlayers.size() * 20;
-                int scrollOffset = (int)(scroll * (totalHeight - listHeight));
+                int scrollOffset = (totalHeight > listHeight) ? (int)(scroll * (totalHeight - listHeight)) : 0;
 
-                int index = (mouseY - listY + scrollOffset) / 20;
+                int index = (scaledMouseY - listY + scrollOffset) / 20;
                 if (index >= 0 && index < sortedPlayers.size()) {
                     parent.contextMenuObject = sortedPlayers.get(index).getKey();
                     parent.contextMenuX = mouseX;
                     parent.contextMenuY = mouseY;
                 }
             }
-        } else if (button == 0 && parent.contextMenuObject != null) {
-
         } else if (button == 0) {
-            parent.contextMenuObject = null;
+            if (parent.contextMenuObject != null && !isMouseOverButton(buttonPlayerKick, mouseX, mouseY) && !isMouseOverButton(buttonPlayerSetTitle, mouseX, mouseY)) {
+                parent.contextMenuObject = null;
+            }
+        }
+    }
+
+    @Override
+    public void handleMouseInput() {
+        int k = Mouse.getEventDWheel();
+        if (k != 0) {
+            int listHeight = parent.getBaseHeight() - 80;
+            int totalContentHeight = sortedPlayers.size() * 20;
+
+            if (totalContentHeight > listHeight) {
+                float scrollAmount = (k > 0 ? -1 : 1) * 20.0f / (totalContentHeight - listHeight);
+                scroll = MathHelper.clamp_float(scroll + scrollAmount, 0.0f, 1.0f);
+            }
         }
     }
 
     @Override public void keyTyped(char c, int key) {}
-    @Override public void handleMouseInput() {}
     @Override public void update() {}
     @Override public void onGuiClosed() {}
-    @Override
-    public boolean isTextFieldFocused() {
-        return false;
-    }
+    @Override public boolean isTextFieldFocused() { return false; }
 }

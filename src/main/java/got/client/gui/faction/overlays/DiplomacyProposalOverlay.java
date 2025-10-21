@@ -2,15 +2,14 @@ package got.client.gui.faction.overlays;
 
 import brain.factions.Faction;
 import brain.factions.network.PacketFactionManage;
-import got.GOT;
 import got.client.gui.faction.GOTGuiFactions;
+import got.client.gui.faction.GuiCustomButton;
 import got.common.faction.GOTFaction;
 import got.common.faction.GOTFactionRelations;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.ChatComponentText;
 import org.lwjgl.input.Keyboard;
-
 import java.util.List;
 
 public class DiplomacyProposalOverlay implements IOverlayRenderer {
@@ -27,10 +26,10 @@ public class DiplomacyProposalOverlay implements IOverlayRenderer {
     @Override
     public void initGui(List<GuiButton> buttonList) {
         Keyboard.enableRepeatEvents(true);
-        final int overlayX = parent.getGuiLeft() + parent.getXSize() / 2;
-        final int overlayY = parent.getGuiTop() + parent.getYSize() / 2;
-        buttonPropose = new GuiButton(50, overlayX - 102, overlayY + 40, 100, 20, "Предложить");
-        buttonCancel = new GuiButton(51, overlayX + 2, overlayY + 40, 100, 20, "Отмена");
+        int overlayX = parent.getBaseWidth() / 2;
+        int overlayY = parent.getBaseHeight() / 2;
+        buttonPropose = new GuiCustomButton(50, overlayX - 102, overlayY + 40, 100, 20, "Предложить");
+        buttonCancel = new GuiCustomButton(51, overlayX + 2, overlayY + 40, 100, 20, "Отмена");
         buttonList.add(buttonPropose);
         buttonList.add(buttonCancel);
 
@@ -48,9 +47,9 @@ public class DiplomacyProposalOverlay implements IOverlayRenderer {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        final int overlayX = parent.getGuiLeft() + parent.getXSize() / 2;
-        final int overlayY = parent.getGuiTop() + parent.getYSize() / 2;
+    public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
+        int overlayX = parent.getBaseWidth() / 2;
+        int overlayY = parent.getBaseHeight() / 2;
 
         buttonPropose.visible = buttonCancel.visible = true;
 
@@ -97,7 +96,7 @@ public class DiplomacyProposalOverlay implements IOverlayRenderer {
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         costField.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -110,15 +109,7 @@ public class DiplomacyProposalOverlay implements IOverlayRenderer {
         }
     }
 
-    @Override
-    public void update() {
-        costField.updateCursorCounter();
-    }
-
+    @Override public void update() { costField.updateCursorCounter(); }
     @Override public void handleMouseInput() {}
-
-    @Override
-    public boolean isTextFieldFocused() {
-        return costField.isFocused();
-    }
+    @Override public boolean isTextFieldFocused() { return costField.isFocused(); }
 }

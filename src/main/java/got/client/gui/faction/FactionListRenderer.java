@@ -2,14 +2,16 @@ package got.client.gui.faction;
 
 import got.client.gui.faction.pages.IPageRenderer;
 import got.client.gui.utils.GuiApi;
-import got.client.utils.UtilO;
 import got.common.faction.GOTFaction;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import java.awt.Color;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class FactionListRenderer implements IPageRenderer {
@@ -18,95 +20,132 @@ public class FactionListRenderer implements IPageRenderer {
     private float currentScroll = 0.0F;
     private boolean isScrolling = false;
 
+    private static final int BANNER_WIDTH = 120;
+    private static final int BANNER_HEIGHT = 450;
+    private static final int BANNER_GAP = 1;
+
+    private GuiButton buttonFilterFactions;
+    private GOTGuiFactions.FactionFilter currentFilter = GOTGuiFactions.FactionFilter.PLAYABLE;
+    private List<GOTFaction> playableFactions = new ArrayList<>();
+    private List<GOTFaction> otherFactions = new ArrayList<>();
+    private List<GOTFaction> currentFactionList = new ArrayList<>();
+
     public FactionListRenderer(GOTGuiFactions parent) {
         this.parent = parent;
     }
 
     @Override
-    public void initGui(List<GuiButton> buttonList) {}
+    public void initGui(List<GuiButton> buttonList) {
+        this.buttonFilterFactions = new GuiCustomButton(4, 15, 10, 150, 20, currentFilter.getButtonText());
+        buttonList.add(buttonFilterFactions);
+
+        playableFactions.clear();
+        otherFactions.clear();
+        for (GOTFaction f : GOTFaction.values()) {
+            if (f.isPlayableAlignmentFaction()) {
+                if (GOTGuiFactions.PLAYABLE_FACTION_NAMES.contains(f.name())) {
+                    playableFactions.add(f);
+                } else {
+                    otherFactions.add(f);
+                }
+            }
+        }
+
+        playableFactions.sort(Comparator.comparing(GOTFaction::factionName));
+        otherFactions.sort(Comparator.comparing(GOTFaction::factionName));
+
+        updateCurrentFactionList();
+    }
+
+    private void updateCurrentFactionList() {
+        currentFactionList = (currentFilter == GOTGuiFactions.FactionFilter.PLAYABLE) ? playableFactions : otherFactions;
+        if (GOTGuiFactions.currentFaction == null || !currentFactionList.contains(GOTGuiFactions.currentFaction)) {
+            GOTGuiFactions.currentFaction = !currentFactionList.isEmpty() ? currentFactionList.get(0) : null;
+        }
+    }
+
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        parent.drawCenteredString("Фракции", parent.width / 2, parent.getGuiTop() + 15, 0xFFFFFF);
+    public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
+        buttonFilterFactions.visible = true;
+        parent.drawCenteredString("Фракции", parent.getBaseWidth() / 2, 15, 0xFFFFFF);
 
-        int listX = parent.getGuiLeft() + 15;
-        int listY = parent.getGuiTop() + 40;
-        int listWidth = parent.getXSize() - 40;
-        int listHeight = parent.getYSize() - 85;
+        int listX = 15;
+        int listY = 40;
+        int listWidth = parent.getBaseWidth() - 30;
+        int listHeight = parent.getBaseHeight() - 85;
 
-        int columns = 4;
-        int boxWidth = (listWidth - (columns - 1) * 10) / columns;
-        int boxHeight = 50;
-        int rowGap = 10;
+        int totalContentWidth = currentFactionList.size() * (BANNER_WIDTH + BANNER_GAP) - BANNER_GAP;
 
-        int totalRows = (int)Math.ceil((double)parent.currentFactionList.size() / columns);
-        int totalContentHeight = totalRows * (boxHeight + rowGap) - rowGap;
+        if (isScrolling) {
+            if (Mouse.isButtonDown(0)) {
+                int scrollBarWidth = listWidth;
+                int scrollWidgetWidth = Math.max(20, (int) ((float) listWidth / (float) totalContentWidth * scrollBarWidth));
+                float mousePos = scaledMouseX - listX - (scrollWidgetWidth / 2.0f);
+                float maxScrollPos = scrollBarWidth - scrollWidgetWidth;
+                this.currentScroll = MathHelper.clamp_float(mousePos / maxScrollPos, 0.0F, 1.0F);
+            } else {
+                isScrolling = false;
+            }
+        }
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GuiApi.glScissor(listX, listY, listWidth + 10, listHeight, false);
+        GuiApi.glScissor(parent.getGuiLeft() + (int)(listX * parent.getScaleFactor()), parent.getGuiTop() + (int)(listY * parent.getScaleFactor()), (int)(listWidth * parent.getScaleFactor()), (int)(listHeight * parent.getScaleFactor()), true);
 
-        int scrollOffset = (int)(this.currentScroll * (totalContentHeight - listHeight));
+        int scrollOffsetX = 0;
+        if (totalContentWidth > listWidth) {
+            scrollOffsetX = (int) (this.currentScroll * (totalContentWidth - listWidth));
+        }
 
-        for (int i = 0; i < parent.currentFactionList.size(); i++) {
-            int row = i / columns;
-            int y = listY + row * (boxHeight + rowGap) - scrollOffset;
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-            if (y + boxHeight < listY || y > listY + listHeight) continue;
+        for (int i = 0; i < currentFactionList.size(); i++) {
+            GOTFaction faction = currentFactionList.get(i);
+            ResourceLocation factionTexture = new ResourceLocation("got", "textures/gui/factions/" + faction.codeName().toLowerCase() + ".png");
 
-            int col = i % columns;
-            int x = listX + col * (boxWidth + 10);
+            int x = listX + i * (BANNER_WIDTH + BANNER_GAP) - scrollOffsetX;
+            int y = listY + (listHeight - BANNER_HEIGHT) / 2;
 
-            GOTFaction faction = parent.currentFactionList.get(i);
-            boolean isHovered = parent.isHover(x, y, boxWidth, boxHeight);
-            int color = isHovered ? new Color(70, 70, 70, 200).getRGB() : new Color(40, 40, 40, 150).getRGB();
-            UtilO.drawRoundedRectangle(x, y, boxWidth, boxHeight, 5, color, 0);
+            if (x + BANNER_WIDTH < listX || x > listX + listWidth) {
+                continue;
+            }
 
-            parent.drawCenteredString(faction.factionName(), x + boxWidth / 2, y + 20, faction.getFactionColor());
+            parent.mc.getTextureManager().bindTexture(factionTexture);
+            parent.drawScaledCustomSizeModalRect(x, y, 0, 0, BANNER_WIDTH, BANNER_HEIGHT, BANNER_WIDTH, BANNER_HEIGHT, (float)BANNER_WIDTH, (float)BANNER_HEIGHT);
         }
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-        if (totalContentHeight > listHeight) {
-            int scrollBarX = listX + listWidth + 5;
-            int scrollBarHeight = listHeight;
-            int scrollWidgetHeight = Math.max(10, (int)((float)listHeight / (float)totalContentHeight * (float)scrollBarHeight));
+        if (totalContentWidth > listWidth) {
+            int scrollBarY = listY + listHeight + 5;
+            int scrollBarWidth = listWidth;
+            int scrollWidgetWidth = Math.max(20, (int) ((float) listWidth / (float) totalContentWidth * scrollBarWidth));
 
-            Gui.drawRect(scrollBarX, listY, scrollBarX + 5, listY + scrollBarHeight, 0x80000000);
-            int scrollWidgetY = listY + (int)(this.currentScroll * (scrollBarHeight - scrollWidgetHeight));
-            Gui.drawRect(scrollBarX, scrollWidgetY, scrollBarX + 5, scrollWidgetY + scrollWidgetHeight, 0xFFC0C0C0);
+            Gui.drawRect(listX, scrollBarY, listX + scrollBarWidth, scrollBarY + 5, 0x80000000);
+            int scrollWidgetX = listX + (int) (this.currentScroll * (scrollBarWidth - scrollWidgetWidth));
+            Gui.drawRect(scrollWidgetX, scrollBarY, scrollWidgetX + scrollWidgetWidth, scrollBarY + 5, 0xFFC0C0C0);
         }
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
+    public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         if (button == 0) {
-            int listX = parent.getGuiLeft() + 15;
-            int listY = parent.getGuiTop() + 40;
-            int listWidth = parent.getXSize() - 40;
-            int listHeight = parent.getYSize() - 85;
+            int listX = 15;
+            int listY = 40;
+            int listWidth = parent.getBaseWidth() - 30;
+            int listHeight = parent.getBaseHeight() - 85;
 
-            if (mouseX >= listX + listWidth + 5 && mouseX < listX + listWidth + 10) {
-                isScrolling = true;
-            }
+            if (parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)) {
+                int totalContentWidth = currentFactionList.size() * (BANNER_WIDTH + BANNER_GAP) - BANNER_GAP;
+                int scrollOffsetX = (totalContentWidth > listWidth) ? (int) (this.currentScroll * (totalContentWidth - listWidth)) : 0;
 
-            if (parent.isHover(listX, listY, listWidth, listHeight)) {
-                int columns = 4;
-                int boxWidth = (listWidth - (columns - 1) * 10) / columns;
-                int boxHeight = 50;
-                int rowGap = 10;
-                int totalRows = (int)Math.ceil((double)parent.currentFactionList.size() / columns);
-                int totalContentHeight = totalRows * (boxHeight + rowGap) - rowGap;
-                int scrollOffset = (totalContentHeight > listHeight) ? (int)(this.currentScroll * (totalContentHeight - listHeight)) : 0;
+                int effectiveMouseX = scaledMouseX - listX + scrollOffsetX;
+                int index = effectiveMouseX / (BANNER_WIDTH + BANNER_GAP);
 
-                for (int i = 0; i < parent.currentFactionList.size(); i++) {
-                    int col = i % columns;
-                    int row = i / columns;
-                    int boxX = listX + col * (boxWidth + 10);
-                    int boxY = listY + row * (boxHeight + rowGap) - scrollOffset;
-
-                    if (parent.isHover(boxX, boxY, boxWidth, boxHeight)) {
-                        parent.setCurrentFaction(parent.currentFactionList.get(i), GOTGuiFactions.View.FACTION);
-                        return;
+                if (index >= 0 && index < currentFactionList.size()) {
+                    int x_start_banner = listX + index * (BANNER_WIDTH + BANNER_GAP) - scrollOffsetX;
+                    if (scaledMouseX >= x_start_banner && scaledMouseX < x_start_banner + BANNER_WIDTH) {
+                        parent.setCurrentFaction(currentFactionList.get(index), GOTGuiFactions.View.FACTION);
                     }
                 }
             }
@@ -114,30 +153,31 @@ public class FactionListRenderer implements IPageRenderer {
     }
 
     @Override
+    public void actionPerformed(GuiButton button) {
+        if (button == buttonFilterFactions) {
+            currentFilter = currentFilter.toggle();
+            buttonFilterFactions.displayString = currentFilter.getButtonText();
+            updateCurrentFactionList();
+        }
+    }
+
+    @Override
     public void handleMouseInput() {
+        int listWidth = parent.getBaseWidth() - 30;
+        int totalContentWidth = currentFactionList.size() * (BANNER_WIDTH + BANNER_GAP) - BANNER_GAP;
+
         int scroll = Mouse.getEventDWheel();
         if (scroll != 0) {
-            int listHeight = parent.getYSize() - 85;
-            int columns = 4;
-            int boxHeight = 50;
-            int rowGap = 10;
-            int totalRows = (int)Math.ceil((double)parent.currentFactionList.size() / columns);
-            int totalContentHeight = totalRows * (boxHeight + rowGap) - rowGap;
-
-            if (totalContentHeight > listHeight) {
-                float amount = (scroll > 0 ? -1 : 1) * 20.0f / (totalContentHeight - listHeight);
+            if (totalContentWidth > listWidth) {
+                float amount = (scroll > 0 ? -1 : 1) * 70.0f / (totalContentWidth - listWidth);
                 this.currentScroll = MathHelper.clamp_float(this.currentScroll + amount, 0.0F, 1.0F);
             }
         }
     }
 
     @Override public void onOpened() { currentScroll = 0.0f; }
-    @Override public void update() {}
-    @Override public void keyTyped(char c, int key) {}
-    @Override public void actionPerformed(GuiButton button) {}
-    @Override public void onGuiClosed() {}
-    @Override
-    public boolean isTextFieldFocused() {
-        return false;
-    }
+    @Override public void update() { }
+    @Override public void keyTyped(char c, int key) { }
+    @Override public void onGuiClosed() { }
+    @Override public boolean isTextFieldFocused() { return false; }
 }

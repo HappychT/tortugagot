@@ -31,6 +31,7 @@ public class StructureManager {
     public static ServerConfig config;
     private static Timer resourceTimer;
     public static boolean isRaidTime = false;
+    public static boolean isRaidTimeFortress = false;
 
     public static void init(File configFolder) {
         config = new ServerConfig(new File(configFolder, "server_config.cfg"));
@@ -133,7 +134,7 @@ public class StructureManager {
                     Block block = (Block) Block.blockRegistry.getObject(blockData.getId());
                     if (block != null) {
                         int blockX = slot.xCoord + blockData.getX() - xOffset;
-                        int blockY = slot.yCoord + blockData.getY();
+                        int blockY = slot.yCoord + blockData.getY() - 3;
                         int blockZ = slot.zCoord + blockData.getZ() - zOffset;
 
                         if (blockX == slot.xCoord && blockY == slot.yCoord && blockZ == slot.zCoord) {

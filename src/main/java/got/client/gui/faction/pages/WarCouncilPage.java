@@ -4,6 +4,7 @@ import brain.factions.Faction;
 import got.client.gui.faction.GOTGuiFactions;
 import net.minecraft.client.gui.GuiButton;
 import java.util.List;
+import got.client.gui.faction.GuiCustomButton;
 
 public class WarCouncilPage implements IPageRenderer {
     private final GOTGuiFactions parent;
@@ -23,16 +24,16 @@ public class WarCouncilPage implements IPageRenderer {
         int left = parent.getGuiLeft();
         int top = parent.getGuiTop();
 
-        int councilX = left + 25;
-        int councilY = top + 40;
-        buttonDeclareWar = new GuiButton(23, councilX, councilY, 150, 20, "Объявить войну");
-        buttonMakeAlliance = new GuiButton(24, councilX, councilY + 25, 150, 20, "Предложить союз");
-        buttonMakePeace = new GuiButton(25, councilX, councilY + 50, 150, 20, "Предложить мир");
-        buttonDeclareHostility = new GuiButton(26, councilX, councilY + 75, 150, 20, "Объявить вражду");
-        buttonIncomingProposals = new GuiButton(30, councilX, councilY + 100, 150, 20, "Входящие предложения");
+        int councilX = 25;
+        int councilY = 40;
+        buttonDeclareWar = new GuiCustomButton(23, councilX, councilY, 150, 20, "Объявить войну");
+        buttonMakeAlliance = new GuiCustomButton(24, councilX, councilY + 25, 150, 20, "Предложить союз");
+        buttonMakePeace = new GuiCustomButton(25, councilX, councilY + 50, 150, 20, "Предложить мир");
+        buttonDeclareHostility = new GuiCustomButton(26, councilX, councilY + 75, 150, 20, "Объявить вражду");
+        buttonIncomingProposals = new GuiCustomButton(30, councilX, councilY + 100, 150, 20, "Входящие предложения");
 
-        councilX = left + 200;
-        buttonPayWarTax = new GuiButton(27, councilX, councilY, 150, 20, "Оплатить налог");
+        councilX = 200;
+        buttonPayWarTax = new GuiCustomButton(27, councilX, councilY, 150, 20, "Оплатить налог");
 
         buttonList.add(buttonDeclareWar);
         buttonList.add(buttonMakeAlliance);
@@ -43,8 +44,8 @@ public class WarCouncilPage implements IPageRenderer {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        parent.drawCenteredString("Военный совет", parent.width / 2, parent.getGuiTop() + 15, 0xFFFFFF);
+    public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
+        parent.drawCenteredString("Военный совет", parent.getBaseWidth() / 2, 15, 0xFFFFFF);
 
         Faction factionData = parent.getFactionData();
         if (factionData == null) return;
@@ -81,7 +82,8 @@ public class WarCouncilPage implements IPageRenderer {
         }
     }
 
-    @Override public void mouseClicked(int mouseX, int mouseY, int button) {}
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {}
     @Override public void keyTyped(char c, int key) {}
     @Override public void handleMouseInput() {}
     @Override public void update() {}

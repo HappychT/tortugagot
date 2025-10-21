@@ -113,8 +113,8 @@ public class GuiStructureBlock extends GuiScreen {
         int guiLeft = (width - 256) / 2;
         int guiTop = (height - 200) / 2;
 
-        GuiButton backButton = new GuiButton(100, guiLeft + 10, guiTop + 170, 100, 20, "Назад");
-        GuiButton closeButton = new GuiButton(99, guiLeft + 146, guiTop + 170, 100, 20, "Закрыть");
+        GuiButton backButton = new GuiCustomButton(100, guiLeft + 10, guiTop + 170, 100, 20, "Назад");
+        GuiButton closeButton = new GuiCustomButton(99, guiLeft + 146, guiTop + 170, 100, 20, "Закрыть");
         mainButtons.add(backButton);
         mainButtons.add(closeButton);
 
@@ -122,7 +122,7 @@ public class GuiStructureBlock extends GuiScreen {
 
         switch (currentState) {
             case UNOWNED:
-                mainButtons.add(new GuiButton(0, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Захватить точку"));
+                mainButtons.add(new GuiCustomButton(0, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Захватить точку"));
                 break;
             case OWNED_SELF:
                 if (structure.type == FactionStructureSlot.StructureType.FORTRESS) setupFortressButtons(guiLeft, guiTop);
@@ -139,8 +139,8 @@ public class GuiStructureBlock extends GuiScreen {
         int overlayX = width / 2;
         int overlayY = height / 2;
 
-        GuiButton confirmButton = new GuiButton(200, overlayX - 102, overlayY + 20, 100, 20, "Подтвердить");
-        GuiButton cancelButton = new GuiButton(201, overlayX + 2, overlayY + 20, 100, 20, "Отмена");
+        GuiButton confirmButton = new GuiCustomButton(200, overlayX - 102, overlayY + 20, 100, 20, "Подтвердить");
+        GuiButton cancelButton = new GuiCustomButton(201, overlayX + 2, overlayY + 20, 100, 20, "Отмена");
         overlayButtons.add(confirmButton);
         overlayButtons.add(cancelButton);
 
@@ -155,7 +155,7 @@ public class GuiStructureBlock extends GuiScreen {
                 break;
             case ADD_BARRACKS_PLAYER:
                 overlayButtons.clear();
-                overlayButtons.add(new GuiButton(201, overlayX - 50, overlayY + 70, 100, 20, "Отмена"));
+                overlayButtons.add(new GuiCustomButton(201, overlayX - 50, overlayY + 70, 100, 20, "Отмена"));
                 break;
         }
     }
@@ -188,25 +188,25 @@ public class GuiStructureBlock extends GuiScreen {
 
         if (fortressState == FortressState.MAIN) {
             if (isMainFortress) {
-                mainButtons.add(new GuiButton(30, guiLeft + (256 - 150) / 2, guiTop + 100, 150, 20, "Внести продовольствие"));
-                mainButtons.add(new GuiButton(31, guiLeft + (256 - 150) / 2, guiTop + 125, 150, 20, "Управление казармой"));
+                mainButtons.add(new GuiCustomButton(30, guiLeft + (256 - 150) / 2, guiTop + 100, 150, 20, "Внести продовольствие"));
+                mainButtons.add(new GuiCustomButton(31, guiLeft + (256 - 150) / 2, guiTop + 125, 150, 20, "Управление казармой"));
             } else {
-                mainButtons.add(new GuiButton(1, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Собрать ресурсы"));
+                mainButtons.add(new GuiCustomButton(1, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Собрать ресурсы"));
             }
-            mainButtons.add(new GuiButton(2, guiLeft + 200, guiTop + 10, 50, 20, "Улучшить"));
+            mainButtons.add(new GuiCustomButton(2, guiLeft + 200, guiTop + 10, 50, 20, "Улучшить"));
 
         } else if (fortressState == FortressState.BARRACKS) {
-            mainButtons.add(new GuiButton(40, guiLeft + 180, guiTop + 40, 70, 20, "Добавить"));
-            GuiButton kickBtn = new GuiButton(41, guiLeft + 180, guiTop + 65, 70, 20, "Исключить");
+            mainButtons.add(new GuiCustomButton(40, guiLeft + 180, guiTop + 40, 70, 20, "Добавить"));
+            GuiButton kickBtn = new GuiCustomButton(41, guiLeft + 180, guiTop + 65, 70, 20, "Исключить");
             kickBtn.enabled = selectedBarracksPlayerName != null;
             mainButtons.add(kickBtn);
-            mainButtons.add(new GuiButton(42, guiLeft + 180, guiTop + 90, 70, 20, "Купить слот"));
+            mainButtons.add(new GuiCustomButton(42, guiLeft + 180, guiTop + 90, 70, 20, "Купить слот"));
         }
     }
 
     private void setupResourcePointButtons(int guiLeft, int guiTop) {
-        mainButtons.add(new GuiButton(1, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Собрать ресурсы"));
-        mainButtons.add(new GuiButton(2, guiLeft + (256 - 150) / 2, guiTop + 105, 150, 20, "Улучшить"));
+        mainButtons.add(new GuiCustomButton(1, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Собрать ресурсы"));
+        mainButtons.add(new GuiCustomButton(2, guiLeft + (256 - 150) / 2, guiTop + 105, 150, 20, "Улучшить"));
     }
 
     private void setupPurchaseButtons(int guiLeft, int guiTop) {
@@ -216,14 +216,14 @@ public class GuiStructureBlock extends GuiScreen {
         int id = 10;
         if (currentState == ScreenState.PURCHASE_CATEGORY) {
             for (String categoryKey : this.availableStructures.keySet()) {
-                mainButtons.add(new GuiButton(id++, buttonX, yPos, buttonWidth, 20, getCategoryDisplayName(categoryKey)));
+                mainButtons.add(new GuiCustomButton(id++, buttonX, yPos, buttonWidth, 20, getCategoryDisplayName(categoryKey)));
                 yPos += 25;
             }
         } else if (currentState == ScreenState.PURCHASE_SUBTYPE) {
             List<String> subTypes = this.availableStructures.get(selectedCategory);
             if (subTypes != null) {
                 for (String subTypeName : subTypes) {
-                    mainButtons.add(new GuiButton(id++, buttonX, yPos, buttonWidth, 20, subTypeName));
+                    mainButtons.add(new GuiCustomButton(id++, buttonX, yPos, buttonWidth, 20, subTypeName));
                     yPos += 25;
                 }
             }
