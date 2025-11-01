@@ -2,7 +2,9 @@ package got.client.gui.faction;
 
 import brain.factions.Faction;
 import brain.factions.network.PacketInfoFactions;
+import brain.factions.network.PacketMessage;
 import brain.factions.servers.CollectionGoal;
+import brain.factions.servers.CoreFaction;
 import got.client.gui.GOTGuiMenu;
 import got.client.gui.GOTGuiMenuWBBase;
 import got.client.gui.faction.overlays.*;
@@ -10,10 +12,14 @@ import got.client.gui.faction.pages.*;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -58,6 +64,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	}
 
 	public static ResourceLocation factionsTexture = new ResourceLocation("got:textures/gui/faction.png");
+	private ResourceLocation currentBackgroundTexture = new ResourceLocation("got:textures/gui/faction.png");
 	public static GOTFaction currentFaction;
 	private View currentView = View.LIST;
 	private Page currentPage = Page.FRONT;
@@ -78,6 +85,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public String diplomacyActionType = "";
 
 	private GuiButton buttonBack, buttonPageNext, buttonPagePrev, buttonOpenMenu;
+	private GOTGuiButtonPledge buttonPledge;
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 	private boolean hasSetInitialView = false;
 
@@ -96,7 +104,6 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		this.mapView = new MapView(this);
 
 		pageRenderers.put(Page.FRONT, new FrontPage(this));
-		pageRenderers.put(Page.POLITICS, new PoliticsPage(this));
 		pageRenderers.put(Page.APPLICATIONS, new ApplicationsPage(this));
 		pageRenderers.put(Page.PLAYER_LIST, new PlayerListPage(this));
 		pageRenderers.put(Page.WAR_COUNCIL, new WarCouncilPage(this));
@@ -138,7 +145,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			if (isOtherPlayer) {
 				this.currentView = View.FACTION;
 				this.currentPage = Page.FRONT;
-			} else if (pd.getPledgeFaction() != null && PLAYABLE_FACTION_NAMES.contains(pd.getPledgeFaction().codeName())) {
+			} else if (pd != null && pd.getPledgeFaction() != null && PLAYABLE_FACTION_NAMES.contains(pd.getPledgeFaction().codeName())) {
 				currentFaction = pd.getPledgeFaction();
 				this.currentView = View.FACTION;
 			} else {
@@ -148,12 +155,19 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		}
 
 		updateFactionDataCache();
+
+		if (this.currentView == View.FACTION && currentFaction != null) {
+			this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction_bg_" + currentFaction.codeName().toLowerCase() + ".png");
+		} else {
+			this.currentBackgroundTexture = new ResourceLocation("got:textures/gui/faction.png");
+		}
+
 		this.buttonList.clear();
 
 		int bottomButtonY = this.baseHeight - 35;
 		this.buttonBack = new GuiCustomButton(0, 15, bottomButtonY, 100, 20, "К списку фракций");
 		this.buttonPagePrev = new GuiCustomButton(1, 120, bottomButtonY, 20, 20, "<");
-		this.buttonPageNext = new GuiCustomButton(2, this.baseWidth - 145, bottomButtonY, 20, 20, ">");
+		this.buttonPageNext = new GuiCustomButton(2, this.baseWidth - 320, bottomButtonY, 20, 20, ">");
 		this.buttonOpenMenu = new GuiCustomButton(3, this.baseWidth / 2 - 75, bottomButtonY, 150, 20, "Главное меню");
 
 		this.buttonList.add(buttonBack);
@@ -161,9 +175,14 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		this.buttonList.add(buttonPageNext);
 		this.buttonList.add(buttonOpenMenu);
 
+
 		getActiveRenderer().initGui(this.buttonList);
 		if (getActiveRenderer() instanceof IPageRenderer) {
 			((IPageRenderer) getActiveRenderer()).onOpened();
+		}
+
+		if (this.buttonPledge != null) {
+			this.buttonPledge.updatePledgeState();
 		}
 	}
 
@@ -204,13 +223,21 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		buttonPagePrev.visible = (this.currentView == View.FACTION && getAvailablePages(isPlayerMember()).size() > 1);
 		buttonPageNext.visible = (this.currentView == View.FACTION && getAvailablePages(isPlayerMember()).size() > 1);
 		buttonOpenMenu.visible = true;
+		if (buttonPledge != null) {
+			buttonPledge.visible = true;
+		}
+
 
 		for (Object obj : this.buttonList) {
 			((GuiButton)obj).drawButton(this.mc, scaledMouseX, scaledMouseY);
 		}
 
 		GL11.glPopMatrix();
-	}
+
+
+		if (activeRenderer instanceof MapView) {
+			((MapView)activeRenderer).drawTooltips(mouseX, mouseY, scaledMouseX, scaledMouseY);
+		}}
 
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int button) {
@@ -222,9 +249,11 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		if (button == 0) {
 			for (Object obj : new ArrayList<>(this.buttonList)) {
 				GuiButton guiButton = (GuiButton) obj;
+
 				if (guiButton.mousePressed(this.mc, scaledMouseX, scaledMouseY)) {
 					guiButton.func_146113_a(this.mc.getSoundHandler());
 					this.actionPerformed(guiButton);
+					return;
 				}
 			}
 		}
@@ -243,15 +272,12 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	}
 
 	public void drawPanel(int x, int y, int width, int height) {
-		this.mc.getTextureManager().bindTexture(factionsTexture);
-
+		this.mc.getTextureManager().bindTexture(this.currentBackgroundTexture);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.8F);
-
 		drawScaledCustomSizeModalRect(x, y, 0, 0, 1920, 1080, width, height, 1920.0F, 1080.0F);
-
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
@@ -308,6 +334,22 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			return;
 		}
 
+		if (button instanceof GOTGuiButtonPledge) {
+			GOTGuiButtonPledge pledgeButton = (GOTGuiButtonPledge) button;
+			if (pledgeButton.enabled) {
+				if (pledgeButton.isPledgedToThisFaction) {
+					CoreFaction.brainChannel.sendToServer(new PacketMessage("quet"));
+					this.mc.displayGuiScreen(null);
+				} else {
+					if (pledgeButton.targetFaction != null) {
+						CoreFaction.brainChannel.sendToServer(new PacketMessage("sendApplication#" + pledgeButton.targetFaction.codeName()));
+						pledgeButton.updatePledgeState();
+					}
+				}
+			}
+			return;
+		}
+
 		getActiveRenderer().actionPerformed(button);
 	}
 
@@ -315,7 +357,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public void keyTyped(char c, int key) {
 		IGuiComponent renderer = getActiveRenderer();
 
-		if (key == 1) { // ESC
+		if (key == 1) {
 			if (currentOverlay != Overlay.NONE) {
 				if (currentOverlay == Overlay.TREASURY_DETAILS) {
 					setCurrentOverlay(Overlay.COLLECTIONS_LIST, true);
@@ -333,7 +375,10 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		renderer.keyTyped(c, key);
 
 		if (!renderer.isTextFieldFocused()) {
-			super.keyTyped(c, key);
+			if (key == 1 || key == this.mc.gameSettings.keyBindInventory.getKeyCode())
+			{
+				this.mc.thePlayer.closeScreen();
+			}
 		}
 	}
 
@@ -348,6 +393,9 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public void updateScreen() {
 		super.updateScreen();
 		getActiveRenderer().update();
+		if (buttonPledge != null) {
+			buttonPledge.updatePledgeState();
+		}
 	}
 
 	private void updateFactionDataCache() {
@@ -358,25 +406,112 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public boolean isHover(int x, int y, int w, int h, int scaledMouseX, int scaledMouseY) {
 		return scaledMouseX >= x && scaledMouseX < x + w && scaledMouseY >= y && scaledMouseY < y + h;
 	}
-
 	public void drawCenteredString(String text, int x, int y, int color) {
-		this.getFontRenderer().drawString(text, x - this.getFontRenderer().getStringWidth(text) / 2, y, color);
+		float scale = 1.3f;
+		GL11.glPushMatrix();
+		int scaledX = (int) (x / scale);
+		int scaledY = (int) (y / scale);
+		GL11.glScalef(scale, scale, 1.0f);
+		this.getFontRenderer().drawString(text, scaledX - this.getFontRenderer().getStringWidth(text) / 2, scaledY, color);		GL11.glPopMatrix();
 	}
 
 	public void drawString(String text, int x, int y, int color) {
-		getFontRenderer().drawString(text, x, y, color);
-	}
+		float scale = 1.3f;
+
+		GL11.glPushMatrix();
+		GL11.glScalef(scale, scale, 1.0f);
+
+		int scaledX = (int) (x / scale);
+		int scaledY = (int) (y / scale);
+
+		getFontRenderer().drawString(text, scaledX, scaledY, color);
+
+		GL11.glPopMatrix();
+			}
+
 
 	public void drawTooltip(List<String> text, int x, int y) {
-		func_146283_a(text, x, y);
+		drawHoveringTextPublic(text, x, y);
 	}
+
+	public void drawHoveringTextPublic(List<String> textLines, int x, int y) {
+		if (!textLines.isEmpty()) {
+			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+			RenderHelper.disableStandardItemLighting();
+			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			int tooltipTextWidth = 0;
+
+			for (String s : textLines) {
+				int textWidth = this.fontRendererObj.getStringWidth(s);
+				if (textWidth > tooltipTextWidth) {
+					tooltipTextWidth = textWidth;
+				}
+			}
+
+			int screenX = x + 12;
+			int screenY = y - 12;
+			int tooltipHeight = 8;
+
+			if (textLines.size() > 1) {
+				tooltipHeight += 2 + (textLines.size() - 1) * 10;
+			}
+
+			if (screenX + tooltipTextWidth + 4 > this.width) {
+				screenX -= 28 + tooltipTextWidth;
+			}
+
+			if (screenY + tooltipHeight + 6 > this.height) {
+				screenY = this.height - tooltipHeight - 6;
+			}
+			if (screenY < 0) {
+				screenY = 0;
+			}
+
+			this.zLevel = 300.0F;
+			int backgroundColor = -267386864;
+			this.drawGradientRect(screenX - 3, screenY - 4, screenX + tooltipTextWidth + 3, screenY - 3, backgroundColor, backgroundColor);
+			this.drawGradientRect(screenX - 3, screenY + tooltipHeight + 3, screenX + tooltipTextWidth + 3, screenY + tooltipHeight + 4, backgroundColor, backgroundColor);
+			this.drawGradientRect(screenX - 3, screenY - 3, screenX + tooltipTextWidth + 3, screenY + tooltipHeight + 3, backgroundColor, backgroundColor);
+			this.drawGradientRect(screenX - 4, screenY - 3, screenX - 3, screenY + tooltipHeight + 3, backgroundColor, backgroundColor);
+			this.drawGradientRect(screenX + tooltipTextWidth + 3, screenY - 3, screenX + tooltipTextWidth + 4, screenY + tooltipHeight + 3, backgroundColor, backgroundColor);
+			int borderColorStart = 1347420415;
+			int borderColorEnd = (borderColorStart & 16711422) >> 1 | borderColorStart & -16777216;
+			this.drawGradientRect(screenX - 3, screenY - 3 + 1, screenX - 3 + 1, screenY + tooltipHeight + 3 - 1, borderColorStart, borderColorEnd);
+			this.drawGradientRect(screenX + tooltipTextWidth + 2, screenY - 3 + 1, screenX + tooltipTextWidth + 3, screenY + tooltipHeight + 3 - 1, borderColorStart, borderColorEnd);
+			this.drawGradientRect(screenX - 3, screenY - 3, screenX + tooltipTextWidth + 3, screenY - 3 + 1, borderColorStart, borderColorStart);
+			this.drawGradientRect(screenX - 3, screenY + tooltipHeight + 2, screenX + tooltipTextWidth + 3, screenY + tooltipHeight + 3, borderColorEnd, borderColorEnd);
+
+			GL11.glPushMatrix();
+			GL11.glTranslatef(0, 0, 300);
+
+			for (int i = 0; i < textLines.size(); ++i) {
+				String line = textLines.get(i);
+				this.fontRendererObj.drawStringWithShadow(line, screenX, screenY, -1);
+				if (i == 0) {
+					screenY += 2;
+				}
+				screenY += 10;
+			}
+			GL11.glPopMatrix();
+
+			this.zLevel = 0.0F;
+			GL11.glEnable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			RenderHelper.enableStandardItemLighting();
+			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+		}
+	}
+
 
 	private GroupStatus calculatePlayerStatus() {
 		if (getFactionData() != null && mc.thePlayer != null) {
 			String playerName = mc.thePlayer.getCommandSenderName();
-			if (getFactionData().getLeaderName().equals(playerName)) return GroupStatus.OWNER;
-			if (getFactionData().getAssistantName().equals(playerName)) return GroupStatus.CO_OWNER;
-			if (getFactionData().getPlayers().containsKey(playerName)) return GroupStatus.PLAYER;
+			if (playerName == null) return GroupStatus.NONE;
+			Faction factionData = getFactionData();
+			if (factionData.getLeaderName() != null && factionData.getLeaderName().equals(playerName)) return GroupStatus.OWNER;
+			if (factionData.getAssistantName() != null && factionData.getAssistantName().equals(playerName)) return GroupStatus.CO_OWNER;
+			if (factionData.getPlayers() != null && factionData.getPlayers().containsKey(playerName)) return GroupStatus.PLAYER;
 		}
 		return GroupStatus.NONE;
 	}
@@ -395,7 +530,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	}
 
 	public void drawButtonHoveringText(List<String> text, int x, int y) {
-		this.func_146283_a(text, x, y);
+		drawHoveringTextPublic(text, x, y);
 	}
 
 	public boolean isPlayerLeader() {

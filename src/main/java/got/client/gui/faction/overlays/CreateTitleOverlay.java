@@ -91,7 +91,8 @@ public class CreateTitleOverlay implements IOverlayRenderer {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
-        titleNameField.mouseClicked(mouseX, mouseY, button);
+        titleNameField.mouseClicked(scaledMouseX, scaledMouseY, button);
+
         if (button == 0) {
             int overlayX = parent.getBaseWidth() / 2;
             int overlayY = parent.getBaseHeight() / 2;
@@ -106,7 +107,6 @@ public class CreateTitleOverlay implements IOverlayRenderer {
             }
         }
     }
-
     @Override public void keyTyped(char c, int key) { if(titleNameField.isFocused()) titleNameField.textboxKeyTyped(c, key); }
     @Override public void update() { titleNameField.updateCursorCounter(); }
     @Override public void handleMouseInput() {}

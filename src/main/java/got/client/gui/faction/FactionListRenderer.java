@@ -20,7 +20,7 @@ public class FactionListRenderer implements IPageRenderer {
     private float currentScroll = 0.0F;
     private boolean isScrolling = false;
 
-    private static final int BANNER_WIDTH = 120;
+    private static final int BANNER_WIDTH = 87;
     private static final int BANNER_HEIGHT = 450;
     private static final int BANNER_GAP = 1;
 
@@ -36,7 +36,7 @@ public class FactionListRenderer implements IPageRenderer {
 
     @Override
     public void initGui(List<GuiButton> buttonList) {
-        this.buttonFilterFactions = new GuiCustomButton(4, 15, 10, 150, 20, currentFilter.getButtonText());
+        this.buttonFilterFactions = new GuiCustomButton(4, 15, 15, 150, 20, currentFilter.getButtonText());
         buttonList.add(buttonFilterFactions);
 
         playableFactions.clear();
@@ -68,7 +68,7 @@ public class FactionListRenderer implements IPageRenderer {
     @Override
     public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
         buttonFilterFactions.visible = true;
-        parent.drawCenteredString("Фракции", parent.getBaseWidth() / 2, 15, 0xFFFFFF);
+        parent.drawCenteredString("Фракции", parent.getBaseWidth() / 2, 15, 0xFFFFFFFF);
 
         int listX = 15;
         int listY = 40;

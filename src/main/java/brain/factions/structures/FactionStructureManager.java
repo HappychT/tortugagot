@@ -26,6 +26,10 @@ public class FactionStructureManager {
     private static Map<String, String> structureOwners = new HashMap<>();
     public static Map<String, Map<String, String>> structureTypes = new HashMap<>();
 
+    private static final int STRUCTURE_SEARCH_RADIUS_XZ = 10;
+    private static final int STRUCTURE_SEARCH_RADIUS_Y = 5;
+
+
     public static void init(File configFolder) {
         structureSlotsFile = new File(configFolder, "faction_structures.json");
         structureOwnershipFile = new File(configFolder, "structure_ownership.json");
@@ -132,6 +136,7 @@ public class FactionStructureManager {
     }
 
     private static void syncOwnershipToSlots() {
+        if (structureSlots == null || structureOwners == null) return;
         for (FactionStructureSlot slot : structureSlots) {
             slot.ownerFactionID = structureOwners.get(slot.id);
         }
@@ -147,7 +152,7 @@ public class FactionStructureManager {
         saveStructureOwnership();
     }
     public static FactionStructureSlot getStructureById(String id) {
-        if (id == null) return null;
+        if (id == null || structureSlots == null) return null;
         for (FactionStructureSlot slot : structureSlots) {
             if (id.equals(slot.id)) {
                 return slot;
@@ -156,9 +161,15 @@ public class FactionStructureManager {
         return null;
     }
 
-    public static FactionStructureSlot getStructureByCoords(int x, int z) {
+
+    public static FactionStructureSlot getStructureNearby(int x, int y, int z) {
+        if (structureSlots == null) return null;
+
         for (FactionStructureSlot slot : structureSlots) {
-            if (slot.xCoord == x && slot.zCoord == z) {
+            double distSqXZ = Math.pow(slot.xCoord - x, 2) + Math.pow(slot.zCoord - z, 2);
+            int distY = Math.abs(slot.yCoord - y);
+
+            if (distSqXZ <= (STRUCTURE_SEARCH_RADIUS_XZ * STRUCTURE_SEARCH_RADIUS_XZ) && distY <= STRUCTURE_SEARCH_RADIUS_Y) {
                 return slot;
             }
         }
