@@ -1,25 +1,23 @@
 package got.client.gui;
 
+import got.client.gui.faction.GOTGuiFactions;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
-public class GOTGuiButtonCoinExchange extends GuiButton {
-	public GOTGuiButtonCoinExchange(int i, int j, int k) {
-		super(i, j, k, 32, 17, "");
+public class GOTGuiButtonFactionsMap extends GuiButton {
+	public GOTGuiButtonFactionsMap(int i, int x, int y) {
+		super(i, x, y, 8, 8, "");
 	}
 
 	@Override
 	public void drawButton(Minecraft mc, int i, int j) {
 		if (visible) {
-			mc.getTextureManager().bindTexture(GOTGuiCoinExchange.guiTexture);
+			mc.getTextureManager().bindTexture(GOTGuiFactions.factionsTexture);
 			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			field_146123_n = i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
-			int k = getHoverState(field_146123_n);
-			int u = 176 + id * width;
-			int v = 0 + k * height;
-			drawTexturedModalRect(xPosition, yPosition, u, v, width, height);
+			drawTexturedModalRect(xPosition, yPosition, 17 + (field_146123_n ? width : 0), 142, width, height);
 			mouseDragged(mc, i, j);
 		}
 	}
