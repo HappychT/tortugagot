@@ -107,22 +107,23 @@ public class MapView implements IPageRenderer {
         GL11.glPopAttrib();
 
         positionDiplomacyContextMenuButtons();
-        drawTooltips(mouseX, mouseY, scaledMouseX, scaledMouseY);
+
     }
 
     public void drawDiplomacyContextMenuAfterButtons(int mouseX, int mouseY) {
         if (parent.contextMenuObject instanceof GOTFaction) {
             GOTFaction fac = (GOTFaction) parent.contextMenuObject;
+
             int x = parent.contextMenuX;
             int y = parent.contextMenuY;
             int menuWidth = 110;
             int menuHeight = 110;
 
-            if (x + menuWidth > parent.getGuiLeft() + parent.getXSize()) x -= menuWidth;
-            if (y + menuHeight > parent.getGuiTop() + parent.getYSize()) y -= menuHeight;
+            if (x + menuWidth > parent.getBaseWidth()) x -= menuWidth;
+            if (y + menuHeight > parent.getBaseHeight()) y -= menuHeight;
 
             UtilO.drawRoundedRectangle(x, y, menuWidth, menuHeight, 5, new Color(20, 20, 20, 200).getRGB(), 0);
-            parent.drawCenteredString(fac.factionName(), x + menuWidth / 2, y + 5, 0xFFFFFF);
+            parent.drawCenteredString(fac.factionName(), x + menuWidth / 2, y + 5, 0xFFFFFFFF);
         }
     }
 
@@ -133,8 +134,8 @@ public class MapView implements IPageRenderer {
             int menuWidth = 110;
             int menuHeight = 110;
 
-            if (x + menuWidth > parent.getGuiLeft() + parent.getXSize()) x -= menuWidth;
-            if (y + menuHeight > parent.getGuiTop() + parent.getYSize()) y -= menuHeight;
+            if (x + menuWidth > parent.getBaseWidth()) x -= menuWidth;
+            if (y + menuHeight > parent.getBaseHeight()) y -= menuHeight;
 
             for (int i = 0; i < diplomacyButtons.length; i++) {
                 diplomacyButtons[i].xPosition = x + 5;
@@ -148,43 +149,54 @@ public class MapView implements IPageRenderer {
         }
     }
 
-    private void drawTooltips(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY) {
+    public void drawTooltips(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY) {
         if (parent.contextMenuObject != null) return;
 
         float[] transformedMouse = untransformMapCoords(scaledMouseX, scaledMouseY);
+        float detectionRadiusMultiplier = 1.5f;
 
         for (FactionStructureSlot slot : this.structureSlots) {
-            if (isClickOnTransformedCircle(transformedMouse, slot.mapX, slot.mapY, 4)) {
+            float checkRadius = 4.0f * detectionRadiusMultiplier;
+            if (isClickOnTransformedCircle(transformedMouse, slot.mapX, slot.mapY, checkRadius)) {
                 List<String> tooltip = new ArrayList<>();
                 tooltip.add("§l" + slot.name);
 
                 if (slot.ownerFactionID != null) {
                     GOTFaction ownerFaction = GOTFaction.forName(slot.ownerFactionID);
-                    tooltip.add("§7Владелец: §f" + ownerFaction.factionName());
+                    if (ownerFaction != null) {
+                        tooltip.add("§7Владелец: §f" + ownerFaction.factionName());
+                    } else {
+                        tooltip.add("§7Владелец: §f" + slot.ownerFactionID);
+                    }
+
 
                     if (parent.getFactionData() != null) {
                         GOTFaction playerFaction = GOTFaction.forName(parent.getFactionData().getID());
-                        GOTFactionRelations.Relation relation = GOTFactionRelations.getRelations(playerFaction, ownerFaction);
+                        if (playerFaction != null && ownerFaction != null) {
+                            GOTFactionRelations.Relation relation = GOTFactionRelations.getRelations(playerFaction, ownerFaction);
 
-                        if (relation == GOTFactionRelations.Relation.ALLY || playerFaction == ownerFaction) {
-                            tooltip.add("§7Уровень: §b" + slot.level);
-                        } else if (relation == GOTFactionRelations.Relation.ENEMY || relation == GOTFactionRelations.Relation.MORTAL_ENEMY) {
-                            tooltip.add("§7Рейд-тайм: §c" + PacketFactionStructures.raidTimeString);
+                            if (relation == GOTFactionRelations.Relation.ALLY || playerFaction == ownerFaction) {
+                                tooltip.add("§7Уровень: §b" + slot.level);
+                            } else if (relation == GOTFactionRelations.Relation.ENEMY || relation == GOTFactionRelations.Relation.MORTAL_ENEMY) {
+                                tooltip.add("§7Рейд-тайм: §c" + PacketFactionStructures.raidTimeString);
+                            }
                         }
                     }
                 } else {
                     tooltip.add("§7Ничейная территория");
                 }
                 tooltip.add(String.format("§8[X: %d, Y: %d, Z: %d]", slot.xCoord, slot.yCoord, slot.zCoord));
-                parent.drawTooltip(tooltip, mouseX, mouseY);
+
+                parent.drawHoveringTextPublic(tooltip, mouseX, mouseY);
                 return;
             }
         }
 
         for (GOTFaction faction : this.playableFactionsOnMap) {
             if (faction.factionMapInfo != null) {
-                if (isClickOnTransformedCircle(transformedMouse, faction.factionMapInfo.mapX, faction.factionMapInfo.mapY, 5)) {
-                    parent.drawTooltip(java.util.Collections.singletonList(faction.factionName()), mouseX, mouseY);
+                float checkRadius = 5.0f * detectionRadiusMultiplier;
+                if (isClickOnTransformedCircle(transformedMouse, faction.factionMapInfo.mapX, faction.factionMapInfo.mapY, checkRadius)) {
+                    parent.drawHoveringTextPublic(java.util.Collections.singletonList(faction.factionName()), mouseX, mouseY);
                     return;
                 }
             }
@@ -222,9 +234,9 @@ public class MapView implements IPageRenderer {
         }
     }
 
-    private boolean isMouseOverButton(GuiButton button, int mouseX, int mouseY) {
+    private boolean isMouseOverButton(GuiButton button, int scaledMouseX, int scaledMouseY) {
         if (button == null || !button.visible) return false;
-        return mouseX >= button.xPosition && mouseY >= button.yPosition && mouseX < button.xPosition + button.width && mouseY < button.yPosition + button.height;
+        return scaledMouseX >= button.xPosition && scaledMouseY >= button.yPosition && scaledMouseX < button.xPosition + button.width && scaledMouseY < button.yPosition + button.height;
     }
 
     @Override
@@ -233,10 +245,11 @@ public class MapView implements IPageRenderer {
             float[] transformedMouse = untransformMapCoords(scaledMouseX, scaledMouseY);
             for (GOTFaction faction : this.playableFactionsOnMap) {
                 if (faction != GOTGuiFactions.currentFaction && faction.factionMapInfo != null) {
-                    if (isClickOnTransformedCircle(transformedMouse, faction.factionMapInfo.mapX, faction.factionMapInfo.mapY, 5)) {
+                    float checkRadius = 5.0f * 1.5f;
+                    if (isClickOnTransformedCircle(transformedMouse, faction.factionMapInfo.mapX, faction.factionMapInfo.mapY, checkRadius)) {
                         parent.contextMenuObject = faction;
-                        parent.contextMenuX = mouseX;
-                        parent.contextMenuY = mouseY;
+                        parent.contextMenuX = scaledMouseX;
+                        parent.contextMenuY = scaledMouseY;
                         return;
                     }
                 }
@@ -244,19 +257,22 @@ public class MapView implements IPageRenderer {
         } else if (button == 0) {
             boolean isOverAnyButton = false;
             for(GuiButton b : diplomacyButtons) {
-                if(isMouseOverButton(b, mouseX, mouseY)) {
+                if(isMouseOverButton(b, scaledMouseX, scaledMouseY)) {
                     isOverAnyButton = true;
                     break;
                 }
             }
-            if (parent.contextMenuObject != null && !isClickInContextMenu(mouseX, mouseY) && !isOverAnyButton) {
+
+            if (parent.contextMenuObject != null && !isClickInContextMenu(scaledMouseX, scaledMouseY) && !isOverAnyButton) {
                 parent.contextMenuObject = null;
                 return;
             }
 
-            this.isMapDragging = true;
-            this.mapDragMouseDownX = scaledMouseX;
-            this.mapDragMouseDownY = scaledMouseY;
+            if (parent.contextMenuObject == null) {
+                this.isMapDragging = true;
+                this.mapDragMouseDownX = scaledMouseX;
+                this.mapDragMouseDownY = scaledMouseY;
+            }
         }
     }
 
@@ -304,8 +320,7 @@ public class MapView implements IPageRenderer {
                 UtilO.drawCircle2(structX, structY, structRadius, color);
 
                 Faction ownerFactionData = PacketInfoFactions.getFactions().get(slot.ownerFactionID);
-                if (ownerFactionData != null && slot.id.equals(ownerFactionData.getMainFortressId())) {
-                    UtilO.drawCircle2(structX, structY, structRadius + 2, new Color(255, 215, 0, 150).getRGB());
+                if (ownerFactionData != null && slot.id != null && slot.id.equals(ownerFactionData.getMainFortressId())) {
                 }
             }
         }
@@ -314,20 +329,22 @@ public class MapView implements IPageRenderer {
     private boolean isClickOnTransformedCircle(float[] transformedMouse, float circleX, float circleY, float radius) {
         float dx = transformedMouse[0] - circleX;
         float dy = transformedMouse[1] - circleY;
-        return dx * dx + dy * dy < (radius * 2) * (radius * 2);
+        return dx * dx + dy * dy < radius * radius;
     }
 
-    private boolean isClickInContextMenu(int mouseX, int mouseY) {
+    private boolean isClickInContextMenu(int scaledMouseX, int scaledMouseY) {
         if (parent.contextMenuObject == null) return false;
+
         int x = parent.contextMenuX;
         int y = parent.contextMenuY;
         int menuWidth = 110;
         int menuHeight = 110;
 
-        if (x + menuWidth > parent.getGuiLeft() + parent.getXSize()) x -= menuWidth;
-        if (y + menuHeight > parent.getGuiTop() + parent.getYSize()) y -= menuHeight;
+        if (x + menuWidth > parent.getBaseWidth()) x -= menuWidth;
+        if (y + menuHeight > parent.getBaseHeight()) y -= menuHeight;
 
-        return mouseX >= x && mouseX < x + menuWidth && mouseY >= y && mouseY < y + menuHeight;
+        return scaledMouseX >= x && scaledMouseX < x + menuWidth &&
+                scaledMouseY >= y && scaledMouseY < y + menuHeight;
     }
 
     @Override
@@ -360,7 +377,9 @@ public class MapView implements IPageRenderer {
     @Override public void keyTyped(char c, int key) {}
     @Override public void onGuiClosed() {}
     @Override public boolean isTextFieldFocused() { return false; }
-    @Override public void handleMouseInput() {
+
+    @Override
+    public void handleMouseInput() {
         int wheel = Mouse.getEventDWheel();
         if (wheel != 0) {
             float newZoom = this.zoomPower + (float)wheel / 120.0F * 0.5F;

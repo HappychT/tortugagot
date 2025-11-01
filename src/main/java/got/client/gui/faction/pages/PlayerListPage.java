@@ -56,7 +56,7 @@ public class PlayerListPage implements IPageRenderer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
-        parent.drawCenteredString("Список Участников", parent.getBaseWidth() / 2, 15, 0xFFFFFF);
+        parent.drawCenteredString("Список Участников", parent.getBaseWidth() / 2, 15, 0xFFFFFFFF);
 
         Faction factionData = parent.getFactionData();
         boolean isLeader = parent.isPlayerLeader();
@@ -107,7 +107,7 @@ public class PlayerListPage implements IPageRenderer {
             if (parent.isHover(listX, currentY, listWidth, 20, scaledMouseX, scaledMouseY)) {
                 Gui.drawRect(listX, currentY, listX + listWidth, currentY + 20, 0x50FFFFFF);
             }
-            parent.drawString(entry.getKey() + " (" + entry.getValue().getTitle() + ")", listX + 5, currentY + 6, 0xFFFFFF);
+            parent.drawString(entry.getKey() + " (" + entry.getValue().getTitle() + ")", listX + 5, currentY + 6, 0xFFFFFFFF);
             parent.getFontRenderer().drawString("Вступил: " + parent.getDateFormat().format(new Date(entry.getValue().getJoinDate())), listX + listWidth - 120, currentY + 6, 0xAAAAAA);
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -192,12 +192,12 @@ public class PlayerListPage implements IPageRenderer {
                 int index = (scaledMouseY - listY + scrollOffset) / 20;
                 if (index >= 0 && index < sortedPlayers.size()) {
                     parent.contextMenuObject = sortedPlayers.get(index).getKey();
-                    parent.contextMenuX = mouseX;
-                    parent.contextMenuY = mouseY;
+                    parent.contextMenuX = scaledMouseX;
+                    parent.contextMenuY = scaledMouseY;
                 }
             }
         } else if (button == 0) {
-            if (parent.contextMenuObject != null && !isMouseOverButton(buttonPlayerKick, mouseX, mouseY) && !isMouseOverButton(buttonPlayerSetTitle, mouseX, mouseY)) {
+            if (parent.contextMenuObject != null && !isMouseOverButton(buttonPlayerKick, scaledMouseX, scaledMouseY) && !isMouseOverButton(buttonPlayerSetTitle, scaledMouseX, scaledMouseY)) {
                 parent.contextMenuObject = null;
             }
         }
