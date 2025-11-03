@@ -22,6 +22,7 @@ public class GOTRenderLargeItem implements IItemRenderer {
 	static {
 		sizeFolders.put("large-2x", 2.0f);
 		sizeFolders.put("large-3x", 3.0f);
+		sizeFolders.put("large-4x", 4.0f);
 	}
 	public Item theItem;
 	public String folderName;

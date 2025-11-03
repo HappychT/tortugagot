@@ -1,54 +1,52 @@
 package got.client.gui;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
+import got.client.gui.faction.GOTGuiFactions;
 import org.lwjgl.opengl.GL11;
-
-import got.client.GOTClientProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
 public class GOTGuiButtonPledge extends GuiButton {
-	public GOTGuiFactions parentGUI;
+	private final GOTGuiFactions parentGUI;
+	private List<String> displayLines;
 	public boolean isBroken;
-	public List<String> displayLines;
 
-	public GOTGuiButtonPledge(GOTGuiFactions gui, int i, int x, int y, String s) {
-		super(i, x, y, 32, 32, s);
-		parentGUI = gui;
+	public GOTGuiButtonPledge(GOTGuiFactions gui, int id, int x, int y, String... text) {
+		super(id, x, y, 32, 32, "");
+		this.parentGUI = gui;
+		this.displayLines = Arrays.asList(text);
+	}
+
+	public void setDisplayLines(String... text) {
+		this.displayLines = Arrays.asList(text);
 	}
 
 	@Override
 	public void drawButton(Minecraft mc, int i, int j) {
-		if (visible) {
-			mc.getTextureManager().bindTexture(GOTClientProxy.alignmentTexture);
-			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			field_146123_n = i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
-			int state = getHoverState(field_146123_n);
-			drawTexturedModalRect(xPosition, yPosition, 0 + state * width, 180, width, height);
-			mouseDragged(mc, i, j);
-			if (func_146115_a() && displayLines != null) {
-				float z = zLevel;
-				parentGUI.drawButtonHoveringText(displayLines, i, j);
-				GL11.glDisable(2896);
-				GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-				zLevel = z;
+		if (this.visible) {
+			mc.getTextureManager().bindTexture(GOTGuiFactions.factionsTexture);
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			this.field_146123_n = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width && j < this.yPosition + this.height;
+			int k = this.getHoverState(this.field_146123_n);
+
+			int u = 0;
+			int v = 192;
+			if (this.isBroken) {
+				u += this.width;
+			}
+			if (!this.enabled) {
+				v += this.height;
+			} else if (this.field_146123_n) {
+				v += this.height * 2;
+			}
+
+			this.drawTexturedModalRect(this.xPosition, this.yPosition, u, v, this.width, this.height);
+
+			if (this.field_146123_n) {
+				this.parentGUI.drawButtonHoveringText(this.displayLines, i, j);
 			}
 		}
-	}
-
-	@Override
-	public int getHoverState(boolean flag) {
-		if (isBroken) {
-			return flag ? 4 : 3;
-		}
-		if (!enabled) {
-			return 0;
-		}
-		return flag ? 2 : 1;
-	}
-
-	public void setDisplayLines(String... s) {
-		displayLines = s == null ? null : Arrays.asList(s);
 	}
 }

@@ -197,7 +197,9 @@ public class GOTTickHandlerClient {
 
         if(enchantments.contains(GOTEnchantment.valyrianSeal)) {
             if(itemstack.hasTagCompound()) {
-                tooltip.add(StatCollector.translateToLocal("got.sealChance.name") + " - " + String.valueOf(itemstack.getTagCompound().getDouble("sealChance") * 100.0) + "%");
+                double percentage = itemstack.getTagCompound().getDouble("sealChance") * 100.0;
+                String formattedPercentage = String.format("%.2f", percentage);
+                tooltip.add(StatCollector.translateToLocal("got.sealChance.name") + " - " + formattedPercentage + "%");
             }
         }
         if (itemstack.getItem() instanceof GOTSquadrons.SquadronItem) {
@@ -1510,18 +1512,14 @@ public class GOTTickHandlerClient {
         if (renderValue) {
             String alignS;
             float alignAlpha;
-            int numericalTick = ticker.numericalTick;
-            if (numericalTick > 0) {
-                alignS = GOTAlignmentValues.formatAlignForDisplay(alignment);
-                alignAlpha = GOTFunctions.triangleWave(numericalTick, 0.7F, 1.0F, 30.0F);
-                int fadeTick = 15;
-                if (numericalTick < fadeTick) {
-                    alignAlpha *= numericalTick / fadeTick;
-                }
-            } else {
-                alignS = rank.getShortNameWithGender(clientPD);
-                alignAlpha = 1.0F;
-            }
+
+            String rankName = rank.getShortNameWithGender(clientPD);
+            String numberValue = GOTAlignmentValues.formatAlignForDisplay(alignment);
+
+            alignS = rankName + " (" + numberValue + ")";
+
+            alignAlpha = 1.0F;
+
             GL11.glEnable(3042);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
             drawAlignmentText(fr, textX - fr.getStringWidth(alignS) / 2, textY + fr.FONT_HEIGHT + 3, alignS, alignAlpha);

@@ -3,6 +3,8 @@ package got.client.gui;
 import org.lwjgl.opengl.GL11;
 
 import got.client.GOTTextures;
+import got.client.gui.faction.GOTGuiFactions;
+import got.client.gui.utils.GuiApi;
 import got.common.world.map.GOTWaypoint;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.*;
@@ -25,17 +27,50 @@ public class GOTGuiRendererMap {
 	public void renderMap(GuiScreen gui, GOTGuiMap mapGui, float f, int x0, int y0, int x1, int y1) {
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		int oceanColor = GOTTextures.getMapOceanColor(sepia);
-		Gui.drawRect(x0, y0, x1, y1, oceanColor);
+
 		float zoom = (float) Math.pow(2.0, zoomExp);
 		float mapPosX = prevMapX + (mapX - prevMapX) * f;
 		float mapPosY = prevMapY + (mapY - prevMapY) * f;
+
+		int guiLeft = 0;
+		int guiTop = 0;
+		float scaleFactor = 1.0f;
+
+		if (gui instanceof GOTGuiFactions) {
+			GOTGuiFactions factionsGui = (GOTGuiFactions) gui;
+			guiLeft = factionsGui.getGuiLeft();
+			guiTop = factionsGui.getGuiTop();
+			scaleFactor = factionsGui.getScaleFactor();
+		} else if (gui instanceof GOTGuiMenuWBBase) {
+			GOTGuiMenuWBBase menuGui = (GOTGuiMenuWBBase) gui;
+			guiLeft = menuGui.guiLeft;
+			guiTop = menuGui.guiTop;
+		}
+
+		int scissorX = guiLeft + (int)(x0 * scaleFactor);
+		int scissorY = guiTop + (int)(y0 * scaleFactor);
+		int scissorW = (int)((x1 - x0) * scaleFactor);
+		int scissorH = (int)((y1 - y0) * scaleFactor);
+
+		GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		GuiApi.glScissor(scissorX, scissorY, scissorW, scissorH, true);
+
+		Gui.drawRect(x0, y0, x1, y1, oceanColor);
+
 		mapGui.setFakeMapProperties(mapPosX, mapPosY, zoom, zoomExp, zoomStable);
 		int[] statics = GOTGuiMap.setFakeStaticProperties(x1 - x0, y1 - y0, x0, x1, y0, y1);
 		mapGui.enableZoomOutWPFading = false;
+
 		mapGui.renderMapAndOverlay(sepia, 1.0f, true);
 		mapGui.renderRoads(false);
+
 		mapGui.renderWaypoints(GOTWaypoint.listAllWaypoints(), 0, 0, 0, false, true);
+
 		GOTGuiMap.setFakeStaticProperties(statics[0], statics[1], statics[2], statics[3], statics[4], statics[5]);
+
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		GL11.glPopAttrib();
 	}
 
 	public void renderVignette(GuiScreen gui, double zLevel) {
