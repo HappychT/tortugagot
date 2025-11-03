@@ -1,9 +1,8 @@
 package got.common.item.other;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTRegistry;
+import got.common.handlers.BandageCooldownHandler;
 import got.common.systems.AccessorySystem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting; // <-- ДОБАВИТЬ ИМПОРТ
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -21,11 +21,12 @@ import java.util.List;
 
 public class GOTItemBandage extends Item {
     private final float healAmount;
+    public static final String HEALING_TARGET_ID_NBT = "healingTargetID";
 
     public GOTItemBandage(float healAmount) {
         this.healAmount = healAmount;
         this.setMaxStackSize(1);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
     public float getHealAmount() {
         return this.healAmount;
@@ -34,22 +35,39 @@ public class GOTItemBandage extends Item {
     public EnumAction getItemUseAction(ItemStack stack) {
         return EnumAction.bow;
     }
+
+    private int getUseDuration(EntityPlayer player) {
+        if (player.inventory.hasItem(GOTRegistry.gauzeSet)) {
+            return 60;
+        }
+        return 100;
+    }
+
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
+
         return 100;
     }
 
     @Override
     public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer player) {
+        long cooldown = BandageCooldownHandler.getCooldown(player);
+        if (cooldown > 0) {
+            if (!world.isRemote) {
+                player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Бинты можно использовать снова через " + cooldown + " сек."));
+            }
+            return itemStack;
+        }
+
         Entity target = getEntityPlayerLookingAt(player, 3.5D);
 
         if (target instanceof EntityPlayer && target != player) {
             if (itemStack.stackTagCompound == null) {
                 itemStack.setTagCompound(new NBTTagCompound());
             }
-            itemStack.stackTagCompound.setInteger("healingTargetID", target.getEntityId());
+            itemStack.stackTagCompound.setInteger(HEALING_TARGET_ID_NBT, target.getEntityId());
 
-            player.setItemInUse(itemStack, this.getMaxItemUseDuration(itemStack));
+            player.setItemInUse(itemStack, this.getUseDuration(player));
         } else {
             if (!world.isRemote) {
                 player.addChatMessage(new ChatComponentText("Цель не найдена или слишком далеко."));
@@ -57,15 +75,16 @@ public class GOTItemBandage extends Item {
         }
         return itemStack;
     }
+
     @Override
     public void onUsingTick(ItemStack stack, EntityPlayer player, int count) {
         World world = player.worldObj;
         if (!world.isRemote) {
-            if (stack.stackTagCompound == null || !stack.stackTagCompound.hasKey("healingTargetID")) {
+            if (stack.stackTagCompound == null || !stack.stackTagCompound.hasKey(HEALING_TARGET_ID_NBT)) {
                 player.stopUsingItem();
                 return;
             }
-            int targetID = stack.stackTagCompound.getInteger("healingTargetID");
+            int targetID = stack.stackTagCompound.getInteger(HEALING_TARGET_ID_NBT);
             Entity target = world.getEntityByID(targetID);
 
             if (target == null || !(target instanceof EntityPlayer) || player.getDistanceToEntity(target) > 4.0D) {
@@ -76,8 +95,8 @@ public class GOTItemBandage extends Item {
     @Override
     public ItemStack onEaten(ItemStack stack, World world, EntityPlayer player) {
         if (!world.isRemote) {
-            if (stack.stackTagCompound != null && stack.stackTagCompound.hasKey("healingTargetID")) {
-                int targetID = stack.stackTagCompound.getInteger("healingTargetID");
+            if (stack.stackTagCompound != null && stack.stackTagCompound.hasKey(HEALING_TARGET_ID_NBT)) {
+                int targetID = stack.stackTagCompound.getInteger(HEALING_TARGET_ID_NBT);
                 Entity target = world.getEntityByID(targetID);
 
                 if (target instanceof EntityPlayer) {
@@ -91,15 +110,20 @@ public class GOTItemBandage extends Item {
 
                     targetPlayer.heal(finalHealAmount);
 
-                    player.addChatMessage(new ChatComponentText("You successfully healed " + targetPlayer.getDisplayName() + "."));
-                    targetPlayer.addChatMessage(new ChatComponentText("You have been healed!"));
+                    BandageCooldownHandler.setCooldown(player, 35);
+
+                    player.addChatMessage(new ChatComponentText("Вы вылечили " + targetPlayer.getDisplayName() + "."));
+                    targetPlayer.addChatMessage(new ChatComponentText("Вас вылечили!"));
                     world.playSoundAtEntity(targetPlayer, "random.orb", 1.0F, 1.0F);
                 }
             }
         }
         if (stack.stackTagCompound != null) {
-            stack.stackTagCompound.removeTag("healingTargetID");
+            stack.stackTagCompound.removeTag(HEALING_TARGET_ID_NBT);
         }
+
+        stack.stackSize--;
+
         return stack;
     }
 
@@ -107,12 +131,10 @@ public class GOTItemBandage extends Item {
     @Override
     public void onPlayerStoppedUsing(ItemStack stack, World world, EntityPlayer player, int itemInUseCount) {
         if (stack.stackTagCompound != null) {
-            stack.stackTagCompound.removeTag("healingTargetID");
-        }
-        if (!world.isRemote) {
-            player.addChatMessage(new ChatComponentText("Применение бинта прервано."));
+            stack.stackTagCompound.removeTag(HEALING_TARGET_ID_NBT);
         }
     }
+
     private Entity getEntityPlayerLookingAt(EntityPlayer player, double range) {
         Vec3 look = player.getLookVec();
         Vec3 start = Vec3.createVectorHelper(player.posX, player.posY + player.getEyeHeight(), player.posZ);

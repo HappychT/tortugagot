@@ -38,7 +38,7 @@ public class AccessoryEventHandler {
     }
 
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.START && !event.player.worldObj.isRemote) {
             EntityPlayer player = event.player;
@@ -64,7 +64,7 @@ public class AccessoryEventHandler {
                 }
             }
         }
-    }
+    *///}
     private boolean isPotionNegative(int potionId) {
         switch (potionId) {
             case 2:

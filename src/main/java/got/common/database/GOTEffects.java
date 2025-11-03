@@ -38,7 +38,7 @@ public class GOTEffects {
     public static void registerPotions() {
         killingPoison = new GOTPotionPoisonKilling();
 
-        combatLog = new GOTPotionCombatlog(idCounter);
+        combatLog = new GOTPotionCombatlog(idCounter, new ResourceLocation("got", "textures/potion/combatLog.png"));
         registerPotion(combatLog);
 
         bleeding = new GOTPotionBleeding(idCounter);
@@ -75,16 +75,16 @@ public class GOTEffects {
         freeze = new GOTPotionFreeze(idCounter);
         registerPotion(freeze);
 
-        rest = new GOTCustomPotion(idCounter, false, 8171463, new ResourceLocation("got", "textures/potions/rest.png"), "got.potion.rest");
+        rest = new GOTCustomPotion(idCounter, false, 8171463, new ResourceLocation("got", "textures/potion/rest.png"), "got.potion.rest");
         registerPotion(rest);
 
-        dexterity = new GOTCustomPotion(idCounter, false, 8171463, new ResourceLocation("got", "textures/potions/dexterity.png"), "got.potion.dexterity");
+        dexterity = new GOTCustomPotion(idCounter, false, 8171463, new ResourceLocation("got", "textures/potion/dexterity.png"), "got.potion.dexterity");
         registerPotion(dexterity);
 
-        secondBreath = new GOTCustomPotion(idCounter, false, 8171463, new ResourceLocation("got", "textures/potions/secondBreath.png"), "got.potion.secondBreath");
+        secondBreath = new GOTCustomPotion(idCounter, false, 8171463, new ResourceLocation("got", "textures/potion/secondBreath.png"), "got.potion.secondBreath");
         registerPotion(secondBreath);
 
-        exhaustion = new GOTCustomPotion(idCounter, true, 8171463, new ResourceLocation("got", "textures/potions/exhaustion.png"), "got.potion.exhaustion");
+        exhaustion = new GOTCustomPotion(idCounter, true, 8171463, new ResourceLocation("got", "textures/potion/exhaustion.png"), "got.potion.exhaustion");
         registerPotion(exhaustion);
 
         antiEffect = new GOTCustomPotion(idCounter, false, 4960121, "antiEffect");

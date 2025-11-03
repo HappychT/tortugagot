@@ -9,6 +9,7 @@ import brain.factions.structures.StructureData;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
+import got.common.block.factionblocks.BlockStructureHeart;
 import got.common.block.factionblocks.TileEntityStructureHeart;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 
 public class StructureManager {
 
@@ -79,6 +81,7 @@ public class StructureManager {
         }, config.resourceGenerationInterval * 1000L, config.resourceGenerationInterval * 1000L);
     }
 
+
     public static void handlePurchase(EntityPlayerMP player, String structureId, String purchaseType, String subType) {
         Faction playerFaction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
         FactionStructureSlot slot = FactionStructureManager.getStructureById(structureId);
@@ -130,19 +133,50 @@ public class StructureManager {
                 int xOffset = structureData.getWidth() / 2;
                 int zOffset = structureData.getDepth() / 2;
 
+                int oldHeartX = slot.xCoord;
+                int oldHeartY = slot.yCoord;
+                int oldHeartZ = slot.zCoord;
+
+                boolean newHeartPlaced = false;
+
                 for (BlockData blockData : structureData.getBlocks()) {
                     Block block = (Block) Block.blockRegistry.getObject(blockData.getId());
-                    if (block != null) {
-                        int blockX = slot.xCoord + blockData.getX() - xOffset;
-                        int blockY = slot.yCoord + blockData.getY() - 3;
-                        int blockZ = slot.zCoord + blockData.getZ() - zOffset;
+                    if (block == null) continue;
 
-                        if (blockX == slot.xCoord && blockY == slot.yCoord && blockZ == slot.zCoord) {
+                    int blockX = oldHeartX + blockData.getX() - xOffset;
+                    int blockY = oldHeartY + blockData.getY() - 3;
+                    int blockZ = oldHeartZ + blockData.getZ() - zOffset;
+
+                    if (blockX == oldHeartX && blockY == oldHeartY && blockZ == oldHeartZ) {
+                        continue;
+                    }
+
+                    if (block instanceof BlockStructureHeart) {
+                        if (newHeartPlaced) {
+                            CoreFaction.logger().log(Level.WARNING, "Структура " + fileName + " содержит более одного сердца! Лишний блок заменен на воздух.");
+                            world.setBlockToAir(blockX, blockY, blockZ);
                             continue;
                         }
 
                         world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
 
+                        slot.xCoord = blockX;
+                        slot.yCoord = blockY;
+                        slot.zCoord = blockZ;
+                        newHeartPlaced = true;
+
+                        TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
+                        if (te instanceof TileEntityStructureHeart) {
+                            ((TileEntityStructureHeart) te).setStructureId(structureId);
+                        }
+
+                        NBTTagCompound nbt = blockData.getNbt();
+                        if (nbt != null && te != null) {
+                            te.readFromNBT(nbt);
+                            te.markDirty();
+                        }
+                    } else {
+                        world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
                         NBTTagCompound nbt = blockData.getNbt();
                         if (nbt != null) {
                             TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
@@ -151,6 +185,17 @@ public class StructureManager {
                                 te.markDirty();
                             }
                         }
+                    }
+                }
+
+                if (newHeartPlaced) {
+                    world.setBlockToAir(oldHeartX, oldHeartY, oldHeartZ);
+                } else {
+                    TileEntity te = world.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
+                    if(te instanceof TileEntityStructureHeart){
+                        ((TileEntityStructureHeart)te).setStructureId(structureId);
+                    } else {
+                        CoreFaction.logger().log(Level.SEVERE, "Structure slot " + slot.id + " at " + slot.xCoord + "," + slot.yCoord + "," + slot.zCoord + " is NOT a TileEntityStructureHeart and no new heart was provided!");
                     }
                 }
 
@@ -170,10 +215,12 @@ public class StructureManager {
                     slot.provisions = 0;
                 }
 
+                /*
                 TileEntity te = world.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
                 if(te instanceof TileEntityStructureHeart){
                     ((TileEntityStructureHeart)te).setStructureId(structureId);
                 }
+                */
 
                 FactionStructureManager.setStructureOwner(slot.id, playerFaction.getID());
                 CoreFaction.saveFactions();

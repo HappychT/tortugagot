@@ -70,6 +70,13 @@ public class GOTItemMug extends Item {
 	@SideOnly(value = Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List list, boolean flag) {
+		if (GOTItemMug.getVessel(itemstack) == Vessel.MEISTER_BOTTLE) {
+			int charges = 8;
+			if (itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("DrinkCharges")) {
+				charges = itemstack.getTagCompound().getInteger("DrinkCharges");
+			}
+			list.add(StatCollector.translateToLocalFormatted("item.got.drink.charges", charges));
+		}
 		if (isBrewable) {
 			float strength = GOTItemMug.getStrength(itemstack);
 			list.add(GOTItemMug.getStrengthSubtitle(itemstack));
@@ -236,6 +243,27 @@ public class GOTItemMug extends Item {
 					continue;
 				}
 				entityplayer.removePotionEffect(potion.id);
+			}
+		}
+		if (vessel == Vessel.MEISTER_BOTTLE) {
+			NBTTagCompound nbt = itemstack.getTagCompound();
+			if (nbt == null) {
+				nbt = new NBTTagCompound();
+			}
+
+			int charges = 8;
+			if (nbt.hasKey("DrinkCharges")) {
+				charges = nbt.getInteger("DrinkCharges");
+			}
+
+			charges--;
+
+			if (charges <= 0) {
+				return !entityplayer.capabilities.isCreativeMode ? new ItemStack(vessel.getEmptyVesselItem()) : itemstack;
+			} else {
+				nbt.setInteger("DrinkCharges", charges);
+				itemstack.setTagCompound(nbt);
+				return itemstack;
 			}
 		}
 		return !entityplayer.capabilities.isCreativeMode ? new ItemStack(vessel.getEmptyVesselItem()) : itemstack;
@@ -430,6 +458,9 @@ public class GOTItemMug extends Item {
 			if (item == Items.glass_bottle) {
 				return true;
 			}
+			if (item == GOTRegistry.meisterBottleC) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -493,7 +524,7 @@ public class GOTItemMug extends Item {
 	}
 
 	public enum Vessel {
-		MUG(0, "mug", true, 0), MUG_CLAY(1, "clay", true, 1), GOBLET_GOLD(2, "goblet_gold", true, 10), GOBLET_SILVER(3, "goblet_silver", true, 8), GOBLET_COPPER(4, "goblet_copper", true, 5), GOBLET_WOOD(5, "goblet_wood", true, 0), SKULL(6, "skull", true, 3), GLASS(7, "glass", true, 3), BOTTLE(8, "bottle", true, 2), SKIN(9, "skin", false, 0), HORN(10, "horn", true, 5), HORN_GOLD(11, "horn_gold", true, 8);
+		MUG(0, "mug", true, 0), MUG_CLAY(1, "clay", true, 1), GOBLET_GOLD(2, "goblet_gold", true, 10), GOBLET_SILVER(3, "goblet_silver", true, 8), GOBLET_COPPER(4, "goblet_copper", true, 5), GOBLET_WOOD(5, "goblet_wood", true, 0), SKULL(6, "skull", true, 3), GLASS(7, "glass", true, 3), BOTTLE(8, "bottle", true, 2), SKIN(9, "skin", false, 0), HORN(10, "horn", true, 5), HORN_GOLD(11, "horn_gold", true, 8), MEISTER_BOTTLE(12, "meister_bottle", false, 0);;
 
 		public String name;
 		public int id;
@@ -587,6 +618,9 @@ public class GOTItemMug extends Item {
 			}
 			if (this == HORN_GOLD) {
 				return GOTRegistry.aleHornGold;
+			}
+			if (this == MEISTER_BOTTLE) {
+				return GOTRegistry.meisterBottleC;
 			}
 			return GOTRegistry.mug;
 		}

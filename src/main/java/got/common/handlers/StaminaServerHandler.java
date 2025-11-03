@@ -47,9 +47,7 @@ public class StaminaServerHandler {
         EntityPlayer player = event.player;
         if (player.worldObj.isRemote)
             return;
-        if (player.isPotionActive(GOTEffects.staminaLock)) {
-            return;
-        }
+
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
 
 
@@ -212,6 +210,9 @@ public class StaminaServerHandler {
     }
 
     public static void regainStamina(int amount, EntityPlayer player) {
+        if (player.isPotionActive(GOTEffects.staminaLock)) {
+            return;
+        }
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
         extendedPlayer.setStamina(Math.min(MAX_STAMINA, extendedPlayer.getStamina() + amount));
         PacketDispatcher.sendTo(new PacketSendStamina(extendedPlayer.getStamina()), (EntityPlayerMP) player);

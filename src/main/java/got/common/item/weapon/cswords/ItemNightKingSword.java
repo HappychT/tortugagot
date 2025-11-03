@@ -20,14 +20,7 @@ public class ItemNightKingSword extends GOTItemGreatsword {
         setCreativeTab(GOTCreativeTabs.tabCombat);
     }
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        stack.damageItem(1, attacker);
 
-        target.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 100, 0));
-
-        return true;
-    }
 
     @Override
     @SideOnly(Side.CLIENT)

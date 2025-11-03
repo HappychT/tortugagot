@@ -1415,25 +1415,60 @@ public class GOTEventHandler implements IFuelHandler {
         }
     }
 
-    @SubscribeEvent
-    public void onPlayerLogout(cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onCombatLogout(cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent event) {
         EntityPlayer player = event.player;
-        if (player.isPotionActive(GOTEffects.combatLog.id)) {
-            //            IInventory inventory = player.inventory;
 
-            //            for (int i = 0; i < inventory.getSizeInventory(); i++) {
-            //                ItemStack stack = inventory.getStackInSlot(i);
-            //
-            //                if (stack != null && stack.getItem() != null) {
-            //                    player.entityDropItem(stack, 0.0f);
-            //                    inventory.setInventorySlotContents(i, null);
-            //                }
-            //            }
+        if (player.isPotionActive(GOTEffects.combatLog.id)) {
+
+            List<ItemStack> mainToSave = new ArrayList<>();
+            List<Integer> mainSlots = new ArrayList<>();
+            List<ItemStack> armorToSave = new ArrayList<>();
+            List<Integer> armorSlots = new ArrayList<>();
+
+            for (int i = 0; i < player.inventory.mainInventory.length; ++i) {
+                ItemStack itemstack = player.inventory.mainInventory[i];
+                if (itemstack != null) {
+                    boolean isSoulBound = (itemstack.getItem() == GOTRegistry.wargCloak) ||
+                            (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.valyrianSeal));
+
+                    if (isSoulBound) {
+                        mainToSave.add(itemstack);
+                        mainSlots.add(i);
+                        player.inventory.mainInventory[i] = null;
+                    }
+                }
+            }
+
+            for (int i = 0; i < player.inventory.armorInventory.length; ++i) {
+                ItemStack itemstack = player.inventory.armorInventory[i];
+                if (itemstack != null) {
+                    boolean isSoulBound = (itemstack.getItem() == GOTRegistry.wargCloak) ||
+                            (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.valyrianSeal));
+
+                    if (isSoulBound) {
+                        armorToSave.add(itemstack);
+                        armorSlots.add(i);
+                        player.inventory.armorInventory[i] = null;
+                    }
+                }
+            }
+
             player.inventory.dropAllItems();
+
+            for (int i = 0; i < mainToSave.size(); ++i) {
+                player.inventory.setInventorySlotContents(mainSlots.get(i), mainToSave.get(i));
+            }
+            for (int i = 0; i < armorToSave.size(); ++i) {
+                player.inventory.setInventorySlotContents(armorSlots.get(i), armorToSave.get(i));
+            }
+
+            if (GOTSoulBoundEvents.instance != null) {
+                GOTSoulBoundEvents.instance.manuallyTriggerSave(player);
+            }
+
             player.setHealth(0);
         }
-        //event.player.setHealth(0);
-        //PotionEffect effect = player.getActivePotionEffect(this);
     }
 
     @SubscribeEvent

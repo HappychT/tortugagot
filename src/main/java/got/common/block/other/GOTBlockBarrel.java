@@ -5,6 +5,7 @@ import java.util.Random;
 import cpw.mods.fml.relauncher.*;
 import got.GOT;
 import got.common.database.GOTCreativeTabs;
+import got.common.database.GOTRegistry;
 import got.common.item.other.*;
 import got.common.recipe.GOTRecipeBrewing;
 import got.common.tileentity.GOTTileEntityBarrel;
@@ -13,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.*;
+import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -103,22 +105,63 @@ public class GOTBlockBarrel extends BlockContainer {
 		ItemStack barrelDrink = barrel.getBrewedDrink();
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		item = itemstack == null ? null : itemstack.getItem();
+
 		if (side == world.getBlockMetadata(i, j, k)) {
 			if (barrelDrink != null && GOTItemMug.isItemEmptyDrink(itemstack)) {
 				ItemStack playerDrink = barrelDrink.copy();
 				playerDrink.stackSize = 1;
-				GOTItemMug.Vessel v = GOTItemMug.getVessel(itemstack);
-				GOTItemMug.setVessel(playerDrink, v, true);
-				--itemstack.stackSize;
-				if (itemstack.stackSize <= 0) {
-					entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, playerDrink);
-				} else if (!entityplayer.inventory.addItemStackToInventory(playerDrink)) {
-					entityplayer.dropPlayerItemWithRandomChoice(playerDrink, false);
+
+
+				GOTItemMug.Vessel v = null;
+				if (item instanceof GOTItemMug) {
+					v = ((GOTItemMug)item).getEmptyVesselType();
+				} else if (item == Items.glass_bottle) {
+					v = GOTItemMug.Vessel.BOTTLE;
+				} else if (item == GOTRegistry.meisterBottleC) {
+					v = GOTItemMug.Vessel.MEISTER_BOTTLE;
 				}
-				barrel.consumeMugRefill();
+
+				if (v == null) {
+					v = GOTItemMug.Vessel.MUG;
+				}
+
+				GOTItemMug.setVessel(playerDrink, v, true);
+
+				if (v == GOTItemMug.Vessel.MEISTER_BOTTLE) {
+
+					if (barrel.inventory[9].stackSize < 6) {
+						return true;
+					}
+
+					net.minecraft.nbt.NBTTagCompound nbt = new net.minecraft.nbt.NBTTagCompound();
+					nbt.setInteger("DrinkCharges", 8);
+					playerDrink.setTagCompound(nbt);
+
+					--itemstack.stackSize;
+					if (itemstack.stackSize <= 0) {
+						entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, playerDrink);
+					} else if (!entityplayer.inventory.addItemStackToInventory(playerDrink)) {
+						entityplayer.dropPlayerItemWithRandomChoice(playerDrink, false);
+					}
+
+					barrel.consumeMugRefill(6);
+
+				} else {
+
+					--itemstack.stackSize;
+					if (itemstack.stackSize <= 0) {
+						entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, playerDrink);
+					} else if (!entityplayer.inventory.addItemStackToInventory(playerDrink)) {
+						entityplayer.dropPlayerItemWithRandomChoice(playerDrink, false);
+					}
+
+					barrel.consumeMugRefill(1);
+				}
+
 				world.playSoundEffect(i + 0.5, j + 0.5, k + 0.5, "got:item.mug_fill", 0.5f, 0.8f + world.rand.nextFloat() * 0.4f);
 				return true;
 			}
+
 			if (itemstack != null && item instanceof GOTItemMug && ((GOTItemMug) item).isBrewable) {
 				boolean match = false;
 				if (barrel.barrelMode == 0) {
@@ -152,6 +195,7 @@ public class GOTBlockBarrel extends BlockContainer {
 				}
 			}
 		}
+
 		if (itemstack != null && item instanceof GOTItemBottlePoison && barrel.canPoisonBarrel()) {
 			if (!world.isRemote) {
 				barrel.poisonBarrel(entityplayer);
@@ -164,6 +208,7 @@ public class GOTBlockBarrel extends BlockContainer {
 			}
 			return true;
 		}
+
 		if (!world.isRemote) {
 			entityplayer.openGui(GOT.instance, 16, world, i, j, k);
 		}

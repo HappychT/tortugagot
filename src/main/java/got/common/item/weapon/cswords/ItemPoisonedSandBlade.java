@@ -20,14 +20,6 @@ public class ItemPoisonedSandBlade extends GOTItemPolearm {
         setCreativeTab(GOTCreativeTabs.tabCombat);
     }
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        stack.damageItem(1, attacker);
-
-        target.addPotionEffect(new PotionEffect(GOTEffects.neurotoxin.id, 60, 0));
-
-        return true;
-    }
 
     @Override
     @SideOnly(Side.CLIENT)

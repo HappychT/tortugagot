@@ -27,35 +27,6 @@ public class ItemStunningHammer extends GOTItemHammer {
     }
 
     @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        stack.damageItem(1, attacker);
-
-        if (!attacker.worldObj.isRemote && attacker instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) attacker;
-
-            NBTTagCompound nbt = stack.getTagCompound();
-            if (nbt == null) {
-                nbt = new NBTTagCompound();
-                stack.setTagCompound(nbt);
-            }
-
-            int count = nbt.getInteger(NBT_KEY);
-            count++;
-
-            if (count >= 3) {
-                target.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 60, 1));
-                count = 0;
-            }
-
-            nbt.setInteger(NBT_KEY, count);
-
-            GOTPacketHandler.networkWrapper.sendTo(new PacketSyncWeaponHitCount(this, count), player);
-        }
-
-        return true;
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean advanced) {
         super.addInformation(stack, player, list, advanced);

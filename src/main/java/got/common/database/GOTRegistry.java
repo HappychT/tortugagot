@@ -188,6 +188,7 @@ import got.common.item.tool.GOTItemHoe;
 import got.common.item.tool.GOTItemPickaxe;
 import got.common.item.tool.GOTItemShovel;
 import got.common.item.weapon.*;
+import got.common.item.weapon.cproj.ItemBoltHarpoon;
 import got.common.item.weapon.cswords.*;
 import got.common.itemreg.GOTItems;
 import got.common.tileentity.GOTTileEntitySignCarved;
@@ -868,6 +869,7 @@ public class GOTRegistry {
     public static Item aegonHelmet;
     public static Item aleHorn;
     public static Item aleHornGold;
+    public static Item meisterBottleC;
     public static Item alloySteelAxe;
     public static Item alloySteelDagger;
     public static Item alloySteelDaggerPoisoned;
@@ -2357,6 +2359,7 @@ public class GOTRegistry {
         aegonHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "aegon").setCreativeTab(GOTCreativeTabs.tabStory);
         aleHorn = new GOTItemVessel();
         aleHornGold = new GOTItemVessel();
+        meisterBottleC = new GOTItemVessel();
         alloySteelAxe = new GOTItemAxe(GOTMaterial.COBALT_TOOL);
         alloySteelDagger = new GOTItemDagger(GOTMaterial.COBALT_TOOL);
         alloySteelDaggerPoisoned = new GOTItemDagger(GOTMaterial.COBALT_TOOL, GOTItemSword.HitEffect.POISON);
@@ -3113,7 +3116,7 @@ public class GOTRegistry {
         buckshot = new GOTItemBuckshot(new double[] {4.0, 4.0, 4.0}, 5.0f, new PotionEffect[] {});
         valyrianSeal = new GOTItemEnchantment(GOTEnchantment.valyrianSeal).setCreativeTab(GOTCreativeTabs.tabCombat);
         siegeCrossbow = new GOTItemSiegeCrossbow();
-        boltHarpoon = new Item().setCreativeTab(GOTCreativeTabs.tabCombat);
+        boltHarpoon = new ItemBoltHarpoon().setCreativeTab(GOTCreativeTabs.tabCombat);
         boltHarpoonBase = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         giantClub = new GOTItemGiantClub();
         wargCloak = new GOTItemArmor(ArmorMaterial.CLOTH, 1).setCreativeTab(GOTCreativeTabs.tabCombat);
@@ -4297,6 +4300,7 @@ public class GOTRegistry {
         registerItem(waterskin, "waterskin");
         registerItem(aleHorn, "aleHorn");
         registerItem(aleHornGold, "aleHornGold");
+        registerItem(meisterBottleC, "meisterBottleC");
         registerItem(horn, "horn");
         registerItem(chisel, "chisel");
         registerItem(valyrianPowder, "valyrianPowder");

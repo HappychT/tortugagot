@@ -1,6 +1,7 @@
 package got.client.handlers;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import got.common.database.GOTEffects;
 import got.common.handlers.StaminaServerHandler;
 import got.rome.ExtendedPlayer;
 import net.minecraft.client.Minecraft;
@@ -55,12 +56,13 @@ public class GOTInterfaceHandler {
 
         mc.getTextureManager().bindTexture(new ResourceLocation("got:textures/hud/stamina_bar.png"));
         drawTextureCustomSize(newPosX, newPosY, 0, 0, 100, 7, 100, 7);
-        
+
         float currentStamina = ExtendedPlayer.get(player).getStamina();
 //      interpolatedStamina += (currentStamina - interpolatedStamina) * 0.1f; // Adjust the 0.1f value for smoother or faster interpolation
         mc.getTextureManager().bindTexture(new ResourceLocation("got:textures/hud/stamina.png"));
-        drawTextureCustomSize(staminaPosX, staminaPosY, 0, 0, ((currentStamina) * 89.5d) / StaminaServerHandler.MAX_STAMINA, 2.4f, 89.5f, 2.4f); // put interpolatedStamina instead of currentStamina to return lerp(smooth transition animation)
-
+        if (!player.isPotionActive(GOTEffects.staminaLock)) {
+            drawTextureCustomSize(staminaPosX, staminaPosY, 0, 0, ((currentStamina) * 89.5d) / StaminaServerHandler.MAX_STAMINA, 2.4f, 89.5f, 2.4f); // put interpolatedStamina instead of currentStamina to return lerp(smooth transition animation)
+        }
         float cooldownPosX = (aX - 260 + disposX) / scaleFactor;
         float cooldownPosY = (aY - 99.2F + disposY) / scaleFactor;
         int secondBreathCooldown = ExtendedPlayer.get(player).getSecondBreathCooldown();

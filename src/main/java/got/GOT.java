@@ -200,7 +200,9 @@ public class GOT {
     public void load(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new AccessoryEventHandler());
         FMLCommonHandler.instance().bus().register(new AccessoryEventHandler());
-        MinecraftForge.EVENT_BUS.register(new GOTSoulBoundEvents());
+        GOTSoulBoundEvents soulBoundHandler = new GOTSoulBoundEvents();
+        FMLCommonHandler.instance().bus().register(soulBoundHandler);
+        MinecraftForge.EVENT_BUS.register(soulBoundHandler);
         MinecraftForge.EVENT_BUS.register(AttackHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(StaminaServerHandler.INSTANCE);
         FMLCommonHandler.instance().bus().register(StaminaServerHandler.INSTANCE);

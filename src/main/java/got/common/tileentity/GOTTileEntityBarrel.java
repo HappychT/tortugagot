@@ -60,8 +60,14 @@ public class GOTTileEntityBarrel extends TileEntity implements ISidedInventory {
 	}
 
 	public void consumeMugRefill() {
+		consumeMugRefill(1);
+	}
+
+	public void consumeMugRefill(int amount) {
 		if (barrelMode == 2 && inventory[9] != null) {
-			--inventory[9].stackSize;
+
+			inventory[9].stackSize -= amount;
+
 			if (inventory[9].stackSize <= 0) {
 				inventory[9] = null;
 				barrelMode = 0;

@@ -28,33 +28,7 @@ public class ItemDecoyClaymore extends GOTItemGreatsword {
         setWeaponDamage(9.0F);
     }
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        stack.damageItem(1, attacker);
 
-        if (!attacker.worldObj.isRemote && attacker instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) attacker;
-
-            NBTTagCompound nbt = stack.getTagCompound();
-            if (nbt == null) {
-                nbt = new NBTTagCompound();
-                stack.setTagCompound(nbt);
-            }
-
-            int count = nbt.getInteger(NBT_KEY);
-            count++;
-
-            if (count >= 3) {
-                target.addPotionEffect(new PotionEffect(GOTEffects.staminaLock.id, 80, 0));
-                count = 0;
-            }
-
-            nbt.setInteger(NBT_KEY, count);
-            GOTPacketHandler.networkWrapper.sendTo(new PacketSyncWeaponHitCount(this, count), player);
-        }
-
-        return true;
-    }
 
     @Override
     @SideOnly(Side.CLIENT)

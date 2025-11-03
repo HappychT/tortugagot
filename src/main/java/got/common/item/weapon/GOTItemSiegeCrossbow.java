@@ -21,13 +21,21 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
 
     @Override
     public int getInvBoltSlot(EntityPlayer entityplayer) {
+
         for (int slot = 0; slot < entityplayer.inventory.mainInventory.length; ++slot) {
             ItemStack invItem = entityplayer.inventory.mainInventory[slot];
-            if (invItem == null || !(invItem.getItem() instanceof GOTItemCrossbowBolt)) {
-                continue;
+            if (invItem != null && invItem.getItem() == GOTRegistry.boltHarpoon) {
+                return slot;
             }
-            return slot;
         }
+
+        for (int slot = 0; slot < entityplayer.inventory.mainInventory.length; ++slot) {
+            ItemStack invItem = entityplayer.inventory.mainInventory[slot];
+            if (invItem != null && invItem.getItem() instanceof GOTItemCrossbowBolt) {
+                return slot;
+            }
+        }
+
         return -1;
     }
 
@@ -57,6 +65,11 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
                 ItemStack shotBolt = boltItem.copy();
                 shotBolt.stackSize = 1;
                 GOTEntityCrossbowBolt bolt = new GOTEntityCrossbowBolt(world, entityplayer, shotBolt, charge * 2.0f * GOTItemCrossbow.getCrossbowLaunchSpeedFactor(itemstack));
+
+                if (boltItem.getItem() == GOTRegistry.boltHarpoon) {
+                    bolt.isHarpoonBolt = true;
+                }
+
                 if (bolt.boltDamageFactor < 1.0) {
                     bolt.boltDamageFactor = 1.0;
                 }
@@ -93,7 +106,7 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
             }
             boolean shouldConsume = shouldConsumeBolt(itemstack, entityplayer);
             if (boltItem == null && !shouldConsume) {
-                boltItem = new ItemStack(GOTRegistry.crossbowBolt);
+                boltItem = new ItemStack(GOTRegistry.boltHarpoon);
             }
             if (boltItem != null) {
                 if (shouldConsume && boltSlot >= 0) {
@@ -117,27 +130,6 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
             world.playSoundAtEntity(entityplayer, "got:item.crossbowLoad", 1.0f, 1.5f + world.rand.nextFloat() * 0.2f);
         }
     }
-
-    /*@Override
-    public void setLoaded(ItemStack itemstack, ItemStack ammo) {
-        if (itemstack != null && itemstack.getItem() instanceof GOTItemCrossbow) {
-            NBTTagCompound nbt = itemstack.getTagCompound();
-            if (nbt == null) {
-                nbt = new NBTTagCompound();
-                itemstack.setTagCompound(nbt);
-            }
-            if (ammo != null) {
-                NBTTagCompound ammoData = new NBTTagCompound();
-                ammo.writeToNBT(ammoData);
-                nbt.setTag("GOTCrossbowAmmo", ammoData);
-            } else {
-                nbt.removeTag("GOTCrossbowAmmo");
-            }
-            if (nbt.hasKey("GOTCrossbowLoaded")) {
-                nbt.removeTag("GOTCrossbowLoaded");
-            }
-        }
-    }*/
 
     @Override
     public boolean shouldConsumeBolt(ItemStack itemstack, EntityPlayer entityplayer) {

@@ -44,6 +44,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovementInput;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
@@ -57,18 +58,6 @@ public class GOTTickHandlerServer {
         FMLCommonHandler.instance().bus().register(this);
     }
 
-    @SubscribeEvent
-    public void onLivingUpdate(LivingUpdateEvent event) {
-        EntityLivingBase living = event.entityLiving;
-        if(living instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer)living;
-            if(player.isPotionActive(GOTEffects.inversion))
-            {
-                //                player.moveForward = -player.moveForward;
-                //                player.moveStrafing  = -player.moveStrafing;
-            }
-        }
-    }
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {

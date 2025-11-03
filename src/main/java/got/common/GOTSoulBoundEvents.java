@@ -1,15 +1,17 @@
 package got.common;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
+import got.common.database.GOTEffects;
 import got.common.database.GOTRegistry;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
@@ -17,13 +19,27 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 public class GOTSoulBoundEvents {
-    private Map<String, ItemStack[]> itemsToRestore = new HashMap<String, ItemStack[]>();
+
+    private Map<String, ItemStack[]> itemsToRestore = new HashMap<>();
+    private Map<String, ItemStack[]> fullInventoryCache = new HashMap<>();
+    private Set<String> skipPenalty = new HashSet<>();
+
+    public static GOTSoulBoundEvents instance;
+
     private static final double killBoostForSeal = 0.0001;
+    private static final String SAVE_DIR = "GOT_SoulBound";
+
+    public GOTSoulBoundEvents() {
+        instance = this;
+    }
 
     @SubscribeEvent
     public void killOther(LivingDeathEvent event) {
@@ -40,7 +56,13 @@ public class GOTSoulBoundEvents {
                             if (mainItem != null && GOTEnchantmentHelper.hasEnchant(mainItem, GOTEnchantment.valyrianSeal)) {
                                 if(mainItem.hasTagCompound()) {
                                     double chance = mainItem.getTagCompound().getDouble("sealChance");
-                                    mainItem.getTagCompound().setDouble("sealChance", chance == 1.0 ? 1.0 : (chance += killBoostForSeal));
+                                    if (chance < 1.0) {
+                                        chance += killBoostForSeal;
+                                        if (chance > 1.0) {
+                                            chance = 1.0;
+                                        }
+                                    }
+                                    mainItem.getTagCompound().setDouble("sealChance", chance);
                                 }
                             }
                         }
@@ -49,7 +71,13 @@ public class GOTSoulBoundEvents {
                             if (armorItem != null && GOTEnchantmentHelper.hasEnchant(armorItem, GOTEnchantment.valyrianSeal)) {
                                 if(armorItem.hasTagCompound()) {
                                     double chance = armorItem.getTagCompound().getDouble("sealChance");
-                                    armorItem.getTagCompound().setDouble("sealChance", chance == 1.0 ? 1.0 : (chance += killBoostForSeal));
+                                    if (chance < 1.0) {
+                                        chance += killBoostForSeal;
+                                        if (chance > 1.0) {
+                                            chance = 1.0;
+                                        }
+                                    }
+                                    armorItem.getTagCompound().setDouble("sealChance", chance);
                                 }
                             }
                         }
@@ -59,27 +87,139 @@ public class GOTSoulBoundEvents {
         }
     }
 
-    @SubscribeEvent
+    private File getSaveDir(EntityPlayer player) {
+        File worldDir = player.worldObj.getSaveHandler().getWorldDirectory();
+        File saveDir = new File(worldDir, SAVE_DIR);
+        if (!saveDir.exists()) {
+            saveDir.mkdirs();
+        }
+        return saveDir;
+    }
+
+    private File getPlayerSaveFile(EntityPlayer player) {
+        return new File(getSaveDir(player), player.getUniqueID().toString() + ".dat");
+    }
+
+    private void saveItemsToFile(EntityPlayer player, ItemStack[] items) {
+        File saveFile = getPlayerSaveFile(player);
+        try (FileOutputStream fos = new FileOutputStream(saveFile)) {
+            NBTTagCompound root = new NBTTagCompound();
+            NBTTagList itemList = new NBTTagList();
+
+            for (int i = 0; i < items.length; i++) {
+                if (items[i] != null) {
+                    NBTTagCompound itemTag = new NBTTagCompound();
+                    itemTag.setInteger("Slot", i);
+                    items[i].writeToNBT(itemTag);
+                    itemList.appendTag(itemTag);
+                }
+            }
+            root.setTag("Inventory", itemList);
+            root.setInteger("InvSize", items.length);
+            CompressedStreamTools.writeCompressed(root, fos);
+        } catch (Exception e) {
+            System.err.println("Ошибка сохранения SoulBound инвентаря для " + player.getDisplayName());
+            e.printStackTrace();
+        }
+    }
+
+    private ItemStack[] loadItemsFromFile(EntityPlayer player) {
+        File saveFile = getPlayerSaveFile(player);
+        if (!saveFile.exists()) {
+            return null;
+        }
+
+        try (FileInputStream fis = new FileInputStream(saveFile)) {
+            NBTTagCompound root = CompressedStreamTools.readCompressed(fis);
+            NBTTagList itemList = root.getTagList("Inventory", 10);
+            int invSize = root.getInteger("InvSize");
+
+            if (invSize == 0) invSize = player.inventory.mainInventory.length + player.inventory.armorInventory.length;
+
+            ItemStack[] items = new ItemStack[invSize];
+
+            for (int i = 0; i < itemList.tagCount(); i++) {
+                NBTTagCompound itemTag = itemList.getCompoundTagAt(i);
+                int slot = itemTag.getInteger("Slot");
+                if (slot >= 0 && slot < items.length) {
+                    items[slot] = ItemStack.loadItemStackFromNBT(itemTag);
+                }
+            }
+            return items;
+        } catch (Exception e) {
+            System.err.println("Ошибка загрузки SoulBound инвентаря для " + player.getDisplayName());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void deleteSaveFile(EntityPlayer player) {
+        File saveFile = getPlayerSaveFile(player);
+        if (saveFile.exists()) {
+            saveFile.delete();
+        }
+    }
+
+    public void manuallyTriggerSave(EntityPlayer player) {
+        String playerID = player.getUniqueID().toString();
+
+        ItemStack[] mainCopy = player.inventory.mainInventory;
+        ItemStack[] armorCopy = player.inventory.armorInventory;
+        ItemStack[] fullInventory = new ItemStack[mainCopy.length + armorCopy.length];
+        for (int i = 0; i < mainCopy.length; i++) {
+            if (mainCopy[i] != null) fullInventory[i + armorCopy.length] = mainCopy[i].copy();
+        }
+        for (int i = 0; i < armorCopy.length; i++) {
+            if (armorCopy[i] != null) fullInventory[i] = armorCopy[i].copy();
+        }
+
+        this.fullInventoryCache.put(playerID, fullInventory);
+
+        saveItemsToFile(player, fullInventory);
+    }
+
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void death(LivingDeathEvent event) {
-        if(!event.entityLiving.worldObj.isRemote) {
+        if (!event.entityLiving.worldObj.isRemote) {
             if (event.entityLiving instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer)event.entityLiving;
+                EntityPlayer player = (EntityPlayer) event.entityLiving;
+                String playerID = player.getUniqueID().toString();
+
+                if (!this.fullInventoryCache.containsKey(playerID)) {
+                    ItemStack[] mainCopy = player.inventory.mainInventory;
+                    ItemStack[] armorCopy = player.inventory.armorInventory;
+                    ItemStack[] fullInventory = new ItemStack[mainCopy.length + armorCopy.length];
+                    for (int i = 0; i < mainCopy.length; i++) {
+                        if (mainCopy[i] != null) {
+                            fullInventory[i + armorCopy.length] = mainCopy[i].copy();
+                        }
+                    }
+                    for (int i = 0; i < armorCopy.length; i++) {
+                        if (armorCopy[i] != null) {
+                            fullInventory[i] = armorCopy[i].copy();
+                        }
+                    }
+                    this.fullInventoryCache.put(playerID, fullInventory);
+                }
+
                 boolean restore = false;
                 ItemStack[] main = player.inventory.mainInventory;
                 ItemStack[] armor = player.inventory.armorInventory;
                 ItemStack[] itemsPerPlayer = new ItemStack[main.length + armor.length];
+
                 for (int mainIndex = 0; mainIndex < main.length; mainIndex++) {
                     ItemStack mainItem = main[mainIndex];
                     if (mainItem != null && mainItem.getItem() == GOTRegistry.wargCloak) {
                         itemsPerPlayer[mainIndex + armor.length] = mainItem;
+                        main[mainIndex] = null;
                         restore = true;
                     }
                     if (mainItem != null && GOTEnchantmentHelper.getEnchantList(mainItem).contains(GOTEnchantment.valyrianSeal)) {
-                        if(player.worldObj.rand.nextDouble() <= mainItem.getTagCompound().getDouble("sealChance")) {
+                        if(mainItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= mainItem.getTagCompound().getDouble("sealChance")) {
                             itemsPerPlayer[mainIndex + armor.length] = mainItem;
+                            main[mainIndex] = null;
                             restore = true;
-                            double chance = mainItem.getTagCompound().getDouble("sealChance");
-                            mainItem.getTagCompound().setDouble("sealChance", chance -= 0.1);
                         }
                     }
                 }
@@ -87,47 +227,90 @@ public class GOTSoulBoundEvents {
                     ItemStack armorItem = armor[armorIndex];
                     if (armorItem != null && armorItem.getItem() == GOTRegistry.wargCloak) {
                         itemsPerPlayer[armorIndex] = armorItem;
+                        armor[armorIndex] = null;
                         restore = true;
                     }
                     if (armorItem != null && GOTEnchantmentHelper.getEnchantList(armorItem).contains(GOTEnchantment.valyrianSeal)) {
-                        if(player.worldObj.rand.nextDouble() <= armorItem.getTagCompound().getDouble("sealChance")) {
+                        if(armorItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= armorItem.getTagCompound().getDouble("sealChance")) {
                             itemsPerPlayer[armorIndex] = armorItem;
+                            armor[armorIndex] = null;
                             restore = true;
-                            double chance = armorItem.getTagCompound().getDouble("sealChance");
-                            armorItem.getTagCompound().setDouble("sealChance", chance -= 0.1);
                         }
                     }
                 }
+
                 if (restore) {
-                    this.itemsToRestore.put(player.getUniqueID().toString(), itemsPerPlayer);
+                    this.itemsToRestore.put(playerID, itemsPerPlayer);
+                    saveItemsToFile(player, itemsPerPlayer);
+                } else {
+                    this.fullInventoryCache.remove(playerID);
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void drop(PlayerDropsEvent event) {
+        if (!event.entityPlayer.worldObj.isRemote) {
+            EntityPlayer player = event.entityPlayer;
+            String playerID = player.getUniqueID().toString();
+
+            if (this.fullInventoryCache.containsKey(playerID)) {
+                if (event.drops.isEmpty()) {
+                    ItemStack[] fullInventory = this.fullInventoryCache.get(playerID);
+                    this.itemsToRestore.put(playerID, fullInventory);
+                    this.skipPenalty.add(playerID);
+                    saveItemsToFile(player, fullInventory);
+                }
+                this.fullInventoryCache.remove(playerID);
             }
         }
     }
 
     @SubscribeEvent
     public void respawn(PlayerEvent.Clone event) {
-        if(!event.entityPlayer.worldObj.isRemote) {
+        if (!event.entityPlayer.worldObj.isRemote) {
             EntityPlayer player = event.entityPlayer;
-            if (event.wasDeath && this.itemsToRestore.containsKey(player.getUniqueID().toString())) {
-                ItemStack[] itemsPerPlayer = this.itemsToRestore.get(player.getUniqueID().toString());
-                System.arraycopy(itemsPerPlayer, player.inventory.armorInventory.length, player.inventory.mainInventory, 0, player.inventory.mainInventory.length);
-                System.arraycopy(itemsPerPlayer, 0, player.inventory.armorInventory, 0, player.inventory.armorInventory.length);
-                this.itemsToRestore.remove(player.getUniqueID().toString());
-            }
-        }
-    }
+            String playerID = player.getUniqueID().toString();
 
-    @SubscribeEvent
-    public void drop(PlayerDropsEvent event) {
-        if(!event.entityPlayer.worldObj.isRemote) {
-            EntityPlayer player = event.entityPlayer;
-            if (this.itemsToRestore.containsKey(player.getUniqueID().toString())) {
-                List<ItemStack> listPerPlayer = Arrays.asList(this.itemsToRestore.get(player.getUniqueID().toString()));
-                Stream<EntityItem> stream = StreamSupport.stream(event.drops.spliterator(), false);
-                Set<EntityItem> itemsToRemove = stream.filter(itemToFilter -> listPerPlayer.contains(itemToFilter.getEntityItem())).collect(Collectors.toSet());
-                event.drops.removeAll(itemsToRemove);
+            if (this.fullInventoryCache.containsKey(playerID)) {
+                this.fullInventoryCache.remove(playerID);
             }
+
+            boolean shouldSkipPenalty = this.skipPenalty.remove(playerID);
+
+            if (event.wasDeath) {
+                ItemStack[] itemsPerPlayer = null;
+
+                if (this.itemsToRestore.containsKey(playerID)) {
+                    itemsPerPlayer = this.itemsToRestore.remove(playerID);
+                }
+                else {
+                    itemsPerPlayer = loadItemsFromFile(player);
+                }
+
+                if (itemsPerPlayer != null) {
+
+                    if (!shouldSkipPenalty) {
+                        for (ItemStack item : itemsPerPlayer) {
+                            if (item != null && GOTEnchantmentHelper.getEnchantList(item).contains(GOTEnchantment.valyrianSeal)) {
+                                if (item.hasTagCompound() && item.getTagCompound().hasKey("sealChance")) {
+                                    double chance = item.getTagCompound().getDouble("sealChance");
+                                    chance = Math.max(0.0, chance - 0.1);
+                                    item.getTagCompound().setDouble("sealChance", chance);
+                                }
+                            }
+                        }
+                    }
+
+                    System.arraycopy(itemsPerPlayer, player.inventory.armorInventory.length, player.inventory.mainInventory, 0, player.inventory.mainInventory.length);
+                    System.arraycopy(itemsPerPlayer, 0, player.inventory.armorInventory, 0, player.inventory.armorInventory.length);
+
+                    deleteSaveFile(player);
+                }
+            }
+
+            this.skipPenalty.remove(playerID);
         }
     }
 }

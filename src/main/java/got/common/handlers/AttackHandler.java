@@ -94,8 +94,8 @@ public class AttackHandler {
         Item heldItemType = heldItem.getItem();
         EntityLivingBase target = event.entityLiving;
         if (heldItemType == GOTRegistry.decoyClaymore) {
-           event.ammount *= 1.5F;
-           player.onCriticalHit(target);
+            event.ammount *= 1.5F;
+            player.onCriticalHit(target);
         }
         else if (heldItemType == GOTRegistry.stunningHammer) {
             if (target.isPotionActive(Potion.moveSlowdown.id)) {
@@ -149,7 +149,7 @@ public class AttackHandler {
     @SubscribeEvent
     public void onLivingHeal(LivingHealEvent event) {
         if (event.entityLiving.isPotionActive(GOTEffects.neurotoxin)) {
-            event.amount *= 0.5F;
+            event.amount *= 0.4F;
         }
     }
     @SubscribeEvent
