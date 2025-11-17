@@ -4,6 +4,9 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import got.client.handlers.ClientEventHandler;
+import noname.weapons.entity.*;
+import noname.weapons.events.OverlayEventHandler;
+import noname.weapons.render.*;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.authlib.GameProfile;
@@ -567,6 +570,12 @@ public class GOTClientProxy extends GOTCommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(GOTTileEntitySignCarved.class, new GOTRenderSignCarved());
         ClientRegistry.bindTileEntitySpecialRenderer(GOTTileEntitySignCarvedValyrian.class, new GOTRenderSignCarvedValyrian());
         ClientRegistry.bindTileEntitySpecialRenderer(DecorationTileEntity.class, new DecorationRenderer());
+        RenderingRegistry.registerEntityRenderingHandler(EntityCatapult.class, new RenderCatapult());
+        RenderingRegistry.registerEntityRenderingHandler(EntityStoneProjectile.class, new RenderStoneProjectile());
+        RenderingRegistry.registerEntityRenderingHandler(EntityTribushet.class, new RenderTribushet());
+        RenderingRegistry.registerEntityRenderingHandler(EntityBatteringRam.class, new RenderBatteringRam());
+        RenderingRegistry.registerEntityRenderingHandler(EntityBalista.class, new RenderBalista());
+        RenderingRegistry.registerEntityRenderingHandler(EntityBalistaProjectile.class, new RenderBalistaProjectile());
 
         for(Decoration d : DecorationsRegister.getDecorations()) {
             bindItemRender(d.getItem(), new DecorationTileEntity(), new DecorationRenderer(d.getItem()));
@@ -580,6 +589,7 @@ public class GOTClientProxy extends GOTCommonProxy {
         MinecraftForge.EVENT_BUS.register(GOTBlockClientHandler.INSTANCE);
         FMLCommonHandler.instance().bus().register(GOTClientStaminaHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(GOTClientStaminaHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(new OverlayEventHandler());
         FMLCommonHandler.instance().bus().register(new GOTEntityElephant3DViewer());
         FMLCommonHandler.instance().bus().register(new GOTKeyHandler(GOTPacketHandler.networkWrapper));
 

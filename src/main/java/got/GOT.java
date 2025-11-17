@@ -161,7 +161,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.oredict.OreDictionary;
-
+import noname.weapons.EntityRegister;
+import noname.weapons.RegItem;
+import noname.weapons.config.WeaponsConfig;
+import noname.weapons.events.BlockDamageTickHandler;
 
 
 @Mod(modid = "got", dependencies = "required-after:geckolib3")
@@ -205,6 +208,7 @@ public class GOT {
         MinecraftForge.EVENT_BUS.register(soulBoundHandler);
         MinecraftForge.EVENT_BUS.register(AttackHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(StaminaServerHandler.INSTANCE);
+        FMLCommonHandler.instance().bus().register(new BlockDamageTickHandler());
         FMLCommonHandler.instance().bus().register(StaminaServerHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockServerHandler.INSTANCE);
         FMLCommonHandler.instance().bus().register(BlockServerHandler.INSTANCE);
@@ -565,6 +569,9 @@ public class GOT {
         packetHandler = new GOTPacketHandler();
         worldTypeGOT = new GOTWorldType("got");
         worldTypeGOTClassic = new GOTWorldType("gotClassic");
+        WeaponsConfig.loadConfig(event);
+        RegItem.regitem();
+        EntityRegister.registerEntities();
         GOTBlockReplacement.replaceVanillaBlock(Blocks.leaves, new GOTBlockLeavesVanilla1(), ItemLeaves.class);
         GOTBlockReplacement.replaceVanillaBlock(Blocks.leaves2, new GOTBlockLeavesVanilla2(), ItemLeaves.class);
         GOTBlockReplacement.replaceVanillaBlock(Blocks.fence, new GOTBlockFenceVanilla(), GOTItemFenceVanilla.class);
