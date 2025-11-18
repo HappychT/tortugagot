@@ -1696,7 +1696,10 @@ public class GOTRegistry {
     public static Item basketPlums;
     public static Item cratePomegranates;
     public static Item bundleFirewood;
-
+    public static Item apHelmet;
+    public static Item apChestplate;
+    public static Item apLeggins;
+    public static Item apBoots;
     public static void assignContent() {
         GOTEffects.registerPotions();
         planks1 = new GOTBlockPlanks1();

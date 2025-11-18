@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import brain.factions.arenas.ArenaManager;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
@@ -36,7 +37,7 @@ public class GOTSoulBoundEvents {
 
     private static final double killBoostForSeal = 0.0001;
     private static final String SAVE_DIR = "GOT_SoulBound";
-
+    private Set<String> processingLogout = new HashSet<>();
     public GOTSoulBoundEvents() {
         instance = this;
     }
@@ -183,9 +184,15 @@ public class GOTSoulBoundEvents {
     public void death(LivingDeathEvent event) {
         if (!event.entityLiving.worldObj.isRemote) {
             if (event.entityLiving instanceof EntityPlayer) {
+
                 EntityPlayer player = (EntityPlayer) event.entityLiving;
                 String playerID = player.getUniqueID().toString();
+                boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
 
+                if (isInSafeZone) {
+                    player.removePotionEffect(GOTEffects.combatLog.id);
+                    return;
+                }
                 if (!this.fullInventoryCache.containsKey(playerID)) {
                     ItemStack[] mainCopy = player.inventory.mainInventory;
                     ItemStack[] armorCopy = player.inventory.armorInventory;
@@ -254,7 +261,12 @@ public class GOTSoulBoundEvents {
         if (!event.entityPlayer.worldObj.isRemote) {
             EntityPlayer player = event.entityPlayer;
             String playerID = player.getUniqueID().toString();
+            boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
 
+            if (isInSafeZone) {
+                player.removePotionEffect(GOTEffects.combatLog.id);
+                return;
+            }
             if (this.fullInventoryCache.containsKey(playerID)) {
                 if (event.drops.isEmpty()) {
                     ItemStack[] fullInventory = this.fullInventoryCache.get(playerID);
@@ -272,7 +284,12 @@ public class GOTSoulBoundEvents {
         if (!event.entityPlayer.worldObj.isRemote) {
             EntityPlayer player = event.entityPlayer;
             String playerID = player.getUniqueID().toString();
+            boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
 
+            if (isInSafeZone) {
+                player.removePotionEffect(GOTEffects.combatLog.id);
+                return;
+            }
             if (this.fullInventoryCache.containsKey(playerID)) {
                 this.fullInventoryCache.remove(playerID);
             }
@@ -312,5 +329,16 @@ public class GOTSoulBoundEvents {
 
             this.skipPenalty.remove(playerID);
         }
+    }
+    public void setProcessingLogout(String playerID) {
+        this.processingLogout.add(playerID);
+    }
+
+    public boolean isProcessingLogout(String playerID) {
+        return this.processingLogout.contains(playerID);
+    }
+
+    public void clearProcessingLogout(String playerID) {
+        this.processingLogout.remove(playerID);
     }
 }

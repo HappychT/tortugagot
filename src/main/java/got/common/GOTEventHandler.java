@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import brain.factions.arenas.ArenaManager;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import got.common.entity.animal.GOTEntityHorse;
 import got.common.handlers.BlockServerHandler;
@@ -1420,7 +1421,14 @@ public class GOTEventHandler implements IFuelHandler {
         EntityPlayer player = event.player;
 
         if (player.isPotionActive(GOTEffects.combatLog.id)) {
-
+            boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
+            if (isInSafeZone) {
+                player.removePotionEffect(GOTEffects.combatLog.id);
+                return;
+            }
+            if (GOTSoulBoundEvents.instance != null) {
+                GOTSoulBoundEvents.instance.setProcessingLogout(player.getUniqueID().toString());
+            }
             List<ItemStack> mainToSave = new ArrayList<>();
             List<Integer> mainSlots = new ArrayList<>();
             List<ItemStack> armorToSave = new ArrayList<>();

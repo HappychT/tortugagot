@@ -38,7 +38,7 @@ public class ROMEMusicTrack implements ISound {
 
     @Override
     public float getVolume() {
-        return 50;
+        return 1.0f;
     }
 
     @Override

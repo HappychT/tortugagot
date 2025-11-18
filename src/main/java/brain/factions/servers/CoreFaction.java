@@ -1,6 +1,8 @@
 package brain.factions.servers;
 
 import brain.factions.Faction;
+import brain.factions.arenas.ArenaManager;
+import brain.factions.arenas.CommandSaveArena;
 import brain.factions.client.PacketStructureGUISyncHandler;
 import brain.factions.network.*;
 import brain.factions.structures.FactionStructureManager;
@@ -68,6 +70,8 @@ public class CoreFaction {
 		brainChannel.registerMessage(PacketBarracksPlayers.Handler.class, PacketBarracksPlayers.class, 5, Side.CLIENT);
 		brainChannel.registerMessage(PacketStructureGUISyncHandler.class, PacketStructureGUISync.class, 6, Side.CLIENT);
 		brainChannel.registerMessage(PacketStructureAction.Handler.class, PacketStructureAction.class, 7, Side.SERVER);
+
+		ArenaManager.instance.initConfig(event.getModConfigurationDirectory());
 	}
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
@@ -86,6 +90,8 @@ public class CoreFaction {
 		event.registerServerCommand(new SaveStructureCommand());
 		event.registerServerCommand(new FactionAdminCommand());
 		event.registerServerCommand(new WarCommand());
+
+		event.registerServerCommand(new CommandSaveArena());
 
 		CompletableFuture.runAsync(() -> {
 			LOGGER.info("Loading Faction data asynchronously...");
