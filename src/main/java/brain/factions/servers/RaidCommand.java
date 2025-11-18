@@ -4,16 +4,16 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
-public class WarCommand extends CommandBase {
+public class RaidCommand extends CommandBase {
 
     @Override
     public String getCommandName() {
-        return "war";
+        return "raid";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/war <start|stop>";
+        return "/raid <start|stop>";
     }
 
     @Override

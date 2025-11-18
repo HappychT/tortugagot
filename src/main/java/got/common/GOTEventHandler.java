@@ -17,6 +17,7 @@ import net.minecraft.entity.passive.*;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.*;
+import noname.weapons.WarManager;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -387,7 +388,7 @@ public class GOTEventHandler implements IFuelHandler {
         int i = event.x;
         int j = event.y;
         int k = event.z;
-        if (!world.isRemote && GOTBannerProtection.isProtected(world, i, j, k, GOTBannerProtection.forPlayer(entityplayer, GOTBannerProtection.Permission.FULL), true)) {
+        if (!world.isRemote && noname.weapons.WarManager.shouldCancelProtectedBreak(event)) {
             event.setCanceled(true);
             return;
         }
@@ -447,6 +448,9 @@ public class GOTEventHandler implements IFuelHandler {
                 } else if (block instanceof BlockButton || block instanceof BlockLever) {
                     perm = GOTBannerProtection.Permission.SWITCHES;
                 }
+            }
+            if (!world.isRemote && WarManager.handleProtectedInteract(event, perm, block)) {
+                return;
             }
             if (!world.isRemote && GOTBannerProtection.isProtected(world, i, j, k, GOTBannerProtection.forPlayer(entityplayer, perm), true)) {
                 event.setCanceled(true);

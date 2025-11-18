@@ -71,6 +71,7 @@ import got.common.command.GOTCommandAllowStructures;
 import got.common.command.GOTCommandBanStructures;
 import got.common.command.GOTCommandConquest;
 import got.common.command.GOTCommandDatabase;
+import noname.weapons.WarCommand;
 import got.common.command.GOTCommandDate;
 import got.common.command.GOTCommandDragon;
 import got.common.command.GOTCommandEnableAlignmentZones;
@@ -163,10 +164,10 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import noname.weapons.EntityRegister;
 import noname.weapons.RegItem;
+import noname.weapons.WarCommand;
+import noname.weapons.WarTicketHandler;
 import noname.weapons.config.WeaponsConfig;
 import noname.weapons.events.BlockDamageTickHandler;
-
-
 @Mod(modid = "got", dependencies = "required-after:geckolib3")
 public class GOT {
     @SidedProxy(clientSide = "got.client.GOTClientProxy", serverSide = "got.common.GOTCommonProxy")
@@ -502,6 +503,8 @@ public class GOT {
         command.add(new GOTCommandInvasion());
         command.add(new GOTCommandAchievement());
         command.add(new GOTCommandDatabase());
+        command.add(new WarCommand());
+        command.add(new WarCommand());
         if (event.getServer().isDedicatedServer()) {
             command.add(new GOTCommandBanStructures());
             command.add(new GOTCommandAllowStructures());
@@ -564,6 +567,7 @@ public class GOT {
         GOTLog.findLogger();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
         FMLCommonHandler.instance().bus().register(new ServerTickHandler());
+        FMLCommonHandler.instance().bus().register(new WarTicketHandler());
         tickHandler = new GOTTickHandlerServer();
         eventHandler = new GOTEventHandler();
         packetHandler = new GOTPacketHandler();
