@@ -4,6 +4,8 @@ import cpw.mods.fml.relauncher.*;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.*;
 import net.minecraft.util.StatCollector;
+import noname.weapons.RegItem;
+import software.bernie.example.registry.ItemRegistry;
 
 public class GOTCreativeTabs extends CreativeTabs {
 	public static GOTCreativeTabs tabBlock = new GOTCreativeTabs("blocks");
@@ -18,6 +20,7 @@ public class GOTCreativeTabs extends CreativeTabs {
 	public static GOTCreativeTabs tabSpawn = new GOTCreativeTabs("spawning");
 	public static GOTCreativeTabs tabBanner = new GOTCreativeTabs("banner");
 	public static GOTCreativeTabs tabResources = new GOTCreativeTabs("resources");
+	public static GOTCreativeTabs tabsWaepons = new GOTCreativeTabs("waepons");
 	public ItemStack theIcon;
 
 	public GOTCreativeTabs(String label) {
@@ -54,5 +57,6 @@ public class GOTCreativeTabs extends CreativeTabs {
 		GOTCreativeTabs.tabSpawn.theIcon = new ItemStack(GOTRegistry.spawnEgg, 1, 248);
 		GOTCreativeTabs.tabBanner.theIcon = new ItemStack(GOTRegistry.bannerTab);
 		GOTCreativeTabs.tabResources.theIcon = new ItemStack(GOTRegistry.treasureSilver);
+		GOTCreativeTabs.tabsWaepons.theIcon = new ItemStack(RegItem.balistaBolt);
 	}
 }

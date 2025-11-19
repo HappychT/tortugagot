@@ -22,7 +22,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
-import got.GOT;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
@@ -89,7 +88,7 @@ public class CoreFaction {
 		event.registerServerCommand(new CheckPlayerCommand());
 		event.registerServerCommand(new SaveStructureCommand());
 		event.registerServerCommand(new FactionAdminCommand());
-		event.registerServerCommand(new WarCommand());
+		event.registerServerCommand(new RaidCommand());
 
 		event.registerServerCommand(new CommandSaveArena());
 
