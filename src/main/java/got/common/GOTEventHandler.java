@@ -6,18 +6,10 @@ import java.util.Random;
 import java.util.UUID;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
-import got.common.entity.animal.GOTEntityHorse;
-import got.common.handlers.BlockServerHandler;
-import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
-import got.common.systems.GOTCoreBlockingSystem;
 import got.common.world.biome.GOTClimateType;
 import net.minecraft.block.*;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.passive.*;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.*;
-import noname.weapons.WarManager;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -36,7 +28,6 @@ import cpw.mods.fml.common.gameevent.PlayerEvent.ItemSmeltedEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -85,7 +76,6 @@ import got.common.entity.other.GOTEntityHumanBase;
 import got.common.entity.other.GOTEntityNPC;
 import got.common.entity.other.GOTEntityProstitute;
 import got.common.entity.other.GOTEntitySpear;
-import got.common.entity.other.GOTEntitySpear.GOTEntityThiefKnife;
 import got.common.entity.other.GOTEntityThrowingAxe;
 import got.common.entity.other.GOTEntityThrowingKnife;
 import got.common.entity.other.GOTMercenary;
@@ -388,10 +378,6 @@ public class GOTEventHandler implements IFuelHandler {
         int i = event.x;
         int j = event.y;
         int k = event.z;
-        if (!world.isRemote && noname.weapons.WarManager.shouldCancelProtectedBreak(event)) {
-            event.setCanceled(true);
-            return;
-        }
         if (!world.isRemote && entityplayer != null) {
             if (GOTBlockGrapevine.isFullGrownGrapes(block, meta)) {
                 GOTEntityReachSoldier.defendGrapevines(entityplayer, world, i, j, k);
@@ -448,9 +434,6 @@ public class GOTEventHandler implements IFuelHandler {
                 } else if (block instanceof BlockButton || block instanceof BlockLever) {
                     perm = GOTBannerProtection.Permission.SWITCHES;
                 }
-            }
-            if (!world.isRemote && WarManager.handleProtectedInteract(event, perm, block)) {
-                return;
             }
             if (!world.isRemote && GOTBannerProtection.isProtected(world, i, j, k, GOTBannerProtection.forPlayer(entityplayer, perm), true)) {
                 event.setCanceled(true);
