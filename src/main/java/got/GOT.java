@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import brain.factions.servers.CoreFaction;
 import com.google.common.base.CaseFormat;
 
 import brain.factions.Faction;
@@ -71,7 +70,6 @@ import got.common.command.GOTCommandAllowStructures;
 import got.common.command.GOTCommandBanStructures;
 import got.common.command.GOTCommandConquest;
 import got.common.command.GOTCommandDatabase;
-import noname.weapons.WarCommand;
 import got.common.command.GOTCommandDate;
 import got.common.command.GOTCommandDragon;
 import got.common.command.GOTCommandEnableAlignmentZones;
@@ -164,10 +162,12 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import noname.weapons.EntityRegister;
 import noname.weapons.RegItem;
-import noname.weapons.WarCommand;
-import noname.weapons.WarTicketHandler;
 import noname.weapons.config.WeaponsConfig;
 import noname.weapons.events.BlockDamageTickHandler;
+import noname.weapons.war.WarBlockHandler;
+import noname.weapons.war.WarCommand;
+import noname.weapons.war.WarTicketHandler;
+
 @Mod(modid = "got", dependencies = "required-after:geckolib3")
 public class GOT {
     @SidedProxy(clientSide = "got.client.GOTClientProxy", serverSide = "got.common.GOTCommonProxy")
@@ -200,6 +200,7 @@ public class GOT {
         devs.add("188e4e9c-8c67-443d-9b6c-a351076a43e3");
         devs.add("f8cc9b45-509a-4034-8740-0b84ce7e4492");
     }
+
     @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new AccessoryEventHandler());
@@ -212,6 +213,7 @@ public class GOT {
         FMLCommonHandler.instance().bus().register(new BlockDamageTickHandler());
         FMLCommonHandler.instance().bus().register(StaminaServerHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockServerHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(new WarBlockHandler());
         FMLCommonHandler.instance().bus().register(BlockServerHandler.INSTANCE);
         GOTCoreBlockingSystem.registerWeapons();
         proxy.onLoad();
@@ -220,22 +222,32 @@ public class GOT {
             if (block instanceof GOTBlockWoodBase) {
                 Blocks.fire.setFireInfo(block, 5, 5);
             }
-            if (block instanceof GOTBlockPlanksBase || block instanceof GOTBlockFence || block instanceof GOTBlockWoodBars || block instanceof GOTBlockWoodBeam || (block instanceof GOTBlockSlabBase || block instanceof GOTBlockStairs) && block.getMaterial() == Material.wood) {
+            if (block instanceof GOTBlockPlanksBase || block instanceof GOTBlockFence
+                    || block instanceof GOTBlockWoodBars || block instanceof GOTBlockWoodBeam
+                    || (block instanceof GOTBlockSlabBase || block instanceof GOTBlockStairs)
+                            && block.getMaterial() == Material.wood) {
                 Blocks.fire.setFireInfo(block, 5, 20);
             }
             if (block instanceof GOTBlockVine) {
                 Blocks.fire.setFireInfo(block, 15, 100);
             }
-            if (block instanceof GOTBlockLeavesBase || block instanceof GOTBlockFallenLeaves || block instanceof GOTBlockBerryBush) {
+            if (block instanceof GOTBlockLeavesBase || block instanceof GOTBlockFallenLeaves
+                    || block instanceof GOTBlockBerryBush) {
                 Blocks.fire.setFireInfo(block, 30, 60);
             }
             if (block instanceof GOTBlockDaub) {
                 Blocks.fire.setFireInfo(block, 40, 40);
             }
-            if (block instanceof GOTBlockThatch || block instanceof GOTBlockThatchFloor || block instanceof GOTBlockReedBars || (block instanceof GOTBlockSlabBase || block instanceof GOTBlockStairs) && block.getMaterial() == Material.grass) {
+            if (block instanceof GOTBlockThatch || block instanceof GOTBlockThatchFloor
+                    || block instanceof GOTBlockReedBars
+                    || (block instanceof GOTBlockSlabBase || block instanceof GOTBlockStairs)
+                            && block.getMaterial() == Material.grass) {
                 Blocks.fire.setFireInfo(block, 60, 20);
             }
-            if (block instanceof GOTBlockThatch || block instanceof GOTBlockThatchFloor || block instanceof GOTBlockReedBars || block instanceof GOTBlockGrass || block instanceof GOTBlockAsshaiGrass || block instanceof GOTBlockAsshaiMoss || block instanceof GOTBlockFlower || block instanceof GOTBlockDoubleFlower) {
+            if (block instanceof GOTBlockThatch || block instanceof GOTBlockThatchFloor
+                    || block instanceof GOTBlockReedBars || block instanceof GOTBlockGrass
+                    || block instanceof GOTBlockAsshaiGrass || block instanceof GOTBlockAsshaiMoss
+                    || block instanceof GOTBlockFlower || block instanceof GOTBlockDoubleFlower) {
                 Blocks.fire.setFireInfo(block, 60, 100);
             }
         }
@@ -282,97 +294,103 @@ public class GOT {
         GameRegistry.registerTileEntity(TileEntityStructureHeart.class, "tileStructureHeart");
         MinecraftForge.EVENT_BUS.register(this);
     }
+
     @SubscribeEvent
     public void onPlayerNameFormat(PlayerEvent.NameFormat event) {
         String originalName = event.displayname;
-        event.displayname = getTag(originalName) +  event.displayname;
-
+        event.displayname = getTag(originalName) + event.displayname;
 
     }
     /*
-    @SubscribeEvent
-    public void onChatMessage(ClientChatReceivedEvent event) {
-        String message = event.message.getUnformattedText();
-        if (message.startsWith("<")) {
-            int endIndex = message.indexOf('>');
-            if (endIndex != -1) {
-                String playerName = message.substring(1, endIndex);
-                String newMessage = getPrefix(playerName) +" " + getTag(playerName) + playerName + "§f:" + message.substring(endIndex + 1);
-
-               event.message = new ChatComponentText(newMessage);
-            }
-        }
-    }*/
-//    @SideOnly(Side.CLIENT)
-//    @SubscribeEvent
-//    public void onChatMessage(ClientChatReceivedEvent event) {
-//        //	event.message = new ChatComponentText("[G] [И] Player317: 2121");
-//        IChatComponent originalMessage = event.message;
-//        String formattedMessage = originalMessage.getFormattedText();
-//        String unformattedMessage = originalMessage.getUnformattedText();
-//
-//        if (unformattedMessage.startsWith("<")) {
-//            int endIndex = unformattedMessage.indexOf('>');
-//            if (endIndex != -1) {
-//                String playerName = unformattedMessage.substring(1, endIndex);
-//
-//                // Получаем префикс и тег
-//                String prefix = getPrefix(playerName);
-//                String tag = getTag(playerName);
-//
-//
-//                ChatComponentText newChat = new ChatComponentText("");
-//
-//
-//                newChat.appendSibling(originalMessage);
-//
-//                newChat.getSiblings().add(0, new ChatComponentText(prefix + " " + tag));
-//
-//                event.message = newChat;
-//            }
-//        } else if (unformattedMessage.startsWith("[")) {
-//            Pattern pattern = Pattern.compile("^((\\[[^\\]]+\\]\\s*)+)");
-//            Matcher matcher = pattern.matcher(unformattedMessage);
-//            if (matcher.find()) {
-//                String bracketGroups = matcher.group(1); // Группы в []
-//                String remainder = unformattedMessage.substring(matcher.end()); // Остальная часть
-//
-//                int colonIndex = remainder.indexOf(':');
-//                if (colonIndex != -1) {
-//                    String playerName = remainder.substring(0, colonIndex).trim();
-//
-//                    String prefix = getPrefix(playerName);
-//                    String tag = getTag(playerName);
-//
-//
-//                    ChatComponentText newChat = new ChatComponentText(bracketGroups);
-//
-//
-//                    newChat.appendSibling(new ChatComponentText(prefix + " " + tag));
-//
-//                    int formattedNameIndex = formattedMessage.indexOf(playerName, bracketGroups.length());
-//                    if (formattedNameIndex != -1) {
-//                        newChat.appendSibling(new ChatComponentText(formattedMessage.substring(formattedNameIndex)));
-//                    }
-//
-//                    event.message = newChat;
-//                }
-//            }
-//        }
-//
-//    }
+     * @SubscribeEvent
+     * public void onChatMessage(ClientChatReceivedEvent event) {
+     * String message = event.message.getUnformattedText();
+     * if (message.startsWith("<")) {
+     * int endIndex = message.indexOf('>');
+     * if (endIndex != -1) {
+     * String playerName = message.substring(1, endIndex);
+     * String newMessage = getPrefix(playerName) +" " + getTag(playerName) +
+     * playerName + "§f:" + message.substring(endIndex + 1);
+     * 
+     * event.message = new ChatComponentText(newMessage);
+     * }
+     * }
+     * }
+     */
+    // @SideOnly(Side.CLIENT)
+    // @SubscribeEvent
+    // public void onChatMessage(ClientChatReceivedEvent event) {
+    // // event.message = new ChatComponentText("[G] [И] Player317: 2121");
+    // IChatComponent originalMessage = event.message;
+    // String formattedMessage = originalMessage.getFormattedText();
+    // String unformattedMessage = originalMessage.getUnformattedText();
+    //
+    // if (unformattedMessage.startsWith("<")) {
+    // int endIndex = unformattedMessage.indexOf('>');
+    // if (endIndex != -1) {
+    // String playerName = unformattedMessage.substring(1, endIndex);
+    //
+    // // Получаем префикс и тег
+    // String prefix = getPrefix(playerName);
+    // String tag = getTag(playerName);
+    //
+    //
+    // ChatComponentText newChat = new ChatComponentText("");
+    //
+    //
+    // newChat.appendSibling(originalMessage);
+    //
+    // newChat.getSiblings().add(0, new ChatComponentText(prefix + " " + tag));
+    //
+    // event.message = newChat;
+    // }
+    // } else if (unformattedMessage.startsWith("[")) {
+    // Pattern pattern = Pattern.compile("^((\\[[^\\]]+\\]\\s*)+)");
+    // Matcher matcher = pattern.matcher(unformattedMessage);
+    // if (matcher.find()) {
+    // String bracketGroups = matcher.group(1); // Группы в []
+    // String remainder = unformattedMessage.substring(matcher.end()); // Остальная
+    // часть
+    //
+    // int colonIndex = remainder.indexOf(':');
+    // if (colonIndex != -1) {
+    // String playerName = remainder.substring(0, colonIndex).trim();
+    //
+    // String prefix = getPrefix(playerName);
+    // String tag = getTag(playerName);
+    //
+    //
+    // ChatComponentText newChat = new ChatComponentText(bracketGroups);
+    //
+    //
+    // newChat.appendSibling(new ChatComponentText(prefix + " " + tag));
+    //
+    // int formattedNameIndex = formattedMessage.indexOf(playerName,
+    // bracketGroups.length());
+    // if (formattedNameIndex != -1) {
+    // newChat.appendSibling(new
+    // ChatComponentText(formattedMessage.substring(formattedNameIndex)));
+    // }
+    //
+    // event.message = newChat;
+    // }
+    // }
+    // }
+    //
+    // }
 
     public Faction.PlayerData getPrefix(String name) {
-        for(Faction faction : PacketInfoFactions.getFactions().values()) {
-            if(faction.getPlayers().containsKey(name)) {
+        for (Faction faction : PacketInfoFactions.getFactions().values()) {
+            if (faction.getPlayers().containsKey(name)) {
                 return faction.getPlayers().get(name);
             }
         }
         return null;
     }
+
     public String getTag(String name) {
-        for(Faction faction : PacketInfoFactions.getFactions().values()) {
-            if(faction.getPlayers().containsKey(name)) {
+        for (Faction faction : PacketInfoFactions.getFactions().values()) {
+            if (faction.getPlayers().containsKey(name)) {
                 return faction.getColorTag();
             }
         }
@@ -380,6 +398,7 @@ public class GOT {
     }
 
     public static boolean tpRequest = false;
+
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
@@ -397,43 +416,49 @@ public class GOT {
         }
     }
 
-/*
-    private static final long TELEPORT_DELAY = 8000;
-    @SideOnly(Side.CLIENT)
-    public static void requestTeleport() {
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-
-        if (player == null) return;
-
-        if (tpRequest) {
-            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Телепортация уже запрошена!"));
-            return;
-        }
-        tpRequest=true;
-        if (player.isPotionActive(GOTEffects.combatLog)) {
-            player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Вы не можете телепортироваться, так как находитесь в бою!"));
-            return;
-        }
-
-        GOTGuiFactions.lastTeleportTime = System.currentTimeMillis();
-        player.addChatMessage(new ChatComponentText(EnumChatFormatting.YELLOW + "Телепортация запрошена! Стойте на месте в течение 8 секунд..."));
-
-        new Thread(() -> {
-            try {
-                Thread.sleep(TELEPORT_DELAY);
-                if (tpRequest) {
-                    if (player.isPotionActive(Potion.blindness.id)) {
-                        player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Вы не можете телепортироваться, так как находитесь в бою!"));
-                    } else {
-                        CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
-                    }
-                    tpRequest = false;
-                }
-
-            } catch (InterruptedException e) {
-            }
-        }).start();
-    } */
+    /*
+     * private static final long TELEPORT_DELAY = 8000;
+     * 
+     * @SideOnly(Side.CLIENT)
+     * public static void requestTeleport() {
+     * EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+     * 
+     * if (player == null) return;
+     * 
+     * if (tpRequest) {
+     * player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED +
+     * "Телепортация уже запрошена!"));
+     * return;
+     * }
+     * tpRequest=true;
+     * if (player.isPotionActive(GOTEffects.combatLog)) {
+     * player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED +
+     * "Вы не можете телепортироваться, так как находитесь в бою!"));
+     * return;
+     * }
+     * 
+     * GOTGuiFactions.lastTeleportTime = System.currentTimeMillis();
+     * player.addChatMessage(new ChatComponentText(EnumChatFormatting.YELLOW +
+     * "Телепортация запрошена! Стойте на месте в течение 8 секунд..."));
+     * 
+     * new Thread(() -> {
+     * try {
+     * Thread.sleep(TELEPORT_DELAY);
+     * if (tpRequest) {
+     * if (player.isPotionActive(Potion.blindness.id)) {
+     * player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED +
+     * "Вы не можете телепортироваться, так как находитесь в бою!"));
+     * } else {
+     * CoreFaction.brainChannel.sendToServer(new PacketMessage("home"));
+     * }
+     * tpRequest = false;
+     * }
+     * 
+     * } catch (InterruptedException e) {
+     * }
+     * }).start();
+     * }
+     */
 
     @Mod.EventHandler
     public void onMissingMappings(FMLMissingMappingsEvent event) {
@@ -504,7 +529,6 @@ public class GOT {
         command.add(new GOTCommandAchievement());
         command.add(new GOTCommandDatabase());
         command.add(new WarCommand());
-        command.add(new WarCommand());
         if (event.getServer().isDedicatedServer()) {
             command.add(new GOTCommandBanStructures());
             command.add(new GOTCommandAllowStructures());
@@ -533,10 +557,16 @@ public class GOT {
             int b = (int) (baseB * rgb[2]);
             biome.waterColorMultiplier = new Color(r, g, b).getRGB();
         }
-        int[] nums = { GOTAchievement.id, GOTPacketHandler.id, BannerType.values().length, GOTEntity.id, GOTStructure.id, GOTAPI.getObjectFieldsOfType(GOTBiome.class, GOTBiome.class).size(), GOTRoads.id, GOTWalls.id, GOTWaypoint.values().length, GOTFaction.values().length, GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Item.class).size(), GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Block.class).size() };
-        String[] strings = { " achievements", " packets", " banners", " mobs", " structures", " biomes", " roads", " walls", " waypoints", " factions", " items", " blocks" };
+        int[] nums = { GOTAchievement.id, GOTPacketHandler.id, BannerType.values().length, GOTEntity.id,
+                GOTStructure.id, GOTAPI.getObjectFieldsOfType(GOTBiome.class, GOTBiome.class).size(), GOTRoads.id,
+                GOTWalls.id, GOTWaypoint.values().length, GOTFaction.values().length,
+                GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Item.class).size(),
+                GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Block.class).size() };
+        String[] strings = { " achievements", " packets", " banners", " mobs", " structures", " biomes", " roads",
+                " walls", " waypoints", " factions", " items", " blocks" };
         for (int i = 0; i < nums.length; i++) {
-            GOTLog.logger.info(new StringBuilder().append("Hummel009: Registered ").append(nums[i]).append(strings[i]).toString());
+            GOTLog.logger.info(
+                    new StringBuilder().append("Hummel009: Registered ").append(nums[i]).append(strings[i]).toString());
         }
     }
 
@@ -544,8 +574,7 @@ public class GOT {
     public void preload(FMLPreInitializationEvent event) {
         DecorationsRegister.registerDecorations();
         Potion[] potionTypes = null;
-        for (Field f : Potion.class.getDeclaredFields())
-        {
+        for (Field f : Potion.class.getDeclaredFields()) {
             f.setAccessible(true);
             try {
                 if (f.getName().equals("potionTypes") || f.getName().equals("field_76425_a")) {
@@ -579,21 +608,24 @@ public class GOT {
         GOTBlockReplacement.replaceVanillaBlock(Blocks.leaves, new GOTBlockLeavesVanilla1(), ItemLeaves.class);
         GOTBlockReplacement.replaceVanillaBlock(Blocks.leaves2, new GOTBlockLeavesVanilla2(), ItemLeaves.class);
         GOTBlockReplacement.replaceVanillaBlock(Blocks.fence, new GOTBlockFenceVanilla(), GOTItemFenceVanilla.class);
-        GOTBlockReplacement.replaceVanillaBlock(Blocks.cake, new GOTBlockPlaceableFood().setBlockTextureName("cake"), null);
-        GOTBlockReplacement.replaceVanillaItem(Items.cake, new GOTItemPlaceableFood(Blocks.cake).setTextureName("cake").setCreativeTab(CreativeTabs.tabFood));
+        GOTBlockReplacement.replaceVanillaBlock(Blocks.cake, new GOTBlockPlaceableFood().setBlockTextureName("cake"),
+                null);
+        GOTBlockReplacement.replaceVanillaItem(Items.cake,
+                new GOTItemPlaceableFood(Blocks.cake).setTextureName("cake").setCreativeTab(CreativeTabs.tabFood));
         GOTBlockReplacement.replaceVanillaItem(Items.potionitem, new GOTItemPotion().setTextureName("potion"));
-        GOTBlockReplacement.replaceVanillaItem(Items.glass_bottle, new GOTItemGlassBottle().setTextureName("potion_bottle_empty"));
+        GOTBlockReplacement.replaceVanillaItem(Items.glass_bottle,
+                new GOTItemGlassBottle().setTextureName("potion_bottle_empty"));
         GOTLoader.preInit();
         Blocks.dragon_egg.setCreativeTab(GOTCreativeTabs.tabStory);
         proxy.onPreload();
         GOTBlockIronBank.preInit();
-        //coreFaction.preInit(event);
+        // coreFaction.preInit(event);
     }
 
     @SideOnly(Side.CLIENT)
     @Mod.EventHandler
     public void preloadClient(FMLPreInitializationEvent event) {
-        //		GOTLoader.preInitClient();
+        // GOTLoader.preInitClient();
         // coreFaction.preInit(event);
     }
 
@@ -605,7 +637,8 @@ public class GOT {
         return world.getGameRules().getGameRuleBooleanValue("mobGriefing");
     }
 
-    public static boolean canNPCAttackEntity(EntityCreature attacker, EntityLivingBase target, boolean isPlayerDirected) {
+    public static boolean canNPCAttackEntity(EntityCreature attacker, EntityLivingBase target,
+            boolean isPlayerDirected) {
         if (target == null || !target.isEntityAlive())
             return false;
         GOTFaction attackerFaction = getNPCFaction(attacker);
@@ -624,7 +657,9 @@ public class GOT {
                 if (targetNPC != null && targetNPC.hiredNPCInfo.isActive) {
                     UUID hiringPlayerUUID = npc.hiredNPCInfo.getHiringPlayerUUID();
                     UUID targetHiringPlayerUUID = targetNPC.hiredNPCInfo.getHiringPlayerUUID();
-                    if (hiringPlayerUUID != null && targetHiringPlayerUUID != null && hiringPlayerUUID.equals(targetHiringPlayerUUID) && !attackerFaction.isBadRelation(getNPCFaction(targetNPC)))
+                    if (hiringPlayerUUID != null && targetHiringPlayerUUID != null
+                            && hiringPlayerUUID.equals(targetHiringPlayerUUID)
+                            && !attackerFaction.isBadRelation(getNPCFaction(targetNPC)))
                         return false;
                 }
             }
@@ -632,19 +667,26 @@ public class GOT {
         if (attackerFaction.allowEntityRegistry) {
             if (attackerFaction.isGoodRelation(getNPCFaction(target)) && attacker.getAttackTarget() != target)
                 return false;
-            if (target.riddenByEntity != null && attackerFaction.isGoodRelation(getNPCFaction(target.riddenByEntity)) && attacker.getAttackTarget() != target && attacker.getAttackTarget() != target.riddenByEntity)
+            if (target.riddenByEntity != null && attackerFaction.isGoodRelation(getNPCFaction(target.riddenByEntity))
+                    && attacker.getAttackTarget() != target && attacker.getAttackTarget() != target.riddenByEntity)
                 return false;
             if (!isPlayerDirected) {
-                if (target instanceof EntityPlayer && GOTLevelData.getData((EntityPlayer) target).getAlignment(attackerFaction) >= 0.0f && attacker.getAttackTarget() != target)
+                if (target instanceof EntityPlayer
+                        && GOTLevelData.getData((EntityPlayer) target).getAlignment(attackerFaction) >= 0.0f
+                        && attacker.getAttackTarget() != target)
                     return false;
-                if (target.riddenByEntity instanceof EntityPlayer && GOTLevelData.getData((EntityPlayer) target.riddenByEntity).getAlignment(attackerFaction) >= 0.0f && attacker.getAttackTarget() != target && attacker.getAttackTarget() != target.riddenByEntity)
+                if (target.riddenByEntity instanceof EntityPlayer
+                        && GOTLevelData.getData((EntityPlayer) target.riddenByEntity)
+                                .getAlignment(attackerFaction) >= 0.0f
+                        && attacker.getAttackTarget() != target && attacker.getAttackTarget() != target.riddenByEntity)
                     return false;
             }
         }
         return true;
     }
 
-    public static boolean canPlayerAttackEntity(EntityPlayer attacker, EntityLivingBase target, boolean warnFriendlyFire) {
+    public static boolean canPlayerAttackEntity(EntityPlayer attacker, EntityLivingBase target,
+            boolean warnFriendlyFire) {
         if (target == null || !target.isEntityAlive())
             return false;
         GOTPlayerData playerData = GOTLevelData.getData(attacker);
@@ -664,7 +706,8 @@ public class GOT {
         }
         Entity targetNPC = null;
         GOTFaction targetNPCFaction = null;
-        if (target instanceof GOTEntityGoldenMan && getNPCFaction(target) == GOTFaction.UNALIGNED || getNPCFaction(target) != GOTFaction.UNALIGNED) {
+        if (target instanceof GOTEntityGoldenMan && getNPCFaction(target) == GOTFaction.UNALIGNED
+                || getNPCFaction(target) != GOTFaction.UNALIGNED) {
             targetNPC = target;
         } else if (getNPCFaction(target.riddenByEntity) != GOTFaction.UNALIGNED) {
             targetNPC = target.riddenByEntity;
@@ -689,7 +732,8 @@ public class GOT {
                     }
                 }
             }
-            if (targetNPC instanceof EntityLiving && ((EntityLiving) targetNPC).getAttackTarget() != attacker && GOTLevelData.getData(attacker).getAlignment(targetNPCFaction) > 0.0f) {
+            if (targetNPC instanceof EntityLiving && ((EntityLiving) targetNPC).getAttackTarget() != attacker
+                    && GOTLevelData.getData(attacker).getAlignment(targetNPCFaction) > 0.0f) {
                 friendlyFire = true;
             }
         }
@@ -729,7 +773,8 @@ public class GOT {
                     i1 = item.stackSize;
                 }
                 item.stackSize -= i1;
-                EntityItem entityItem = new EntityItem(world, i + f, j + f1, k + f2, new ItemStack(item.getItem(), i1, item.getItemDamage()));
+                EntityItem entityItem = new EntityItem(world, i + f, j + f1, k + f2,
+                        new ItemStack(item.getItem(), i1, item.getItemDamage()));
                 if (item.hasTagCompound()) {
                     entityItem.getEntityItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
                 }
@@ -769,7 +814,8 @@ public class GOT {
         Chunk chunk = world.getChunkProvider().provideChunk(i >> 4, k >> 4);
         for (int j = chunk.getTopFilledSegment() + 15; j > 0; --j) {
             Block block = world.getBlock(i, j, k);
-            if (!block.getMaterial().blocksMovement() || block.getMaterial() == Material.leaves || block.isFoliage(world, i, j, k)) {
+            if (!block.getMaterial().blocksMovement() || block.getMaterial() == Material.leaves
+                    || block.isFoliage(world, i, j, k)) {
                 continue;
             }
             return j + 1;
@@ -832,7 +878,8 @@ public class GOT {
 
             @Override
             public boolean isEntityApplicable(Entity entity) {
-                return entity instanceof EntityPlayer && entity.isEntityAlive() && !((EntityPlayer) entity).capabilities.isCreativeMode;
+                return entity instanceof EntityPlayer && entity.isEntityAlive()
+                        && !((EntityPlayer) entity).capabilities.isCreativeMode;
             }
         };
     }
@@ -848,7 +895,8 @@ public class GOT {
             entity.dimension = newDimension;
             entity.worldObj.removeEntity(entity);
             entity.isDead = false;
-            minecraftserver.getConfigurationManager().transferEntityToWorld(entity, oldDimension, oldWorld, newWorld, teleporter);
+            minecraftserver.getConfigurationManager().transferEntityToWorld(entity, oldDimension, oldWorld, newWorld,
+                    teleporter);
             Entity newEntity = EntityList.createEntityByName(EntityList.getEntityString(entity), newWorld);
             if (newEntity != null) {
                 newEntity.copyDataFrom(entity, true);
