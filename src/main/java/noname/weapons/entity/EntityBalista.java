@@ -3,6 +3,8 @@ package noname.weapons.entity;
 import noname.weapons.RegItem;
 import noname.weapons.config.WeaponsConfig;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.ItemStack;
@@ -11,30 +13,34 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityBalista extends Entity {
+public class EntityBalista extends EntityLivingBase {
 
     private int reloadTimer = 0;
     private boolean isReloading = false;
     private boolean isLoaded = false;
     private EntityPlayer rider;
     private boolean lastSwingState = false;
-    private float health;
 
     public EntityBalista(World world) {
         super(world);
         this.setSize(2.0F, 1.5F);
         this.preventEntitySpawning = true;
-        this.health = WeaponsConfig.maxHealthBalista;
+    }
+
+    @Override
+    protected void applyEntityAttributes() {
+        super.applyEntityAttributes();
+        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(WeaponsConfig.maxHealthBalista);
     }
 
     @Override
     protected void entityInit() {
+        super.entityInit();
         this.dataWatcher.addObject(17, Byte.valueOf((byte)0)); 
         this.dataWatcher.addObject(18, Integer.valueOf(0)); 
         this.dataWatcher.addObject(19, Float.valueOf(0.0F)); 
         this.dataWatcher.addObject(20, Float.valueOf(0.0F)); 
         this.dataWatcher.addObject(21, Byte.valueOf((byte)0)); 
-        this.dataWatcher.addObject(22, Float.valueOf(WeaponsConfig.maxHealthBalista));
     }
 
     @Override
@@ -106,12 +112,8 @@ public class EntityBalista extends Entity {
             this.rotationYaw = this.dataWatcher.getWatchableObjectFloat(19);
             isReloading = (this.dataWatcher.getWatchableObjectByte(17) & 1) != 0;
             reloadTimer = this.dataWatcher.getWatchableObjectInt(18);
-            this.health = this.dataWatcher.getWatchableObjectFloat(22);
         }
     }
-
-    
-
 
     private void startReloading() {
         isReloading = true;
@@ -122,9 +124,6 @@ public class EntityBalista extends Entity {
         this.dataWatcher.updateObject(21, Byte.valueOf((byte)0));
     }
 
-    
-
-
     private void stopReloading() {
         isReloading = false;
         reloadTimer = 0;
@@ -132,22 +131,15 @@ public class EntityBalista extends Entity {
         this.dataWatcher.updateObject(18, Integer.valueOf(0));
     }
 
-    
-
-
     private void completeReload() {
         stopReloading();
         isLoaded = true;
         this.dataWatcher.updateObject(21, Byte.valueOf((byte)1));
     }
 
-    
-
-
     public boolean isReadyToFire() {
         return isLoaded && !isReloading;
     }
-
 
     public void fire() {
         if (!this.worldObj.isRemote && this.riddenByEntity != null) {
@@ -193,9 +185,6 @@ public class EntityBalista extends Entity {
         }
     }
 
-    
-
-
     @Override
     public boolean attackEntityFrom(DamageSource damageSource, float damage) {
         if (this.isDead) {
@@ -209,23 +198,22 @@ public class EntityBalista extends Entity {
             return false;
         }
 
+        float reducedDamage;
         if (damageSource.getSourceOfDamage() instanceof EntityBalistaProjectile) {
-            this.health -= damage;
+            reducedDamage = damage;
         } else {
-            float reducedDamage = damage * (1.0F - Math.min(10.0F / 25.0F, 0.8F));
-            this.health -= reducedDamage;
+            reducedDamage = damage * (1.0F - Math.min(10.0F / 25.0F, 0.8F));
         }
-        this.dataWatcher.updateObject(22, Float.valueOf(this.health));
-        if (this.health <= 0) {
+
+        this.setHealth(this.getHealth() - reducedDamage);
+
+        if (this.getHealth() <= 0) {
             this.setDead();
             return true;
         }
 
         return true;
     }
-
-    
-
 
     @Override
     public boolean isEntityInvulnerable() {
@@ -283,34 +271,26 @@ public class EntityBalista extends Entity {
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound nbt) {
+    public void readEntityFromNBT(NBTTagCompound nbt) {
+        super.readEntityFromNBT(nbt);
         this.reloadTimer = nbt.getInteger("ReloadTimer");
         this.isReloading = nbt.getBoolean("IsReloading");
         this.isLoaded = nbt.getBoolean("IsLoaded");
-        this.health = nbt.getFloat("Health");
-
-        if (this.health <= 0 || this.health > WeaponsConfig.maxHealthBalista) {
-            this.health = WeaponsConfig.maxHealthBalista;
-        }
-
+        
         this.dataWatcher.updateObject(21, Byte.valueOf(this.isLoaded ? (byte)1 : (byte)0));
-        this.dataWatcher.updateObject(22, Float.valueOf(this.health));
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound nbt) {
+    public void writeEntityToNBT(NBTTagCompound nbt) {
+        super.writeEntityToNBT(nbt);
         nbt.setInteger("ReloadTimer", this.reloadTimer);
         nbt.setBoolean("IsReloading", this.isReloading);
         nbt.setBoolean("IsLoaded", this.isLoaded);
-        nbt.setFloat("Health", this.health);
     }
 
     public String getEntityName() {
         return "Balista";
     }
-
-    
-
 
     private boolean hasAmmo(EntityPlayer player) {
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
@@ -321,9 +301,6 @@ public class EntityBalista extends Entity {
         }
         return false;
     }
-
-    
-
 
     private boolean consumeAmmo(EntityPlayer player) {
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
@@ -337,5 +314,25 @@ public class EntityBalista extends Entity {
             }
         }
         return false;
+    }
+
+    @Override
+    public ItemStack getHeldItem() {
+        return null;
+    }
+
+    @Override
+    public ItemStack getEquipmentInSlot(int slot) {
+        return null;
+    }
+
+    @Override
+    public void setCurrentItemOrArmor(int slot, ItemStack stack) {
+        
+    }
+
+    @Override
+    public ItemStack[] getLastActiveItems() {
+        return new ItemStack[5]; 
     }
 }
