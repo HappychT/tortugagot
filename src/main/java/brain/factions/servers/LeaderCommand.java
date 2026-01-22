@@ -73,6 +73,7 @@ public class LeaderCommand extends CommandBase {
 			CoreFaction.saveFactions();
 			CoreFaction.initFactions();
 			CoreFaction.sendAllGui();
+			CoreFaction.updatePrefix(playerName);
 			sender.addChatMessage(new ChatComponentText("§aУспешно!"));
 			return;
 		}

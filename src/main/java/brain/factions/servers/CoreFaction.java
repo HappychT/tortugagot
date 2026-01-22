@@ -25,6 +25,7 @@ import cpw.mods.fml.relauncher.Side;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
 public class CoreFaction {
 	public static final String MODID = "faction";
 	public static final Logger LOGGER = Logger.getLogger(MODID);
-
+	private static final Set<String> clearedPrefixCache = Collections.synchronizedSet(new HashSet<>());
 	public static SimpleNetworkWrapper brainChannel = new SimpleNetworkWrapper("brainchannel");
 	public static Gson GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 	public static File configFolder;
@@ -89,7 +90,6 @@ public class CoreFaction {
 		event.registerServerCommand(new SaveStructureCommand());
 		event.registerServerCommand(new FactionAdminCommand());
 		event.registerServerCommand(new RaidCommand());
-
 		event.registerServerCommand(new CommandSaveArena());
 
 		CompletableFuture.runAsync(() -> {
@@ -97,6 +97,15 @@ public class CoreFaction {
 			initFactions();
 			checkPlayers();
 			factionsInitialized = true;
+			ServerTaskExecutor.addScheduledTask(() -> {
+				if(MinecraftServer.getServer() != null) {
+					for(Object obj : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+						if(obj instanceof EntityPlayer) {
+							updatePrefix(((EntityPlayer)obj).getCommandSenderName());
+						}
+					}
+				}
+			});
 			LOGGER.info("Faction data loaded.");
 		}).exceptionally(e -> {
 			LOGGER.log(Level.SEVERE, "Failed to load faction data asynchronously!", e);
@@ -135,6 +144,92 @@ public class CoreFaction {
 		saveFactions();
 		initFactions();
 	}
+	public static void updatePrefix(String playerName) {
+		Faction faction = PacketMessage.getCurrentFaction(playerName);
+		String newPrefix = "";
+		Faction.PlayerData pData = null;
+
+		if (faction != null) {
+			String color = faction.getColorTag() != null ? faction.getColorTag() : "";
+			String titleText = "";
+
+			if (faction.getLeaderName().equals(playerName)) {
+				titleText = "Лидер";
+				if (faction.getPlayers().containsKey(playerName)) {
+					pData = faction.getPlayers().get(playerName);
+				}
+			} else {
+				pData = faction.getPlayers().get(playerName);
+				if (pData != null && pData.getTitle() != null && !pData.getTitle().isEmpty()
+						&& !pData.getTitle().equals("Игрок")) {
+					titleText = pData.getTitle();
+				}
+			}
+
+			String factionName = faction.getID();
+
+			if (!titleText.isEmpty()) {
+				newPrefix = color + "[" + factionName + "][" + titleText + "] ";
+			} else {
+				newPrefix = color + "[" + factionName + "] ";
+			}
+		}
+
+		newPrefix = newPrefix.replace('§', '&');
+
+
+		if (newPrefix.isEmpty()) {
+			if (clearedPrefixCache.contains(playerName)) {
+				return;
+			}
+			clearedPrefixCache.add(playerName);
+		} else {
+			clearedPrefixCache.remove(playerName);
+
+			if (pData != null) {
+				String currentStoredPrefix = pData.getPrefix();
+				if (currentStoredPrefix == null) currentStoredPrefix = "";
+
+				if (newPrefix.equals(currentStoredPrefix)) {
+					return;
+				}
+				pData.setPrefix(newPrefix);
+				saveFactions();
+			}
+		}
+
+		String command;
+		if (newPrefix.isEmpty()) {
+			command = "lp user " + playerName + " meta clear prefix";
+		} else {
+			command = "lp user " + playerName + " meta setprefix \"" + newPrefix + "\"";
+		}
+
+		boolean executedViaBukkit = false;
+
+		try {
+			Class<?> bukkitClass = Class.forName("org.bukkit.Bukkit");
+			Class<?> commandSenderClass = Class.forName("org.bukkit.command.CommandSender");
+
+			Object server = bukkitClass.getMethod("getServer").invoke(null);
+			Object consoleSender = server.getClass().getMethod("getConsoleSender").invoke(server);
+
+			server.getClass()
+					.getMethod("dispatchCommand", commandSenderClass, String.class)
+					.invoke(server, consoleSender, command);
+
+			executedViaBukkit = true;
+		} catch (ClassNotFoundException ignored) {
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to execute LuckPerms command via Bukkit", e);
+		}
+
+		if (!executedViaBukkit && MinecraftServer.getServer() != null) {
+			MinecraftServer.getServer()
+					.getCommandManager()
+					.executeCommand(MinecraftServer.getServer(), command);
+		}
+	}
 
 	public static Faction.PlayerData getPlayerData(Faction faction, String player) {
 		for(Map.Entry<String, Faction.PlayerData> fac: faction.getPlayers().entrySet()) {
@@ -169,7 +264,7 @@ public class CoreFaction {
 
 		EntityPlayerMP player = (EntityPlayerMP) e.player;
 		brainChannel.sendTo(new PacketInfoFactions(), player);
-
+		updatePrefix(player.getCommandSenderName());
 		for(Faction faction : factions.values()) {
 			if(faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
 				if(faction.getApplications().size() > 0) {

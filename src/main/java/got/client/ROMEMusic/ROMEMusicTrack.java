@@ -1,6 +1,8 @@
 package got.client.ROMEMusic;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.function.Supplier;
@@ -38,7 +40,11 @@ public class ROMEMusicTrack implements ISound {
 
     @Override
     public float getVolume() {
-        return 1.0f;
+        try {
+            return 1.0f * Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.MUSIC);
+        } catch (Exception e) {
+            return 1.0f;
+        }
     }
 
     @Override

@@ -24,6 +24,9 @@ import net.minecraft.world.WorldServer;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -35,8 +38,11 @@ public class StructureManager {
     public static boolean isRaidTime = false;
     public static boolean isRaidTimeFortress = false;
 
+    public static int serverTimeOffsetMinutes = 0;
+
     public static void init(File configFolder) {
         config = new ServerConfig(new File(configFolder, "server_config.cfg"));
+        CustomResourceConfig.init(configFolder);
         startResourceGeneration();
     }
 
@@ -44,33 +50,96 @@ public class StructureManager {
         return isRaidTime;
     }
 
+    public static boolean isRaidTimeNow(FactionStructureSlot slot) {
+        if (slot == null) return false;
+
+        String timeString = null;
+
+        if (slot.raidTime != null && !slot.raidTime.isEmpty() && !slot.raidTime.equals("00:00-00:00")) {
+            timeString = slot.raidTime;
+        } else {
+            if (slot.type == FactionStructureSlot.StructureType.FORTRESS) {
+                timeString = config.specificRaidTimes.get("FORTRESS");
+            } else if (slot.category != null) {
+                timeString = config.specificRaidTimes.get(slot.category.name());
+            }
+
+            if (timeString == null) {
+                timeString = config.raidTimeResourcePoints;
+            }
+        }
+
+        return isTimeInInterval(timeString);
+    }
+
+    public static boolean isTimeInInterval(String interval) {
+        try {
+            if(interval == null || !interval.contains("-")) return false;
+            String[] parts = interval.split("-");
+            LocalTime start = LocalTime.parse(parts[0]);
+            LocalTime end = LocalTime.parse(parts[1]);
+
+            LocalTime now = LocalTime.now().plusMinutes(serverTimeOffsetMinutes);
+
+            if (start.isAfter(end)) {
+                return !now.isBefore(start) || now.isBefore(end);
+            } else {
+                return !now.isBefore(start) && now.isBefore(end);
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private static void startResourceGeneration() {
         if (resourceTimer != null) resourceTimer.cancel();
         resourceTimer = new Timer("StructureResourceTimer", true);
+
+        long interval = config.resourceGenerationInterval * 1000L;
+
         resourceTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 ServerTaskExecutor.addScheduledTask(() -> {
                     final MinecraftServer server = MinecraftServer.getServer();
                     if (server == null) return;
-                    final WorldServer mainWorld = server.worldServerForDimension(0);
-                    if (mainWorld == null) return;
-
-                    for (FactionStructureSlot slot : FactionStructureManager.structureSlots) {
-                        if (slot.ownerFactionID != null && (slot.category == FactionStructureSlot.StructureCategory.FARMS || slot.category == FactionStructureSlot.StructureCategory.INDUSTRY || slot.type == FactionStructureSlot.StructureType.FORTRESS)) {
+                    for (WorldServer world : server.worldServers) {
+                        for (FactionStructureSlot slot : FactionStructureManager.structureSlots) {
+                            if (slot.ownerFactionID == null) continue;
                             Faction ownerFaction = CoreFaction.factions.get(slot.ownerFactionID);
-                            if(ownerFaction != null && slot.id.equals(ownerFaction.getMainFortressId())) {
-                                continue;
-                            }
+                            if (ownerFaction != null && slot.id.equals(ownerFaction.getMainFortressId())) continue;
 
-                            TileEntity te = mainWorld.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
-                            if (te instanceof TileEntityStructureHeart) {
-                                String[] items = config.resourceItems.getOrDefault(slot.level, new String[0]);
-                                if (items.length > 0) {
-                                    String itemString = items[mainWorld.rand.nextInt(items.length)];
-                                    Item item = (Item) Item.itemRegistry.getObject(itemString);
-                                    if (item != null) {
-                                        ((TileEntityStructureHeart) te).addItems(new ItemStack(item, config.resourcesPerCollection.getOrDefault(slot.level, 1)));
+                            if (slot.category == FactionStructureSlot.StructureCategory.FARMS ||
+                                    slot.category == FactionStructureSlot.StructureCategory.INDUSTRY ||
+                                    slot.type == FactionStructureSlot.StructureType.FORTRESS) {
+
+                                TileEntityStructureHeart te = findStructureHeartNearby(world, slot.xCoord, slot.yCoord, slot.zCoord, 10, 5);
+
+                                if (te != null) {
+                                    if (!te.getStructureId().equals(slot.id)) {
+                                        te.setStructureId(slot.id);
+                                        te.markDirty();
+                                    }
+
+                                    Map<String, Map<String, List<CustomResourceConfig.ResourceEntry>>> factionCats = CustomResourceConfig.factionResources.get(slot.ownerFactionID);
+                                    if (factionCats != null) {
+                                        Map<String, List<CustomResourceConfig.ResourceEntry>> variants = factionCats.get(slot.category.name());
+                                        if (variants != null) {
+                                            String variantKey = slot.resource;
+                                            if (slot.type == FactionStructureSlot.StructureType.FORTRESS && (variantKey == null || variantKey.isEmpty())) {
+                                                variantKey = "FORTRESS";
+                                            }
+
+                                            List<CustomResourceConfig.ResourceEntry> resources = variants.get(variantKey);
+                                            if (resources != null) {
+                                                double productivityMultiplier = 1.0 + ((slot.level - 1) * 0.20);
+
+                                                for (CustomResourceConfig.ResourceEntry res : resources) {
+                                                    double totalAmount = res.amount * productivityMultiplier;
+                                                    te.addFractionalItem(res.item, totalAmount);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -78,10 +147,36 @@ public class StructureManager {
                     }
                 });
             }
-        }, config.resourceGenerationInterval * 1000L, config.resourceGenerationInterval * 1000L);
+        }, interval, interval);
     }
 
+    private static TileEntityStructureHeart findStructureHeartNearby(World world, int centerX, int centerY, int centerZ, int radiusXZ, int radiusY) {
+        TileEntity centerTe = world.getTileEntity(centerX, centerY, centerZ);
+        if (centerTe instanceof TileEntityStructureHeart) {
+            return (TileEntityStructureHeart) centerTe;
+        }
 
+        for (int dx = -radiusXZ; dx <= radiusXZ; dx++) {
+            for (int dy = -radiusY; dy <= radiusY; dy++) {
+                for (int dz = -radiusXZ; dz <= radiusXZ; dz++) {
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+
+                    int x = centerX + dx;
+                    int y = centerY + dy;
+                    int z = centerZ + dz;
+
+                    if (world.blockExists(x, y, z)) {
+                        TileEntity te = world.getTileEntity(x, y, z);
+                        if (te instanceof TileEntityStructureHeart) {
+                            return (TileEntityStructureHeart) te;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
     public static void handlePurchase(EntityPlayerMP player, String structureId, String purchaseType, String subType) {
         Faction playerFaction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
         FactionStructureSlot slot = FactionStructureManager.getStructureById(structureId);
@@ -110,8 +205,14 @@ public class StructureManager {
             }
         }
 
+        long existingCount = FactionStructureManager.structureSlots.stream()
+                .filter(s -> playerFaction.getID().equals(s.ownerFactionID))
+                .filter(s -> isFortressPurchase ? s.type == FactionStructureSlot.StructureType.FORTRESS : s.type != FactionStructureSlot.StructureType.FORTRESS)
+                .count();
 
-        if (playerFaction.getTreasury() >= slot.price) {
+        long finalPrice = (long) (slot.price * Math.pow(2, existingCount));
+
+        if (playerFaction.getTreasury() >= finalPrice) {
             World world = player.worldObj;
             try {
                 String fileName = FactionStructureManager.structureTypes.get(purchaseType).get(subType);
@@ -136,7 +237,31 @@ public class StructureManager {
                 int oldHeartX = slot.xCoord;
                 int oldHeartY = slot.yCoord;
                 int oldHeartZ = slot.zCoord;
+                int minX = 0, minY = 0, minZ = 0;
+                int maxX = 0, maxY = 0, maxZ = 0;
 
+                for (BlockData b : structureData.getBlocks()) {
+                    if (b.getX() < minX) minX = b.getX();
+                    if (b.getX() > maxX) maxX = b.getX();
+                    if (b.getY() < minY) minY = b.getY();
+                    if (b.getY() > maxY) maxY = b.getY();
+                    if (b.getZ() < minZ) minZ = b.getZ();
+                    if (b.getZ() > maxZ) maxZ = b.getZ();
+                }
+
+                for (int x = minX; x <= maxX; x++) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = minZ; z <= maxZ; z++) {
+                            int clearX = oldHeartX + x - xOffset;
+                            int clearY = oldHeartY + y - 3;
+                            int clearZ = oldHeartZ + z - zOffset;
+
+                            if (clearX == oldHeartX && clearY == oldHeartY && clearZ == oldHeartZ) continue;
+
+                            world.setBlockToAir(clearX, clearY, clearZ);
+                        }
+                    }
+                }
                 boolean newHeartPlaced = false;
 
                 for (BlockData blockData : structureData.getBlocks()) {
@@ -199,7 +324,7 @@ public class StructureManager {
                     }
                 }
 
-                playerFaction.setTreasury(playerFaction.getTreasury() - slot.price);
+                playerFaction.setTreasury(playerFaction.getTreasury() - finalPrice);
 
                 slot.ownerFactionID = playerFaction.getID();
                 slot.name = subType;
@@ -215,17 +340,10 @@ public class StructureManager {
                     slot.provisions = 0;
                 }
 
-                /*
-                TileEntity te = world.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
-                if(te instanceof TileEntityStructureHeart){
-                    ((TileEntityStructureHeart)te).setStructureId(structureId);
-                }
-                */
-
                 FactionStructureManager.setStructureOwner(slot.id, playerFaction.getID());
                 CoreFaction.saveFactions();
                 CoreFaction.sendAllGui();
-                player.addChatMessage(new ChatComponentText("§aВы успешно захватили и построили: " + slot.name));
+                player.addChatMessage(new ChatComponentText("§aВы успешно захватили и построили: " + slot.name + " за " + finalPrice + " монет (Множитель x" + Math.pow(2, existingCount) + ")"));
                 player.closeScreen();
             } catch (IOException e) {
                 player.addChatMessage(new ChatComponentText("§cОшибка при чтении файла структуры."));
@@ -234,7 +352,7 @@ public class StructureManager {
                 player.addChatMessage(new ChatComponentText("§cОшибка: неверная категория структуры '" + purchaseType + "'."));
             }
         } else {
-            player.addChatMessage(new ChatComponentText("§cВ казне недостаточно средств."));
+            player.addChatMessage(new ChatComponentText("§cВ казне недостаточно средств. Требуется: " + finalPrice));
         }
     }
 
@@ -268,9 +386,11 @@ public class StructureManager {
             }
 
             if (slot.level < config.maxStructureLevel) {
-                int cost = config.upgradeCost.getOrDefault(slot.level + 1, Integer.MAX_VALUE);
-                if (playerFaction.getTreasury() >= cost) {
-                    playerFaction.setTreasury(playerFaction.getTreasury() - cost);
+                int baseCost = config.upgradeCost.getOrDefault(slot.level + 1, 5000);
+                long finalCost = (long) (baseCost * Math.pow(1.5, slot.level - 1));
+
+                if (playerFaction.getTreasury() >= finalCost) {
+                    playerFaction.setTreasury(playerFaction.getTreasury() - finalCost);
                     slot.level++;
                     slot.destructionCount = config.structureBreakCounts.getOrDefault(slot.level, slot.level);
 
@@ -281,9 +401,9 @@ public class StructureManager {
                     FactionStructureManager.saveStructureOwnership();
                     CoreFaction.saveFactions();
                     CoreFaction.sendAllGui();
-                    player.addChatMessage(new ChatComponentText("§aСтруктура улучшена до уровня " + slot.level));
+                    player.addChatMessage(new ChatComponentText("§aСтруктура улучшена до уровня " + slot.level + " за " + finalCost));
                 } else {
-                    player.addChatMessage(new ChatComponentText("§cНедостаточно средств для улучшения. Цена: " + cost));
+                    player.addChatMessage(new ChatComponentText("§cНедостаточно средств для улучшения. Цена: " + finalCost));
                 }
             } else {
                 player.addChatMessage(new ChatComponentText("§cДостигнут максимальный уровень."));

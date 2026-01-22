@@ -3,6 +3,7 @@ package got.client.sound;
 import java.io.InputStream;
 import java.util.*;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.*;
 import net.minecraft.util.ResourceLocation;
 
@@ -89,7 +90,14 @@ public class GOTMusicTrack extends PositionedSound {
 		}
 		return list.toArray(new String[0]);
 	}
-
+	@Override
+	public float getVolume() {
+		try {
+			return this.volume * Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.MUSIC);
+		} catch (Exception e) {
+			return this.volume;
+		}
+	}
 	public void loadSoundResource() {
 		SoundEventAccessorComposite soundAccessorComp;
 		ResourceLocation resource = getPositionedSoundLocation();

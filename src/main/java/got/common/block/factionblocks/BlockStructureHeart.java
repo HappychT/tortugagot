@@ -13,27 +13,25 @@ import brain.factions.structures.StructureData;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
-import cpw.mods.fml.relauncher.Side;
-import got.GOT;
 import got.common.database.GOTCreativeTabs;
 import got.common.faction.GOTFaction;
 import got.common.faction.GOTFactionRelations;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BlockStructureHeart extends BlockContainer {
 
@@ -51,7 +49,6 @@ public class BlockStructureHeart extends BlockContainer {
         return new TileEntityStructureHeart();
     }
 
-
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
@@ -68,7 +65,7 @@ public class BlockStructureHeart extends BlockContainer {
                 if (playerFaction != null && (slot.for_fraction.equalsIgnoreCase("ALL") || slot.for_fraction.equalsIgnoreCase(playerFaction.getID()))) {
                     canCapture = true;
                 } else if (playerFaction == null && slot.for_fraction.equalsIgnoreCase("ALL")) {
-                    // canCapture = true;
+
                 }
 
                 if (canCapture) {
@@ -95,7 +92,6 @@ public class BlockStructureHeart extends BlockContainer {
                         canOpen = true;
                     } else {
                         if (GOTFactionRelations.areFactionsHostile(GOTFaction.forName(playerFaction.getID()), GOTFaction.forName(slot.ownerFactionID))) {
-                            // canOpen = true;
                             player.addChatMessage(new ChatComponentText("§cЭто территория враждебной фракции!"));
                         } else {
                             canOpen = true;
@@ -122,54 +118,50 @@ public class BlockStructureHeart extends BlockContainer {
     public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int meta) {
         if (!world.isRemote) {
             FactionStructureSlot slot = FactionStructureManager.getStructureNearby(x, y, z);
+            EntityPlayer player = world.getClosestPlayer((double)x + 0.5D, (double)y + 0.5D, (double)z + 0.5D, -1.0D);
 
             if (slot != null && slot.ownerFactionID != null) {
-                EntityPlayer player = world.getClosestPlayer((double)x + 0.5D, (double)y + 0.5D, (double)z + 0.5D, -1.0D);
-                if (player == null) return;
+                if (player == null) {
+                    restoreBlock(world, x, y, z, meta, slot.id);
+                    return;
+                }
 
                 Faction playerFaction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
 
                 if (playerFaction == null || playerFaction.getID().equals(slot.ownerFactionID)) {
-                    world.setBlock(x, y, z, this, meta, 3);
+                    restoreBlock(world, x, y, z, meta, slot.id);
                     player.addChatMessage(new ChatComponentText("§cВы не можете разрушить свою структуру!"));
-                    super.onBlockDestroyedByPlayer(world, x, y, z, meta);
                     return;
                 }
 
-
-                boolean isFortress = slot.type == FactionStructureSlot.StructureType.FORTRESS;
-                boolean raidTimeActive = isFortress ? StructureManager.isRaidTimeFortress : StructureManager.isRaidTime;
+                boolean raidTimeActive = StructureManager.isRaidTimeNow(slot);
 
                 if (!raidTimeActive) {
-                    world.setBlock(x, y, z, this, meta, 3);
+                    restoreBlock(world, x, y, z, meta, slot.id);
                     player.addChatMessage(new ChatComponentText("§cСтруктуру можно разрушать только во время рейд-тайма!"));
-                    super.onBlockDestroyedByPlayer(world, x, y, z, meta);
                     return;
                 }
-
 
                 if (GOTFactionRelations.areFactionsHostile(GOTFaction.forName(playerFaction.getID()), GOTFaction.forName(slot.ownerFactionID))) {
                     slot.destructionCount--;
                     player.addChatMessage(new ChatComponentText("§eПрочность структуры: " + slot.destructionCount));
 
                     if (slot.destructionCount <= 0) {
+                        boolean isFortress = slot.type == FactionStructureSlot.StructureType.FORTRESS;
                         if (isFortress) {
                             FactionStructureManager.setStructureOwner(slot.id, playerFaction.getID());
                             slot.ownerFactionID = playerFaction.getID();
                             slot.destructionCount = StructureManager.config.structureBreakCounts.getOrDefault(slot.level, slot.level);
-                            world.setBlock(x, y, z, this, meta, 3);
+
+                            restoreBlock(world, x, y, z, meta, slot.id);
                             TileEntity te = world.getTileEntity(x, y, z);
-                            if (te instanceof TileEntityStructureHeart) {
-                                ((TileEntityStructureHeart) te).setStructureId(slot.id);
-                            }
-                            player.addChatMessage(new ChatComponentText("§aВы захватили крепость!"));
                             if (te instanceof TileEntityStructureHeart) {
                                 Arrays.fill(((TileEntityStructureHeart) te).getInventory(), null);
                                 te.markDirty();
-                                world.markBlockForUpdate(x, y, z);
                             }
+                            world.markBlockForUpdate(x, y, z);
                             slot.provisions = 0;
-
+                            player.addChatMessage(new ChatComponentText("§aВы захватили крепость!"));
                         } else {
                             if (slot.structureFile != null && !slot.structureFile.isEmpty()) {
                                 try {
@@ -189,26 +181,8 @@ public class BlockStructureHeart extends BlockContainer {
                                         }
                                     }
                                 } catch (Exception e) {
-                                    CoreFaction.logger().severe("Не удалось удалить блоки структуры для слота " + slot.id + ": " + e.getMessage());
+                                    CoreFaction.logger().severe("Error removing structure blocks: " + e.getMessage());
                                     e.printStackTrace();
-                                }
-                            }
-
-                            TileEntity te = world.getTileEntity(x, y, z);
-                            if (te instanceof TileEntityStructureHeart) {
-                                TileEntityStructureHeart heart = (TileEntityStructureHeart) te;
-                                for (ItemStack itemStack : heart.getInventory()) {
-                                    if (itemStack != null) {
-                                        float f = world.rand.nextFloat() * 0.8F + 0.1F;
-                                        float f1 = world.rand.nextFloat() * 0.8F + 0.1F;
-                                        float f2 = world.rand.nextFloat() * 0.8F + 0.1F;
-                                        EntityItem entityitem = new EntityItem(world, (double)x + f, (double)y + f1, (double)z + f2, itemStack.copy());
-                                        float f3 = 0.05F;
-                                        entityitem.motionX = (double)((float)world.rand.nextGaussian() * f3);
-                                        entityitem.motionY = (double)((float)world.rand.nextGaussian() * f3 + 0.2F);
-                                        entityitem.motionZ = (double)((float)world.rand.nextGaussian() * f3);
-                                        world.spawnEntityInWorld(entityitem);
-                                    }
                                 }
                             }
 
@@ -218,8 +192,8 @@ public class BlockStructureHeart extends BlockContainer {
                                 ((TileEntityStructureHeart) newTe).setStructureId(slot.id);
                                 Arrays.fill(((TileEntityStructureHeart) newTe).getInventory(), null);
                                 newTe.markDirty();
-                                world.markBlockForUpdate(slot.xCoord, slot.yCoord, slot.zCoord);
                             }
+                            world.markBlockForUpdate(slot.xCoord, slot.yCoord, slot.zCoord);
 
                             FactionStructureManager.setStructureOwner(slot.id, null);
                             slot.ownerFactionID = null;
@@ -229,59 +203,35 @@ public class BlockStructureHeart extends BlockContainer {
                             slot.structureFile = null;
                             slot.destructionCount = 1;
 
-
                             player.addChatMessage(new ChatComponentText("§cВы разрушили ресурсную точку!"));
                         }
                     } else {
-                        world.setBlock(x, y, z, this, meta, 3);
-                        TileEntity te = world.getTileEntity(x, y, z);
-                        if (te instanceof TileEntityStructureHeart) {
-                            ((TileEntityStructureHeart) te).setStructureId(slot.id);
-                        }
+                        restoreBlock(world, x, y, z, meta, slot.id);
                     }
                     FactionStructureManager.saveStructureOwnership();
                     CoreFaction.sendAllGui();
                 } else {
-                    world.setBlock(x, y, z, this, meta, 3);
+                    restoreBlock(world, x, y, z, meta, slot.id);
                     player.addChatMessage(new ChatComponentText("§cВы не можете атаковать структуры союзных или нейтральных фракций!"));
-                    super.onBlockDestroyedByPlayer(world, x, y, z, meta);
-                    return;
                 }
-            } else {
             }
         }
-
     }
 
+    private void restoreBlock(World world, int x, int y, int z, int meta, String structureId) {
+        world.setBlock(x, y, z, this, meta, 3);
+        TileEntity te = world.getTileEntity(x, y, z);
+        if (te instanceof TileEntityStructureHeart) {
+            ((TileEntityStructureHeart) te).setStructureId(structureId);
+            te.markDirty();
+        }
+        world.markBlockForUpdate(x, y, z);
+    }
 
     @Override
     public float getPlayerRelativeBlockHardness(EntityPlayer player, World world, int x, int y, int z) {
-        FactionStructureSlot slot = FactionStructureManager.getStructureNearby(x, y, z);
-        if (slot == null || slot.ownerFactionID == null) return -1.0f;
-
-        Faction playerFaction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
-        if (playerFaction == null) return -1.0f;
-
-        if (playerFaction.getID().equals(slot.ownerFactionID)) return -1.0f;
-
-        boolean isFortress = slot.type == FactionStructureSlot.StructureType.FORTRESS;
-        boolean raidTimeActive = isFortress ? StructureManager.isRaidTimeFortress : StructureManager.isRaidTime;
-
-        if (!raidTimeActive) return -1.0f;
-
-        if (GOTFactionRelations.areFactionsHostile(GOTFaction.forName(playerFaction.getID()), GOTFaction.forName(slot.ownerFactionID))) {
-            float hardness = getBlockHardness(world, x, y, z);
-            if (hardness < 0.0F) return 0.0F;
-
-            float strength = player.getBreakSpeed(this, false, world.getBlockMetadata(x, y, z), x, y, z);
-
-            if (strength / hardness / 30F > 0) {
-                return strength / hardness / 30F;
-            } else {
-                return 0.0f;
-            }
-        }
-
-        return -1.0f;
+        float hardness = this.getBlockHardness(world, x, y, z);
+        if (hardness < 0.0F) return 0.0F;
+        return player.getBreakSpeed(this, true, world.getBlockMetadata(x, y, z), x, y, z) / hardness / 30F;
     }
 }

@@ -6,6 +6,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import got.common.network.clientToServer.PacketBounceRequest;
+import got.common.network.clientToServer.PacketPunishSpamClick;
 import got.common.network.clientToServer.PacketSendAttackCooldown;
 import got.common.network.serverToClient.PacketSendBounceCooldown;
 import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
@@ -20,6 +21,7 @@ public class PacketDispatcher {
     private static final SimpleNetworkWrapper dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel("got");
 
     public static final void registerPackets() {
+        registerMessage(PacketPunishSpamClick.class);
 
         registerMessage(PacketSendAttackCooldown.class);
         registerMessage(PacketSendStamina.class);

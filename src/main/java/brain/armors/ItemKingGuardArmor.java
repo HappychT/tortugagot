@@ -15,7 +15,7 @@ public class ItemKingGuardArmor extends ItemArmor {
     @SideOnly(Side.CLIENT)
     private IIcon itemIcon;
     
-    public ItemKingGuardArmor(ItemArmor.ArmorMaterial material, int renderIndex, int armorType) {
+    public ItemKingGuardArmor(ArmorMaterial material, int renderIndex, int armorType) {
         super(material, renderIndex, armorType);
     }
     

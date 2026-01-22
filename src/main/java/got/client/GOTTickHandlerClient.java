@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import got.common.item.weapon.*;
+import got.common.network.clientToServer.PacketPunishSpamClick;
 import got.common.systems.GOTCoreBlockingSystem;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemSword;
+import net.minecraft.util.*;
+import net.minecraftforge.client.event.*;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -102,22 +105,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.StringUtils;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.client.GuiIngameForge;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.FOVUpdateEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -173,7 +165,10 @@ public class GOTTickHandlerClient {
     public Class<? extends Item> itemClass = null;
     public int leftAngle = 0;
     public int rightAngle = 0;
-
+    private long lastClickTime = 0;
+    private int clicksThisSecond = 0;
+    private boolean isPunished = false;
+    private long punishmentEndTime = 0;
     public GOTTickHandlerClient() {
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
@@ -392,23 +387,73 @@ public class GOTTickHandlerClient {
     public void onBurnDamage() {
         this.burnTick = 40;
     }
+    @SubscribeEvent
+    public void onMouseClick(MouseEvent event) {
+        if (event.button == 0 && event.buttonstate) {
+            Minecraft mc = Minecraft.getMinecraft();
+            EntityClientPlayerMP player = mc.thePlayer;
 
+            if (player == null || mc.currentScreen != null) return;
+
+            if (player.capabilities.isCreativeMode) {
+                return;
+            }
+
+            long currentTime = System.currentTimeMillis();
+
+            if (currentTime - lastClickTime > 1000) {
+                clicksThisSecond = 0;
+                lastClickTime = currentTime;
+            }
+
+            if (isPunished) {
+                if (currentTime > punishmentEndTime) {
+                    isPunished = false;
+                } else {
+
+                }
+            }
+
+            clicksThisSecond++;
+
+            if (clicksThisSecond > 10 && !isPunished) {
+                PacketDispatcher.sendToServer(new PacketPunishSpamClick());
+
+                player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Вы кликаете слишком быстро! Наложены штрафы."));
+
+                isPunished = true;
+                punishmentEndTime = currentTime + (45 * 1000);
+
+                event.setCanceled(true);
+                return;
+            }
+
+            if (ExtendedPlayer.get(player).getAttackCooldown() > 0 || GOTAttackTiming.attackTime > 0) {
+                event.setCanceled(true);
+            } else {
+                int newCooldown = got.common.libs.GOTLib.getAttackCooldown(player);
+                ExtendedPlayer.get(player).setAttackCooldown(newCooldown);
+                PacketDispatcher.sendToServer(new PacketSendAttackCooldown());
+                GOTAttackTiming.startAttackTimer();
+            }
+        }
+    }
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft minecraft = Minecraft.getMinecraft();
         EntityClientPlayerMP entityplayer = minecraft.thePlayer;
         WorldClient world = minecraft.theWorld;
-        if (GOTAttackTiming.coolDownTick >= 1 ) {
-            GOTAttackTiming.coolDownTick++;
-        }
+        //if (GOTAttackTiming.coolDownTick >= 1 ) {
+        //    GOTAttackTiming.coolDownTick++;
+        //}
 
-        if (GOTAttackTiming.coolDownTick >= 2) {
-            GOTAttackTiming.coolDownTick = 0;
-            if(ExtendedPlayer.get(GOTAttackTiming.mc.thePlayer).getAttackCooldown() <= 0) {
-                ExtendedPlayer.get(GOTAttackTiming.mc.thePlayer).setAttackCooldown(getAttackCooldown(GOTAttackTiming.mc.thePlayer));
-                PacketDispatcher.sendToServer(new PacketSendAttackCooldown());
-            }
-        }
+        // if (GOTAttackTiming.coolDownTick >= 2) {
+       //     GOTAttackTiming.coolDownTick = 0;
+       //     if(ExtendedPlayer.get(GOTAttackTiming.mc.thePlayer).getAttackCooldown() <= 0) {
+        //        ExtendedPlayer.get(GOTAttackTiming.mc.thePlayer).setAttackCooldown(getAttackCooldown(GOTAttackTiming.mc.thePlayer));
+       //         PacketDispatcher.sendToServer(new PacketSendAttackCooldown());
+       //     }
+       // }
         if (event.phase == TickEvent.Phase.START) {
             clientTick++;
             if (GOTConfig.fixRenderDistance && !FMLClientHandler.instance().hasOptifine()) {

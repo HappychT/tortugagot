@@ -107,7 +107,24 @@ public class MapView implements IPageRenderer {
         GL11.glPopAttrib();
 
         positionDiplomacyContextMenuButtons();
+        if (parent.mc.thePlayer.capabilities.isCreativeMode) {
 
+            float[] mapCoords = untransformMapCoords(scaledMouseX, scaledMouseY);
+            int cursorMapX = (int) mapCoords[0];
+            int cursorMapY = (int) mapCoords[1];
+
+            String coordsText = String.format("X: %d, Y: %d", cursorMapX, cursorMapY);
+
+            int textWidth = parent.mc.fontRenderer.getStringWidth(coordsText);
+            int padding = 5;
+            int screenWidth = parent.getBaseWidth();
+            int screenHeight = parent.getBaseHeight();
+
+            int renderX = screenWidth - textWidth - padding;
+            int renderY = screenHeight - 10 - padding;
+
+            parent.drawString(parent.mc.fontRenderer, coordsText, renderX, renderY, 0xFFFFFFFF);
+        }
     }
 
     public void drawDiplomacyContextMenuAfterButtons(int mouseX, int mouseY) {

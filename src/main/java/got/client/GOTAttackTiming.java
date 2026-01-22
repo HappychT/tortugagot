@@ -1,5 +1,6 @@
 package got.client;
 
+import got.rome.ExtendedPlayer;
 import org.lwjgl.opengl.GL11;
 
 import got.common.database.GOTEffects;
@@ -26,40 +27,34 @@ public class GOTAttackTiming {
     public static int lastCheckTick = -1;
 
     public static int coolDownTick;
+    public static void startAttackTimer() {
+        if (mc.thePlayer == null) return;
 
+        ItemStack itemstack = mc.thePlayer.getHeldItem();
+
+        if (mc.thePlayer.isPotionActive(GOTEffects.exhaustion) || mc.thePlayer.isPotionActive(Potion.digSlowdown)) {
+            attackTime = fullAttackTime = (int) (GOTWeaponStats.getAttackTimePlayer(itemstack) + (GOTWeaponStats.getAttackTimePlayer(itemstack) * 1.3));
+        } else {
+            attackTime = fullAttackTime = GOTWeaponStats.getAttackTimePlayer(itemstack);
+        }
+
+        attackItem = itemstack;
+        coolDownTick = 1;
+    }
     public static void doAttackTiming() {
         int currentTick = GOTTickHandlerClient.clientTick;
+
         if (lastCheckTick == -1) {
             lastCheckTick = currentTick;
         } else if (lastCheckTick == currentTick)
             return;
+
         if (GOTAttackTiming.mc.thePlayer == null) {
             GOTAttackTiming.reset();
         } else {
-            KeyBinding attackKey = GOTAttackTiming.mc.gameSettings.keyBindAttack;
-            boolean pressed = attackKey.isPressed();
-            if (pressed) {
-                KeyBinding.onTick(attackKey.getKeyCode());
-            }
-            if (pressed && !GOTAttackTiming.mc.thePlayer.capabilities.isCreativeMode) {
-                coolDownTick = 1;
-                if (attackTime > 0) {
-                    while (attackKey.isPressed()) {
-                    }
-                } else {
-                    ItemStack itemstack = GOTAttackTiming.mc.thePlayer.getHeldItem();
-                    if (mc.thePlayer.isPotionActive(GOTEffects.exhaustion) || mc.thePlayer.isPotionActive(Potion.digSlowdown)) {
-                        attackTime = fullAttackTime = (int) (GOTWeaponStats.getAttackTimePlayer(itemstack) + (GOTWeaponStats.getAttackTimePlayer(itemstack) * 1.3));
-                    } else {
-                        attackTime = fullAttackTime = GOTWeaponStats.getAttackTimePlayer(itemstack);
-                    } // Implementation is vulnerable to client cheats, fixing is possible, but not necessary in this case.
-                    attackItem = itemstack;
-                }
-                lastCheckTick = currentTick;
-            }
+            lastCheckTick = currentTick;
         }
     }
-
     public static void renderAttackMeter(ScaledResolution resolution, float partialTicks) {
         if (fullAttackTime > 0) {
             float attackTimeF = prevAttackTime + ((attackTime) - prevAttackTime) * partialTicks;

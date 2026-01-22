@@ -1,0 +1,11 @@
+# Items
+item.gooseFeather.name=Гусиное перо
+item.rawGoose.name=Сырая гусятина
+item.cookedGoose.name=Жареная гусятина
+item.foieGras.name=Фуа Гра
+item.cookedFoieGras.name=Жареная Фуа Гра
+item.corn.name=Кукуруза
+item.walrusFat.name=Сало моржа
+
+# Entity
+entity.Goose.name=Гусь

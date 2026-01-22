@@ -43,7 +43,10 @@ public class PacketMessage implements IMessage {
 	}
 
 	public static EntityPlayerMP getPlayer(String name) {
-		for(EntityPlayerMP player : (List<EntityPlayerMP>) MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+		MinecraftServer server = MinecraftServer.getServer();
+		if (server == null || server.getConfigurationManager() == null) return null;
+
+		for(EntityPlayerMP player : (List<EntityPlayerMP>) server.getConfigurationManager().playerEntityList) {
 			if(player.getDisplayName().equals(name)) {
 				return player;
 			}
@@ -52,7 +55,14 @@ public class PacketMessage implements IMessage {
 	}
 
 	public static Faction getCurrentFaction(String name) {
-		for(Faction fac : CoreFaction.factions.values()) {
+		Map<String, Faction> factionsMap = CoreFaction.factions;
+		if (factionsMap == null) {
+			factionsMap = PacketInfoFactions.getFactions();
+		}
+
+		if (factionsMap == null) return null;
+
+		for(Faction fac : factionsMap.values()) {
 			if(fac.getPlayers().containsKey(name)) {
 				return fac;
 			}
@@ -66,7 +76,11 @@ public class PacketMessage implements IMessage {
 	}
 
 	public static boolean checkAplic(String name) {
-		for(Faction fac : CoreFaction.factions.values()) {
+		Map<String, Faction> factionsMap = CoreFaction.factions;
+		if (factionsMap == null) factionsMap = PacketInfoFactions.getFactions();
+		if (factionsMap == null) return false;
+
+		for(Faction fac : factionsMap.values()) {
 			if(fac.getApplications().containsKey(name)) {
 				return true;
 			}
@@ -75,8 +89,11 @@ public class PacketMessage implements IMessage {
 	}
 
 	public static Faction getFaction(String id) {
-		if (CoreFaction.factions.containsKey(id)) {
-			return CoreFaction.factions.get(id);
+		Map<String, Faction> factionsMap = CoreFaction.factions;
+		if (factionsMap == null) factionsMap = PacketInfoFactions.getFactions();
+
+		if (factionsMap != null && factionsMap.containsKey(id)) {
+			return factionsMap.get(id);
 		}
 		return null;
 	}
@@ -86,7 +103,10 @@ public class PacketMessage implements IMessage {
 		public IMessage onMessage(PacketMessage packet, MessageContext ctx) {
 			String[] args = packet.message.split("#");
 			EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-			CoreFaction.initFactions();
+
+			if (brain.factions.Annot.SERVER) {
+				CoreFaction.initFactions();
+			}
 
 			if (args[0].equalsIgnoreCase("requestStructures")) {
 				CoreFaction.brainChannel.sendTo(new PacketFactionStructures(FactionStructureManager.structureSlots), player);
@@ -149,6 +169,9 @@ public class PacketMessage implements IMessage {
 				CoreFaction.saveFactions();
 				CoreFaction.initFactions();
 				CoreFaction.sendAllGui();
+
+				CoreFaction.updatePrefix(player.getCommandSenderName());
+
 				return null;
 			}
 
@@ -172,6 +195,7 @@ public class PacketMessage implements IMessage {
 							return null;
 						}
 						faction.getPlayers().remove(upprovePlayer);
+						CoreFaction.updatePrefix(upprovePlayer);
 						if(faction.getAssistantName().equals(upprovePlayer)) {
 							faction.setAssistantName("");
 						}
@@ -184,11 +208,13 @@ public class PacketMessage implements IMessage {
 							return null;
 						}
 						faction.setAssistantName(upprovePlayer);
+						CoreFaction.updatePrefix(upprovePlayer);
 						break;
 					case -1:
 						if (faction.getAssistantName().equals(upprovePlayer)) {
 							faction.setAssistantName("");
 						}
+						CoreFaction.updatePrefix(upprovePlayer);
 						break;
 					default:
 						break;
@@ -221,6 +247,7 @@ public class PacketMessage implements IMessage {
 
 							faction.getApplications().remove(upprovePlayer);
 							faction.getPlayers().put(upprovePlayer, new Faction.PlayerData("", System.currentTimeMillis(), "Игрок"));
+							CoreFaction.updatePrefix(upprovePlayer);
 							GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer));
 							GOTFaction fac = GOTFaction.forName(faction.getID());
 							pd.setPledgeFaction(fac);

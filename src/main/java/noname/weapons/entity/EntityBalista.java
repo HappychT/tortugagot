@@ -36,11 +36,11 @@ public class EntityBalista extends EntityLivingBase {
     @Override
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(17, Byte.valueOf((byte)0)); 
-        this.dataWatcher.addObject(18, Integer.valueOf(0)); 
-        this.dataWatcher.addObject(19, Float.valueOf(0.0F)); 
-        this.dataWatcher.addObject(20, Float.valueOf(0.0F)); 
-        this.dataWatcher.addObject(21, Byte.valueOf((byte)0)); 
+        this.dataWatcher.addObject(17, Byte.valueOf((byte)0));
+        this.dataWatcher.addObject(18, Integer.valueOf(0));
+        this.dataWatcher.addObject(19, Float.valueOf(0.0F));
+        this.dataWatcher.addObject(20, Float.valueOf(0.0F));
+        this.dataWatcher.addObject(21, Byte.valueOf((byte)0));
     }
 
     @Override
@@ -107,7 +107,7 @@ public class EntityBalista extends EntityLivingBase {
                 }
             }
         } else {
-            
+
             this.prevRotationYaw = this.dataWatcher.getWatchableObjectFloat(20);
             this.rotationYaw = this.dataWatcher.getWatchableObjectFloat(19);
             isReloading = (this.dataWatcher.getWatchableObjectByte(17) & 1) != 0;
@@ -176,7 +176,7 @@ public class EntityBalista extends EntityLivingBase {
             double shootZ = this.posZ + motionZ * 2.0D;
 
             projectile.setPosition(shootX, shootY, shootZ);
-            
+
             projectile.setStartPosition(shootX, shootY, shootZ);
             this.worldObj.spawnEntityInWorld(projectile);
 
@@ -276,7 +276,7 @@ public class EntityBalista extends EntityLivingBase {
         this.reloadTimer = nbt.getInteger("ReloadTimer");
         this.isReloading = nbt.getBoolean("IsReloading");
         this.isLoaded = nbt.getBoolean("IsLoaded");
-        
+
         this.dataWatcher.updateObject(21, Byte.valueOf(this.isLoaded ? (byte)1 : (byte)0));
     }
 
@@ -328,11 +328,11 @@ public class EntityBalista extends EntityLivingBase {
 
     @Override
     public void setCurrentItemOrArmor(int slot, ItemStack stack) {
-        
+
     }
 
     @Override
     public ItemStack[] getLastActiveItems() {
-        return new ItemStack[5]; 
+        return new ItemStack[5];
     }
 }

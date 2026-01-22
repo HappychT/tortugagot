@@ -550,6 +550,7 @@ public class PacketFactionManage implements IMessage {
                 }
 
                 faction.getPlayers().remove(targetName);
+                CoreFaction.updatePrefix(targetName);
                 player.addChatMessage(new ChatComponentText("§aИгрок " + targetName + " был изгнан из фракции."));
             } else if (action.equals("setTitle")) {
                 if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_CREATE_TITLES)) {
@@ -561,6 +562,7 @@ public class PacketFactionManage implements IMessage {
                 if(pData != null && faction.getTitles().containsKey(titleName)){
                     pData.setTitle(titleName);
                     player.addChatMessage(new ChatComponentText("§aИгроку " + targetName + " назначен титул '" + titleName + "'."));
+                    CoreFaction.updatePrefix(targetName);
                 } else {
                     player.addChatMessage(new ChatComponentText("§cНе удалось найти игрока или титул."));
                 }

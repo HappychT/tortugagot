@@ -25,22 +25,22 @@ public class AttackHandler {
     public static final AttackHandler INSTANCE = new AttackHandler();
     private static final int PARRY_WINDOW = 7;
 
-    @SubscribeEvent
-    public void onLivingAttacked(LivingAttackEvent event) {
-        if(event.source.getSourceOfDamage() instanceof EntityPlayer) {
-            EntityPlayer attacker = (EntityPlayer) event.source.getSourceOfDamage();
+    //@SubscribeEvent
+    //public void onLivingAttacked(LivingAttackEvent event) {
+       // if(event.source.getSourceOfDamage() instanceof EntityPlayer) {
+        //    EntityPlayer attacker = (EntityPlayer) event.source.getSourceOfDamage();
 
-            if (ExtendedPlayer.get(attacker).getAttackCooldown() > 0) {
-                event.setCanceled(true);
-                DamageSource source = event.source;
-                if (source instanceof EntityDamageSourceIndirect) {
-                    source.getSourceOfDamage();
-                }
-            }
-        }
+            //if (ExtendedPlayer.get(attacker).getAttackCooldown() > 0) {
+             //   event.setCanceled(true);
+             //   DamageSource source = event.source;
+             //   if (source instanceof EntityDamageSourceIndirect) {
+             //       source.getSourceOfDamage();
+              //  }
+            //}
+       // }
 
 
-    }
+   // }
     @SubscribeEvent
     public void onEntityConstructing(EntityEvent.EntityConstructing event) {
         if (event.entity instanceof EntityPlayer) {

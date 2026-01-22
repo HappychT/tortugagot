@@ -569,7 +569,7 @@ public class GOTClientProxy extends GOTCommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(GOTTileEntityKebabStand.class, new GOTRenderKebabStand());
         ClientRegistry.bindTileEntitySpecialRenderer(GOTTileEntitySignCarved.class, new GOTRenderSignCarved());
         ClientRegistry.bindTileEntitySpecialRenderer(GOTTileEntitySignCarvedValyrian.class, new GOTRenderSignCarvedValyrian());
-        ClientRegistry.bindTileEntitySpecialRenderer(DecorationTileEntity.class, new DecorationRenderer());
+         ClientRegistry.bindTileEntitySpecialRenderer(DecorationTileEntity.class, new DecorationRenderer());
         RenderingRegistry.registerEntityRenderingHandler(EntityCatapult.class, new RenderCatapult());
         RenderingRegistry.registerEntityRenderingHandler(EntityStoneProjectile.class, new RenderStoneProjectile());
         RenderingRegistry.registerEntityRenderingHandler(EntityTribushet.class, new RenderTribushet());

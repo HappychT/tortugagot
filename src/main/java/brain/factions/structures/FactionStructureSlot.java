@@ -28,6 +28,7 @@ public class FactionStructureSlot {
     public int provisions;
     public int barracksCapacity;
 
+    public String raidTime = "";
 
     public static enum StructureType {
         FORTRESS, RESOURCE_POINT, BARN, ENGINEERING_WORKSHOP;

@@ -17,7 +17,7 @@ public class ItemKingWeapon extends ItemSword {
     private IIcon itemIcon;
     private String textureName;
     
-    public static Item.ToolMaterial VALYRIAN_STEEL = EnumHelper.addToolMaterial(
+    public static ToolMaterial VALYRIAN_STEEL = EnumHelper.addToolMaterial(
         "VALYRIAN_STEEL", 
         3, 
         2500, 
@@ -26,7 +26,7 @@ public class ItemKingWeapon extends ItemSword {
         22 
     );
     
-    public static Item.ToolMaterial ICE = EnumHelper.addToolMaterial(
+    public static ToolMaterial ICE = EnumHelper.addToolMaterial(
         "ICE",
         3,
         1800,
@@ -35,7 +35,7 @@ public class ItemKingWeapon extends ItemSword {
         18
     );
     
-    public static Item.ToolMaterial PATHKEEPER = EnumHelper.addToolMaterial(
+    public static ToolMaterial PATHKEEPER = EnumHelper.addToolMaterial(
         "PATHKEEPER",
         3,
         2000,
@@ -44,7 +44,7 @@ public class ItemKingWeapon extends ItemSword {
         20
     );
     
-    public ItemKingWeapon(Item.ToolMaterial material, String unlocalizedName, String textureName) {
+    public ItemKingWeapon(ToolMaterial material, String unlocalizedName, String textureName) {
         super(material);
         this.setUnlocalizedName(unlocalizedName);
         this.setCreativeTab(CreativeTabs.tabCombat);

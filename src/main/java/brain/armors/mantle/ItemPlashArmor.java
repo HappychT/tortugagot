@@ -16,7 +16,7 @@ public class ItemPlashArmor extends ItemArmor {
     private IIcon itemIcon;
     private final int plashType; 
     
-    public ItemPlashArmor(ItemArmor.ArmorMaterial material, int renderIndex, int armorType, int plashType) {
+    public ItemPlashArmor(ArmorMaterial material, int renderIndex, int armorType, int plashType) {
         super(material, renderIndex, armorType);
         this.plashType = plashType;
         this.setMaxDamage(0);

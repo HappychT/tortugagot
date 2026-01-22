@@ -1,0 +1,11 @@
+# Items
+item.gooseFeather.name=Goose Feather
+item.rawGoose.name=Raw Goose
+item.cookedGoose.name=Cooked Goose
+item.foieGras.name=Foie Gras
+item.cookedFoieGras.name=Cooked Foie Gras
+item.corn.name=Corn
+item.walrusFat.name=Walrus Fat
+
+# Entity
+entity.Goose.name=Goose

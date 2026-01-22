@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import brain.armors.KingArmorMod;
 import com.google.common.base.CaseFormat;
 
-import brain.armors.KingArmorMod;
 import brain.factions.Faction;
 import brain.factions.network.PacketInfoFactions;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -163,11 +163,11 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import noname.weapons.EntityRegister;
 import noname.weapons.RegItem;
-import noname.weapons.WarCommand;
-import noname.weapons.WarTicketHandler;
 import noname.weapons.config.WeaponsConfig;
 import noname.weapons.events.BlockDamageTickHandler;
 import noname.weapons.war.WarBlockHandler;
+import noname.weapons.war.WarCommand;
+import noname.weapons.war.WarTicketHandler;
 
 @Mod(modid = "got", dependencies = "required-after:geckolib3")
 public class GOT {
@@ -621,9 +621,8 @@ public class GOT {
         Blocks.dragon_egg.setCreativeTab(GOTCreativeTabs.tabStory);
         proxy.onPreload();
         GOTBlockIronBank.preInit();
-        
-        KingArmorMod.preInit(event);
         // coreFaction.preInit(event);
+        KingArmorMod.preInit(event);
     }
 
     @SideOnly(Side.CLIENT)
