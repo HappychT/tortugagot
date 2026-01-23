@@ -25,7 +25,7 @@ public class Plash4 extends ModelBiped {
         bone2 = new ModelRenderer(this);
         bone2.setRotationPoint(3.0F, 0.0F, -3.0F);
         bone2.setTextureOffset(0, 0);
-        bone2.addBox(-12.0F, -0.55F, -1.25F, 18, 19, 9, 0.1f);
+        bone2.addBox(-12.0F, -0.55F, -1.45F, 18, 19, 9, 0.1f);
 
     }
 
@@ -38,8 +38,7 @@ public class Plash4 extends ModelBiped {
     }
 
     @Override
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks,
-                                  float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
+    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entity);
 
         this.bipedHead.rotateAngleX = headPitch * 0.017453292F;
