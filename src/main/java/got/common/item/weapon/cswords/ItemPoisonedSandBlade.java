@@ -17,7 +17,7 @@ public class ItemPoisonedSandBlade extends GOTItemPolearm {
 
     public ItemPoisonedSandBlade(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
 

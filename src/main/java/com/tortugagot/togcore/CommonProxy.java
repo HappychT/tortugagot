@@ -23,7 +23,5 @@ public class CommonProxy {
     public void serverStarting(FMLServerStartingEvent event) {}
 
     public void registerRenderers() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registerRenderers'");
     }
 }

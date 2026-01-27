@@ -26,7 +26,7 @@ public class GOTItemBandage extends Item {
     public GOTItemBandage(float healAmount) {
         this.healAmount = healAmount;
         this.setMaxStackSize(1);
-        setCreativeTab(GOTCreativeTabs.tabStory);
+        setCreativeTab(GOTCreativeTabs.tabMisc);
     }
     public float getHealAmount() {
         return this.healAmount;

@@ -91,7 +91,7 @@ public class CoreFaction {
 		event.registerServerCommand(new FactionAdminCommand());
 		event.registerServerCommand(new RaidCommand());
 		event.registerServerCommand(new CommandSaveArena());
-
+		event.registerServerCommand(new FactionKickCommand());
 		CompletableFuture.runAsync(() -> {
 			LOGGER.info("Loading Faction data asynchronously...");
 			initFactions();

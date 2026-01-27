@@ -15,7 +15,7 @@ public class ItemIceStarkSword extends GOTItemGreatsword {
 
     public ItemIceStarkSword(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

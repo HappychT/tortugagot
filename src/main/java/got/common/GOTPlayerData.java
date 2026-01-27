@@ -2071,7 +2071,7 @@ public class GOTPlayerData {
             float newAlign = rankBelow2.alignment;
             newAlign = Math.max(newAlign, pledgeLvl / 2.0F);
             float alignPenalty = newAlign - prevAlign;
-            if (alignPenalty < 0.0F) {
+            /**if (alignPenalty < 0.0F) {
                 GOTAlignmentValues.AlignmentBonus penalty = GOTAlignmentValues.createPledgePenalty(alignPenalty);
                 double alignX;
                 double alignY;
@@ -2091,7 +2091,7 @@ public class GOTPlayerData {
                     alignZ = posSight.zCoord;
                 }
                 addAlignment(entityplayer, penalty, wasPledge, alignX, alignY, alignZ);
-            }
+            *///}
             world.playSoundAtEntity(entityplayer, "got:event.unpledge", 1.0F, 1.0F);
             if (intentional) {
                 ChatComponentTranslation chatComponentTranslation = new ChatComponentTranslation("got.chat.unpledge", wasPledge.factionName());

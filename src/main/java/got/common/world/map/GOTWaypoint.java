@@ -404,15 +404,8 @@ public enum GOTWaypoint implements GOTAbstractWaypoint {
 	@Override
 	public boolean hasPlayerUnlocked(EntityPlayer entityplayer) {
 		GOTPlayerData pd = GOTLevelData.getData(entityplayer);
-		if (pd.isFTRegionUnlocked(region)) {
-			if (isCompatibleAlignment(entityplayer)) {
-				return true;
-			}
-			if (isConquestUnlockable(entityplayer)) {
-				return isConquered(entityplayer);
-			}
-		}
-		return false;
+
+		return pd.isFTRegionUnlocked(region);
 	}
 
 	public GOTWaypoint info(int i, int j, int r) {

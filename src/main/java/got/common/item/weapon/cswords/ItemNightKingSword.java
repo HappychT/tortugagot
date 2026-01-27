@@ -17,7 +17,7 @@ public class ItemNightKingSword extends GOTItemGreatsword {
 
     public ItemNightKingSword(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
 

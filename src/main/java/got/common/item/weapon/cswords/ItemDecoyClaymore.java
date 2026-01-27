@@ -24,7 +24,7 @@ public class ItemDecoyClaymore extends GOTItemGreatsword {
 
     public ItemDecoyClaymore(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
         setWeaponDamage(9.0F);
     }
 

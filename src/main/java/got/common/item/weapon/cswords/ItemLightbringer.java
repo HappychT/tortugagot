@@ -23,7 +23,7 @@ public class ItemLightbringer extends GOTItemGreatsword {
 
     public ItemLightbringer(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     private void spawnFlameParticles(World world, Entity entity) {

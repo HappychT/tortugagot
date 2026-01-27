@@ -32,7 +32,7 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemGreatsword.class, 0.667f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemLongsword.class, 0.8f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemSword.class, 0.6897f);
-		GOTWeaponStats.registerMeleeSpeed(GOTItemBattleaxe.class, 0.60f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemBattleaxe.class, 0.54f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemPoleaxe.class, 0.49f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemArrynClaymore.class, 0.629f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemRiverlandsTrident.class, 0.45f);

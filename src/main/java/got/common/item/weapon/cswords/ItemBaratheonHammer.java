@@ -19,7 +19,7 @@ public class ItemBaratheonHammer extends GOTItemLegendaryHammer {
 
     public ItemBaratheonHammer(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

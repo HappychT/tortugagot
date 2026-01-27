@@ -4486,6 +4486,20 @@ item.got:alloy_steel_nugget.name=Самородок легированной с�
 item.got:alloy_steel_pickaxe.name=Кирка из легированной стали
 item.got:alloy_steel_shovel.name=Лопата из легированной стали
 item.got:alloy_steel_sword.name=Меч из легированной стали
+
+item.got:baratheon_hammer.name=Молот Роберта Баратеона
+item.got:stunning_hammer.name=Ошеломляющий
+item.got:lightbringersec.name=Светозарный
+item.got:nightking_swordsec.name=Меч Короля Ночи
+item.got:ice_stark_sword.name=Лёд (меч Старков)
+item.got:poisoned_sand_blade.name=Лезвие Ядовитого Песка
+item.got:syrio_forel_sword.name=Фехтовальный Меч Сирио Форель
+item.got:decoy_claymore.name=Подставной Клеймор
+
+item.got:bandage_tier1.name=Бинт (1-ый уровень)
+item.got:bandage_tier2.name=Бинт (2-ый уровень)
+item.got:bandage_tier3.name=Бинт (3-ый уровень)
+
 item.got:almond.name=Миндаль
 item.got:amber.name=Янтарь
 item.got:amethyst.name=Аметист

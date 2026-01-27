@@ -23,7 +23,7 @@ public class ItemStunningHammer extends GOTItemHammer {
 
     public ItemStunningHammer(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

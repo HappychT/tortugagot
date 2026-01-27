@@ -13,7 +13,7 @@ public class GOTItemBattleaxe extends GOTItemSword {
 		super(material);
 		efficiencyOnProperMaterial = material.getEfficiencyOnProperMaterial();
 		setHarvestLevel("axe", material.getHarvestLevel());
-		gotWeaponDamage += 1.0f;
+		gotWeaponDamage += 0.5f;
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class ItemSyrioForelSword extends GOTItemSword {
 
     public ItemSyrioForelSword(ToolMaterial material) {
         super(material);
-        setCreativeTab(GOTCreativeTabs.tabCombat);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

@@ -229,12 +229,12 @@ public class GOTTickHandlerClient {
                 }
                 for (int j = 0; j <= dmgIndex - 1; j++) {
                     if (j == 1 && itemstack.getItemUseAction() == EnumAction.block) {
+                        String angleLine = EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.got.blockAngle") + " " + leftAngle + "|" + rightAngle;
+                        newTooltip.add(angleLine);
                         if (!tooltip.get(j).isEmpty()) {
                             newTooltip.add(tooltip.get(j));
-                            newTooltip.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.got.blockAngle") + " " + leftAngle + "|" + rightAngle);
-                            continue;
                         }
-                        newTooltip.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.got.blockAngle") + " " + leftAngle + "|" + rightAngle);
+                        continue;
                     }
                     newTooltip.add(tooltip.get(j));
                 }
