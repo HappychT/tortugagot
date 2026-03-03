@@ -2380,7 +2380,7 @@ public class GOTRegistry {
         appleCrumbleItem = new GOTItemPlaceableFood(appleCrumble);
         appleGreen = new GOTItemFood(4, 0.3f, false);
         archmagStaff = new GOTItemAsshaiArchmagStaff();
-        areoHotahAxe = new GOTItemLegendaryBattleaxe(GOTMaterial.IRON);
+        areoHotahAxe = new GOTItemAreoHotahAxe();
         armorStandItem = new GOTItemArmorStand();
         arrowFire = new GOTItemArrowFire();
         arrowPoisoned = new GOTItemArrowPoisoned();
@@ -2422,7 +2422,7 @@ public class GOTRegistry {
         blackfyreChestplate = new GOTItemArmor(GOTMaterial.BLACKFYRE, 1).setCreativeTab(GOTCreativeTabs.tabStory);
         blackfyreHelmet = new GOTItemArmor(GOTMaterial.BLACKFYRE, 0, "helmet").setCreativeTab(GOTCreativeTabs.tabStory);
         blackfyreLeggings = new GOTItemArmor(GOTMaterial.BLACKFYRE, 2).setCreativeTab(GOTCreativeTabs.tabStory);
-        blackfyre = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
+        blackfyre = new ItemBlackfyreSword();
         blackrootStick = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials).setFull3D();
         blackskinChestplate = new GOTItemArmor(GOTMaterial.BLACKSKIN, 1).setCreativeTab(GOTCreativeTabs.tabStory);
         blacksmithHammer = new GOTItemHammer(GOTMaterial.IRON);
@@ -2440,7 +2440,7 @@ public class GOTRegistry {
         braavosHelmet = new GOTItemArmor(GOTMaterial.BRAAVOS, 0, "helmet");
         braavosLeggings = new GOTItemArmor(GOTMaterial.BRAAVOS, 2);
         brandingIron = new GOTItemBrandingIron();
-        brightroar = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
+        brightroar = new ItemBrightroarSword();
         bronzeAxe = new GOTItemAxe(GOTMaterial.BRONZE_TOOL);
         bronzeBattleaxe = new GOTItemBattleaxe(GOTMaterial.BRONZE_TOOL);
         bronzeBoots = new GOTItemArmor(GOTMaterial.BRONZE, 3);
@@ -2460,7 +2460,7 @@ public class GOTRegistry {
         camelCooked = new GOTItemFood(6, 0.6f, true);
         camelRaw = new GOTItemFood(2, 0.2f, true);
         cargocart = new GOTItemCargocart();
-        celtigarAxe = new GOTItemLegendaryBattleaxe(GOTMaterial.VALYRIAN_TOOL);
+        celtigarAxe = new GOTItemCeltigarAxe();
         ceramicMug = new GOTItemVessel();
         ceramicPlate = new GOTItemPlate(ceramicPlateBlock);
         cherry = new GOTItemFood(2, 0.2f, false);
@@ -2510,7 +2510,7 @@ public class GOTRegistry {
         dart = new GOTItemDart();
         dartPoisoned = new GOTItemDart().setPoisoned();
         date = new GOTItemHangingFruit(2, 0.3f, false, dateBlock);
-        dawn = new GOTItemLegendarySword(GOTMaterial.IRON).setIsGlowing().addWeaponDamage(-1.0f);
+        dawn = new ItemDawnSword();
         deerCooked = new GOTItemFood(8, 0.8f, true);
         deerRaw = new GOTItemFood(3, 0.3f, true);
         diamond = new GOTItemGemWithAnvilNameColor(EnumChatFormatting.GRAY);
@@ -2566,7 +2566,7 @@ public class GOTRegistry {
         gemsbokHide = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         gemsbokHorn = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         gemsbokLeggings = new GOTItemArmor(GOTMaterial.GEMSBOK, 2);
-        gendryHammer = new GOTItemLegendaryHammer(GOTMaterial.IRON);
+        gendryHammer = new ItemGendryHammer();
         gendryHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "gendry").setCreativeTab(GOTCreativeTabs.tabStory);
         ghiscarBoots = new GOTItemArmor(GOTMaterial.GHISCAR, 3);
         ghiscarChestplate = new GOTItemArmor(GOTMaterial.GHISCAR, 1);
@@ -2592,12 +2592,12 @@ public class GOTRegistry {
         copperRing = new GOTItemRing();
         grapeRed = new GOTItemFood(2, 0.2f, false);
         grapeWhite = new GOTItemFood(2, 0.2f, false);
-        gregorCleganeSword = new GOTItemLegendaryGreatsword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
+        gregorCleganeSword = new ItemGregorCleganeSword();
         handGold = new GOTItemArmor(GOTMaterial.HAND, 1, "gold").setCreativeTab(GOTCreativeTabs.tabStory);
         handSilver = new GOTItemArmor(GOTMaterial.HAND, 1, "silver").setCreativeTab(GOTCreativeTabs.tabStory);
         harpy = new GOTItemArmor(GOTMaterial.GHISCAR, 0, "harpy");
         hearteater = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        heartsbane = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
+        heartsbane = new ItemHeartsbaneSword();
         hillmenBoots = new GOTItemArmor(GOTMaterial.HILLMEN, 3);
         hillmenChestplate = new GOTItemArmor(GOTMaterial.HILLMEN, 1);
         hillmenHelmet = new GOTItemArmor(GOTMaterial.HILLMEN, 0, "helmet");
@@ -2674,7 +2674,7 @@ public class GOTRegistry {
         lionFur = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         lionRaw = new GOTItemFood(3, 0.3f, true);
         lionRug = new GOTItemLionRug();
-        longclaw = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
+        longclaw = new ItemLongclawSword();
         lorathBoots = new GOTItemArmor(GOTMaterial.LORATH, 3);
         lorathChestplate = new GOTItemArmor(GOTMaterial.LORATH, 1);
         lorathHelmet = new GOTItemArmor(GOTMaterial.LORATH, 0);
@@ -2772,7 +2772,7 @@ public class GOTRegistry {
         npcRespawner = new GOTItemNPCRespawner();
         nymeriaWhip = new GOTItemLegendaryWhip();
         oathkeeper = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
-        obaraSpear = new GOTItemLegendarySword(GOTMaterial.IRON, GOTItemSword.HitEffect.POISON);
+        obaraSpear = new ItemObaraSpear();
         obsidianShard = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         olive = new GOTItemFood(1, 0.1f, false);
         oliveBread = new GOTItemFood(5, 0.6f, false);
@@ -2927,7 +2927,7 @@ public class GOTRegistry {
         summerPike = new GOTItemPike(GOTMaterial.IRON);
         summerSpear = new GOTItemSpear(GOTMaterial.IRON);
         summerSword = new GOTItemSword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        sunspear = new GOTItemLegendarySword(GOTMaterial.IRON, GOTItemSword.HitEffect.POISON);
+        sunspear = new ItemSunspear();
         swanFeather = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         targaryenBoots = new GOTItemArmor(GOTMaterial.TARGARYEN, 3).setCreativeTab(GOTCreativeTabs.tabStory);
         targaryenChestplate = new GOTItemArmor(GOTMaterial.TARGARYEN, 1, "chestplate").setCreativeTab(GOTCreativeTabs.tabStory);
@@ -2945,7 +2945,7 @@ public class GOTRegistry {
         turnip = new ItemSeedFood(2, 0.3f, turnipCrop, Blocks.farmland).setCreativeTab(GOTCreativeTabs.tabFood);
         turnipCooked = new GOTItemFood(6, 0.6f, false);
         tyeneDagger = new GOTItemLegendaryDagger(GOTMaterial.IRON, GOTItemSword.HitEffect.POISON);
-        tyrionAxe = new GOTItemLegendaryBattleaxe(GOTMaterial.IRON);
+        tyrionAxe = new GOTItemTyrionAxe();
         tyroshBoots = new GOTItemArmor(GOTMaterial.TYROSH, 3);
         tyroshChestplate = new GOTItemArmor(GOTMaterial.TYROSH, 1);
         tyroshHelmet = new GOTItemArmor(GOTMaterial.TYROSH, 0);
@@ -2979,7 +2979,7 @@ public class GOTRegistry {
         valyrianSpear = new GOTItemSpear(GOTMaterial.VALYRIAN_TOOL);
         valyrianSword = new GOTItemSword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         velaryonBrooch = new GOTItemArmor(GOTMaterial.HAND, 1, "velaryon").setCreativeTab(GOTCreativeTabs.tabStory);
-        victarionAxe = new GOTItemLegendaryBattleaxe(GOTMaterial.IRON);
+        victarionAxe = new GOTItemVictarionAxe();
         victarionHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "victarion").setCreativeTab(GOTCreativeTabs.tabStory);
         vigilance = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         volantisBoots = new GOTItemArmor(GOTMaterial.VOLANTIS, 3);
@@ -3065,11 +3065,11 @@ public class GOTRegistry {
         zebraRaw = new GOTItemFood(2, 0.1f, true);
         dornePolearm = new GOTItemDornePolearm(GOTMaterial.DORNE_TOOL).addWeaponDamage(-0.5f);
         ironBornAxe = new GOTItemIronBornAxe(GOTMaterial.IRON).addWeaponDamage(0.25f);
-        arrynClaymore = new GOTItemArrynClaymore(GOTMaterial.IRON).addWeaponDamage(-3.5f);;
+        arrynClaymore = new GOTItemArrynClaymore(GOTMaterial.IRON).addWeaponDamage(-3.5f);
         riverlandsTrident = new GOTItemRiverlandsTrident(GOTMaterial.IRON);
         reachPike = new GOTItemReachPike(GOTMaterial.IRON).addWeaponDamage(1.0f);
         stormlandsHammer = new GOTItemStormlandsHammer(GOTMaterial.IRON).addWeaponDamage(0.5f);
-        northGreatSword = new GOTItemNorthGreatSword(GOTMaterial.IRON).addWeaponDamage(-3.0f);
+        northGreatSword = new GOTItemNorthGreatSword(GOTMaterial.IRON).addWeaponDamage(-1.5f);
         whiteMammothSkin = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         millitaryCard = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
         frostSpiderString = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);

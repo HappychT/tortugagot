@@ -165,7 +165,7 @@ public class GOTNetHandlerPlayServer extends NetHandlerPlayServer {
             double reach = GOTWeaponStats.getMeleeReachDistance(this.playerEntity);
             reach += GOTWeaponStats.getMeleeExtraLookWidth();
             reach += target.getCollisionBorderSize();
-            int attackTime = GOTWeaponStats.getAttackTimePlayer(itemstack);
+            int attackTime = GOTWeaponStats.getAttackTimePlayer(itemstack, this.playerEntity);
             if (this.playerEntity.getDistanceSqToEntity(target) < reach * reach) {
                 if (packet.func_149565_c() == C02PacketUseEntity.Action.INTERACT) {
                     this.playerEntity.interactWith(target);

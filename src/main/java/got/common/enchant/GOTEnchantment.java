@@ -108,6 +108,7 @@ public abstract class GOTEnchantment {
 	public static GOTEnchantment dexterityBuff = new GOTEnchantmentDexterityBuff("dexterityBuff").setEnchantWeight(1).setSkilful();
 	
 	public static GOTEnchantment valyrianSeal = new GOTEnchantmentValyrianSeal("valyrianSeal").setEnchantWeight(0);
+	public static GOTEnchantment soulbound = new GOTEnchantmentSoulbound("soulbound").setEnchantWeight(0);
 
 	public String enchantName;
 

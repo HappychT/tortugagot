@@ -19,6 +19,19 @@ public class GOTCoreBlockingSystem {
     }
 
     public static void registerWeapons() {
+        registerWeapon(GOTItemNorthGreatSword.class, 35.0f, 35.0f, 2, 2.5);
+        registerWeapon(ItemHeartsbaneSword.class, 35.0f, 35.0f, 2.0, 2.5);
+        registerWeapon(ItemBrightroarSword.class, 35.0f, 35.0f, 2.0, 2.5);
+        registerWeapon(ItemDawnSword.class, 35.0f, 35.0f, 2.0, 2.5);
+        registerWeapon(ItemLongclawSword.class, 32.0f, 32.0f, 1.8, 2.3);
+        registerWeapon(ItemBlackfyreSword.class, 32.0f, 32.0f, 1.8, 2.3);
+        registerWeapon(ItemSunspear.class, 15.0f, 15.0f, 3.0, 3.5);
+        registerWeapon(ItemObaraSpear.class, 15.0f, 15.0f, 3.0, 3.5);
+        registerWeapon(GOTItemCeltigarAxe.class, 25.0f, 25.0f, 3.0, 3.5);
+        registerWeapon(GOTItemAreoHotahAxe.class, 20.0f, 20.0f, 3.0, 3.5);
+        registerWeapon(GOTItemVictarionAxe.class, 28.0f, 28.0f, 2.0, 2.5);
+        registerWeapon(GOTItemTyrionAxe.class, 20.0f, 20.0f, 1.5, 1.8);
+        registerWeapon(ItemGendryHammer.class, 20.0f, 20.0f, 2.5, 3.0);
         registerWeapon(GOTItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
         registerWeapon(ItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
         registerWeapon(GOTItemArrynClaymore.class, 32.0f, 32.0f, 1.5, 1.8);

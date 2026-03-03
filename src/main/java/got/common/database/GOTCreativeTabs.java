@@ -1,11 +1,16 @@
 package got.common.database;
 
 import cpw.mods.fml.relauncher.*;
+import got.common.enchant.GOTEnchantment;
+import got.common.enchant.GOTEnchantmentHelper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import noname.weapons.RegItem;
 import software.bernie.example.registry.ItemRegistry;
+
+import java.util.List;
 
 public class GOTCreativeTabs extends CreativeTabs {
 	public static GOTCreativeTabs tabBlock = new GOTCreativeTabs("blocks");
@@ -42,6 +47,24 @@ public class GOTCreativeTabs extends CreativeTabs {
 	@SideOnly(value = Side.CLIENT)
 	public String getTranslatedTabLabel() {
 		return StatCollector.translateToLocal("got.tab." + getTabLabel());
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void displayAllReleventItems(List list) {
+		super.displayAllReleventItems(list);
+		if (this == tabStory) {
+			for (Object o : list) {
+				ItemStack stack = (ItemStack) o;
+				if (stack != null && stack.getItem() != null && stack.getItem() != GOTRegistry.valyrianSeal) {
+					GOTEnchantmentHelper.addEnchant(stack, GOTEnchantment.valyrianSeal);
+					if (!stack.hasTagCompound()) {
+						stack.setTagCompound(new NBTTagCompound());
+					}
+					stack.getTagCompound().setDouble("sealChance", 1.0);
+				}
+			}
+		}
 	}
 
 	public static void onInit() {

@@ -1,4 +1,4 @@
-﻿
+
 got.warning=Вы не можете использовать данное снаряжение
 attribute.name.generic.movementSpeedAir=Скорость (Воздух)
 color.black=Чёрный
@@ -2164,6 +2164,8 @@ got.enchant.weak1=Тупой
 got.enchant.weak2=Погнутый
 got.enchant.weak3=Кривой
 got.enchant.valyrianSeal=Валирийский
+got.enchant.soulbound=Привязка к душе
+got.enchant.soulbound.desc=Вещь не теряется при смерти и при выходе в бою
 got.faction.ARRYN.entity=Люди долины
 got.faction.ARRYN.name=Долина Аррен
 got.faction.ARRYN.subtitle=Защищённые горами плодородные земли
@@ -5817,6 +5819,7 @@ got.potion.combatSpirit=Боевой дух
 got.potion.inversion=Инверсия
 got.potion.freeze=Вечная стужа
 got.jewelry.desc.cooldown=Можно повторно использовать через
+got.throwingKnife.cooldown=КД метательного ножа
 
 item.got:fingers.name=Человеческие пальцы
 item.got:scorpion_tail.name=Хвост скорпиона

@@ -11,7 +11,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 public class GOTEntityThrowingKnife extends GOTEntityProjectileBase {
-    public int KnifeRotation;
     public int effectType;
 
     public GOTEntityThrowingKnife(World world) {
@@ -39,6 +38,11 @@ public class GOTEntityThrowingKnife extends GOTEntityProjectileBase {
         return speed * damage;
     }
 
+    @Override
+    public int getMinTicksInAirBeforeBlockHit() {
+        return 5;
+    }
+
     public boolean isThrowingKnife() {
         Item item = getProjectileItem().getItem();
         return item instanceof GOTItemThrowingKnife;
@@ -47,16 +51,8 @@ public class GOTEntityThrowingKnife extends GOTEntityProjectileBase {
     @Override
     public void onUpdate() {
         super.onUpdate();
-        if (!this.inGround) {
-            ++this.KnifeRotation;
-            if (this.KnifeRotation > 9) {
-                this.KnifeRotation = 0;
-            }
-            this.rotationPitch = this.KnifeRotation / 9.0f * 360.0f;
-        }
         if (!isThrowingKnife()) {
             setDead();
         }
-
     }
 }

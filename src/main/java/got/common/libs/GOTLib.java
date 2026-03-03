@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 public class GOTLib {
 
     public static int getAttackCooldown(EntityPlayer ply) {
-        return GOTWeaponStats.getAttackTimePlayer(ply.getHeldItem()) - 4;
+        return GOTWeaponStats.getAttackTimePlayer(ply.getHeldItem(), ply) - 4;
     }
 
 }

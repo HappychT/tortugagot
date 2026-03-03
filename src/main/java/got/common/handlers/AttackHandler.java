@@ -70,7 +70,7 @@ public class AttackHandler {
                         attacker.attackEntityFrom(DamageSource.causePlayerDamage(defendingPlayer), 2.0F);
                     }
 
-                    defendingPlayer.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 80, 0));
+                    parryData.setLastSyrioCounterTime(defendingPlayer.worldObj.getTotalWorldTime());
                     parryData.setBlockStartTime(0);
                 }
             }

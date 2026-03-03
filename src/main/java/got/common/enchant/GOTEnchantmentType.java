@@ -8,9 +8,14 @@ import got.common.item.weapon.*;
 import net.minecraft.item.*;
 
 public enum GOTEnchantmentType {
-	BREAKABLE, ARMOR, ARMOR_FEET, ARMOR_LEGS, ARMOR_BODY, ARMOR_HEAD, MELEE, TOOL, SHEARS, RANGED, RANGED_LAUNCHER, THROWING_AXE, FISHING, FACTION_WEAPON, FACTION_ARMOR, PICKAXE;
+	BREAKABLE, ARMOR, ARMOR_FEET, ARMOR_LEGS, ARMOR_BODY, ARMOR_HEAD, MELEE, TOOL, SHEARS, RANGED, RANGED_LAUNCHER, THROWING_AXE, FISHING, FACTION_WEAPON, FACTION_ARMOR, PICKAXE,
+	/** Любой предмет (для Привязки к душе и т.п.) */
+	ANY;
 
 	public boolean canApply(ItemStack itemstack, boolean considering) {
+		if (this == ANY) {
+			return itemstack != null && itemstack.getItem() != null;
+		}
 		Item item = itemstack.getItem();
 
 		if (this == BREAKABLE && item.isDamageable()) {

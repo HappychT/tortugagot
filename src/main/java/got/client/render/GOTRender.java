@@ -253,6 +253,7 @@ public class GOTRender {
         renders.put(GOTEntitySwan.class, new GOTRenderSwan());
         renders.put(GOTEntityTermite.class, new GOTRenderTermite());
         renders.put(GOTEntityThrowingAxe.class, new GOTRenderThrowingAxe());
+        renders.put(GOTEntityThrowingKnife.class, new GOTRenderThrowingKnife());
         renders.put(GOTEntityThrownRock.class, new GOTRenderThrownRock());
         renders.put(GOTEntityThrownTermite.class, new RenderSnowball(GOTRegistry.termite));
         renders.put(GOTEntityTraderRespawn.class, new GOTRenderTraderRespawn());

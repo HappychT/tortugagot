@@ -840,6 +840,26 @@ public class GOTTickHandlerClient {
                     GL11.glPopMatrix();
                 }
             }
+            if (event.type == RenderGameOverlayEvent.ElementType.TEXT) {
+                ItemStack held = entityClientPlayerMP.getHeldItem();
+                if (held != null && held.getItem() instanceof GOTItemThrowingKnife && held.hasTagCompound() && held.stackTagCompound.getInteger("timer") > 0) {
+                    int timer = held.stackTagCompound.getInteger("timer");
+                    int sec = (timer + 19) / 20;
+                    String cooldownStr = String.valueOf(sec);
+                    ScaledResolution sr = event.resolution;
+                    int w = sr.getScaledWidth();
+                    int h = sr.getScaledHeight();
+                    int hotbarCenterX = w / 2;
+                    int hotbarRight = hotbarCenterX + 91;
+                    int slot9CenterX = hotbarRight + 12;
+                    int x = slot9CenterX - mc.fontRenderer.getStringWidth(cooldownStr) / 2;
+                    int y = h - 30;
+                    if (!mc.playerController.shouldDrawHUD()) {
+                        y += 14;
+                    }
+                    mc.fontRenderer.drawStringWithShadow(cooldownStr, x, y, 0xFFFF00);
+                }
+            }
         }
     }
 

@@ -14,6 +14,8 @@ public class PlayerParryData implements IExtendedEntityProperties {
 
     private boolean isTryingToBlock = false;
     private long blockStartTime = 0;
+    /** World time when Syrio counter last succeeded (for +10% melee speed for 5 sec). */
+    private long lastSyrioCounterTime = 0;
 
     public PlayerParryData(EntityPlayer player) {
         this.player = player;
@@ -51,5 +53,13 @@ public class PlayerParryData implements IExtendedEntityProperties {
     }
     public boolean isTryingToBlock() {
         return this.isTryingToBlock;
+    }
+
+    public long getLastSyrioCounterTime() {
+        return lastSyrioCounterTime;
+    }
+
+    public void setLastSyrioCounterTime(long time) {
+        this.lastSyrioCounterTime = time;
     }
 }

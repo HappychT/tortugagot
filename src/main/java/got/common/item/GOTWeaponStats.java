@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 import com.google.common.collect.Multimap;
 
 import got.GOT;
+import got.common.database.GOTRegistry;
+import got.common.handlers.PlayerParryData;
 import got.common.enchant.GOTEnchantmentHelper;
 import got.common.enchant.GOTEnchantmentRangedDamage;
 import got.common.item.weapon.*;
@@ -71,6 +73,39 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(ItemIceStarkSword.class, 0.25f);
 		GOTWeaponStats.registerMeleeReach(ItemIceStarkSword.class, 1.30f);
 
+		// Gregor Clegane sword uses default greatsword speed/reach (0.667, 1.5) like Ice in-game
+
+		GOTWeaponStats.registerMeleeSpeed(ItemHeartsbaneSword.class, 0.55f);
+		GOTWeaponStats.registerMeleeReach(ItemHeartsbaneSword.class, 1.1f);
+		GOTWeaponStats.registerMeleeSpeed(ItemBrightroarSword.class, 0.55f);
+		GOTWeaponStats.registerMeleeReach(ItemBrightroarSword.class, 1.1f);
+		GOTWeaponStats.registerMeleeSpeed(ItemDawnSword.class, 0.55f);
+		GOTWeaponStats.registerMeleeReach(ItemDawnSword.class, 1.1f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemLongclawSword.class, 0.64f);
+		GOTWeaponStats.registerMeleeReach(ItemLongclawSword.class, 1.04f);
+		GOTWeaponStats.registerMeleeSpeed(ItemBlackfyreSword.class, 0.64f);
+		GOTWeaponStats.registerMeleeReach(ItemBlackfyreSword.class, 1.04f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemSunspear.class, 0.65f);
+		GOTWeaponStats.registerMeleeReach(ItemSunspear.class, 1.3f);
+		GOTWeaponStats.registerMeleeSpeed(ItemObaraSpear.class, 0.65f);
+		GOTWeaponStats.registerMeleeReach(ItemObaraSpear.class, 1.3f);
+
+		GOTWeaponStats.registerMeleeSpeed(GOTItemCeltigarAxe.class, 0.45f);
+		GOTWeaponStats.registerMeleeReach(GOTItemCeltigarAxe.class, 1.2f);
+
+		GOTWeaponStats.registerMeleeSpeed(GOTItemAreoHotahAxe.class, 0.52f);
+		GOTWeaponStats.registerMeleeReach(GOTItemAreoHotahAxe.class, 1.25f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemVictarionAxe.class, 0.60f);
+		GOTWeaponStats.registerMeleeReach(GOTItemVictarionAxe.class, 0.96f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemTyrionAxe.class, 0.77f);
+		GOTWeaponStats.registerMeleeReach(GOTItemTyrionAxe.class, 0.77f);
+
+		GOTWeaponStats.registerMeleeSpeed(ItemGendryHammer.class, 0.45f);
+		GOTWeaponStats.registerMeleeReach(ItemGendryHammer.class, 1.0f);
+		GOTWeaponStats.registerMeleeExtraKnockback(ItemGendryHammer.class, 1);
+
 		GOTWeaponStats.registerMeleeSpeed(ItemPoisonedSandBlade.class, 0.54f);
 		GOTWeaponStats.registerMeleeReach(ItemPoisonedSandBlade.class, 1.45f);
 
@@ -131,7 +166,19 @@ public class GOTWeaponStats {
 	}
 
 	public static int getAttackTimePlayer(ItemStack itemstack) {
-		return GOTWeaponStats.getAttackTimeWithBase(itemstack, basePlayerMeleeTime);
+		return getAttackTimePlayer(itemstack, null);
+	}
+
+	/** With player context: Syrio counter gives +10% melee speed for 5 sec (stored in PlayerParryData, no potion). */
+	public static int getAttackTimePlayer(ItemStack itemstack, EntityPlayer player) {
+		float time = getUnroundAttackTimeWithBase(itemstack, basePlayerMeleeTime);
+		if (player != null && itemstack != null && itemstack.getItem() == GOTRegistry.syrioForelSword) {
+			PlayerParryData parryData = PlayerParryData.get(player);
+			if (parryData != null && player.worldObj.getTotalWorldTime() - parryData.getLastSyrioCounterTime() <= 100) {
+				time /= 1.1f;
+			}
+		}
+		return Math.round(Math.max(time, 1.0f));
 	}
 
 	public static float getUnroundAttackTimeWithBase(ItemStack itemstack, int baseTime) {

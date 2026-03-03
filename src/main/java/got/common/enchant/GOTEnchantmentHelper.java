@@ -5,6 +5,7 @@ import java.util.*;
 import com.google.common.collect.Lists;
 
 import got.common.GOTConfig;
+import got.common.database.GOTRegistry;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
@@ -397,6 +398,9 @@ public class GOTEnchantmentHelper {
 		List<GOTEnchantment> enchants = getEnchantList(itemstack);
 		enchants = Lists.reverse(enchants);
 		for (GOTEnchantment ench : enchants) {
+			if (ench == GOTEnchantment.valyrianSeal) {
+				continue;
+			}
 			name = StatCollector.translateToLocalFormatted("got.enchant.nameFormat", ench.getDisplayName(), name);
 		}
 		return name;
@@ -463,6 +467,13 @@ public class GOTEnchantmentHelper {
 			return nbt.getBoolean("GOTRandomEnch");
 		}
 		return false;
+	}
+
+	/** Предмет сохраняется при ливе в бою и при смерти (Плащ варга, Валирийская печать, Привязка к душе). */
+	public static boolean isItemSoulBound(ItemStack itemstack) {
+		if (itemstack == null || itemstack.getItem() == null) return false;
+		if (itemstack.getItem() == GOTRegistry.wargCloak) return true;
+		return hasEnchant(itemstack, GOTEnchantment.valyrianSeal) || hasEnchant(itemstack, GOTEnchantment.soulbound);
 	}
 
 	public static boolean hasEnchant(ItemStack itemstack, GOTEnchantment ench) {

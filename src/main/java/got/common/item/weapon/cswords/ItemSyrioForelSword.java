@@ -18,6 +18,7 @@ public class ItemSyrioForelSword extends GOTItemSword {
 
     public ItemSyrioForelSword(ToolMaterial material) {
         super(material);
+        setWeaponDamage(7.0f);
         setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
@@ -55,7 +56,7 @@ public class ItemSyrioForelSword extends GOTItemSword {
         list.add("");
         list.add(EnumChatFormatting.AQUA + "Контратака" + EnumChatFormatting.WHITE + " – идеальный блок наносит 2 урона.");
         list.add(EnumChatFormatting.DARK_AQUA + "Поглощение стамины" + EnumChatFormatting.WHITE + " – ворует 3% при пробитии блока.");
-        list.add(EnumChatFormatting.YELLOW + "Мастерство фехтования" + EnumChatFormatting.WHITE + " – +5% скорости после контратаки.");
+        list.add(EnumChatFormatting.YELLOW + "Мастерство фехтования" + EnumChatFormatting.WHITE + " – +10% скорости атаки на 5 сек после контратаки.");
         list.add("");
         list.add(EnumChatFormatting.GRAY + "Легкий клинок для мастеров дуэлей.");
     }

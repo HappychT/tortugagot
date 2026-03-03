@@ -217,13 +217,13 @@ public class GOTSoulBoundEvents {
 
                 for (int mainIndex = 0; mainIndex < main.length; mainIndex++) {
                     ItemStack mainItem = main[mainIndex];
-                    if (mainItem != null && mainItem.getItem() == GOTRegistry.wargCloak) {
+                    if (mainItem == null) continue;
+                    if (mainItem.getItem() == GOTRegistry.wargCloak || GOTEnchantmentHelper.hasEnchant(mainItem, GOTEnchantment.soulbound)) {
                         itemsPerPlayer[mainIndex + armor.length] = mainItem;
                         main[mainIndex] = null;
                         restore = true;
-                    }
-                    if (mainItem != null && GOTEnchantmentHelper.getEnchantList(mainItem).contains(GOTEnchantment.valyrianSeal)) {
-                        if(mainItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= mainItem.getTagCompound().getDouble("sealChance")) {
+                    } else if (GOTEnchantmentHelper.getEnchantList(mainItem).contains(GOTEnchantment.valyrianSeal)) {
+                        if (mainItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= mainItem.getTagCompound().getDouble("sealChance")) {
                             itemsPerPlayer[mainIndex + armor.length] = mainItem;
                             main[mainIndex] = null;
                             restore = true;
@@ -232,13 +232,13 @@ public class GOTSoulBoundEvents {
                 }
                 for (int armorIndex = 0; armorIndex < armor.length; armorIndex++) {
                     ItemStack armorItem = armor[armorIndex];
-                    if (armorItem != null && armorItem.getItem() == GOTRegistry.wargCloak) {
+                    if (armorItem == null) continue;
+                    if (armorItem.getItem() == GOTRegistry.wargCloak || GOTEnchantmentHelper.hasEnchant(armorItem, GOTEnchantment.soulbound)) {
                         itemsPerPlayer[armorIndex] = armorItem;
                         armor[armorIndex] = null;
                         restore = true;
-                    }
-                    if (armorItem != null && GOTEnchantmentHelper.getEnchantList(armorItem).contains(GOTEnchantment.valyrianSeal)) {
-                        if(armorItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= armorItem.getTagCompound().getDouble("sealChance")) {
+                    } else if (GOTEnchantmentHelper.getEnchantList(armorItem).contains(GOTEnchantment.valyrianSeal)) {
+                        if (armorItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= armorItem.getTagCompound().getDouble("sealChance")) {
                             itemsPerPlayer[armorIndex] = armorItem;
                             armor[armorIndex] = null;
                             restore = true;
@@ -310,7 +310,7 @@ public class GOTSoulBoundEvents {
 
                     if (!shouldSkipPenalty) {
                         for (ItemStack item : itemsPerPlayer) {
-                            if (item != null && GOTEnchantmentHelper.getEnchantList(item).contains(GOTEnchantment.valyrianSeal)) {
+                            if (item != null && GOTEnchantmentHelper.hasEnchant(item, GOTEnchantment.valyrianSeal)) {
                                 if (item.hasTagCompound() && item.getTagCompound().hasKey("sealChance")) {
                                     double chance = item.getTagCompound().getDouble("sealChance");
                                     chance = Math.max(0.0, chance - 0.1);

@@ -32,6 +32,9 @@ public abstract class GOTEntityProjectileBase extends Entity implements IThrowab
 	public int canBePickedUp;
 	public int knockbackStrength;
 
+	/** Попадание в блок, отложенное до истечения getMinTicksInAirBeforeBlockHit() (нож не уходит внутрь блока). */
+	private MovingObjectPosition pendingBlockHit;
+
 	public GOTEntityProjectileBase(World world) {
 		super(world);
 		setSize(0.5f, 0.5f);
@@ -167,6 +170,11 @@ public abstract class GOTEntityProjectileBase extends Entity implements IThrowab
 		return d < (d1 *= 64.0) * d1;
 	}
 
+	/** Минимум тиков в полёте до учёта попадания в блок (0 = сразу). Для метательного ножа 5, чтобы не втыкался в блок под прицелом при броске вниз. */
+	public int getMinTicksInAirBeforeBlockHit() {
+		return 0;
+	}
+
 	public int maxTicksInGround() {
 		return canBePickedUp == 1 ? 6000 : 1200;
 	}
@@ -244,6 +252,7 @@ public abstract class GOTEntityProjectileBase extends Entity implements IThrowab
 			}
 		} else {
 			int l;
+			boolean skipMotionUpdate = pendingBlockHit != null;
 			++ticksInAir;
 			Vec3 vec3d = Vec3.createVectorHelper(posX, posY, posZ);
 			Vec3 vec3d1 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
@@ -275,6 +284,10 @@ public abstract class GOTEntityProjectileBase extends Entity implements IThrowab
 				if (entityplayer.capabilities.disableDamage || shootingEntity instanceof EntityPlayer && !((EntityPlayer) shootingEntity).canAttackPlayer(entityplayer)) {
 					movingobjectposition = null;
 				}
+			}
+			if (pendingBlockHit != null && ticksInAir >= getMinTicksInAirBeforeBlockHit()) {
+				movingobjectposition = pendingBlockHit;
+				pendingBlockHit = null;
 			}
 			if (movingobjectposition != null) {
 				Entity hitEntity = movingobjectposition.entityHit;
@@ -326,24 +339,46 @@ public abstract class GOTEntityProjectileBase extends Entity implements IThrowab
 						prevRotationYaw += 180.0f;
 						ticksInAir = 0;
 					}
+				} else if (ticksInAir < getMinTicksInAirBeforeBlockHit()) {
+					pendingBlockHit = movingobjectposition;
+					motionX = (float) (movingobjectposition.hitVec.xCoord - posX);
+					motionY = (float) (movingobjectposition.hitVec.yCoord - posY);
+					motionZ = (float) (movingobjectposition.hitVec.zCoord - posZ);
+					float f2 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+					if (f2 > 1.0E-7) {
+						posX -= motionX / f2 * 0.05;
+						posY -= motionY / f2 * 0.05;
+						posZ -= motionZ / f2 * 0.05;
+					}
+					motionX = 0;
+					motionY = 0;
+					motionZ = 0;
+					skipMotionUpdate = true;
 				} else {
 					xTile = movingobjectposition.blockX;
 					yTile = movingobjectposition.blockY;
 					zTile = movingobjectposition.blockZ;
 					inTile = worldObj.getBlock(xTile, yTile, zTile);
 					inData = worldObj.getBlockMetadata(xTile, yTile, zTile);
-					motionX = (float) (movingobjectposition.hitVec.xCoord - posX);
-					motionY = (float) (movingobjectposition.hitVec.yCoord - posY);
-					motionZ = (float) (movingobjectposition.hitVec.zCoord - posZ);
-					float f2 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
-					posX -= motionX / f2 * 0.05;
-					posY -= motionY / f2 * 0.05;
-					posZ -= motionZ / f2 * 0.05;
-					worldObj.playSoundAtEntity(this, getImpactSound(), 1.0f, 1.2f / (rand.nextFloat() * 0.2f + 0.9f));
-					inGround = true;
-					shake = 7;
-					setIsCritical(false);
 					if (inTile.getMaterial() != Material.air) {
+						motionX = (float) (movingobjectposition.hitVec.xCoord - posX);
+						motionY = (float) (movingobjectposition.hitVec.yCoord - posY);
+						motionZ = (float) (movingobjectposition.hitVec.zCoord - posZ);
+						float f2 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+						posX -= motionX / f2 * 0.05;
+						posY -= motionY / f2 * 0.05;
+						posZ -= motionZ / f2 * 0.05;
+						worldObj.playSoundAtEntity(this, getImpactSound(), 1.0f, 1.2f / (rand.nextFloat() * 0.2f + 0.9f));
+						inGround = true;
+						shake = 7;
+						setIsCritical(false);
+						float impactYaw = (float) (Math.atan2(motionX, motionZ) * 180.0 / 3.141592653589793);
+						float impactPitch = (float) (Math.atan2(motionY, MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ)) * 180.0 / 3.141592653589793);
+						if (impactPitch < -50.0f) {
+							impactPitch = -22.0f;
+						}
+						rotationYaw = prevRotationYaw = impactYaw;
+						rotationPitch = prevRotationPitch = impactPitch;
 						inTile.onEntityCollidedWithBlock(worldObj, xTile, yTile, zTile, this);
 					}
 				}
@@ -356,35 +391,20 @@ public abstract class GOTEntityProjectileBase extends Entity implements IThrowab
 			posX += motionX;
 			posY += motionY;
 			posZ += motionZ;
-			float f3 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
-			rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0 / 3.141592653589793);
-			rotationPitch = (float) (Math.atan2(motionY, f3) * 180.0 / 3.141592653589793);
-			while (rotationPitch - prevRotationPitch < -180.0f) {
-				prevRotationPitch -= 360.0f;
-			}
-			while (rotationPitch - prevRotationPitch >= 180.0f) {
-				prevRotationPitch += 360.0f;
-			}
-			while (rotationYaw - prevRotationYaw < -180.0f) {
-				prevRotationYaw -= 360.0f;
-			}
-			while (rotationYaw - prevRotationYaw >= 180.0f) {
-				prevRotationYaw += 360.0f;
-			}
-			rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2f;
-			rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2f;
-			float f4 = getSpeedReduction();
-			if (isInWater()) {
-				for (int k1 = 0; k1 < 4; ++k1) {
-					float f7 = 0.25f;
-					worldObj.spawnParticle("bubble", posX - motionX * f7, posY - motionY * f7, posZ - motionZ * f7, motionX, motionY, motionZ);
+			if (!skipMotionUpdate) {
+				float f4 = getSpeedReduction();
+				if (isInWater()) {
+					for (int k1 = 0; k1 < 4; ++k1) {
+						float f7 = 0.25f;
+						worldObj.spawnParticle("bubble", posX - motionX * f7, posY - motionY * f7, posZ - motionZ * f7, motionX, motionY, motionZ);
+					}
+					f4 = 0.8f;
 				}
-				f4 = 0.8f;
+				motionX *= f4;
+				motionY *= f4;
+				motionZ *= f4;
+				motionY -= 0.05000000074505806;
 			}
-			motionX *= f4;
-			motionY *= f4;
-			motionZ *= f4;
-			motionY -= 0.05000000074505806;
 			setPosition(posX, posY, posZ);
 			func_145775_I();
 		}

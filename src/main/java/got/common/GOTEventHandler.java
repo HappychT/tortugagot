@@ -1403,6 +1403,15 @@ public class GOTEventHandler implements IFuelHandler {
         }
     }
 
+    /**
+     * Лив в бою (с эффектом «Присутствие в бою»): сохраняем SoulBound (Плащ варга, Валирийская печать, Привязка к душе),
+     * дропаем остальное, пишем инвентарь в GOT_SoulBound/<uuid>.dat, ставим player.setHealth(0).
+     * Восстановление при следующем входе — через GOTSoulBoundEvents.respawn (PlayerEvent.Clone) и loadItemsFromFile.
+     * Если на сервере вещи всё равно пропадают: 1) Проверить порядок событий — другой мод/плагин может раньше
+     * обработать PlayerLoggedOutEvent и очистить инвентарь или убить игрока. 2) Отключать моды по одному и тестировать.
+     * 3) Проверить ядро/плагины на обработку disconnect (kill on quit, clear inventory). 4) Логировать вручную:
+     * до/после dropAllItems, до/после manuallyTriggerSave, проверить наличие файла в world/GOT_SoulBound/.
+     */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onCombatLogout(cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent event) {
         EntityPlayer player = event.player;
@@ -1423,29 +1432,19 @@ public class GOTEventHandler implements IFuelHandler {
 
             for (int i = 0; i < player.inventory.mainInventory.length; ++i) {
                 ItemStack itemstack = player.inventory.mainInventory[i];
-                if (itemstack != null) {
-                    boolean isSoulBound = (itemstack.getItem() == GOTRegistry.wargCloak) ||
-                            (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.valyrianSeal));
-
-                    if (isSoulBound) {
-                        mainToSave.add(itemstack);
-                        mainSlots.add(i);
-                        player.inventory.mainInventory[i] = null;
-                    }
+                if (itemstack != null && GOTEnchantmentHelper.isItemSoulBound(itemstack)) {
+                    mainToSave.add(itemstack);
+                    mainSlots.add(i);
+                    player.inventory.mainInventory[i] = null;
                 }
             }
 
             for (int i = 0; i < player.inventory.armorInventory.length; ++i) {
                 ItemStack itemstack = player.inventory.armorInventory[i];
-                if (itemstack != null) {
-                    boolean isSoulBound = (itemstack.getItem() == GOTRegistry.wargCloak) ||
-                            (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.valyrianSeal));
-
-                    if (isSoulBound) {
-                        armorToSave.add(itemstack);
-                        armorSlots.add(i);
-                        player.inventory.armorInventory[i] = null;
-                    }
+                if (itemstack != null && GOTEnchantmentHelper.isItemSoulBound(itemstack)) {
+                    armorToSave.add(itemstack);
+                    armorSlots.add(i);
+                    player.inventory.armorInventory[i] = null;
                 }
             }
 

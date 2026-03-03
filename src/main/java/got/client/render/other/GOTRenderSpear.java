@@ -2,8 +2,9 @@ package got.client.render.other;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.FMLLog;
 import got.common.entity.other.GOTEntitySpear;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
@@ -32,8 +33,16 @@ public class GOTRenderSpear extends Render {
 		IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(itemstack, IItemRenderer.ItemRenderType.EQUIPPED);
 		if (customRenderer != null) {
 			customRenderer.renderItem(IItemRenderer.ItemRenderType.EQUIPPED, itemstack, new Object[2]);
-		} else {
-			FMLLog.severe("Error rendering spear: no custom renderer for " + itemstack.toString());
+		} else if (itemstack != null && itemstack.getItem() != null) {
+			IIcon icon = itemstack.getIconIndex();
+			if (icon == null) {
+				icon = itemstack.getItem().getIconFromDamage(itemstack.getItemDamage());
+			}
+			if (icon != null) {
+				bindTexture(TextureMap.locationItemsTexture);
+				Tessellator tessellator = Tessellator.instance;
+				ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(), icon.getIconWidth(), icon.getIconHeight(), 0.0625f);
+			}
 		}
 		GL11.glDisable(32826);
 		GL11.glPopMatrix();
