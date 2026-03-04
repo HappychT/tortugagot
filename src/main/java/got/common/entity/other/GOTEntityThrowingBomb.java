@@ -40,12 +40,12 @@ public class GOTEntityThrowingBomb extends EntityThrowable {
 
     @Override
     protected float getGravityVelocity() {
-        return 0.05F;
+        return 0.025f;
     }
 
     @Override
     protected float func_70182_d() {
-        return 0.5F;
+        return 0.65F;
     }
 
     @Override

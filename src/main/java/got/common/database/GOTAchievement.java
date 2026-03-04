@@ -584,8 +584,8 @@ public class GOTAchievement {
 		killMaester = new GOTAchievement(Category.KILL, id++, Items.book, "KILL_MAESTER");
 		killMammoth = new GOTAchievement(Category.KILL, id++, GOTRegistry.stoneSpear, "KILL_MAMMOTH");
 		killShryke = new GOTAchievement(Category.KILL, id++, GOTRegistry.bottlePoison, "KILL_SHRYKE");
-		killMelisandra = new GOTAchievement(Category.LEGENDARY, id++, GOTRegistry.lightbringer, "KILL_MELISANDRA");
-		killNightKing = new GOTAchievement(Category.LEGENDARY, id++, GOTRegistry.nightKingSword, "KILL_NIGHT_KING").createTitle();
+		killMelisandra = new GOTAchievement(Category.LEGENDARY, id++, GOTRegistry.lightbringersec, "KILL_MELISANDRA");
+		killNightKing = new GOTAchievement(Category.LEGENDARY, id++, GOTRegistry.nightkingSword, "KILL_NIGHT_KING").createTitle();
 		killNightWatchGuard = new GOTAchievement(Category.KILL, id++, GOTRegistry.westerosSword, "KILL_NIGHT_WATCH_GUARD");
 		killOberynMartell = new GOTAchievement(Category.LEGENDARY, id++, GOTRegistry.sunspear, "KILL_OBERYN_MARTELL").createTitle();
 		killPetyrBaelish = new GOTAchievement(Category.LEGENDARY, id++, GOTRegistry.baelishDagger, "KILL_PETYR_BAELISH");

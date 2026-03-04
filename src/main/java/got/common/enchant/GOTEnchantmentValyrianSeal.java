@@ -14,9 +14,7 @@ public class GOTEnchantmentValyrianSeal extends GOTEnchantment {
 
     @Override
     public boolean canApply(ItemStack itemstack, boolean considering) {
-        if (super.canApply(itemstack, considering))
-            return true;
-        return false;
+        return true;
     }
 
     @Override

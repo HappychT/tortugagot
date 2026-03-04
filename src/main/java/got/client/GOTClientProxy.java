@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import got.client.handlers.ClientEventHandler;
+import got.client.render.item.GOTItemShieldRenderer;
+import got.common.database.GOTRegistry;
+import got.common.entity.other.*;
+import net.minecraft.client.renderer.entity.RenderSnowball;
 import noname.weapons.entity.*;
 import noname.weapons.events.OverlayEventHandler;
 import noname.weapons.render.*;
@@ -75,11 +79,6 @@ import got.common.decorations.base.Decoration;
 import got.common.entity.animal.GOTEntityElephant3DViewer;
 import got.common.entity.animal.GOTEntityMammoth3DViewer;
 import got.common.entity.dragon.GOTEntityDragon3DViewer;
-import got.common.entity.other.GOTEntityBanner;
-import got.common.entity.other.GOTEntityInvasionSpawner;
-import got.common.entity.other.GOTEntityNPC;
-import got.common.entity.other.GOTHiredNPCInfo;
-import got.common.entity.other.GOTInvasionStatus;
 import got.common.faction.GOTAlignmentBonusMap;
 import got.common.faction.GOTFaction;
 import got.common.network.GOTPacketClientInfo;
@@ -576,7 +575,10 @@ public class GOTClientProxy extends GOTCommonProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityBatteringRam.class, new RenderBatteringRam());
         RenderingRegistry.registerEntityRenderingHandler(EntityBalista.class, new RenderBalista());
         RenderingRegistry.registerEntityRenderingHandler(EntityBalistaProjectile.class, new RenderBalistaProjectile());
-
+        RenderingRegistry.registerEntityRenderingHandler(
+                GOTEntityWildfireBomb.class,
+                new RenderSnowball(GOTRegistry.wildfireBomb)
+        );
         for(Decoration d : DecorationsRegister.getDecorations()) {
             bindItemRender(d.getItem(), new DecorationTileEntity(), new DecorationRenderer(d.getItem()));
         }
@@ -594,7 +596,6 @@ public class GOTClientProxy extends GOTCommonProxy {
         FMLCommonHandler.instance().bus().register(new GOTKeyHandler(GOTPacketHandler.networkWrapper));
 
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
-
     }
     public static void bindItemRender(Block block, TileEntity tile, DecorationRenderer tesr){
         Item blockItem = ItemBlock.getItemFromBlock(block);

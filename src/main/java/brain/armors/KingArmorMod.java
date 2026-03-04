@@ -75,11 +75,6 @@ public class KingArmorMod {
             .setUnlocalizedName("king_guard_boots")
             .setTextureName("armors:king_guard/king_guard_boots")
             .setCreativeTab(CreativeTabs.tabCombat);
-        
-        GameRegistry.registerItem(kingGuardHelmet, "king_guard_helmet");
-        GameRegistry.registerItem(kingGuardChestplate, "king_guard_body");
-        GameRegistry.registerItem(kingGuardLeggings, "king_guard_legs");
-        GameRegistry.registerItem(kingGuardBoots, "king_guard_boots");
 
         plash1 = new ItemPlashArmor(PLASH_MATERIAL, 0, 0, 0)
             .setUnlocalizedName("plash1")
@@ -132,13 +127,10 @@ public class KingArmorMod {
             .setUnlocalizedName("spear_valyrian")
             .setCreativeTab(CreativeTabs.tabCombat);
         
-        GameRegistry.registerItem(valyrianSword, "valyrian_sword");
         GameRegistry.registerItem(swordIce, "sword_ice");
         GameRegistry.registerItem(swordPathkeeper, "sword_pathkeeper");
         GameRegistry.registerItem(swordPathkeeperRed, "sword_pathkeeper_red");
-        GameRegistry.registerItem(battleaxeValyrian, "battleaxe_valyrian");
-        GameRegistry.registerItem(hammerValyrian, "hammer_valyrian");
-        GameRegistry.registerItem(spearValyrian, "spear_valyrian");
+
     }
     
     public static void init(FMLInitializationEvent event) {

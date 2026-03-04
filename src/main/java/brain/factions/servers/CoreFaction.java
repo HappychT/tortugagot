@@ -77,9 +77,13 @@ public class CoreFaction {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
 		FMLCommonHandler.instance().bus().register(this);
+
 		FMLCommonHandler.instance().bus().register(new TeleportHandler());
+		MinecraftForge.EVENT_BUS.register(new TeleportHandler());
+
 		FMLCommonHandler.instance().bus().register(new ServerTickHandler());
 		FMLCommonHandler.instance().bus().register(new TimedEventsHandler());
+		MinecraftForge.EVENT_BUS.register(new TimedEventsHandler());
 		ItemToProvisionMap.init();
 	}
 
