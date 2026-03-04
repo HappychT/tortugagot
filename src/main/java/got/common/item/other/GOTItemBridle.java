@@ -5,85 +5,141 @@ import java.lang.reflect.InvocationTargetException;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.database.GOTCreativeTabs;
+import got.common.database.GOTEffects;
 import got.common.entity.animal.GOTEntityHorse;
-import got.common.util.GOTReflection;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
+/**
+ * Поводья: призыв маунта по удержанию ПКМ 8 сек. Снятие — Shift (GOTTickHandlerServer).
+ * При эффекте «Присутствие в бою» призыв недоступен и отменяется при появлении эффекта во время удержания.
+ */
 public class GOTItemBridle extends Item {
-    private Class<? extends GOTEntityHorse> entity;
+
+    /** Длительность удержания ПКМ для призыва (тики). Для клиентского прогресс-бара. */
+    public static final int SUMMON_TICKS = 20 * 8;
+
+    private final Class<? extends GOTEntityHorse> entityClass;
 
     public GOTItemBridle(Class<? extends GOTEntityHorse> entityClass) {
         super();
         setMaxStackSize(1);
         setCreativeTab(GOTCreativeTabs.tabMisc);
-        this.entity = entityClass;
+        this.entityClass = entityClass;
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
-        if(!world.isRemote) {
-            GOTPlayerData data = GOTLevelData.getData(entityplayer);
-            if(!entityplayer.isRiding()) {
-                if(data.getBridleMount() == -1) {
-                    GOTEntityHorse mount = new GOTEntityHorse(world);
-                    try {
-                        mount = this.entity.getConstructor(World.class).newInstance(world);
-                    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                        e.printStackTrace();
-                    }
-                    mount.setTamedBy(entityplayer);
-                    mount.setHorseSaddled(true);
-                    mount.setLocationAndAngles(entityplayer.posX, entityplayer.posY, entityplayer.posZ, entityplayer.rotationYaw, entityplayer.rotationPitch);
-                    mount.setCustomNameTag(StatCollector.translateToLocal("got.bridle_mount"));
-                    setupAttrib(mount);
-                    world.spawnEntityInWorld(mount);
-                    entityplayer.mountEntity(mount);
-                    data.setBridleMount(mount.getEntityId());
-                    return itemstack;
-                }
-                else {
-                    Entity entity = world.getEntityByID(data.getBridleMount());
-                    if(!(entity instanceof EntityLivingBase)) return itemstack;
-                    EntityLivingBase mount = (EntityLivingBase)entity;
-                    mount.setDead();
-                    data.setBridleMount(-1);
-                    return itemstack;
-                }
-            }
-            if (entityplayer.ridingEntity != null && entityplayer.ridingEntity.getEntityId() == data.getBridleMount()) {
-                entityplayer.dismountEntity(entityplayer.ridingEntity);
-                entityplayer.ridingEntity.setDead();
-                entityplayer.ridingEntity = null;
-                data.setBridleMount(-1);
-                return itemstack;
-            }
-        }
-        return super.onItemRightClick(itemstack, world, entityplayer);
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return SUMMON_TICKS;
     }
 
-    public static void setupAttrib(GOTEntityHorse entity) {
-        float healthBoost = 1.5f;
-        float speedBoost = 1.3f;
-        float jumpAdd = 0.2f;
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.bow;
+    }
 
-        double maxHealth = entity.getEntityAttribute(SharedMonsterAttributes.maxHealth).getAttributeValue();
-        entity.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(maxHealth *= healthBoost);
-        entity.setHealth(entity.getMaxHealth());
+    @Override
+    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+        if (!canStartSummon(player, world)) {
+            return stack;
+        }
+        player.setItemInUse(stack, getMaxItemUseDuration(stack));
+        return stack;
+    }
 
-        double movementSpeed = entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
-        entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(movementSpeed *= speedBoost);
+    @Override
+    public void onUsingTick(ItemStack stack, EntityPlayer player, int count) {
+        World world = player.worldObj;
+        if (world.isRemote) {
+            return;
+        }
+        if (player.isPotionActive(GOTEffects.combatLog.id)) {
+            player.clearItemInUse();
+            return;
+        }
+        if (count != 1) {
+            return;
+        }
+        if (!canCompleteSummon(player)) {
+            return;
+        }
+        if (trySummonMount(stack, world, player)) {
+            player.clearItemInUse();
+        }
+    }
 
-        double jumpStrength = entity.getEntityAttribute(GOTReflection.getHorseJumpStrength()).getAttributeValue();
-        double jumpLimit = Math.max(jumpStrength, 1.0);
-        jumpStrength += jumpAdd;
-        jumpStrength = Math.min(jumpStrength, jumpLimit);
-        entity.getEntityAttribute(GOTReflection.getHorseJumpStrength()).setBaseValue(jumpStrength);
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityPlayer player, int timeLeft) {
+        if (world.isRemote || timeLeft > 0) {
+            return;
+        }
+        if (!canCompleteSummon(player)) {
+            return;
+        }
+        trySummonMount(stack, world, player);
+    }
+
+    /** Можно ли начать удержание (нет эффекта боя; на сервере — не в седле и нет призванного маунта). */
+    private boolean canStartSummon(EntityPlayer player, World world) {
+        if (player.isPotionActive(GOTEffects.combatLog.id)) {
+            return false;
+        }
+        if (!world.isRemote) {
+            GOTPlayerData data = GOTLevelData.getData(player);
+            if (player.isRiding() || data.getBridleMount() != -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Можно ли завершить призыв (те же проверки, только на сервере). */
+    private boolean canCompleteSummon(EntityPlayer player) {
+        if (player.isPotionActive(GOTEffects.combatLog.id)) {
+            return false;
+        }
+        GOTPlayerData data = GOTLevelData.getData(player);
+        if (player.isRiding() || data.getBridleMount() != -1) {
+            return false;
+        }
+        return true;
+    }
+
+    /** Создаёт маунта, спавнит, сажает игрока, записывает id в данные. Вызывать только на сервере. */
+    private boolean trySummonMount(ItemStack stack, World world, EntityPlayer player) {
+        if (world.isRemote) {
+            return false;
+        }
+        GOTPlayerData data = GOTLevelData.getData(player);
+        if (player.isRiding() || data.getBridleMount() != -1) {
+            return false;
+        }
+        GOTEntityHorse mount = createMount(world);
+        if (mount == null) {
+            return false;
+        }
+        mount.setTamedBy(player);
+        mount.setHorseSaddled(true);
+        mount.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+        mount.setCustomNameTag(StatCollector.translateToLocal("got.bridle_mount"));
+        GOTBridleMountStats.getStats(mount.getClass()).applyTo(mount);
+        world.spawnEntityInWorld(mount);
+        player.mountEntity(mount);
+        data.setBridleMount(mount.getEntityId());
+        return true;
+    }
+
+    private GOTEntityHorse createMount(World world) {
+        try {
+            return entityClass.getConstructor(World.class).newInstance(world);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

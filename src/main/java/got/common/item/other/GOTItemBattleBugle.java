@@ -14,6 +14,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 
 public class GOTItemBattleBugle extends Item {
+
     private static PotionEffect effect = new PotionEffect(GOTEffects.combatSpirit.id, 2 * 60 * 20);
 
     public GOTItemBattleBugle() {

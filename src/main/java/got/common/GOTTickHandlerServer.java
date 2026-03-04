@@ -73,6 +73,24 @@ public class GOTTickHandlerServer {
 
             if (event.phase == TickEvent.Phase.END) {
                 GOTLevelData.getData(entityplayer).onUpdate(entityplayer, (WorldServer) world);
+                GOTPlayerData data = GOTLevelData.getData(entityplayer);
+                int bridleMountId = data.getBridleMount();
+                if (bridleMountId != -1) {
+                    if (entityplayer.isRiding() && entityplayer.ridingEntity != null
+                            && entityplayer.ridingEntity.getEntityId() == bridleMountId && entityplayer.isSneaking()) {
+                        Entity mount = entityplayer.ridingEntity;
+                        entityplayer.dismountEntity(mount);
+                        mount.setDead();
+                        entityplayer.ridingEntity = null;
+                        data.setBridleMount(-1);
+                    } else if (!entityplayer.isRiding()) {
+                        Entity mount = world.getEntityByID(bridleMountId);
+                        if (mount != null) {
+                            mount.setDead();
+                        }
+                        data.setBridleMount(-1);
+                    }
+                }
                 NetHandlerPlayServer netHandler = entityplayer.playerNetServerHandler;
                 if (netHandler instanceof GOTNetHandlerPlayServer) {
                     ((GOTNetHandlerPlayServer) netHandler).update();

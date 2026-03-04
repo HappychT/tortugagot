@@ -8,6 +8,7 @@ import got.client.GOTClientProxy;
 import got.common.database.GOTEffects;
 import got.common.database.GOTRegistry;
 import got.common.item.other.GOTItemBandage;
+import got.common.item.other.GOTItemBridle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.RenderHelper;
@@ -133,5 +134,25 @@ public class ClientEventHandler {
                 GL11.glPopMatrix();
             }
         }
+
+        if (player.isUsingItem() && player.getItemInUse() != null && player.getItemInUse().getItem() instanceof GOTItemBridle) {
+            drawBridleSummonProgress(event, player);
+        }
+    }
+
+    /** Оставшееся время удержания поводья (8.0 → 0.0 с) над хотбаром. */
+    private void drawBridleSummonProgress(RenderGameOverlayEvent.Post event, EntityPlayer player) {
+        int remainingTicks = player.getItemInUseCount();
+        if (remainingTicks <= 0) return;
+
+        float remainingSec = (float) remainingTicks / 20.0f;
+        if (remainingSec < 0) remainingSec = 0;
+
+        int screenWidth = event.resolution.getScaledWidth();
+        int screenHeight = event.resolution.getScaledHeight();
+        String text = String.format("%.1f", remainingSec);
+        int x = screenWidth / 2 - mc.fontRenderer.getStringWidth(text) / 2;
+        int y = screenHeight - 58;
+        mc.fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
     }
 }

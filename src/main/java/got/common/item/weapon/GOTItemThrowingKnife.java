@@ -78,7 +78,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
             itemstack.stackTagCompound = new NBTTagCompound();
             itemstack.stackTagCompound.setInteger("timer", 0);
         }
-        if(GOTLevelData.getData(entityplayer).isPledgedTo(GOTFaction.BANDITS) || true) {
+        if(GOTLevelData.getData(entityplayer).isPledgedTo(GOTFaction.BANDITS)) {
             if (itemstack.stackTagCompound.getInteger("timer") == 0) {
                 GOTEntityThrowingKnife knife = new GOTEntityThrowingKnife(world, entityplayer, itemstack.copy(), 2.0f);
                 knife.setIsCritical(true);

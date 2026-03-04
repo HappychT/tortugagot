@@ -1799,7 +1799,7 @@ public class GOTPlayerData {
         }
         this.lastOnlineTime = getCurrentOnlineTime();
         if (this.bridleMount != -1) {
-            if(world.getEntityByID(this.bridleMount) == null) {
+            if (world.getEntityByID(this.bridleMount) == null) {
                 setBridleMount(-1);
             }
         }
