@@ -62,7 +62,7 @@ public class BlockServerHandler {
                 }
 
                 if (weapon instanceof ItemPoisonedSandBlade) {
-                    player.addPotionEffect(new PotionEffect(GOTEffects.neurotoxin.id, 160, 0));
+                    player.addPotionEffect(new PotionEffect(GOTEffects.neurotoxin.id, 200, 0));
                 }
 
                 if (weapon instanceof ItemNightKingSword) {

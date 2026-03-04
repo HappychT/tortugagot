@@ -58,7 +58,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
     public boolean getIsRepairable(ItemStack itemstack, ItemStack repairItem) {
         if (GOTRecipe.checkItemEquals(this.knifeMaterial.getRepairItemStack(), repairItem))
             return true;
-        return super.getIsRepairable(itemstack, repairItem);
+     return super.getIsRepairable(itemstack, repairItem);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
             itemstack.stackTagCompound = new NBTTagCompound();
             itemstack.stackTagCompound.setInteger("timer", 0);
         }
-        if(GOTLevelData.getData(entityplayer).isPledgedTo(GOTFaction.BANDITS)) {
+           if(GOTLevelData.getData(entityplayer).isPledgedTo(GOTFaction.BANDITS)) {
             if (itemstack.stackTagCompound.getInteger("timer") == 0) {
                 GOTEntityThrowingKnife knife = new GOTEntityThrowingKnife(world, entityplayer, itemstack.copy(), 2.0f);
                 knife.setIsCritical(true);
@@ -95,8 +95,6 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
                 }
                 if (entityplayer.capabilities.isCreativeMode) {
                     knife.canBePickedUp = 2;
-                } else {
-                    knife.canBePickedUp = 0;
                 }
                 world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + 0.25f);
                 if (!world.isRemote) {
@@ -105,7 +103,6 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
                 if (!entityplayer.capabilities.isCreativeMode) {
                     itemstack.damageItem(10, entityplayer);
                 }
-                itemstack.stackTagCompound.setInteger("timer", 100);
             }
             else {
                 if(!world.isRemote) {

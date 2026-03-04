@@ -691,5 +691,6 @@ public class GOTEntity {
         GOTEntityRegistry.registerHidden(GOTEntitySmoke.class, id++, 64, 10, true);
         GOTEntityRegistry.registerHidden(GOTEntitySmokeEffect.class, id++, 64, 1, true);
         GOTEntityRegistry.registerHidden(GOTEntityBattleRam.class, id++);
+        GOTEntityRegistry.registerHidden(GOTEntityWildfireBomb.class, id++);
     }
 }

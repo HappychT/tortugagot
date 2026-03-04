@@ -36,14 +36,14 @@ public class GOTItemLegendaryWhip extends GOTItemSword {
 
 	@Override
 	public int getMaxItemUseDuration(ItemStack itemstack) {
-		return 20;
+		return 40;
 	}
 
 	@Override
 	public boolean hitEntity(ItemStack itemstack, EntityLivingBase hitEntity, EntityLivingBase user) {
 		if (super.hitEntity(itemstack, hitEntity, user)) {
 			if (!user.worldObj.isRemote && hitEntity.hurtTime == hitEntity.maxHurtTime) {
-				launchWhip(user, hitEntity);
+				launchWhip(user, hitEntity, false);
 			}
 			return true;
 		}
@@ -51,6 +51,10 @@ public class GOTItemLegendaryWhip extends GOTItemSword {
 	}
 
 	public void launchWhip(EntityLivingBase user, EntityLivingBase hitEntity) {
+		launchWhip(user, hitEntity, true);
+	}
+
+	public void launchWhip(EntityLivingBase user, EntityLivingBase hitEntity, boolean isChargedAttack) {
 		user.worldObj.playSoundAtEntity(user, "got:item.whip", 2.0f, 0.7f + itemRand.nextFloat() * 0.6f);
 		double range = 16.0;
 		Vec3 position = Vec3.createVectorHelper(user.posX, user.posY, user.posZ);
@@ -77,11 +81,24 @@ public class GOTItemLegendaryWhip extends GOTItemSword {
 			}
 			whipTargets.add(entity);
 		}
+
+		DamageSource source;
+		if (user instanceof EntityPlayer) {
+			source = DamageSource.causePlayerDamage((EntityPlayer) user);
+		} else {
+			source = DamageSource.causeMobDamage(user);
+		}
+
 		for (EntityLivingBase entity : whipTargets) {
-			if (entity != hitEntity && !entity.attackEntityFrom(DamageSource.causeMobDamage(user), 1.0f)) {
-				continue;
+			if (isChargedAttack) {
+				entity.attackEntityFrom(source, 10.0f);
+			}
+
+			else if (entity != hitEntity) {
+				entity.attackEntityFrom(source, 1.0f);
 			}
 		}
+
 		Vec3 eyeHeight = position.addVector(0.0, user.getEyeHeight(), 0.0);
 		block2: for (int l = 4; l < (int) range; ++l) {
 			double d = l / range;
@@ -116,7 +133,7 @@ public class GOTItemLegendaryWhip extends GOTItemSword {
 	public ItemStack onEaten(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		entityplayer.swingItem();
 		if (!world.isRemote) {
-			launchWhip(entityplayer, null);
+			launchWhip(entityplayer, null, true);
 		}
 		itemstack.damageItem(1, entityplayer);
 		return itemstack;

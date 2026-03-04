@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import got.client.gui.faction.GOTGuiFactions;
+import got.common.database.GOTEffects;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.*;
 import org.lwjgl.opengl.GL11;
@@ -1083,10 +1084,12 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 			if (!loadingConquestGrid) {
 				GOTPlayerData pd = GOTLevelData.getData(mc.thePlayer);
 				if (i == GOTKeyHandler.keyBindingFastTravel.getKeyCode() && isGameOfThrones() && selectedWaypoint != null && selectedWaypoint.hasPlayerUnlocked(mc.thePlayer) && pd.getTimeSinceFT() >= pd.getWaypointFTTime(selectedWaypoint, mc.thePlayer)) {
-					GOTPacketFastTravel packet = new GOTPacketFastTravel(selectedWaypoint);
-					GOTPacketHandler.networkWrapper.sendToServer(packet);
-					mc.thePlayer.closeScreen();
-					return;
+					if (!mc.thePlayer.isPotionActive(GOTEffects.combatLog)) {
+						GOTPacketFastTravel packet = new GOTPacketFastTravel(selectedWaypoint);
+						GOTPacketHandler.networkWrapper.sendToServer(packet);
+						mc.thePlayer.closeScreen();
+						return;
+					}
 				}
 				if (selectedWaypoint == null && i == GOTKeyHandler.keyBindingMapTeleport.getKeyCode() && isMouseWithinMap && canTeleport()) {
 					GOTPacketMapTp packet = new GOTPacketMapTp(mouseXCoord, mouseZCoord);

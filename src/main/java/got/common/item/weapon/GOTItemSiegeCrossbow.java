@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTRegistry;
 import got.common.entity.other.GOTEntityCrossbowBolt;
 import got.common.recipe.GOTRecipe;
@@ -17,6 +18,7 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
         setMaxDamage((int) (this.crossbowMaterial.getMaxUses() * 1.25f));
         setMaxStackSize(1);
         this.boltDamageFactor = 1.25f;
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

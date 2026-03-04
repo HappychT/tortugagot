@@ -9,8 +9,12 @@ import net.minecraft.world.WorldServer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
- public class FreeTeleporter extends Teleporter {
+
+public class FreeTeleporter extends Teleporter {
 	WorldServer world;
 	double x, y, z;
 

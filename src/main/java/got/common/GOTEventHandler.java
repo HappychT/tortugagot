@@ -1290,8 +1290,12 @@ public class GOTEventHandler implements IFuelHandler {
             event.ammount -= event.ammount * 0.15f;
         }
 
-        if(entity.isPotionActive(GOTEffects.rage)) {
-            event.ammount += event.ammount * 0.5f;
+        if (entity.isPotionActive(GOTEffects.rage)) {
+            event.ammount += event.ammount * 0.15f;
+        }
+
+        if (attacker != null && attacker.isPotionActive(GOTEffects.rage)) {
+            event.ammount += event.ammount * 0.25f;
         }
 
         if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !(((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance) || entity.isPotionActive(GOTEffects.antiEffect.id))) {
