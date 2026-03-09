@@ -160,7 +160,7 @@ public class PacketFactionManage implements IMessage {
             int amount = (int) message.l_data1;
 
             FactionStructureSlot slot = FactionStructureManager.getStructureById(structureId);
-            if (slot == null || !faction.getID().equals(slot.ownerFactionID) || slot.type != FactionStructureSlot.StructureType.FORTRESS) {
+            if (slot == null || !faction.getID().equals(slot.ownerFactionID) || slot.category != FactionStructureSlot.StructureCategory.FORTRESS) {
                 return;
             }
 
@@ -179,6 +179,7 @@ public class PacketFactionManage implements IMessage {
                 player.addChatMessage(new ChatComponentText("§aВместимость казармы увеличена на " + amount + "!"));
                 FactionStructureManager.saveStructureOwnership();
                 CoreFaction.sendAllGui();
+                CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(slot.xCoord, slot.yCoord, slot.zCoord, slot), player);
             } else {
                 player.addChatMessage(new ChatComponentText("§cНедостаточно продовольствия в крепости. Требуется: " + cost));
             }
@@ -191,45 +192,63 @@ public class PacketFactionManage implements IMessage {
             int amountToDeposit = (int) message.l_data1;
             if (amountToDeposit <= 0) return;
 
-            int provisionsInInventory = 0;
+            boolean isBarn = slot.category == FactionStructureSlot.StructureCategory.BARN;
+            boolean isFortressBarn = slot.category == FactionStructureSlot.StructureCategory.FORTRESS;
+
+            int itemsInInventory = 0;
             for (ItemStack stack : player.inventory.mainInventory) {
-                if (stack != null && stack.getItem() instanceof ItemFood) {
-                    ItemFood food = (ItemFood) stack.getItem();
-                    provisionsInInventory += stack.stackSize * food.func_150905_g(stack);
+                if (stack != null && brain.factions.servers.ItemToProvisionMap.getProvisionValue(stack) > 0) {
+                    itemsInInventory += stack.stackSize;
                 }
             }
 
-            if (provisionsInInventory < amountToDeposit) {
-                player.addChatMessage(new ChatComponentText("§cУ вас недостаточно еды для взноса " + amountToDeposit + " продовольствия."));
+            if (itemsInInventory < amountToDeposit) {
+                player.addChatMessage(new ChatComponentText("§cУ вас недостаточно еды для внесения " + amountToDeposit + " предметов."));
                 return;
             }
 
-            int amountLeftToSatisfy = amountToDeposit;
+            if (isBarn || isFortressBarn) {
+                int capacity = isFortressBarn ? StructureManager.getGranaryCapacity(slot.barnLevel) : StructureManager.getGranaryCapacity(slot.level);
+                if (slot.storedFoodItems + amountToDeposit > capacity) {
+                    player.addChatMessage(new ChatComponentText("§cАмбар не может вместить столько еды! Свободно: " + (capacity - slot.storedFoodItems) + " шт."));
+                    return;
+                }
+            }
+
+            int itemsLeftToDeposit = amountToDeposit;
+            float addedProvisions = 0;
+
             for (int i = 0; i < player.inventory.mainInventory.length; i++) {
                 ItemStack stack = player.inventory.mainInventory[i];
-                if (stack != null && stack.getItem() instanceof ItemFood) {
-                    ItemFood food = (ItemFood) stack.getItem();
-                    int valuePerItem = food.func_150905_g(stack);
-                    if (valuePerItem <= 0) continue;
+                if (stack != null && brain.factions.servers.ItemToProvisionMap.getProvisionValue(stack) > 0) {
+                    int itemsToRemove = Math.min(stack.stackSize, itemsLeftToDeposit);
 
-                    int itemsToConsume = (int) Math.ceil((double) amountLeftToSatisfy / valuePerItem);
-                    int itemsToRemove = Math.min(stack.stackSize, itemsToConsume);
+                    float provisionPerItem = brain.factions.servers.ItemToProvisionMap.getProvisionValue(stack);
+                    addedProvisions += provisionPerItem * itemsToRemove;
 
-                    amountLeftToSatisfy -= itemsToRemove * valuePerItem;
+                    itemsLeftToDeposit -= itemsToRemove;
                     stack.stackSize -= itemsToRemove;
 
                     if (stack.stackSize <= 0) {
                         player.inventory.mainInventory[i] = null;
                     }
-                    if (amountLeftToSatisfy <= 0) break;
+                    if (itemsLeftToDeposit <= 0) break;
                 }
             }
             player.inventory.markDirty();
 
-            slot.provisions += amountToDeposit;
-            player.addChatMessage(new ChatComponentText("§aВы внесли " + amountToDeposit + " ед. продовольствия в крепость."));
+            slot.provisions += addedProvisions;
+
+            if (isBarn || isFortressBarn) {
+                slot.storedFoodItems += amountToDeposit;
+                player.addChatMessage(new ChatComponentText("§aВы внесли " + amountToDeposit + " предметов еды в амбар."));
+            } else {
+                player.addChatMessage(new ChatComponentText("§aВы внесли продовольствие."));
+            }
+
             FactionStructureManager.saveStructureOwnership();
             CoreFaction.sendAllGui();
+            CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(slot.xCoord, slot.yCoord, slot.zCoord, slot), player);
         }
 
         private void handleBarracksAction(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
@@ -239,7 +258,7 @@ public class PacketFactionManage implements IMessage {
             String playerName = message.s_data2;
 
             FactionStructureSlot slot = FactionStructureManager.getStructureById(structureId);
-            if (slot == null || !faction.getID().equals(slot.ownerFactionID) || slot.type != FactionStructureSlot.StructureType.FORTRESS) {
+            if (slot == null || !faction.getID().equals(slot.ownerFactionID) || slot.category != FactionStructureSlot.StructureCategory.FORTRESS) {
                 player.addChatMessage(new ChatComponentText("§cНеверная структура для управления казармой."));
                 return;
             }
@@ -252,11 +271,23 @@ public class PacketFactionManage implements IMessage {
             switch (action) {
                 case "add_player":
                     if(BarracksManager.getBarracksPlayers(structureId).size() >= slot.barracksCapacity){
-                        player.addChatMessage(new ChatComponentText("§cВместимость казармы полная!"));
+                        player.addChatMessage(new ChatComponentText("§cВместимость казармы полная (Лимит: " + slot.barracksCapacity + ")!"));
                         return;
                     }
+
+                    int currentPlayers = BarracksManager.getBarracksPlayers(structureId).size();
+                    long cost = (long) (100 * Math.pow(1.5, currentPlayers));
+
+                    if (slot.provisions < cost) {
+                        player.addChatMessage(new ChatComponentText("§cНедостаточно продовольствия! Требуется: " + cost));
+                        return;
+                    }
+
+                    slot.provisions -= cost;
                     BarracksManager.addPlayer(structureId, playerName);
-                    player.addChatMessage(new ChatComponentText("§aИгрок " + playerName + " добавлен в казарму."));
+                    player.addChatMessage(new ChatComponentText("§aИгрок " + playerName + " добавлен в казарму за " + cost + " ед. продовольствия."));
+
+                    FactionStructureManager.saveStructureOwnership();
                     break;
                 case "remove_player":
                     BarracksManager.removePlayer(structureId, playerName);
@@ -264,6 +295,7 @@ public class PacketFactionManage implements IMessage {
                     break;
             }
             CoreFaction.sendAllGui();
+            CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(slot.xCoord, slot.yCoord, slot.zCoord, slot), player);
         }
 
         private void handleCloseCollectionGoal(EntityPlayerMP player, Faction faction, PacketFactionManage message) {

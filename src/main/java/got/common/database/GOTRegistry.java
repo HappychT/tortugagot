@@ -1666,6 +1666,8 @@ public class GOTRegistry {
     public static Item alchemicalJars;
     public static Item gauzeSet;
 
+    public static Item dublon;
+
     public static Item barrel_beer;
     public static Item barrel_whine;
     public static Item bundle_firewood_modded;
@@ -3223,6 +3225,7 @@ public class GOTRegistry {
         wildfireBomb = new GOTItemWildfireBomb().setUnlocalizedName("wildfireBomb");
 
         smithKit = new ItemSmithKit();
+        dublon = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
 
     }
 
@@ -4818,5 +4821,6 @@ public class GOTRegistry {
         registerItem(bundleFirewood, "bundle_firewood");
         registerItem(wildfireBomb, "wildfire_bomb");
         registerItem(smithKit, "smith_kit");
+        registerItem(dublon, "dublon");
     }
 }

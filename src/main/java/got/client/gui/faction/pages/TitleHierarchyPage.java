@@ -46,7 +46,7 @@ public class TitleHierarchyPage implements IPageRenderer {
         int xSize = parent.getBaseWidth();
         int ySize = parent.getBaseHeight();
 
-        saveButton = new GuiCustomButton(150, xSize / 2 - 50, ySize - 60, 100, 20, "Сохранить");
+        saveButton = new GuiCustomButton(150, xSize / 2 - 50, ySize - 110, 100, 20, "Сохранить");
         moveUpButton = new GuiCustomButton(151, 0, 0, 20, 20, "▲");
         moveDownButton = new GuiCustomButton(152, 0, 0, 20, 20, "▼");
 
@@ -65,7 +65,7 @@ public class TitleHierarchyPage implements IPageRenderer {
         int listX = 25;
         int listY = 40;
         int listWidth = parent.getBaseWidth() - 50;
-        int listHeight = parent.getBaseHeight() - 110;
+        int listHeight = 14 * 22;
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GuiApi.glScissor(parent.getGuiLeft() + (int)(listX * parent.getScaleFactor()), parent.getGuiTop() + (int)(listY * parent.getScaleFactor()), (int)(listWidth * parent.getScaleFactor()), (int)(listHeight * parent.getScaleFactor()), true);
@@ -83,15 +83,16 @@ public class TitleHierarchyPage implements IPageRenderer {
             if (isHovering) {
                 Gui.drawRect(listX, drawY, listX + listWidth, drawY + 20, 0x50FFFFFF);
             }
-            parent.drawString(title, listX + 10, drawY + 6, 0xFFFFFF);
+
+            parent.drawString(title, listX + 45, drawY + 6, 0xFFFFFF);
 
             if(isHovering){
-                moveUpButton.xPosition = listX + listWidth - 50;
+                moveUpButton.xPosition = listX + listWidth - 75;
                 moveUpButton.yPosition = drawY;
                 moveUpButton.enabled = (i > 0);
                 moveUpButton.visible = true;
 
-                moveDownButton.xPosition = listX + listWidth - 25;
+                moveDownButton.xPosition = listX + listWidth - 50;
                 moveDownButton.yPosition = drawY;
                 moveDownButton.enabled = (i < titlesSortedByHierarchy.size() - 1);
                 moveDownButton.visible = true;
@@ -114,7 +115,7 @@ public class TitleHierarchyPage implements IPageRenderer {
             int listX = 25;
             int listY = 40;
             int listWidth = parent.getBaseWidth() - 50;
-            int listHeight = parent.getBaseHeight() - 110;
+            int listHeight = 14 * 22;
 
             if(parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)){
                 int totalContentHeight = titlesSortedByHierarchy.size() * 22;
@@ -123,10 +124,11 @@ public class TitleHierarchyPage implements IPageRenderer {
 
                 if (index >= 0 && index < titlesSortedByHierarchy.size()) {
                     int drawY = listY + index * 22 - scrollOffset;
-                    if (parent.isHover(listX + listWidth - 50, drawY, 20, 20, scaledMouseX, scaledMouseY) && index > 0) {
+
+                    if (parent.isHover(listX + listWidth - 75, drawY, 20, 20, scaledMouseX, scaledMouseY) && index > 0) {
                         Collections.swap(titlesSortedByHierarchy, index, index - 1);
                     }
-                    if (parent.isHover(listX + listWidth - 25, drawY, 20, 20, scaledMouseX, scaledMouseY) && index < titlesSortedByHierarchy.size() - 1) {
+                    if (parent.isHover(listX + listWidth - 50, drawY, 20, 20, scaledMouseX, scaledMouseY) && index < titlesSortedByHierarchy.size() - 1) {
                         Collections.swap(titlesSortedByHierarchy, index, index + 1);
                     }
                 }
@@ -138,7 +140,7 @@ public class TitleHierarchyPage implements IPageRenderer {
     public void handleMouseInput() {
         int k = Mouse.getEventDWheel();
         if (k != 0) {
-            int listHeight = parent.getBaseHeight() - 110;
+            int listHeight = 14 * 22;
             int totalContentHeight = titlesSortedByHierarchy.size() * 22;
             if (totalContentHeight > listHeight) {
                 float scrollAmount = (k > 0 ? -1 : 1) * 20.0f / (totalContentHeight - listHeight);

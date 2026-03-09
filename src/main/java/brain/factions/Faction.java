@@ -182,7 +182,10 @@ public class Faction {
 		CAN_MANAGE_TREASURY("Управлять казной", 1L << 4),
 		CAN_USE_TREASURY("Использовать казну", 1L << 5),
 		CAN_MANAGE_BARRACKS("Управлять казармой", 1L << 6),
-		CAN_MANAGE_STRUCTURES("Захватывать и улучшать точки", 1L << 7);
+		CAN_MANAGE_STRUCTURES("Захватывать и улучшать точки", 1L << 7),
+		CAN_INTERACT_RESOURCE_POINTS("Взаимодействие с ресурсными точками", 1L << 8),
+		CAN_BUY_SIEGE_WEAPONS("Приобретение осадных орудий", 1L << 9),
+		CAN_UPGRADE_STRUCTURES("Улучшения зданий", 1L << 10);
 		private final String description;
 		private final long bit;
 

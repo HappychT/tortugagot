@@ -1,14 +1,10 @@
 package brain.factions.servers;
 
-import brain.factions.network.PacketFactionStructures;
 import brain.factions.structures.FactionStructureManager;
+import brain.factions.structures.FactionStructureSlot;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-
-import java.util.List;
 
 public class RaidCommand extends CommandBase {
 
@@ -19,7 +15,7 @@ public class RaidCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/raid <start|stop>";
+        return "/raid <start|stop|point_id>";
     }
 
     @Override
@@ -31,22 +27,29 @@ public class RaidCommand extends CommandBase {
 
         if (args[0].equalsIgnoreCase("start")) {
             StructureManager.isRaidTimeFortress = true;
-            sender.addChatMessage(new ChatComponentText("§cРейд-тайм для крепостей начался!"));
-            updateClients();
+            StructureManager.isRaidTime = true;
+            sender.addChatMessage(new ChatComponentText("§cГлобальный рейд-тайм начался!"));
         } else if (args[0].equalsIgnoreCase("stop")) {
             StructureManager.isRaidTimeFortress = false;
-            sender.addChatMessage(new ChatComponentText("§aРейд-тайм для крепостей окончен."));
-            updateClients();
+            StructureManager.isRaidTime = false;
+            StructureManager.activeRaidPoints.clear();
+            sender.addChatMessage(new ChatComponentText("§aГлобальный рейд-тайм окончен."));
         } else {
-            sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
-        }
-    }
+            String targetId = args[0];
+            FactionStructureSlot slot = FactionStructureManager.getStructureById(targetId);
 
-    private void updateClients() {
-        List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-        PacketFactionStructures packet = new PacketFactionStructures(FactionStructureManager.structureSlots);
-        for (EntityPlayerMP player : players) {
-            CoreFaction.brainChannel.sendTo(packet, player);
+            if (slot == null || slot.category == FactionStructureSlot.StructureCategory.FORTRESS) {
+                sender.addChatMessage(new ChatComponentText("§cРесурсная точка с таким ID не найдена."));
+                return;
+            }
+
+            if (StructureManager.activeRaidPoints.contains(targetId)) {
+                StructureManager.activeRaidPoints.remove(targetId);
+                sender.addChatMessage(new ChatComponentText("§aРейд-тайм для точки " + slot.name + " отключен."));
+            } else {
+                StructureManager.activeRaidPoints.add(targetId);
+                sender.addChatMessage(new ChatComponentText("§cРейд-тайм для точки " + slot.name + " включен! Уязвимость в радиусе 250 блоков."));
+            }
         }
     }
 

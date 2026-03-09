@@ -85,6 +85,9 @@ public class CoreFaction {
 		FMLCommonHandler.instance().bus().register(new TimedEventsHandler());
 		MinecraftForge.EVENT_BUS.register(new TimedEventsHandler());
 		ItemToProvisionMap.init();
+		if (event.getSide().isClient()) {
+			MinecraftForge.EVENT_BUS.register(new brain.factions.client.HUDHandler());
+		}
 	}
 
 	@EventHandler
@@ -96,6 +99,8 @@ public class CoreFaction {
 		event.registerServerCommand(new RaidCommand());
 		event.registerServerCommand(new CommandSaveArena());
 		event.registerServerCommand(new FactionKickCommand());
+		event.registerServerCommand(new WarCommand());
+
 		CompletableFuture.runAsync(() -> {
 			LOGGER.info("Loading Faction data asynchronously...");
 			initFactions();
@@ -268,6 +273,7 @@ public class CoreFaction {
 
 		EntityPlayerMP player = (EntityPlayerMP) e.player;
 		brainChannel.sendTo(new PacketInfoFactions(), player);
+		brainChannel.sendTo(new PacketFactionStructures(FactionStructureManager.structureSlots), player);
 		updatePrefix(player.getCommandSenderName());
 		for(Faction faction : factions.values()) {
 			if(faction.getLeaderName().equals(player.getDisplayName()) || faction.getAssistantName().equals(player.getDisplayName())) {
@@ -282,8 +288,11 @@ public class CoreFaction {
 	public static void sendAllGui() {
 		if (!factionsInitialized) return;
 		List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+		PacketFactionStructures structPacket = new PacketFactionStructures(FactionStructureManager.structureSlots);
+
 		for(EntityPlayerMP player : players) {
 			brainChannel.sendTo(new PacketInfoFactions(), player);
+			brainChannel.sendTo(structPacket, player);
 		}
 	}
 

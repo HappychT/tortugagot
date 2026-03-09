@@ -1,5 +1,8 @@
 package noname.weapons.war;
 
+import brain.factions.servers.StructureManager;
+import brain.factions.structures.FactionStructureManager;
+import brain.factions.structures.FactionStructureSlot;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -22,7 +25,7 @@ public class WarCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/war <on|off>";
+        return "/war <structure_id>";
     }
 
     @Override
@@ -32,48 +35,33 @@ public class WarCommand extends CommandBase {
 
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-        if (args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, "on", "off");
-        }
         return null;
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        if (args.length < 1) {
-            // Показать текущее состояние
-            boolean isActive = WarModeManager.getInstance().isWarModeActive();
-            String status = isActive ? EnumChatFormatting.RED + "АКТИВНО" : EnumChatFormatting.GREEN + "ВЫКЛЮЧЕНО";
-            sender.addChatMessage(new ChatComponentText(
-                    EnumChatFormatting.GOLD + "Военное положение: " + status));
+        if (args.length != 1) {
+            sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
             return;
         }
 
-        String action = args[0].toLowerCase();
+        String targetId = args[0];
+        FactionStructureSlot slot = FactionStructureManager.getStructureById(targetId);
 
-        switch (action) {
-            case "on":
-                WarModeManager.getInstance().setWarMode(true);
-                broadcastMessage(EnumChatFormatting.RED + "⚔ ВОЕННОЕ ПОЛОЖЕНИЕ ОБЪЯВЛЕНО! ⚔");
-                broadcastMessage(EnumChatFormatting.YELLOW
-                        + "Земля теперь может быть размещена в приватах при особых условиях.");
-                broadcastMessage(EnumChatFormatting.YELLOW + "Игроки без военного билета будут исключены!");
-                sender.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.GREEN + "Военное положение включено."));
-                break;
+        if (slot == null || slot.category != FactionStructureSlot.StructureCategory.FORTRESS) {
+            sender.addChatMessage(new ChatComponentText("§cКрепость с таким ID не найдена."));
+            return;
+        }
 
-            case "off":
-                WarModeManager.getInstance().setWarMode(false);
-                broadcastMessage(EnumChatFormatting.GREEN + "☮ Военное положение снято. ☮");
-                sender.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.GREEN + "Военное положение выключено."));
-                break;
-
-            default:
-                sender.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.RED + "Использование: " + getCommandUsage(sender)));
+        if (StructureManager.activeWarFortresses.contains(targetId)) {
+            StructureManager.activeWarFortresses.remove(targetId);
+            sender.addChatMessage(new ChatComponentText("§aВоенный режим для крепости " + slot.name + " отключен."));
+        } else {
+            StructureManager.activeWarFortresses.add(targetId);
+            sender.addChatMessage(new ChatComponentText("§cВоенный режим для крепости " + slot.name + " включен! Сердце уязвимо в радиусе 500 блоков."));
         }
     }
+
 
     private void broadcastMessage(String message) {
         MinecraftServer server = MinecraftServer.getServer();
