@@ -6,20 +6,9 @@ import brain.factions.structures.FactionStructureManager;
 import brain.factions.structures.FactionStructureSlot;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import got.common.block.other.GOTBlockWildFire;
-import got.common.database.GOTRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,67 +22,7 @@ public class TimedEventsHandler {
     private static final long CHECK_INTERVAL_TICKS = 20 * 60;
     private static final long ONE_DAY_TICKS = 20 * 60 * 60 * 24;
 
-    @SubscribeEvent
-    public void onMobDrops(LivingDropsEvent event) {
-        if (event.entityLiving.worldObj.isRemote) return;
-        if (event.entityLiving instanceof EntityBat) {
-            if (!event.recentlyHit) return;
-            if (event.entityLiving.worldObj.rand.nextFloat() < 0.8f) {
-                ItemStack itemStack = new ItemStack(GOTRegistry.batWings, 1);
-                EntityItem drop = new EntityItem(
-                        event.entityLiving.worldObj,
-                        event.entityLiving.posX,
-                        event.entityLiving.posY,
-                        event.entityLiving.posZ,
-                        itemStack
-                );
-                drop.posY += 0.5;
-                drop.delayBeforeCanPickup = 10;
-                event.drops.add(drop);
-            }
-        }
-    }
 
-    @SubscribeEvent
-    public void onLeftClick(PlayerInteractEvent event) {
-        if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) return;
-
-        World world = event.world;
-        int x = event.x;
-        int y = event.y;
-        int z = event.z;
-
-        Block directBlock = world.getBlock(x, y, z);
-
-        if (directBlock instanceof GOTBlockWildFire) {
-            extinguishFire(world, x, y, z, event);
-            return;
-        }
-
-        ForgeDirection dir = ForgeDirection.getOrientation(event.face);
-        int offX = x + dir.offsetX;
-        int offY = y + dir.offsetY;
-        int offZ = z + dir.offsetZ;
-
-        Block offsetBlock = world.getBlock(offX, offY, offZ);
-
-        if (offsetBlock instanceof GOTBlockWildFire) {
-            extinguishFire(world, offX, offY, offZ, event);
-        }
-    }
-
-    private void extinguishFire(World world, int x, int y, int z, PlayerInteractEvent event) {
-        if (!world.isRemote) {
-            world.playAuxSFX(1009, x, y, z, 0);
-            world.setBlockToAir(x, y, z);
-        } else {
-            event.entityPlayer.swingItem();
-        }
-
-        if (event.isCancelable()) {
-            event.setCanceled(true);
-        }
-    }
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;

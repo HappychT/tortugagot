@@ -1,6 +1,5 @@
 package got.common.item.weapon;
 
-import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTMaterial;
 import got.common.entity.other.GOTEntityCrossbowBolt;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +12,6 @@ public class GOTItemCrossbowFirstPeople extends GOTItemCrossbow {
         super(GOTMaterial.IRON);
         boltDamageFactor = 1.6f;
         setMaxDamage(7000);
-        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

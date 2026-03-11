@@ -25,7 +25,7 @@ public class GOTAttackTiming {
     public static int fullAttackTime;
     public static ItemStack attackItem;
     public static int lastCheckTick = -1;
-    public static boolean isSwapCooldown = false;
+
     public static int coolDownTick;
     public static void startAttackTimer() {
         if (mc.thePlayer == null) return;
@@ -40,7 +40,6 @@ public class GOTAttackTiming {
 
         attackItem = itemstack;
         coolDownTick = 1;
-        isSwapCooldown = false;
     }
     public static void doAttackTiming() {
         int currentTick = GOTTickHandlerClient.clientTick;
@@ -111,7 +110,6 @@ public class GOTAttackTiming {
         prevAttackTime = 0;
         fullAttackTime = 0;
         attackItem = null;
-        isSwapCooldown = false;
     }
 
     public static void update() {

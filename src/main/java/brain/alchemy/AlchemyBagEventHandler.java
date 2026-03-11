@@ -1,6 +1,5 @@
 package brain.alchemy;
 
-import got.common.item.potions.GOTItemLingeringPotion;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemPotion;
@@ -35,19 +34,24 @@ public class AlchemyBagEventHandler {
         EntityPlayer player = event.entityPlayer;
         ItemStack pickedItem = event.item.getEntityItem();
 
-        if (pickedItem != null) {
-            boolean isSplash = pickedItem.getItem() == Items.potionitem && ItemPotion.isSplash(pickedItem.getItemDamage());
-            boolean isLingering = pickedItem.getItem() instanceof GOTItemLingeringPotion;
+        if (pickedItem != null && pickedItem.getItem() == Items.potionitem
+            && ItemPotion.isSplash(pickedItem.getItemDamage())) {
 
-            if (isSplash || isLingering) {
-                ItemStack bagStack = findAlchemyBagInInventory(player);
-                if (bagStack != null) {
-                    ItemAlchemyBag bag = (ItemAlchemyBag) bagStack.getItem();
-                    if (bag.addPotionSilent(bagStack, pickedItem, player)) {
-                        event.item.setDead();
-                        event.setCanceled(true);
-                        player.worldObj.playSoundAtEntity(player, "random.pop", 0.2F, 2.0F);
-                    }
+            ItemStack bagStack = findAlchemyBagInInventory(player);
+
+            if (bagStack != null) {
+                ItemAlchemyBag bag = (ItemAlchemyBag) bagStack.getItem();
+
+                if (bag.addPotionSilent(bagStack, pickedItem, player)) {
+
+                    event.item.setDead();
+                    event.setCanceled(true);
+
+                    player.worldObj.playSoundAtEntity(
+                        player,
+                        "random.pop",
+                        0.2F,
+                        ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 }
             }
         }

@@ -10,7 +10,7 @@ public class ItemWarTicket extends Item {
         setUnlocalizedName("war_ticket");
         setTextureName("got:war_ticket");
         setMaxStackSize(64);
-        setCreativeTab(GOTCreativeTabs.tabMisc);
+        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 }
 

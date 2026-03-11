@@ -10,11 +10,9 @@ public class InventoryBagAdapter implements IInventory {
 
     private ItemStack[] inventory = new ItemStack[9];
     private ItemStack bagStack;
-    private EntityPlayer player;
 
-    public InventoryBagAdapter(ItemStack bag, EntityPlayer player) {
+    public InventoryBagAdapter(ItemStack bag) {
         this.bagStack = bag;
-        this.player = player;
         loadFromNBT();
     }
 
@@ -26,9 +24,7 @@ public class InventoryBagAdapter implements IInventory {
         NBTTagCompound nbt = bagStack.getTagCompound();
         NBTTagList potions = nbt.getTagList("Potions", 10);
 
-        inventory = new ItemStack[9];
-
-        for (int i = 0; i < potions.tagCount(); i++) {
+        for (int i = 0; i < potions.tagCount() && i < 9; i++) {
             NBTTagCompound potionTag = potions.getCompoundTagAt(i);
             int slot = potionTag.getInteger("Slot");
             if (slot >= 0 && slot < 9) {
@@ -45,9 +41,6 @@ public class InventoryBagAdapter implements IInventory {
         NBTTagCompound nbt = bagStack.hasTagCompound() ? bagStack.getTagCompound() : new NBTTagCompound();
         NBTTagList potions = new NBTTagList();
 
-        boolean hasActiveSlotItem = false;
-        int activeSlot = nbt.getInteger("ActiveSlot");
-
         for (int i = 0; i < inventory.length; i++) {
             if (inventory[i] != null) {
                 NBTTagCompound potionTag = new NBTTagCompound();
@@ -55,17 +48,19 @@ public class InventoryBagAdapter implements IInventory {
                 potionTag.setInteger("Count", inventory[i].stackSize);
                 potionTag.setInteger("Slot", i);
                 potions.appendTag(potionTag);
-
-                if (i == activeSlot) hasActiveSlotItem = true;
             }
         }
 
         nbt.setTag("Potions", potions);
 
-        if (!hasActiveSlotItem && potions.tagCount() > 0) {
-            nbt.setInteger("ActiveSlot", potions.getCompoundTagAt(0).getInteger("Slot"));
-        } else if (potions.tagCount() == 0) {
-            nbt.setInteger("ActiveSlot", 0);
+        int activeSlot = nbt.getInteger("ActiveSlot");
+        if (inventory[activeSlot] == null) {
+            for (int i = 0; i < inventory.length; i++) {
+                if (inventory[i] != null) {
+                    nbt.setInteger("ActiveSlot", i);
+                    break;
+                }
+            }
         }
 
         bagStack.setTagCompound(nbt);
@@ -133,15 +128,12 @@ public class InventoryBagAdapter implements IInventory {
 
     @Override
     public int getInventoryStackLimit() {
-        return 1;
+        return 64;
     }
 
     @Override
     public void markDirty() {
         saveToNBT();
-        if (player != null) {
-            player.inventory.markDirty();
-        }
     }
 
     @Override
@@ -155,9 +147,6 @@ public class InventoryBagAdapter implements IInventory {
     @Override
     public void closeInventory() {
         saveToNBT();
-        if (player != null) {
-            player.inventory.markDirty();
-        }
     }
 
     @Override

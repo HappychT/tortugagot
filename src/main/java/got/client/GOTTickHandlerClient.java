@@ -169,55 +169,12 @@ public class GOTTickHandlerClient {
     private int clicksThisSecond = 0;
     private boolean isPunished = false;
     private long punishmentEndTime = 0;
-    private int lastSlot = -1;
-    private long lastEquipTime = 0;
     public GOTTickHandlerClient() {
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
         this.ambienceTicker = new GOTAmbience();
         notificationDisplay = new GOTGuiNotificationDisplay();
         miniquestTracker = new GOTGuiMiniquestTracker();
-    }
-
-    @SubscribeEvent
-    public void onItemTooltip(ItemTooltipEvent event) {
-        if (event.itemStack == null || event.itemStack.getItem() == null) {
-            return;
-        }
-
-        Item item = event.itemStack.getItem();
-
-        if (item == GOTRegistry.marzipan ||
-                item == GOTRegistry.marzipanChocolate ||
-                item == GOTRegistry.melonSoup ||
-                item == GOTRegistry.kebab ||
-                item == GOTRegistry.gingerbread ||
-                item == GOTRegistry.pancakeMapleSyrup ||
-                item == GOTRegistry.rhinoCooked ||
-                item == GOTRegistry.elephantCooked ||
-                item == GOTRegistry.walrusLardCooked ||
-                item == GOTRegistry.shishKebab) {
-
-            event.toolTip.add(EnumChatFormatting.GRAY + "Накладывает эффект отдыха");
-        }
-    }
-    @SubscribeEvent
-    public void onClientTick2(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
-
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (mc.thePlayer == null || mc.theWorld == null) return;
-
-        if (mc.thePlayer.inventory.currentItem != lastSlot) {
-
-            if (lastSlot != -1) {
-                GOTAttackTiming.startAttackTimer();
-                GOTAttackTiming.isSwapCooldown = true;
-            }
-
-            lastSlot = mc.thePlayer.inventory.currentItem;
-        }
     }
 
     @SubscribeEvent

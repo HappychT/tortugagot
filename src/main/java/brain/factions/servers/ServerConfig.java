@@ -18,7 +18,12 @@ public class ServerConfig {
     public Map<Integer, Integer> upgradeCost = new HashMap<>();
     public int warStateRecruitmentCost;
     public int warTaxPerMember;
+
     public int provisionCostPerBarracksSlot;
+
+    public Map<Integer, Integer> provisionsPerCollection = new HashMap<>();
+    public Map<Integer, Integer> resourcesPerCollection = new HashMap<>();
+    public Map<Integer, String[]> resourceItems = new HashMap<>();
 
     public Map<Integer, Integer> structureBreakCounts = new HashMap<>();
     public Map<Integer, Integer> fortressBarracksCapacity = new HashMap<>();
@@ -54,9 +59,19 @@ public class ServerConfig {
 
         for (int i = 1; i <= maxStructureLevel; i++) {
             upgradeCost.put(i, config.getInt("upgradeCostLevel" + i, "costs", 5000 * i, 100, Integer.MAX_VALUE, "Стоимость улучшения до уровня " + i));
-            structureBreakCounts.put(i, config.getInt("structureBreakCountLevel" + i, "raiding", i, 1, Integer.MAX_VALUE, "Количество разрушений, необходимых для полного уничтожения структуры уровня " + i));
+        }
+
+        for (int i = 1; i <= maxStructureLevel; i++) {
+            provisionsPerCollection.put(i, config.getInt("provisionsLevel" + i, "production", 10 * i, 1, Integer.MAX_VALUE, "Кол-во продовольствия для амбара уровня " + i));
+            resourcesPerCollection.put(i, config.getInt("resourcesLevel" + i, "production", 5 * i, 1, Integer.MAX_VALUE, "Кол-во ресурсов для ресурсной точки уровня " + i));
+            resourceItems.put(i, config.getStringList("resourceItemsLevel" + i, "production", new String[]{"minecraft:coal", "minecraft:iron_ingot"}, "Предметы, которые генерирует ресурсная точка уровня " + i + " в формате 'modid:item_name'"));
             fortressBarracksCapacity.put(i, config.getInt("fortressBarracksCapacity" + i, "fortress", 10 * i, 1, Integer.MAX_VALUE, "Вместимость казарм в крепости уровня " + i));
         }
+
+        for (int i = 1; i <= maxStructureLevel; i++) {
+            structureBreakCounts.put(i, config.getInt("structureBreakCountLevel" + i, "raiding", i, 1, Integer.MAX_VALUE, "Количество разрушений, необходимых для полного уничтожения структуры уровня " + i));
+        }
+
 
         if (config.hasChanged()) {
             config.save();

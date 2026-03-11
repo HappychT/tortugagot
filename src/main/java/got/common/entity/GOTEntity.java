@@ -6,6 +6,10 @@ import got.common.entity.animal.GOTEntityBird;
 import got.common.entity.animal.GOTEntityBison;
 import got.common.entity.animal.GOTEntityBlizzard;
 import got.common.entity.animal.GOTEntityBoar;
+import got.common.entity.animal.GOTEntityBridleDornishSteed;
+import got.common.entity.animal.GOTEntityBridleDothrakiStallion;
+import got.common.entity.animal.GOTEntityBridleLordHorse;
+import got.common.entity.animal.GOTEntityBridleSerogriv;
 import got.common.entity.animal.GOTEntityButterfly;
 import got.common.entity.animal.GOTEntityCamel;
 import got.common.entity.animal.GOTEntityCrocodile;
@@ -690,7 +694,10 @@ public class GOTEntity {
         GOTEntityRegistry.registerHidden(GOTEntityLingeringBombEffect.class, id++, 64, 1, true);
         GOTEntityRegistry.registerHidden(GOTEntitySmoke.class, id++, 64, 10, true);
         GOTEntityRegistry.registerHidden(GOTEntitySmokeEffect.class, id++, 64, 1, true);
+        GOTEntityRegistry.registerHidden(GOTEntityBridleDornishSteed.class, id++);
+        GOTEntityRegistry.registerHidden(GOTEntityBridleDothrakiStallion.class, id++);
+        GOTEntityRegistry.registerHidden(GOTEntityBridleSerogriv.class, id++);
+        GOTEntityRegistry.registerHidden(GOTEntityBridleLordHorse.class, id++);
         GOTEntityRegistry.registerHidden(GOTEntityBattleRam.class, id++);
-        GOTEntityRegistry.registerHidden(GOTEntityWildfireBomb.class, id++);
     }
 }

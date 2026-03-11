@@ -47,6 +47,7 @@ public class GOTFactionRelations {
 	}
 
 	public static void load() {
+		needsLoad = false;
 		try {
 			NBTTagCompound facData = GOTLevelData.loadNBTFromFile(GOTFactionRelations.getRelationsFile());
 			overrideMap.clear();
@@ -60,7 +61,6 @@ public class GOTFactionRelations {
 				}
 				overrideMap.put(pair, rel);
 			}
-			needsLoad = false;
 			GOTFactionRelations.save();
 		} catch (Exception e) {
 			FMLLog.severe("Error loading GOT faction relations");

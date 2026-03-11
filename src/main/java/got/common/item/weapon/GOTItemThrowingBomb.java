@@ -66,27 +66,16 @@ public class GOTItemThrowingBomb extends Item {
 
     @Override
     public int getMaxItemUseDuration(ItemStack p_77626_1_) {
-        return 72000;
+        return 32;
     }
 
     @Override
     public EnumAction getItemUseAction(ItemStack p_77661_1_) {
-        return EnumAction.bow;
+        return EnumAction.drink;
     }
 
     @Override
     public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
-        entityplayer.setItemInUse(itemstack, getMaxItemUseDuration(itemstack));
-        return itemstack;
-    }
-    @Override
-    public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer entityplayer, int timeLeft) {
-        int j = this.getMaxItemUseDuration(itemstack) - timeLeft;
-
-        if (j < 30) {
-            return;
-        }
-
         if (!entityplayer.capabilities.isCreativeMode) {
             --itemstack.stackSize;
         }
@@ -94,13 +83,10 @@ public class GOTItemThrowingBomb extends Item {
         world.playSoundAtEntity(entityplayer, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
         if (!world.isRemote) {
-            GOTEntityThrowingBomb bomb = new GOTEntityThrowingBomb(world, entityplayer, this.listEffects, this.radius);
-            bomb.setDamage(this.damage);
-
-            bomb.setThrowableHeading(bomb.motionX, bomb.motionY, bomb.motionZ, 0.7F, 1.0F);
-
-            world.spawnEntityInWorld(bomb);
+            world.spawnEntityInWorld(new GOTEntityThrowingBomb(world, entityplayer, this.listEffects, this.radius).setDamage(this.damage));
         }
+
+        return itemstack;
     }
 
     @Override
@@ -213,4 +199,5 @@ public class GOTItemThrowingBomb extends Item {
     public boolean hasEffect(ItemStack itemstack) {
         return false;
     }
+
 }

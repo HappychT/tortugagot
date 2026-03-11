@@ -606,7 +606,7 @@ public abstract class GOTBiome extends BiomeGenBase {
 			return new GrassBlockAndMeta(Blocks.tallgrass, 2);
 		}
 		if (random.nextInt(35) == 0) {
-			return new GrassBlockAndMeta(GOTRegistry.plantain, 0);
+			return new GrassBlockAndMeta(GOTRegistry.plantain, 2);
 		}
 		if (random.nextInt(200) == 0) {
 			return new GrassBlockAndMeta(GOTRegistry.tallGrass, 3);

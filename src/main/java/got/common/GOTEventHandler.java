@@ -34,6 +34,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import got.GOT;
 import got.common.block.GOTVanillaSaplings;
+import got.common.block.factionblocks.BlockStructureHeart;
 import got.common.block.other.GOTBlockArmorStand;
 import got.common.block.other.GOTBlockBarrel;
 import got.common.block.other.GOTBlockBookshelfStorage;
@@ -221,6 +222,7 @@ import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import noname.weapons.war.WarBlockHandler;
 
 public class GOTEventHandler implements IFuelHandler {
     public GOTItemBow proxyBowItemServer;
@@ -396,6 +398,7 @@ public class GOTEventHandler implements IFuelHandler {
                     GOTEntityReachSoldier.defendGrapevines(entityplayer, world, i, j + 1, k);
                 }
             }
+            WarBlockHandler.scheduleDirtColumnFallChecks(world, i, j + 1, k);
         }
     }
 
@@ -410,6 +413,15 @@ public class GOTEventHandler implements IFuelHandler {
         int side = event.face;
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             Block block = world.getBlock(i, j, k);
+            if (block instanceof BlockStructureHeart) {
+                if (!world.isRemote) {
+                    System.out.println("[DEBUG][StructureHeart] GOTEventHandler RIGHT_CLICK_BLOCK server " + i + " " + j + " " + k);
+                    entityplayer.addChatMessage(new ChatComponentText("[DEBUG] GOTEventHandler saw StructureHeart click on server"));
+                } else {
+                    System.out.println("[DEBUG][StructureHeart] GOTEventHandler RIGHT_CLICK_BLOCK client " + i + " " + j + " " + k);
+                }
+                return;
+            }
             int meta = world.getBlockMetadata(i, j, k);
             GOTBannerProtection.Permission perm = GOTBannerProtection.Permission.FULL;
             boolean mightBeAbleToAlterWorld = entityplayer.isSneaking() && itemstack != null;
@@ -434,6 +446,23 @@ public class GOTEventHandler implements IFuelHandler {
                     perm = GOTBannerProtection.Permission.BEDS;
                 } else if (block instanceof BlockButton || block instanceof BlockLever) {
                     perm = GOTBannerProtection.Permission.SWITCHES;
+                }
+            }
+            if (!world.isRemote && itemstack != null && itemstack.getItem() instanceof ItemBlock) {
+                Block blockToPlace = ((ItemBlock) itemstack.getItem()).field_150939_a;
+                if (WarBlockHandler.isDirtBlock(blockToPlace)) {
+                    int placeX = i + (side == 4 ? -1 : side == 5 ? 1 : 0);
+                    int placeY = j + (side == 0 ? -1 : side == 1 ? 1 : 0);
+                    int placeZ = k + (side == 2 ? -1 : side == 3 ? 1 : 0);
+                    boolean protectedTarget = GOTBannerProtection.isProtected(world, placeX, placeY, placeZ, GOTBannerProtection.forPlayer(entityplayer, GOTBannerProtection.Permission.FULL), false);
+                    if (protectedTarget && WarBlockHandler.isWarActiveAt(world, placeX, placeY, placeZ)) {
+                        if (WarBlockHandler.canPlaceProtectedDirt(world, i, j, k, side)) {
+                            WarBlockHandler.scheduleDirtFallCheck(world, placeX, placeY, placeZ);
+                            return;
+                        }
+                        event.setCanceled(true);
+                        return;
+                    }
                 }
             }
             if (!world.isRemote && GOTBannerProtection.isProtected(world, i, j, k, GOTBannerProtection.forPlayer(entityplayer, perm), true)) {
@@ -596,6 +625,9 @@ public class GOTEventHandler implements IFuelHandler {
         Block block = event.block;
         int meta = event.metadata;
         float speed = event.newSpeed;
+        if (WarBlockHandler.isDirtBlock(block) && GOTBannerProtection.isProtected(entityplayer.worldObj, (int) event.x, (int) event.y, (int) event.z, GOTBannerProtection.anyBanner(), false) && WarBlockHandler.isWarActiveAt(entityplayer.worldObj, (int) event.x, (int) event.y, (int) event.z)) {
+            return;
+        }
         ItemStack itemstack = entityplayer.getCurrentEquippedItem();
         if (itemstack != null) {
             float baseDigSpeed = itemstack.getItem().getDigSpeed(itemstack, block, meta);
@@ -1290,12 +1322,8 @@ public class GOTEventHandler implements IFuelHandler {
             event.ammount -= event.ammount * 0.15f;
         }
 
-        if (entity.isPotionActive(GOTEffects.rage)) {
-            event.ammount += event.ammount * 0.15f;
-        }
-
-        if (attacker != null && attacker.isPotionActive(GOTEffects.rage)) {
-            event.ammount += event.ammount * 0.25f;
+        if(entity.isPotionActive(GOTEffects.rage)) {
+            event.ammount += event.ammount * 0.5f;
         }
 
         if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !(((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance) || entity.isPotionActive(GOTEffects.antiEffect.id))) {
@@ -1304,10 +1332,14 @@ public class GOTEventHandler implements IFuelHandler {
 
         if (attacker instanceof EntityPlayer) {
             if (entity instanceof EntityPlayer) {
-                PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
-                effect.setCurativeItems(Lists.newArrayList());
-                entity.addPotionEffect(effect);
-                attacker.addPotionEffect(effect);
+                boolean attackerInArena = ArenaManager.instance.isPlayerInAnyRegion((EntityPlayer) attacker);
+                boolean entityInArena = ArenaManager.instance.isPlayerInAnyRegion((EntityPlayer) entity);
+                if (!attackerInArena && !entityInArena) {
+                    PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
+                    effect.setCurativeItems(Lists.newArrayList());
+                    entity.addPotionEffect(effect);
+                    attacker.addPotionEffect(effect);
+                }
             }
         }
 
@@ -1423,7 +1455,6 @@ public class GOTEventHandler implements IFuelHandler {
         if (player.isPotionActive(GOTEffects.combatLog.id)) {
             boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
             if (isInSafeZone) {
-                player.removePotionEffect(GOTEffects.combatLog.id);
                 return;
             }
             if (GOTSoulBoundEvents.instance != null) {

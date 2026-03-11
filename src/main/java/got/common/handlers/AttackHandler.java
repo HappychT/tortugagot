@@ -167,9 +167,8 @@ public class AttackHandler {
 
         if (heldItem.getItem() == GOTRegistry.baratheonHammer) {
             if (event.entityLiving instanceof EntityPlayer) {
-                killer.addPotionEffect(new PotionEffect(GOTEffects.rage.id, 1200, 0));
-                killer.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 1200, 0));
-                killer.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 1200, 0));
+                killer.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 100, 0));
+                killer.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 100, 0));
             }
         }
     }

@@ -49,13 +49,6 @@ public class GOTItemBow extends ItemBow {
         this.arrowDamageFactor = d;
         this.bowPullTime = 20;
     }
-    public GOTItemBow(Item.ToolMaterial material, double d, GOTCreativeTabs tab) {
-        this.bowMaterial = material;
-        setMaxDamage((int) (material.getMaxUses() * 1.5f));
-        setCreativeTab(tab);
-        this.arrowDamageFactor = d;
-        this.bowPullTime = 20;
-    }
 
     public BowState getBowState(EntityLivingBase entity, ItemStack usingItem, int useRemaining) {
         if (entity instanceof EntityPlayer && usingItem != null && usingItem.getItem() == this) {

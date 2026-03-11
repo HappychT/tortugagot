@@ -35,6 +35,8 @@ public class WeaponsConfig {
     public static float maxRangeBalsita = 250.0F;
     public static float rotationSpeedBatteringRam = 2.0F;
     public static float movementSpeedBatteringRam = 0.15F;
+    public static float maxHealthBatteringRam = 500.0F;
+    public static float armorBatteringRam = 20.0F;
 
 
     public static void loadConfig(FMLPreInitializationEvent event) {
@@ -113,6 +115,14 @@ public class WeaponsConfig {
             Property MovementSpeedBatteringRamProp = config.get("battering_ram", "MovementSpeedBatteringRamProp", 0.15D,
                     "Maximum movement change per tick for the battering ram. Default: 0.15");
             movementSpeedBatteringRam = (float) MovementSpeedBatteringRamProp.getDouble();
+
+            Property maxHealthBatteringRamProp = config.get("battering_ram", "maxHealthBatteringRam", 500.0D,
+                    "Maximum health of battering ram. Default: 500.0");
+            maxHealthBatteringRam = (float) maxHealthBatteringRamProp.getDouble();
+
+            Property armorBatteringRamProp = config.get("battering_ram", "armorBatteringRam", 20.0D,
+                    "Armor of battering ram (reduces damage). Default: 20.0");
+            armorBatteringRam = (float) armorBatteringRamProp.getDouble();
 
             Property baseDamageProp = config.get("projectile", "baseDamage", 1.0D,
                     "Base damage dealt to blocks at epicenter. Default: 1.0");

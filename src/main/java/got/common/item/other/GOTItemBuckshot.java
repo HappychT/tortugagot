@@ -53,10 +53,12 @@ public class GOTItemBuckshot extends Item {
             for (int i = 0; i < nbttaglist.tagCount(); ++i) {
                 NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
                 PotionEffect potioneffect = PotionEffect.readCustomPotionEffectFromNBT(nbttagcompound);
+
                 if (potioneffect != null) {
                     arraylist.add(potioneffect);
                 }
             }
+
             return arraylist;
         } else
             return this.listEffects;
@@ -64,7 +66,7 @@ public class GOTItemBuckshot extends Item {
 
     @Override
     public int getMaxItemUseDuration(ItemStack p_77626_1_) {
-        return 72000;
+        return 32;
     }
 
     @Override
@@ -79,13 +81,7 @@ public class GOTItemBuckshot extends Item {
     }
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer entityplayer, int timeLeft) {
-        int j = this.getMaxItemUseDuration(itemstack) - timeLeft;
-
-        if (j < 30) {
-            return;
-        }
-
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int side, float f, float f1, float f2) {
         if (!entityplayer.capabilities.isCreativeMode) {
             --itemstack.stackSize;
         }
@@ -93,14 +89,11 @@ public class GOTItemBuckshot extends Item {
         world.playSoundAtEntity(entityplayer, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
         if (!world.isRemote) {
-            GOTEntityThrowingBomb bomb = new GOTEntityThrowingBomb(world, entityplayer, this.listEffects, this.radius);
-            bomb.setDamage(this.damage);
-
-            bomb.setThrowableHeading(bomb.motionX, bomb.motionY, bomb.motionZ, 0.7F, 1.0F);
-
-            world.spawnEntityInWorld(bomb);
+            world.spawnEntityInWorld(new GOTEntityThrowingBomb(world, entityplayer, this.listEffects, this.radius).setDamage(this.damage));
         }
+        return true;
     }
+
     @SideOnly(Side.CLIENT)
     public int getColorFromDamage(int meta) {
         return PotionHelper.func_77915_a(meta, false);
@@ -123,11 +116,14 @@ public class GOTItemBuckshot extends Item {
         if (this.listEffects != null && !this.listEffects.isEmpty()) {
             Iterator<PotionEffect> iterator = this.listEffects.iterator();
             PotionEffect potioneffect;
+
             do {
                 if (!iterator.hasNext())
                     return false;
+
                 potioneffect = (PotionEffect)iterator.next();
             } while (!Potion.potionTypes[potioneffect.getPotionID()].isInstant());
+
             return true;
         } else
             return false;
@@ -136,61 +132,63 @@ public class GOTItemBuckshot extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> inf, boolean p_77624_4_) {
-        List<PotionEffect> list = this.getEffects(itemstack);
+        if (itemstack.getItemDamage() != 0) {
+            List<PotionEffect> list = Items.potionitem.getEffects(itemstack);
+            HashMultimap<String, AttributeModifier> hashmultimap = HashMultimap.create();
+            if (list != null && !list.isEmpty()) {
 
-        HashMultimap<String, AttributeModifier> hashmultimap = HashMultimap.create();
-        if (list != null && !list.isEmpty()) {
-            for (PotionEffect potioneffect : list) {
-                String s1 = StatCollector.translateToLocal(potioneffect.getEffectName()).trim();
-                Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
-                Map<IAttribute, AttributeModifier> map = potion.func_111186_k();
+                for (PotionEffect potioneffect : list) {
+                    String s1 = StatCollector.translateToLocal(potioneffect.getEffectName()).trim();
+                    Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
+                    Map<IAttribute, AttributeModifier> map = potion.func_111186_k();
 
-                if (map != null && map.size() > 0) {
-                    for (Entry<IAttribute, AttributeModifier> entry : map.entrySet()) {
-                        AttributeModifier attributemodifier = entry.getValue();
-                        AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), potion.func_111183_a(potioneffect.getAmplifier(), attributemodifier), attributemodifier.getOperation());
-                        hashmultimap.put(entry.getKey().getAttributeUnlocalizedName(), attributemodifier1);
+                    if (map != null && map.size() > 0) {
+                        for (Entry<IAttribute, AttributeModifier> entry : map.entrySet()) {
+                            AttributeModifier attributemodifier = entry.getValue();
+                            AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), potion.func_111183_a(potioneffect.getAmplifier(), attributemodifier), attributemodifier.getOperation());
+                            hashmultimap.put(entry.getKey().getAttributeUnlocalizedName(), attributemodifier1);
+                        }
+                    }
+
+                    if (potioneffect.getAmplifier() > 0) {
+                        s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + potioneffect.getAmplifier()).trim();
+                    }
+
+                    if (potioneffect.getDuration() > 20) {
+                        s1 = s1 + " (" + Potion.getDurationString(potioneffect) + ")";
+                    }
+
+                    if (potion.isBadEffect()) {
+                        inf.add(EnumChatFormatting.RED + s1);
+                    } else {
+                        inf.add(EnumChatFormatting.GRAY + s1);
                     }
                 }
-
-                if (potioneffect.getAmplifier() > 0) {
-                    s1 = s1 + " " + StatCollector.translateToLocal("potion.potency." + potioneffect.getAmplifier()).trim();
-                }
-
-                if (potioneffect.getDuration() > 20) {
-                    s1 = s1 + " (" + Potion.getDurationString(potioneffect) + ")";
-                }
-
-                if (potion.isBadEffect()) {
-                    inf.add(EnumChatFormatting.RED + s1);
-                } else {
-                    inf.add(EnumChatFormatting.GRAY + s1);
-                }
+            } else {
+                String s = StatCollector.translateToLocal("potion.empty").trim();
+                inf.add(EnumChatFormatting.GRAY + s);
             }
-        } else {
-            String s = StatCollector.translateToLocal("potion.empty").trim();
-            inf.add(EnumChatFormatting.GRAY + s);
-        }
 
-        if (!hashmultimap.isEmpty()) {
-            inf.add("");
-            inf.add(EnumChatFormatting.DARK_PURPLE + StatCollector.translateToLocal("potion.effects.whenDrank"));
-            for (Entry<String, AttributeModifier> entry1 : hashmultimap.entries()) {
-                AttributeModifier attributemodifier2 = entry1.getValue();
-                double d0 = attributemodifier2.getAmount();
-                double d1;
+            if (!hashmultimap.isEmpty()) {
+                inf.add("");
+                inf.add(EnumChatFormatting.DARK_PURPLE + StatCollector.translateToLocal("potion.effects.whenDrank"));
+                for (Entry<String, AttributeModifier> entry1 : hashmultimap.entries()) {
+                    AttributeModifier attributemodifier2 = entry1.getValue();
+                    double d0 = attributemodifier2.getAmount();
+                    double d1;
 
-                if (attributemodifier2.getOperation() != 1 && attributemodifier2.getOperation() != 2) {
-                    d1 = attributemodifier2.getAmount();
-                } else {
-                    d1 = attributemodifier2.getAmount() * 100.0D;
-                }
+                    if (attributemodifier2.getOperation() != 1 && attributemodifier2.getOperation() != 2) {
+                        d1 = attributemodifier2.getAmount();
+                    } else {
+                        d1 = attributemodifier2.getAmount() * 100.0D;
+                    }
 
-                if (d0 > 0.0D) {
-                    inf.add(EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted("attribute.modifier.plus." + attributemodifier2.getOperation(), new Object[] {ItemStack.field_111284_a.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
-                } else if (d0 < 0.0D) {
-                    d1 *= -1.0D;
-                    inf.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted("attribute.modifier.take." + attributemodifier2.getOperation(), new Object[] {ItemStack.field_111284_a.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
+                    if (d0 > 0.0D) {
+                        inf.add(EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted("attribute.modifier.plus." + attributemodifier2.getOperation(), new Object[] {ItemStack.field_111284_a.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
+                    } else if (d0 < 0.0D) {
+                        d1 *= -1.0D;
+                        inf.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted("attribute.modifier.take." + attributemodifier2.getOperation(), new Object[] {ItemStack.field_111284_a.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
+                    }
                 }
             }
         }
@@ -201,4 +199,5 @@ public class GOTItemBuckshot extends Item {
     public boolean hasEffect(ItemStack itemstack) {
         return false;
     }
+
 }

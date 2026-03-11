@@ -22,6 +22,7 @@ import net.minecraft.util.MovementInput;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
@@ -48,6 +49,15 @@ public class ClientEventHandler {
                 player.movementInput = ((GOTMovementInputInverted) player.movementInput).originalInput;
             }
 
+        }
+    }
+
+    @SubscribeEvent
+    public void onPressSwing(TickEvent.PlayerTickEvent e){
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        System.out.println("3");
+        if(player != null && Mouse.isButtonDown(0)){
+            System.out.println(player.riddenByEntity);
         }
     }
 

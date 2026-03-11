@@ -14,11 +14,13 @@ import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
 import got.common.faction.GOTFactionRelations;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FrontPage implements IPageRenderer {
@@ -35,10 +37,6 @@ public class FrontPage implements IPageRenderer {
     private List<GOTFaction> enemies = new ArrayList<>();
     private List<GOTFaction> wars = new ArrayList<>();
     private GuiButton buttonWarCouncil;
-
-    private static final ResourceLocation BANNER_TEX = new ResourceLocation("got", "textures/gui/faction/banner_bg.png");
-    private static final ResourceLocation PLATE_TEX = new ResourceLocation("got", "textures/gui/faction/info_plate.png");
-    private static final ResourceLocation MAP_FRAME_TEX = new ResourceLocation("got", "textures/gui/faction/map_frame.png");
 
     public FrontPage(GOTGuiFactions parent) {
         this.parent = parent;
@@ -68,37 +66,45 @@ public class FrontPage implements IPageRenderer {
 
     @Override
     public void initGui(List<GuiButton> buttonList) {
-        int pledgeButtonBaseY = parent.getBaseHeight() - 72;
-        int pledgeButtonY = pledgeButtonBaseY;
+        int gap = 10;
+        int buttonHeight = 20;
+        int managementButtonWidth = 130;
 
-        int pledgeButtonWidth = 64;
-        int pledgeButtonHeight = 64;
-        int pledgeButtonX = (int) (parent.getBaseWidth() / 1.25f - ((float) pledgeButtonWidth / 2));
+
+        int pledgeButtonBaseY = parent.getBaseHeight() - 60;
+        int pledgeButtonY = pledgeButtonBaseY - 15;
+
+        int pledgeButtonWidth = 150 * 2;
+        int pledgeButtonHeight = buttonHeight * 2;
+        int pledgeButtonX = parent.getBaseWidth() / 2 - (pledgeButtonWidth / 2);
 
         this.buttonPledge = new GOTGuiButtonPledge(parent, 9, pledgeButtonX, pledgeButtonY, pledgeButtonWidth, pledgeButtonHeight, GOTGuiFactions.currentFaction);
 
-        int frameWidth = (int) (202 / 1.2f);
-        int frameHeight = (int) (134 / 1.2f);
-        int mapWidgetX = 65;
-        int mapWidgetY = 60;
+        int mapWidgetWidth = (int)(150 * 1.3);
+        int mapWidgetHeight = (int)(100 * 1.3);
+        int mapWidgetX = parent.getBaseWidth() - 15 - mapWidgetWidth;
+        int mapWidgetY = 35;
 
-        int diplomacyButtonHeight = 26 * 2;
-        int diplomacyButtonY = mapWidgetY + frameHeight + 10;
+        int diplomacyButtonHeight = (int)(buttonHeight * 1.3); // 26
+        int diplomacyButtonY = mapWidgetY + mapWidgetHeight + 5;
+        this.buttonViewMap = new GuiCustomButton(11, mapWidgetX, diplomacyButtonY, mapWidgetWidth, diplomacyButtonHeight, "Дипломатия");
 
-        this.buttonViewMap = new GuiCustomButton(11, mapWidgetX, diplomacyButtonY, frameWidth, diplomacyButtonHeight, "Дипломатия");
+        int mgmt_row2Y = pledgeButtonY - gap - buttonHeight;
+        int mgmt_row1Y = mgmt_row2Y - gap - buttonHeight;
 
-        buttonWarCouncil = new GuiCustomButton(50, mapWidgetX, diplomacyButtonY + diplomacyButtonHeight + 10, frameWidth, diplomacyButtonHeight, "Военный совет");
+
+        int rightAlignX = parent.getBaseWidth() - 15;
+        int mgmt_col2X = rightAlignX - managementButtonWidth;
+        int mgmt_col1X = mgmt_col2X - gap - managementButtonWidth;
+
+        buttonMembers = new GuiCustomButton(7, mgmt_col1X, mgmt_row1Y + 63, managementButtonWidth, buttonHeight, "Участники");
+        buttonCollections = new GuiCustomButton(22, mgmt_col2X, mgmt_row1Y + 63, managementButtonWidth, buttonHeight, "Казна и сборы");
+        buttonSetHome = new GuiCustomButton(6, mgmt_col1X, mgmt_row2Y + 63, managementButtonWidth, buttonHeight, "Установить дом");
+        buttonTeleportHome = new GuiCustomButton(5, mgmt_col2X, mgmt_row2Y + 63, managementButtonWidth, buttonHeight, "Телепорт домой");
+
+        int xSize = parent.getBaseWidth();
+        buttonWarCouncil = new GuiCustomButton(50, xSize - 175, 10, 150, 20, "Военный совет");
         buttonList.add(buttonWarCouncil);
-
-
-        int rightButtonsX = parent.getBaseWidth() - mapWidgetX - frameWidth;
-        int rightButtonsY = mapWidgetY;
-        int rightGap = 10;
-
-        buttonMembers = new GuiCustomButton(7, rightButtonsX, rightButtonsY, frameWidth, diplomacyButtonHeight, "Участники");
-        buttonCollections = new GuiCustomButton(22, rightButtonsX, rightButtonsY + diplomacyButtonHeight + rightGap, frameWidth, diplomacyButtonHeight, "Казна и сборы");
-        buttonSetHome = new GuiCustomButton(6, rightButtonsX, rightButtonsY + 2 * (diplomacyButtonHeight + rightGap), frameWidth, diplomacyButtonHeight, "Установить дом");
-        buttonTeleportHome = new GuiCustomButton(5, rightButtonsX, rightButtonsY + 3 * (diplomacyButtonHeight + rightGap), frameWidth, diplomacyButtonHeight, "Телепорт домой");
 
         buttonList.add(buttonPledge);
         buttonList.add(buttonViewMap);
@@ -112,7 +118,7 @@ public class FrontPage implements IPageRenderer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
-        parent.drawCenteredString(GOTGuiFactions.currentFaction.factionName(), parent.getBaseWidth() / 2, 10, 0xFFFFFF);
+        parent.drawCenteredString(GOTGuiFactions.currentFaction.factionName(), parent.getBaseWidth() / 2, 15, 0xFFFFFF);
 
         Faction factionData = parent.getFactionData();
         if (factionData == null) {
@@ -120,30 +126,25 @@ public class FrontPage implements IPageRenderer {
             return;
         }
 
-        buttonWarCouncil.visible = parent.isPlayerLeader();
+        if (factionData != null) {
+            buttonWarCouncil.visible = parent.isPlayerLeader();
+        } else {
+            buttonWarCouncil.visible = false;
+        }
+
         GOTPlayerData pd = GOTLevelData.getData(parent.mc.thePlayer);
         boolean isMember = parent.isPlayerMember();
 
-        int bannerWidth = (int) (181 / 1.25f);
-        int bannerHeight = (int) (178 / 1.25f);
-        int bannerX = (parent.getBaseWidth() - bannerWidth) / 2;
-        int bannerY = 15;
+        int bannerX = 20;
+        int bannerY = 40;
+        int bannerWidth = 200;
+        int bannerHeight = 300;
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        parent.mc.getTextureManager().bindTexture(BANNER_TEX);
-        parent.drawScaledCustomSizeModalRect(bannerX, bannerY, 0, 0, 362, 356, bannerWidth, bannerHeight, 362.0F, 356.0F);
+        UtilO.drawRoundedRectangle(bannerX, bannerY, bannerWidth, bannerHeight, 5, new Color(50, 50, 50, 100).getRGB(), 0);
+        parent.drawCenteredString("Знамя", bannerX + bannerWidth / 2, bannerY + bannerHeight / 2, 0xFFFFFF);
 
-        int plateWidth = 250;
-        int plateHeight = 172;
-        int plateX = (parent.getBaseWidth() - plateWidth) / 2;
-        int plateY = bannerY + bannerHeight + 5;
-
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        parent.mc.getTextureManager().bindTexture(PLATE_TEX);
-        parent.drawScaledCustomSizeModalRect(plateX, plateY, 0, 0, 500, 344, plateWidth, plateHeight, 500.0F, 344.0F);
-
-        int infoX = plateX + 15;
-        int infoY = plateY + 15;
+        int infoX = 250;
+        int infoY = 40;
 
         parent.drawString("Лидер: §7" + (factionData.getLeaderName().isEmpty() ? "Нет" : factionData.getLeaderName()), infoX, infoY, 0xFFFFFFFF);
         infoY += 12;
@@ -152,21 +153,21 @@ public class FrontPage implements IPageRenderer {
         parent.drawString("Столица: §7" + factionData.getCapitalName(), infoX, infoY, 0xFFFFFFFF);
         infoY += 12;
         parent.drawString("Участников: §7" + factionData.getPlayers().size(), infoX, infoY, 0xFFFFFFFF);
+        infoY += 12;
 
         infoY += 20;
-        int politicsColWidth = 70;
+        int politicsColWidth = 120;
+        int politicsColGap = 10;
         drawRelationList("Союз:", allies, infoX, infoY, 0x55FF55, politicsColWidth);
-        drawRelationList("Война:", wars, infoX + politicsColWidth, infoY, 0xFF5555, politicsColWidth);
-        drawRelationList("Враги:", enemies, infoX + politicsColWidth * 2, infoY, 0xFFAA00, politicsColWidth);
+        drawRelationList("Война:", wars, infoX + politicsColWidth + politicsColGap, infoY, 0xFF5555, politicsColWidth);
+        drawRelationList("Враждебность:", enemies, infoX + (politicsColWidth + politicsColGap) * 2, infoY, 0xFFAA00, politicsColWidth);
 
-        int frameWidth = (int) (202 / 1.2f);
-        int frameHeight = (int) (134 / 1.2f);
-        int mapWidgetX = 65;
-        int mapWidgetY = 60;
+        int mapWidgetWidth = (int)(150 * 1.3);
+        int mapWidgetHeight = (int)(100 * 1.3);
+        int mapWidgetX = parent.getBaseWidth() - 15 - mapWidgetWidth;
+        int mapWidgetY = 35;
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        parent.mc.getTextureManager().bindTexture(MAP_FRAME_TEX);
-        parent.drawScaledCustomSizeModalRect(mapWidgetX, mapWidgetY,  0, 0, 404, 268, frameWidth, frameHeight, 404.0F, 268.0F);
+        UtilO.drawRoundedRectangle(mapWidgetX, mapWidgetY, mapWidgetWidth, mapWidgetHeight, 2, new Color(10, 10, 10, 200).getRGB(), 0);
 
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         GL11.glPushMatrix();
@@ -188,38 +189,25 @@ public class FrontPage implements IPageRenderer {
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GuiApi.glScissor(
-                parent.getGuiLeft() + (int)((mapWidgetX + 5) * parent.getScaleFactor()),
-                parent.getGuiTop() + (int)((mapWidgetY + 5) * parent.getScaleFactor()),
-                (int)((frameWidth - 10) * parent.getScaleFactor()),
-                (int)((frameHeight - 10) * parent.getScaleFactor()),
+                parent.getGuiLeft() + (int)(mapWidgetX * parent.getScaleFactor()),
+                parent.getGuiTop() + (int)(mapWidgetY * parent.getScaleFactor()),
+                (int)(mapWidgetWidth * parent.getScaleFactor()),
+                (int)(mapWidgetHeight * parent.getScaleFactor()),
                 true
         );
 
         miniMapRenderer.renderMap(parent, mapGui, partialTicks,
-                mapWidgetX + 5, mapWidgetY + 5,
-                mapWidgetX + frameWidth - 5, mapWidgetY + frameHeight - 5);
+                mapWidgetX, mapWidgetY,
+                mapWidgetX + mapWidgetWidth, mapWidgetY + mapWidgetHeight);
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
         GL11.glPopMatrix();
         GL11.glPopAttrib();
 
         float alignment = pd.getAlignment(GOTGuiFactions.currentFaction);
+        GOTTickHandlerClient.renderAlignmentBar(alignment, false, GOTGuiFactions.currentFaction, infoX - 125, bannerY + bannerHeight + 10, true, true, true, true);
 
-        int barY = plateY + plateHeight + 35;
-
-        GOTTickHandlerClient.renderAlignmentBar(alignment, false, GOTGuiFactions.currentFaction, parent.getBaseWidth() / 2, barY, false, false, false, true);
-
-        got.common.faction.GOTFactionRank rank = GOTGuiFactions.currentFaction.getRank(alignment);
-        String rankName = rank.getShortNameWithGender(pd);
-
-        String centerText = rankName + " (" + (int)alignment + ")";
-
-        int textWidth = parent.getFontRenderer().getStringWidth(centerText);
-        int textX = parent.getBaseWidth() / 2 - textWidth / 2;
-
-        int textY = barY + 3;
-
-        parent.getFontRenderer().drawStringWithShadow(centerText, textX, textY, 0xFFFFFFFF);
         if (buttonPledge != null) buttonPledge.visible = true;
 
         if (isMember) {

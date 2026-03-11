@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
@@ -16,6 +17,7 @@ public class EntityBalistaProjectile extends EntityThrowable {
     private double startY;
     private double startZ;
     private boolean startInitialized = false;
+    private float maxRange = WeaponsConfig.maxRangeBalsita;
 
     public EntityBalistaProjectile(World world) {
         super(world);
@@ -48,7 +50,7 @@ public class EntityBalistaProjectile extends EntityThrowable {
                     Math.pow(this.posZ - startZ, 2)
             );
 
-            if (distanceTraveled >= WeaponsConfig.maxRangeBalsita) {
+            if (distanceTraveled >= this.maxRange) {
                 
                 this.setDead();
                 return;
@@ -61,6 +63,10 @@ public class EntityBalistaProjectile extends EntityThrowable {
         this.startY = y;
         this.startZ = z;
         this.startInitialized = true;
+    }
+
+    public void setMaxRange(float range) {
+        this.maxRange = range;
     }
 
     @Override
@@ -119,7 +125,7 @@ public class EntityBalistaProjectile extends EntityThrowable {
                     float damage = WeaponsConfig.damageBalista;
                     if (damage > 0) {
                         livingEntity.attackEntityFrom(
-                                net.minecraft.util.DamageSource.generic,
+                                DamageSource.causeThrownDamage(this, getThrower()),
                                 damage
                         );
                     }

@@ -14,6 +14,7 @@ import got.*;
 import got.client.gui.*;
 import got.common.*;
 import got.common.database.*;
+import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.entity.other.GOTEntityNPCRideable;
 import got.common.inventory.GOTContainerCoinExchange;
 import got.common.item.other.GOTItemCoin;
@@ -251,7 +252,7 @@ public class GOTGuiHandler {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityClientPlayerMP entityplayer = mc.thePlayer;
 		WorldClient world = mc.theWorld;
-		if ((gui instanceof GuiInventory || gui instanceof GuiContainerCreative) && entityplayer != null && world != null && entityplayer.ridingEntity instanceof GOTEntityNPCRideable && ((GOTEntityNPCRideable) entityplayer.ridingEntity).getMountInventory() != null) {
+		if ((gui instanceof GuiInventory || gui instanceof GuiContainerCreative) && entityplayer != null && world != null && ((entityplayer.ridingEntity instanceof GOTEntityNPCRideable && ((GOTEntityNPCRideable) entityplayer.ridingEntity).getMountInventory() != null) || entityplayer.ridingEntity instanceof GOTEntityDirewolf)) {
 			entityplayer.closeScreen();
 			GOTPacketMountOpenInv packet = new GOTPacketMountOpenInv();
 			GOTPacketHandler.networkWrapper.sendToServer(packet);

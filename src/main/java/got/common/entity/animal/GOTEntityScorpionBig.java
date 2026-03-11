@@ -63,16 +63,10 @@ public abstract class GOTEntityScorpionBig extends GOTEntityNPC implements GOTBi
 	@Override
 	public void dropFewItems(boolean flag, int i) {
 		int k = 1 + rand.nextInt(3) + rand.nextInt(i + 1);
-
 		for (int j = 0; j < k; ++j) {
 			dropItem(Items.rotten_flesh, 1);
 		}
-
-		if (rand.nextFloat() < 0.8F) {
-			dropItem(GOTRegistry.scorpionTail, 1);
-		}
 	}
-
 
 	@Override
 	public void entityInit() {

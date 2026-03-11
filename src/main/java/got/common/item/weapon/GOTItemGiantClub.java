@@ -3,7 +3,6 @@ package got.common.item.weapon;
 import java.util.ArrayList;
 import java.util.List;
 
-import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTMaterial;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -22,9 +21,8 @@ public class GOTItemGiantClub extends GOTItemSword {
 
     public GOTItemGiantClub() {
         super(GOTMaterial.GIANT_CLUB);
-        this.gotWeaponDamage = 13.0f;
+        this.gotWeaponDamage = 10.0f;
         setMaxDamage(7000);
-        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override

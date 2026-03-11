@@ -12,12 +12,14 @@ import got.client.gui.faction.pages.*;
 import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -62,7 +64,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	}
 
 	public static ResourceLocation factionsTexture = new ResourceLocation("got:textures/gui/faction.png");
-	private ResourceLocation currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
+	private ResourceLocation currentBackgroundTexture = new ResourceLocation("got:textures/gui/faction.png");
 	public static GOTFaction currentFaction;
 	private View currentView = View.LIST;
 	private Page currentPage = Page.FRONT;
@@ -154,15 +156,19 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 
 		updateFactionDataCache();
 
-		this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
+		if (this.currentView == View.FACTION && currentFaction != null) {
+			this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction_bg_" + currentFaction.codeName().toLowerCase() + ".png");
+		} else {
+			this.currentBackgroundTexture = new ResourceLocation("got:textures/gui/faction.png");
+		}
 
 		this.buttonList.clear();
 
-		int bottomButtonY = this.baseHeight - 70;
-		this.buttonBack = new GuiCustomButton(0, 60, bottomButtonY, 100, 60, "К списку фракций");
-		this.buttonPagePrev = new GuiCustomButton(1, 180, bottomButtonY, 20, 20, "<");
+		int bottomButtonY = this.baseHeight - 35;
+		this.buttonBack = new GuiCustomButton(0, 15, bottomButtonY, 100, 20, "К списку фракций");
+		this.buttonPagePrev = new GuiCustomButton(1, 120, bottomButtonY, 20, 20, "<");
 		this.buttonPageNext = new GuiCustomButton(2, this.baseWidth - 320, bottomButtonY, 20, 20, ">");
-		this.buttonOpenMenu = new GuiCustomButton(3, this.baseWidth / 2 - 75, bottomButtonY, 150, 60, "Главное меню");
+		this.buttonOpenMenu = new GuiCustomButton(3, this.baseWidth / 2 - 75, bottomButtonY, 150, 20, "Главное меню");
 
 		this.buttonList.add(buttonBack);
 		this.buttonList.add(buttonPagePrev);
@@ -221,16 +227,17 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			buttonPledge.visible = true;
 		}
 
+
 		for (Object obj : this.buttonList) {
 			((GuiButton)obj).drawButton(this.mc, scaledMouseX, scaledMouseY);
 		}
 
 		GL11.glPopMatrix();
 
+
 		if (activeRenderer instanceof MapView) {
 			((MapView)activeRenderer).drawTooltips(mouseX, mouseY, scaledMouseX, scaledMouseY);
-		}
-	}
+		}}
 
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int button) {
@@ -399,15 +406,13 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public boolean isHover(int x, int y, int w, int h, int scaledMouseX, int scaledMouseY) {
 		return scaledMouseX >= x && scaledMouseX < x + w && scaledMouseY >= y && scaledMouseY < y + h;
 	}
-
 	public void drawCenteredString(String text, int x, int y, int color) {
 		float scale = 1.3f;
 		GL11.glPushMatrix();
 		int scaledX = (int) (x / scale);
 		int scaledY = (int) (y / scale);
 		GL11.glScalef(scale, scale, 1.0f);
-		this.getFontRenderer().drawString(text, scaledX - this.getFontRenderer().getStringWidth(text) / 2, scaledY, color);
-		GL11.glPopMatrix();
+		this.getFontRenderer().drawString(text, scaledX - this.getFontRenderer().getStringWidth(text) / 2, scaledY, color);		GL11.glPopMatrix();
 	}
 
 	public void drawString(String text, int x, int y, int color) {
@@ -422,7 +427,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		getFontRenderer().drawString(text, scaledX, scaledY, color);
 
 		GL11.glPopMatrix();
-	}
+			}
 
 
 	public void drawTooltip(List<String> text, int x, int y) {
@@ -497,6 +502,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 		}
 	}
+
 
 	private GroupStatus calculatePlayerStatus() {
 		if (getFactionData() != null && mc.thePlayer != null) {

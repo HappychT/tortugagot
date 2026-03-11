@@ -8,7 +8,7 @@ import net.minecraftforge.common.util.EnumHelper;
 
 public class GOTMaterial {
 	public static ArmorMaterial ANONYMOUS = EnumHelper.addArmorMaterial("GOT_ANONYMOUS", 12, new int[] { 1, 3, 2, 1 }, 15);
-	public static ArmorMaterial ARRYN = EnumHelper.addArmorMaterial("GOT_ARRYN", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial ARRYN = EnumHelper.addArmorMaterial("GOT_ARRYN", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial ARRYNGUARD = EnumHelper.addArmorMaterial("GOT_ARRYNGUARD", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial ASSHAI = EnumHelper.addArmorMaterial("GOT_ASSHAI", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial BLACKFYRE = EnumHelper.addArmorMaterial("GOT_BLACKFYRE", 60, new int[] { 2, 7, 6, 3 }, 9);
@@ -17,10 +17,10 @@ public class GOTMaterial {
 	public static ArmorMaterial BRAAVOS = EnumHelper.addArmorMaterial("GOT_BRAAVOS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial BRONZE_CHAINMAIL = EnumHelper.addArmorMaterial("GOT_BRONZE_CHAINMAIL", 37, new int[] { 2, 4, 3, 1 }, 12);
 	public static ArmorMaterial BRONZE = EnumHelper.addArmorMaterial("GOT_BRONZE", 37, new int[] { 2, 5, 4, 1 }, 9);
-	public static ArmorMaterial CROWNLANDS = EnumHelper.addArmorMaterial("GOT_CROWNLANDS", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial CROWNLANDS = EnumHelper.addArmorMaterial("GOT_CROWNLANDS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial DORNE = EnumHelper.addArmorMaterial("GOT_DORNE", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial DOTHRAKI = EnumHelper.addArmorMaterial("GOT_DOTHRAKI", 12, new int[] { 1, 3, 2, 1 }, 15);
-	public static ArmorMaterial DRAGONSTONE = EnumHelper.addArmorMaterial("GOT_DRAGONSTONE", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial DRAGONSTONE = EnumHelper.addArmorMaterial("GOT_DRAGONSTONE", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial FUR = EnumHelper.addArmorMaterial("GOT_FUR", 12, new int[] { 1, 3, 2, 1 }, 15);
 	public static ArmorMaterial GEMSBOK = EnumHelper.addArmorMaterial("GOT_GEMSBOK", 12, new int[] { 1, 3, 2, 1 }, 15);
 	public static ArmorMaterial GHISCAR = EnumHelper.addArmorMaterial("GOT_GHISCAR", 37, new int[] { 2, 6, 5, 2 }, 9);
@@ -31,7 +31,7 @@ public class GOTMaterial {
 	public static ArmorMaterial HILLMEN = EnumHelper.addArmorMaterial("GOT_HILLMEN", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial IBBEN = EnumHelper.addArmorMaterial("GOT_IBBEN", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial ICE = EnumHelper.addArmorMaterial("GOT_ICE", 60, new int[] { 2, 7, 6, 3 }, 9);
-	public static ArmorMaterial IRONBORN = EnumHelper.addArmorMaterial("GOT_IRONBORN", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial IRONBORN = EnumHelper.addArmorMaterial("GOT_IRONBORN", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial JOGOS = EnumHelper.addArmorMaterial("GOT_JOGOS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial KAFTAN = EnumHelper.addArmorMaterial("GOT_KAFTAN", 12, new int[] { 1, 3, 2, 1 }, 15);
 	public static ArmorMaterial KINGSGUARD = EnumHelper.addArmorMaterial("GOT_KINGSGUARD", 60, new int[] { 2, 7, 6, 3 }, 9);
@@ -41,22 +41,22 @@ public class GOTMaterial {
 	public static ArmorMaterial LYS = EnumHelper.addArmorMaterial("GOT_LYS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial MOSSOVY = EnumHelper.addArmorMaterial("GOT_MOSSOVY", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial MYR = EnumHelper.addArmorMaterial("GOT_MYR", 37, new int[] { 2, 6, 5, 2 }, 9);
-	public static ArmorMaterial NORTH = EnumHelper.addArmorMaterial("GOT_NORTH", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial NORTH = EnumHelper.addArmorMaterial("GOT_NORTH", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial NORTHGUARD = EnumHelper.addArmorMaterial("GOT_NORTHGUARD", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial NORVOS = EnumHelper.addArmorMaterial("GOT_NORVOS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial PENTOS = EnumHelper.addArmorMaterial("GOT_PENTOS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial QARTH = EnumHelper.addArmorMaterial("GOT_QARTH", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial QOHOR = EnumHelper.addArmorMaterial("GOT_QOHOR", 37, new int[] { 2, 6, 5, 2 }, 9);
-	public static ArmorMaterial REACH = EnumHelper.addArmorMaterial("GOT_REACH", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial REACH = EnumHelper.addArmorMaterial("GOT_REACH", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial REACHGUARD = EnumHelper.addArmorMaterial("GOT_REACHGUARD", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial REDKING = EnumHelper.addArmorMaterial("GOT_REDKING", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial RENLY = EnumHelper.addArmorMaterial("GOT_RENLY", 60, new int[] { 2, 7, 6, 3 }, 9);
-	public static ArmorMaterial RIVERLANDS = EnumHelper.addArmorMaterial("GOT_RIVERLANDS", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial RIVERLANDS = EnumHelper.addArmorMaterial("GOT_RIVERLANDS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial ROBES = EnumHelper.addArmorMaterial("GOT_ROBES", 12, new int[] { 1, 3, 2, 1 }, 15);
 	public static ArmorMaterial ROYCE = EnumHelper.addArmorMaterial("GOT_ROYCE", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial SOTHORYOS = EnumHelper.addArmorMaterial("GOT_SOTHORYOS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial SOTHORYOS_GOLD = EnumHelper.addArmorMaterial("GOT_SOTHORYOS_GOLD", 17, new int[] { 2, 5, 3, 1 }, 25);
-	public static ArmorMaterial STORMLANDS = EnumHelper.addArmorMaterial("GOT_STORMLANDS", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial STORMLANDS = EnumHelper.addArmorMaterial("GOT_STORMLANDS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial SUMMER = EnumHelper.addArmorMaterial("GOT_SUMMER", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial TARGARYEN = EnumHelper.addArmorMaterial("GOT_TARGARYEN", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial TYROSH = EnumHelper.addArmorMaterial("GOT_TYROSH", 37, new int[] { 2, 6, 5, 2 }, 9);
@@ -64,7 +64,7 @@ public class GOTMaterial {
 	public static ArmorMaterial VALYRIAN_CHAINMAIL = EnumHelper.addArmorMaterial("GOT_VALYRIAN_CHAINMAIL", 82, new int[] { 3, 7, 5, 2 }, 13);
 	public static ArmorMaterial VALYRIAN = EnumHelper.addArmorMaterial("GOT_VALYRIAN", 82, new int[] { 3, 8, 6, 3 }, 10);
 	public static ArmorMaterial VOLANTIS = EnumHelper.addArmorMaterial("GOT_VOLANTIS", 37, new int[] { 2, 6, 5, 2 }, 9);
-	public static ArmorMaterial WESTERLANDS = EnumHelper.addArmorMaterial("GOT_WESTERLANDS", 37, new int[] { 2, 6, 4, 1 }, 9);
+	public static ArmorMaterial WESTERLANDS = EnumHelper.addArmorMaterial("GOT_WESTERLANDS", 37, new int[] { 2, 6, 5, 2 }, 9);
 	public static ArmorMaterial WESTERLANDSGUARD = EnumHelper.addArmorMaterial("GOT_WESTERLANDSGUARD", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial WESTKING = EnumHelper.addArmorMaterial("GOT_WESTKING", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial YITI = EnumHelper.addArmorMaterial("GOT_YITI", 37, new int[] { 2, 6, 5, 2 }, 9);
@@ -86,7 +86,6 @@ public class GOTMaterial {
 	public static ToolMaterial OBSIDIAN_TOOL = EnumHelper.addToolMaterial("GOT_OBSIDIAN_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial SILVER_TOOL = EnumHelper.addToolMaterial("GOT_SILVER_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial VALYRIAN_TOOL = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL", 4, 6000, 9.0F, 4.0F, 8);
-	public static ToolMaterial VALYRIAN_TOOL2 = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL2", 4, 6000, 9.0F, 3.0F, 8);
 	public static ToolMaterial ASSHAI_TOOL = EnumHelper.addToolMaterial("GOT_ASSHAI_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial THIEF_TOOL = EnumHelper.addToolMaterial("GOT_THIEF_TOOL", 2, 625, 6.0F, 2.0F, 14);
     public static ToolMaterial CORSAIR = EnumHelper.addToolMaterial("GOT_CORSAIR", 2, 625, 6.0F, 4.0F, 14);
@@ -94,15 +93,14 @@ public class GOTMaterial {
     public static ToolMaterial THIEF_KNIFE = EnumHelper.addToolMaterial("GOT_THIEF_TOOL", 2, 625, 6.0F, 2.0F, 14);
     public static ToolMaterial GIANT_CLUB = EnumHelper.addToolMaterial("GOT_GIANT_CLUB", 2, 250, 6.0F, 2.0F, 14);
 
-	public static ToolMaterial LIGHTBRINGER = EnumHelper.addToolMaterial("LIGHTBRINGER", 2, 10000, 6.0F, 0.0F, 14);
+	public static ToolMaterial LIGHTBRINGER = EnumHelper.addToolMaterial("LIGHTBRINGER", 2, 10000, 6.0F, 1.0F, 14);
 	public static ToolMaterial NIGHTKING = EnumHelper.addToolMaterial("NIGHTKING", 2, 10000, 6.0F, 0.0F, 14);
-	public static ToolMaterial BARATHEONHAMMER = EnumHelper.addToolMaterial("BARATHEONHAMMER", 2, 10000, 6.0F, -4.5F, 14);
-	public static ToolMaterial STUNNINGHAMMER = EnumHelper.addToolMaterial("STUNNINGHAMMER", 2, 10000, 6.0F, 3.0F, 14);
+	public static ToolMaterial BARATHEONHAMMER = EnumHelper.addToolMaterial("BARATHEONHAMMER", 2, 10000, 6.0F, -3.5F, 14);
+	public static ToolMaterial STUNNINGHAMMER = EnumHelper.addToolMaterial("STUNNINGHAMMER", 2, 10000, 6.0F, -1.5F, 14);
 	public static ToolMaterial ICESTARK = EnumHelper.addToolMaterial("ICESTARK", 2, 10000, 6.0F, 4.0F, 14);
-	public static ToolMaterial POISONEDGE = EnumHelper.addToolMaterial("POISONEDGE", 2, 10000, 6.0F, 2.5F, 14);
+	public static ToolMaterial POISONEDGE = EnumHelper.addToolMaterial("POISONEDGE", 2, 10000, 6.0F, 1.0F, 14);
 	public static ToolMaterial SYRIO = EnumHelper.addToolMaterial("SYRIO", 2, 10000, 6.0F, 1.0F, 14);
-	public static ToolMaterial DECOYCLAYMORE = EnumHelper.addToolMaterial("DECOYCLAYMORE", 2, 10000, 6.0F, -1.5F, 14);
-	public static ToolMaterial BATTLEAXEWESTROS = EnumHelper.addToolMaterial("BATTLEAXEWESTROS", 2, 10000, 6.0F, 2.0F, 14);
+	public static ToolMaterial DECOYCLAYMORE = EnumHelper.addToolMaterial("DECOYCLAYMORE", 2, 10000, 6.0F, 0.0F, 14);
 
 	public static ItemArmor.ArmorMaterial getArmorMaterialByName(String name) {
 		return ItemArmor.ArmorMaterial.valueOf(name);

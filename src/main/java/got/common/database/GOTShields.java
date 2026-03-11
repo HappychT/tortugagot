@@ -50,7 +50,7 @@ public enum GOTShields {
 
 	public boolean canPlayerWear(EntityPlayer entityplayer) {
 		if (shieldType == ShieldType.ALIGNMENT) {
-			return GOTLevelData.getData(entityplayer).getAlignment(alignmentFaction) >= 5000.0f;
+			return GOTLevelData.getData(entityplayer).getAlignment(alignmentFaction) >= 100.0f;
 		}
 		if (this == ACHIEVEMENT_BRONZE) {
 			return GOTLevelData.getData(entityplayer).getEarnedAchievements(GOTDimension.GAME_OF_THRONES).size() >= 10;

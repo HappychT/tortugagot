@@ -26,6 +26,20 @@ public class ReloadRenderer extends Gui {
         }
 
         EntityCatapult catapult = (EntityCatapult) player.ridingEntity;
+        ScaledResolution scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        int screenWidth = scaledResolution.getScaledWidth();
+        int screenHeight = scaledResolution.getScaledHeight();
+
+        float rangePower = catapult.getDataWatcher().getWatchableObjectFloat(28);
+        int rangePct = (int)(rangePower * 100F);
+        String rangeText = "Дальность: " + rangePct + "% (W/S)";
+        int rangeBarWidth = 120;
+        int rangeBarX = (screenWidth - rangeBarWidth) / 2;
+        int rangeBarY = screenHeight - 72;
+        mc.fontRenderer.drawStringWithShadow(rangeText, (screenWidth - mc.fontRenderer.getStringWidth(rangeText)) / 2, rangeBarY - 12, 0xFFFFFF);
+        drawRect(rangeBarX, rangeBarY, rangeBarX + rangeBarWidth, rangeBarY + 6, 0x80000000);
+        drawRect(rangeBarX, rangeBarY, rangeBarX + (int)(rangeBarWidth * rangePower), rangeBarY + 6, 0xFF4080FF);
+
         boolean isReloading = (catapult.getDataWatcher().getWatchableObjectByte(17) & 1) != 0;
         int reloadTimer = catapult.getDataWatcher().getWatchableObjectInt(18);
 
@@ -33,10 +47,6 @@ public class ReloadRenderer extends Gui {
 
         int maxReloadTime = WeaponsConfig.reloadTimeCatapult;
         float percentage = Math.max(0f, Math.min(1f, (float) reloadTimer / (float) maxReloadTime));
-
-        ScaledResolution scaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-        int screenWidth = scaledResolution.getScaledWidth();
-        int screenHeight = scaledResolution.getScaledHeight();
 
         int computedWidth = 182;
         int posX = (screenWidth / 2) - (computedWidth / 2); 

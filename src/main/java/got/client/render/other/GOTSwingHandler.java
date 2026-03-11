@@ -87,9 +87,6 @@ public class GOTSwingHandler {
 
 	public void tryUpdateSwing(EntityLivingBase entity) {
 		if (entity == Minecraft.getMinecraft().thePlayer) {
-			if (GOTAttackTiming.isSwapCooldown) {
-				return;
-			}
 			if (GOTAttackTiming.fullAttackTime > 0) {
 				float max = GOTAttackTiming.fullAttackTime;
 				float swing = (max - GOTAttackTiming.attackTime) / max;

@@ -62,7 +62,7 @@ public class GOTItemJewelryActive extends Item {
                         player.attackEntityFrom(DamageSource.generic, 6.0f);
                     }
                     if(this == GOTRegistry.direwolfFang) {
-                        player.attackEntityFrom(DamageSource.generic, 5.0f);
+                        player.attackEntityFrom(DamageSource.generic, 4.0f);
                     }
                     stack.damageItem(1, player);
                 }

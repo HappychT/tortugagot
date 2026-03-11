@@ -20,7 +20,6 @@ import net.minecraft.client.gui.GuiTextField;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,11 +49,8 @@ public class GuiStructureBlock extends GuiScreen {
     private List<GuiButton> mainButtons = new ArrayList<>();
     private List<GuiButton> overlayButtons = new ArrayList<>();
 
-    private final int xSize = 340;
-    private final int ySize = 200;
-
     private enum ScreenState { UNOWNED, OWNED_SELF, OWNED_ALLY, OWNED_ENEMY, PURCHASE_CATEGORY, PURCHASE_SUBTYPE }
-    private enum FortressState { MAIN, BARRACKS, SIEGE_EQUIPMENT }
+    private enum FortressState { MAIN, BARRACKS }
     private enum Overlay { NONE, DEPOSIT_PROVISIONS, ADD_BARRACKS_PLAYER, INCREASE_CAPACITY }
 
     public GuiStructureBlock(int x, int y, int z, FactionStructureSlot initialStructure) {
@@ -71,6 +67,7 @@ public class GuiStructureBlock extends GuiScreen {
 
     private void determineState() {
         if (structure == null || structure.ownerFactionID == null) {
+
             currentState = ScreenState.UNOWNED;
         } else if (playerFaction != null && playerFaction.getID() != null && playerFaction.getID().equals(structure.ownerFactionID)) {
             currentState = ScreenState.OWNED_SELF;
@@ -86,10 +83,12 @@ public class GuiStructureBlock extends GuiScreen {
         }
         if (currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE && structure != null && structure.ownerFactionID == null) {
             currentState = ScreenState.UNOWNED;
+        } else if (currentState == ScreenState.PURCHASE_CATEGORY || currentState == ScreenState.PURCHASE_SUBTYPE) {
         }
     }
 
     public void updateData(FactionStructureSlot newSlot, Map<String, List<String>> structures) {
+        boolean structureWasNull = (this.structure == null);
         this.structure = newSlot;
         this.availableStructures = structures != null ? structures : new HashMap<>();
 
@@ -98,6 +97,7 @@ public class GuiStructureBlock extends GuiScreen {
         } else if (newSlot != null && newSlot.ownerFactionID != null) {
             determineState();
         }
+
 
         if (this.mc != null && this.mc.currentScreen == this) {
             this.initGui();
@@ -119,80 +119,65 @@ public class GuiStructureBlock extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        this.buttonList.clear();
         this.mainButtons.clear();
         this.overlayButtons.clear();
 
-        int guiLeft = (width - xSize) / 2;
-        int guiTop = (height - ySize) / 2;
+        if (this.structure == null && currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE) {
+            int guiLeft = (width - 256) / 2;
+            int guiTop = (height - 200) / 2;
+            GuiButton closeButton = new GuiCustomButton(99, guiLeft + (256-100)/2, guiTop + 170, 100, 20, "Закрыть");
+            mainButtons.add(closeButton);
+            this.buttonList.clear();
+            this.buttonList.addAll(mainButtons);
+            return;
+        }
 
         if (activeOverlay != Overlay.NONE) {
             initOverlayButtons();
-        }
-
-        if (currentState == ScreenState.UNOWNED) {
-            mainButtons.add(new GuiCustomButton(0, guiLeft + (xSize - 120) / 2, guiTop + 130, 120, 20, "Захватить"));
-        } else if (currentState == ScreenState.OWNED_SELF) {
-
-            if (structure.category == FactionStructureSlot.StructureCategory.FORTRESS && fortressState == FortressState.MAIN) {
-                mainButtons.add(new GuiCustomButton(80, guiLeft + 270, guiTop + 45, 50, 16, "Улучш."));
-                mainButtons.add(new GuiCustomButton(87, guiLeft + 215, guiTop + 45, 50, 16, "Внести"));
-
-                mainButtons.add(new GuiCustomButton(81, guiLeft + 270, guiTop + 65, 50, 16, "Улучш."));
-                mainButtons.add(new GuiCustomButton(82, guiLeft + 215, guiTop + 65, 50, 16, "Войти"));
-                mainButtons.add(new GuiCustomButton(83, guiLeft + 270, guiTop + 85, 50, 16, "Улучш."));
-                mainButtons.add(new GuiCustomButton(84, guiLeft + 215, guiTop + 85, 50, 16, "Осадки"));
-                mainButtons.add(new GuiCustomButton(85, guiLeft + 270, guiTop + 105, 50, 16, "Улучш."));
-                mainButtons.add(new GuiCustomButton(86, guiLeft + 215, guiTop + 105, 50, 16, "Купить"));
-
-                mainButtons.add(new GuiCustomButton(2, guiLeft + (xSize - 140) / 2, guiTop + 160, 140, 20, "Улучшить Крепость"));
-            } else if (structure.category == FactionStructureSlot.StructureCategory.FORTRESS && fortressState == FortressState.BARRACKS) {
-                mainButtons.add(new GuiCustomButton(10, guiLeft + 20, guiTop + 20, 50, 20, "Назад"));
-                mainButtons.add(new GuiCustomButton(42, guiLeft + xSize - 110, guiTop + 20, 90, 20, "Расширить"));
-
-                mainButtons.add(new GuiCustomButton(11, guiLeft + (xSize / 2) - 105, guiTop + 165, 100, 20, "Добавить"));
-                GuiButton kickBtn = new GuiCustomButton(41, guiLeft + (xSize / 2) + 5, guiTop + 165, 100, 20, "Исключить");
-                if (selectedBarracksPlayerName == null) kickBtn.enabled = false;
-                mainButtons.add(kickBtn);
-
-            } else if (structure.category == FactionStructureSlot.StructureCategory.FORTRESS && fortressState == FortressState.SIEGE_EQUIPMENT) {
-                mainButtons.add(new GuiCustomButton(10, guiLeft + 20, guiTop + 20, 50, 20, "Назад"));
-
-                mainButtons.add(new GuiCustomButton(90, guiLeft + 35, guiTop + 75, 120, 20, "Баллиста (18k)"));
-                mainButtons.add(new GuiCustomButton(91, guiLeft + 185, guiTop + 75, 120, 20, "Катапульта (25k)"));
-                mainButtons.add(new GuiCustomButton(92, guiLeft + 35, guiTop + 100, 120, 20, "Требушет (30k)"));
-                mainButtons.add(new GuiCustomButton(93, guiLeft + 185, guiTop + 100, 120, 20, "Таран (40k)"));
-            } else {
-                setupResourcePointButtons(guiLeft, guiTop);
-            }
-
-        } else if (currentState == ScreenState.PURCHASE_CATEGORY) {
-            int y = guiTop + 60;
-            int id = 20;
-            for (String category : availableStructures.keySet()) {
-                mainButtons.add(new GuiCustomButton(id++, guiLeft + (xSize - 140) / 2, y, 140, 20, getCategoryDisplayName(category)));
-                y += 25;
-            }
-            mainButtons.add(new GuiCustomButton(99, guiLeft + (xSize - 140) / 2, guiTop + 160, 140, 20, "Отмена"));
-        } else if (currentState == ScreenState.PURCHASE_SUBTYPE) {
-            int y = guiTop + 60;
-            int id = 40;
-            List<String> subTypes = availableStructures.get(selectedCategory);
-            if (subTypes != null) {
-                for (String subType : subTypes) {
-                    mainButtons.add(new GuiCustomButton(id++, guiLeft + (xSize - 140) / 2, y, 140, 20, subType));
-                    y += 25;
-                }
-            }
-            mainButtons.add(new GuiCustomButton(100, guiLeft + (xSize - 140) / 2, guiTop + 160, 140, 20, "Назад"));
-        }
-
-        if (activeOverlay == Overlay.NONE) {
-            for (GuiButton btn : mainButtons) buttonList.add(btn);
         } else {
-            for (GuiButton btn : overlayButtons) buttonList.add(btn);
+            initMainButtons();
+        }
+        this.buttonList.clear();
+        this.buttonList.addAll(mainButtons);
+        this.buttonList.addAll(overlayButtons);
+    }
+
+
+    private void initMainButtons() {
+        int guiLeft = (width - 256) / 2;
+        int guiTop = (height - 200) / 2;
+
+        GuiButton backButton = new GuiCustomButton(100, guiLeft + 10, guiTop + 170, 100, 20, "Назад");
+        GuiButton closeButton = new GuiCustomButton(99, guiLeft + 146, guiTop + 170, 100, 20, "Закрыть");
+        mainButtons.add(backButton);
+        mainButtons.add(closeButton);
+
+        backButton.visible = (fortressState != FortressState.MAIN || currentState == ScreenState.PURCHASE_CATEGORY || currentState == ScreenState.PURCHASE_SUBTYPE);
+        closeButton.visible = true;
+
+        switch (currentState) {
+            case UNOWNED:
+                mainButtons.add(new GuiCustomButton(0, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Захватить точку"));
+                break;
+            case OWNED_SELF:
+                if (structure != null) {
+                    if (structure.type == FactionStructureSlot.StructureType.FORTRESS) {
+                        setupFortressButtons(guiLeft, guiTop);
+                    } else {
+                        setupResourcePointButtons(guiLeft, guiTop);
+                    }
+                }
+                break;
+            case PURCHASE_CATEGORY:
+            case PURCHASE_SUBTYPE:
+                setupPurchaseButtons(guiLeft, guiTop);
+                break;
+            case OWNED_ALLY:
+            case OWNED_ENEMY:
+                break;
         }
     }
+
 
     private void initOverlayButtons() {
         int overlayX = width / 2;
@@ -231,7 +216,6 @@ public class GuiStructureBlock extends GuiScreen {
             case "BARN": return "Амбар";
             case "ENGINEERING_WORKSHOP": return "Инженерная мастерская";
             case "FORTRESS": return "Крепости";
-            case "STABLE": return "Конюшни";
             default: return categoryKey;
         }
     }
@@ -243,32 +227,65 @@ public class GuiStructureBlock extends GuiScreen {
         if ("Амбар".equals(displayName)) return "BARN";
         if ("Инженерная мастерская".equals(displayName)) return "ENGINEERING_WORKSHOP";
         if ("Крепости".equals(displayName)) return "FORTRESS";
-        if ("Конюшни".equals(displayName)) return "STABLE";
         return displayName;
     }
 
-    private void setupResourcePointButtons(int guiLeft, int guiTop) {
-        if (structure != null && structure.category == FactionStructureSlot.StructureCategory.BARN) {
-            mainButtons.add(new GuiCustomButton(30, guiLeft + (xSize - 150) / 2, guiTop + 90, 150, 20, "Внести еду"));
-            mainButtons.add(new GuiCustomButton(2, guiLeft + (xSize - 150) / 2, guiTop + 115, 150, 20, "Улучшить"));
-        } else if (structure != null && structure.category == FactionStructureSlot.StructureCategory.ENGINEERING_WORKSHOP) {
-            mainButtons.add(new GuiCustomButton(50, guiLeft + 35, guiTop + 85, 120, 20, "Баллиста (18k)"));
-            mainButtons.add(new GuiCustomButton(51, guiLeft + 185, guiTop + 85, 120, 20, "Катапульта (25k)"));
-            mainButtons.add(new GuiCustomButton(52, guiLeft + 35, guiTop + 110, 120, 20, "Требушет (30k)"));
-            mainButtons.add(new GuiCustomButton(53, guiLeft + 185, guiTop + 110, 120, 20, "Таран (40k)"));
-            mainButtons.add(new GuiCustomButton(2, guiLeft + (xSize - 150) / 2, guiTop + 135, 150, 20, "Улучшить"));
-        } else if (structure != null && structure.category == FactionStructureSlot.StructureCategory.STABLE) {
-            mainButtons.add(new GuiCustomButton(60, guiLeft + (xSize - 150) / 2, guiTop + 90, 150, 20, "Купить коня (5000)"));
-            mainButtons.add(new GuiCustomButton(2, guiLeft + (xSize - 150) / 2, guiTop + 115, 150, 20, "Улучшить"));
-        } else {
-            mainButtons.add(new GuiCustomButton(1, guiLeft + (xSize - 150) / 2, guiTop + 90, 150, 20, "Собрать ресурсы"));
-            mainButtons.add(new GuiCustomButton(2, guiLeft + (xSize - 150) / 2, guiTop + 115, 150, 20, "Улучшить"));
-        }
-        if (structure != null && structure.category != FactionStructureSlot.StructureCategory.FORTRESS) {
-            mainButtons.add(new GuiCustomButton(70, guiLeft + 35, guiTop + 165, 120, 20, "Защита (Монеты)"));
-            mainButtons.add(new GuiCustomButton(71, guiLeft + 185, guiTop + 165, 120, 20, "Защита (Дублоны)"));
+    private void setupFortressButtons(int guiLeft, int guiTop) {
+        if (structure == null || playerFaction == null) return;
+        boolean isMainFortress = structure.id != null && structure.id.equals(playerFaction.getMainFortressId());
+
+        if (fortressState == FortressState.MAIN) {
+            mainButtons.add(new GuiCustomButton(2, guiLeft + 200, guiTop + 10, 50, 20, "Улучшить"));
+            if (isMainFortress) {
+                mainButtons.add(new GuiCustomButton(30, guiLeft + (256 - 150) / 2, guiTop + 100, 150, 20, "Внести продовольствие"));
+                mainButtons.add(new GuiCustomButton(31, guiLeft + (256 - 150) / 2, guiTop + 125, 150, 20, "Управление казармой"));
+            } else {
+                mainButtons.add(new GuiCustomButton(30, guiLeft + (256 - 150) / 2, guiTop + 100, 150, 20, "Внести продовольствие"));
+                mainButtons.add(new GuiCustomButton(31, guiLeft + (256 - 150) / 2, guiTop + 125, 150, 20, "Управление казармой"));
+            }
+        } else if (fortressState == FortressState.BARRACKS) {
+            mainButtons.add(new GuiCustomButton(40, guiLeft + 180, guiTop + 40, 70, 20, "Добавить"));
+            GuiButton kickBtn = new GuiCustomButton(41, guiLeft + 180, guiTop + 65, 70, 20, "Исключить");
+            kickBtn.enabled = selectedBarracksPlayerName != null;
+            mainButtons.add(kickBtn);
+            mainButtons.add(new GuiCustomButton(42, guiLeft + 180, guiTop + 90, 70, 20, "Купить слот"));
         }
     }
+
+
+    private void setupResourcePointButtons(int guiLeft, int guiTop) {
+        mainButtons.add(new GuiCustomButton(1, guiLeft + (256 - 150) / 2, guiTop + 80, 150, 20, "Собрать ресурсы"));
+        mainButtons.add(new GuiCustomButton(2, guiLeft + (256 - 150) / 2, guiTop + 105, 150, 20, "Улучшить"));
+    }
+
+    private void setupPurchaseButtons(int guiLeft, int guiTop) {
+        int yPos = guiTop + 50;
+        int buttonWidth = 150;
+        int buttonX = guiLeft + (256 - buttonWidth) / 2;
+        int id = 10;
+
+        if (currentState == ScreenState.PURCHASE_CATEGORY) {
+            if (availableStructures != null && !availableStructures.isEmpty()) {
+                for (String categoryKey : this.availableStructures.keySet()) {
+                    mainButtons.add(new GuiCustomButton(id++, buttonX, yPos, buttonWidth, 20, getCategoryDisplayName(categoryKey)));
+                    yPos += 25;
+                }
+            } else {
+                this.drawCenteredString(fontRendererObj, "§cНет доступных категорий", width / 2, yPos + 20, 0xFF5555);
+            }
+        } else if (currentState == ScreenState.PURCHASE_SUBTYPE) {
+            List<String> subTypes = this.availableStructures.get(selectedCategory);
+            if (subTypes != null && !subTypes.isEmpty()) {
+                for (String subTypeName : subTypes) {
+                    mainButtons.add(new GuiCustomButton(id++, buttonX, yPos, buttonWidth, 20, subTypeName));
+                    yPos += 25;
+                }
+            } else {
+                this.drawCenteredString(fontRendererObj, "§cНет доступных типов в этой категории", width / 2, yPos + 20, 0xFF5555);
+            }
+        }
+    }
+
 
     @Override
     protected void actionPerformed(GuiButton button) {
@@ -299,14 +316,14 @@ public class GuiStructureBlock extends GuiScreen {
                 handleOwnedSelfActions(button);
                 break;
             case PURCHASE_CATEGORY:
-                if (button.id >= 20 && button.id < 40) {
+                if (button.id >= 10) {
                     selectedCategory = getCategoryKey(button.displayString);
                     currentState = ScreenState.PURCHASE_SUBTYPE;
                     initGui();
                 }
                 break;
             case PURCHASE_SUBTYPE:
-                if (button.id >= 40 && button.id < 90 && this.structure != null) {
+                if (button.id >= 10 && this.structure != null) {
                     brain.factions.servers.CoreFaction.brainChannel.sendToServer(
                             new PacketStructureAction("purchase", structure.id, selectedCategory, button.displayString)
                     );
@@ -318,6 +335,7 @@ public class GuiStructureBlock extends GuiScreen {
                 break;
         }
     }
+
 
     private void handleOverlayActions(GuiButton button) {
         if (button.id == 201) {
@@ -354,6 +372,7 @@ public class GuiStructureBlock extends GuiScreen {
         }
     }
 
+
     private void handleBackButton() {
         boolean needsReinit = false;
         if (activeOverlay != Overlay.NONE) {
@@ -361,7 +380,7 @@ public class GuiStructureBlock extends GuiScreen {
             return;
         }
 
-        if (fortressState == FortressState.BARRACKS || fortressState == FortressState.SIEGE_EQUIPMENT) {
+        if (fortressState == FortressState.BARRACKS) {
             fortressState = FortressState.MAIN;
             selectedBarracksPlayerName = null;
             needsReinit = true;
@@ -372,6 +391,7 @@ public class GuiStructureBlock extends GuiScreen {
         } else if (currentState == ScreenState.PURCHASE_CATEGORY) {
             currentState = ScreenState.UNOWNED;
             needsReinit = true;
+        } else if (currentState == ScreenState.OWNED_SELF || currentState == ScreenState.OWNED_ALLY || currentState == ScreenState.OWNED_ENEMY) {
         }
 
         if (needsReinit) {
@@ -379,60 +399,34 @@ public class GuiStructureBlock extends GuiScreen {
         }
     }
 
+
     private void handleOwnedSelfActions(GuiButton button) {
         boolean stateChanged = false;
 
         if (structure == null) return;
 
-        if (button.id == 1) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("collect", structure.id));
-        if (button.id == 2) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade", structure.id));
+        boolean isMainFortress = playerFaction != null && structure.id != null && structure.id.equals(playerFaction.getMainFortressId());
 
-        if (structure.category == FactionStructureSlot.StructureCategory.BARN) {
-            if (button.id == 30) {
-                setCurrentOverlay(Overlay.DEPOSIT_PROVISIONS);
-                return;
-            }
+        if (button.id == 1) {
+            brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("collect", structure.id));
         }
-        if (structure.category == FactionStructureSlot.StructureCategory.ENGINEERING_WORKSHOP) {
-            if (button.id == 50) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "ballista", ""));
-            if (button.id == 51) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "catapult", ""));
-            if (button.id == 52) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "trebuchet", ""));
-            if (button.id == 53) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "ram", ""));
-        }
-        if (structure.category == FactionStructureSlot.StructureCategory.STABLE) {
-            if (button.id == 60) {
-                brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_horse", structure.id));
-                return;
-            }
+        if (button.id == 2) {
+            brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade", structure.id));
         }
 
-        if (structure.category == FactionStructureSlot.StructureCategory.FORTRESS) {
+        if (structure.type == FactionStructureSlot.StructureType.FORTRESS) {
             if (fortressState == FortressState.MAIN) {
-                if (button.id == 80) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade_sub", structure.id, "barn", ""));
-                if (button.id == 87) {
+                if (button.id == 30) {
                     setCurrentOverlay(Overlay.DEPOSIT_PROVISIONS);
                     return;
                 }
-                if (button.id == 81) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade_sub", structure.id, "barracks", ""));
-                if (button.id == 82) {
+                if (button.id == 31) {
                     fortressState = FortressState.BARRACKS;
                     brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketMessage("requestBarracksPlayers#" + structure.id));
                     stateChanged = true;
                 }
-                if (button.id == 83) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade_sub", structure.id, "workshop", ""));
-                if (button.id == 84) {
-                    fortressState = FortressState.SIEGE_EQUIPMENT;
-                    stateChanged = true;
-                }
-                if (button.id == 85) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade_sub", structure.id, "stable", ""));
-                if (button.id == 86) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_horse", structure.id));
-
             } else if (fortressState == FortressState.BARRACKS) {
-                if (button.id == 10) {
-                    fortressState = FortressState.MAIN;
-                    stateChanged = true;
-                }
-                if (button.id == 11 || button.id == 40) {
+                if (button.id == 40) {
                     Set<String> allPlayers = (playerFaction != null && playerFaction.getPlayers() != null) ? playerFaction.getPlayers().keySet() : null;
                     if (allPlayers != null) {
                         Set<String> currentBarracksPlayers = barracksPlayers.stream().map(BarracksManager.PlayerProfile::getName).collect(Collectors.toSet());
@@ -455,26 +449,6 @@ public class GuiStructureBlock extends GuiScreen {
                     setCurrentOverlay(Overlay.INCREASE_CAPACITY);
                     return;
                 }
-            } else if (fortressState == FortressState.SIEGE_EQUIPMENT) {
-                if (button.id == 10) {
-                    fortressState = FortressState.MAIN;
-                    stateChanged = true;
-                }
-                if (button.id == 90) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "ballista", ""));
-                if (button.id == 91) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "catapult", ""));
-                if (button.id == 92) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "trebuchet", ""));
-                if (button.id == 93) brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("buy_siege", structure.id, "ram", ""));
-            }
-        }
-
-        if (structure.category != FactionStructureSlot.StructureCategory.FORTRESS) {
-            if (button.id == 70) {
-                brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade_security", structure.id, "coins", ""));
-                return;
-            }
-            if (button.id == 71) {
-                brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketStructureAction("upgrade_security", structure.id, "dubloons", ""));
-                return;
             }
         }
 
@@ -483,28 +457,25 @@ public class GuiStructureBlock extends GuiScreen {
         }
     }
 
+
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
-        drawMainScreen(mouseX, mouseY, partialTicks);
-
         if (activeOverlay == Overlay.NONE) {
-            super.drawScreen(mouseX, mouseY, partialTicks);
+            drawDefaultBackground();
+            drawMainScreen(mouseX, mouseY, partialTicks);
         } else {
-            for (GuiButton btn : mainButtons) {
-                btn.drawButton(this.mc, mouseX, mouseY);
-            }
-
+            drawMainScreen(mouseX, mouseY, partialTicks);
             drawRect(0, 0, this.width, this.height, 0x90000000);
             drawOverlay(mouseX, mouseY, partialTicks);
-            super.drawScreen(mouseX, mouseY, partialTicks);
         }
+        super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
+
     private void drawMainScreen(int mouseX, int mouseY, float partialTicks) {
-        org.lwjgl.opengl.GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        int guiLeft = (width - xSize) / 2;
-        int guiTop = (height - ySize) / 2;
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        int guiLeft = (width - 256) / 2;
+        int guiTop = (height - 200) / 2;
 
         String title = "Структура";
         if (structure != null && structure.name != null && !structure.name.isEmpty() && currentState != ScreenState.UNOWNED) {
@@ -513,6 +484,7 @@ public class GuiStructureBlock extends GuiScreen {
             title = "Нейтральная территория";
         }
         this.drawCenteredString(this.fontRendererObj, title, width / 2, guiTop + 15, 0xFFFFFF);
+
 
         if (structure == null && currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE) {
             this.drawCenteredString(fontRendererObj, "Загрузка данных...", width / 2, guiTop + 90, 0xAAAAAA);
@@ -526,49 +498,12 @@ public class GuiStructureBlock extends GuiScreen {
                 break;
             case OWNED_SELF:
                 if (structure != null) {
-                    if (structure.category == FactionStructureSlot.StructureCategory.FORTRESS) {
-                        if (fortressState == FortressState.MAIN) drawFortressMainScreen(guiTop);
+                    if (structure.type == FactionStructureSlot.StructureType.FORTRESS) {
+                        if (fortressState == FortressState.MAIN) drawFortressMainScreen(guiTop + 35);
                         else if (fortressState == FortressState.BARRACKS) drawFortressBarracksScreen(guiLeft, guiTop, mouseX, mouseY);
-                        else if (fortressState == FortressState.SIEGE_EQUIPMENT) drawFortressSiegeScreen(guiLeft, guiTop);
-                    } else if (structure.category == FactionStructureSlot.StructureCategory.BARN) {
-                        this.drawCenteredString(this.fontRendererObj, "Владелец: §aВаша фракция", width / 2, guiTop + 35, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 47, 0xFFFFFF);
-                        int capacity = brain.factions.servers.StructureManager.getGranaryCapacity(structure.level);
-                        this.drawCenteredString(this.fontRendererObj, "Мест под еду: §6" + structure.storedFoodItems + " / " + capacity + " шт.", width / 2, guiTop + 59, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Всего продовольствия: §e" + String.format("%.1f", structure.provisions).replace(',', '.'), width / 2, guiTop + 71, 0xFFFFFF);
-                    } else if (structure.category == FactionStructureSlot.StructureCategory.ENGINEERING_WORKSHOP) {
-                        this.drawCenteredString(this.fontRendererObj, "Владелец: §aВаша фракция", width / 2, guiTop + 35, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 47, 0xFFFFFF);
-
-                        long cooldownDays = 11 - structure.level;
-                        if (cooldownDays < 1) cooldownDays = 1;
-                        long cooldownMs = cooldownDays * 24 * 60 * 60 * 1000L;
-
-                        if (System.currentTimeMillis() - structure.lastSiegePurchaseTime < cooldownMs) {
-                            long timeLeft = cooldownMs - (System.currentTimeMillis() - structure.lastSiegePurchaseTime);
-                            long daysLeft = timeLeft / (24 * 60 * 60 * 1000L);
-                            long hoursLeft = (timeLeft / (60 * 60 * 1000L)) % 24;
-                            this.drawCenteredString(this.fontRendererObj, "КД покупки: §c" + daysLeft + " д. " + hoursLeft + " ч.", width / 2, guiTop + 59, 0xFFFFFF);
-                        } else {
-                            this.drawCenteredString(this.fontRendererObj, "КД покупки: §aГотово", width / 2, guiTop + 59, 0xFFFFFF);
-                        }
-                    } else if (structure.category == FactionStructureSlot.StructureCategory.STABLE) {
-                        this.drawCenteredString(this.fontRendererObj, "Владелец: §aВаша фракция", width / 2, guiTop + 35, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 47, 0xFFFFFF);
-
-                        double[] healthLevels = {18, 21, 24, 27, 30, 33, 36, 39, 42, 45};
-                        double[] speedLevels = {0.22, 0.23, 0.25, 0.26, 0.28, 0.29, 0.31, 0.32, 0.33, 0.34};
-                        int levelIndex = Math.max(0, Math.min(9, structure.level - 1));
-
-                        this.drawCenteredString(this.fontRendererObj, "Здоровье коня: §c" + healthLevels[levelIndex] + " хп", width / 2, guiTop + 59, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Скорость: §b" + speedLevels[levelIndex], width / 2, guiTop + 71, 0xFFFFFF);
                     } else {
-                        this.drawCenteredString(this.fontRendererObj, "Владелец: §aВаша фракция", width / 2, guiTop + 35, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 47, 0xFFFFFF);
-                        this.drawCenteredString(this.fontRendererObj, "Защищенность: §a" + structure.securityLevel, width / 2, guiTop + 59, 0xFFFFFF);
-
-                        int maxHp = 100 + (structure.securityLevel * 10);
-                        this.drawCenteredString(this.fontRendererObj, "Прочность: §c" + (int)structure.destructionCount + " / " + maxHp, width / 2, guiTop + 71, 0xFFFFFF);
+                        this.drawCenteredString(this.fontRendererObj, "Владелец: §aВаша фракция", width / 2, guiTop + 45, 0xFFFFFF);
+                        this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 57, 0xFFFFFF);
                     }
                 }
                 break;
@@ -579,10 +514,7 @@ public class GuiStructureBlock extends GuiScreen {
                     String color = (currentState == ScreenState.OWNED_ALLY) ? "§2" : "§c";
                     this.drawCenteredString(this.fontRendererObj, "Владелец: " + color + ownerName, width / 2, guiTop + 45, 0xFFFFFF);
                     if (currentState == ScreenState.OWNED_ENEMY) {
-                        int maxHpEnemy = (structure.category == FactionStructureSlot.StructureCategory.FORTRESS)
-                                ? (100 + ((structure.level > 0 ? structure.level : 1) - 1) * 10)
-                                : (100 + structure.securityLevel * 10);
-                        this.drawCenteredString(this.fontRendererObj, "Прочность: §c" + (int)structure.destructionCount + " / " + maxHpEnemy, width / 2, guiTop + 60, 0xFFFFFF);
+                        this.drawCenteredString(this.fontRendererObj, "Прочность: §c" + structure.health, width / 2, guiTop + 60, 0xFFFFFF);
                     } else {
                         this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 60, 0xFFFFFF);
                     }
@@ -596,6 +528,7 @@ public class GuiStructureBlock extends GuiScreen {
                 break;
         }
     }
+
 
     private void drawOverlay(int mouseX, int mouseY, float partialTicks) {
         int overlayX = width / 2;
@@ -634,6 +567,7 @@ public class GuiStructureBlock extends GuiScreen {
         }
     }
 
+
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int button) {
         if (activeOverlay != Overlay.NONE) {
@@ -661,12 +595,12 @@ public class GuiStructureBlock extends GuiScreen {
         }
 
         if (currentState == ScreenState.OWNED_SELF && fortressState == FortressState.BARRACKS && structure != null) {
-            int guiLeft = (width - xSize) / 2;
-            int guiTop = (height - ySize) / 2;
-            int listWidth = 200;
-            int listHeight = 120;
-            int listX = guiLeft + (xSize - listWidth) / 2;
+            int guiLeft = (width - 256) / 2;
+            int guiTop = (height - 200) / 2;
+            int listX = guiLeft + 10;
             int listY = guiTop + 40;
+            int listWidth = 160;
+            int listHeight = 120;
 
             if (mouseX >= listX && mouseX < listX + listWidth && mouseY >= listY && mouseY < listY + listHeight) {
                 int slotIndex = (mouseY - listY) / 15;
@@ -678,6 +612,7 @@ public class GuiStructureBlock extends GuiScreen {
             }
         }
     }
+
 
     private void handleOverlayMouseClick(int mouseX, int mouseY, int button) {
         if (activeOverlay == Overlay.DEPOSIT_PROVISIONS && provisionsAmountField != null) provisionsAmountField.mouseClicked(mouseX, mouseY, button);
@@ -709,6 +644,7 @@ public class GuiStructureBlock extends GuiScreen {
         }
     }
 
+
     @Override
     protected void keyTyped(char c, int key) {
         if (activeOverlay != Overlay.NONE) {
@@ -736,37 +672,30 @@ public class GuiStructureBlock extends GuiScreen {
         }
     }
 
-    private void drawFortressMainScreen(int guiTop) {
-        int guiLeft = (width - xSize) / 2;
-        int maxFortressHp = 100 + ((structure.level > 0 ? structure.level : 1) - 1) * 10;
+    private void drawFortressMainScreen(int yPos) {
+        if (structure == null) return;
+        boolean isMainFortress = playerFaction != null && structure.id != null && structure.id.equals(playerFaction.getMainFortressId());
 
-        this.drawCenteredString(this.fontRendererObj, "Крепость (Ур. " + structure.level + ") | Прочность: " + structure.destructionCount + " / " + maxFortressHp, width / 2, guiTop + 30, 0xFFD700);
+        this.drawCenteredString(this.fontRendererObj, "Владелец: §aВаша фракция", width / 2, yPos, 0xFFFFFF);
+        this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, yPos + 12, 0xFFFFFF);
 
-        int barnCap = brain.factions.servers.StructureManager.getGranaryCapacity(structure.barnLevel);
-        String provStr = String.format("%.1f", structure.provisions).replace(',', '.');
-        this.drawString(this.fontRendererObj, "Амбар (Ур. " + structure.barnLevel + "): " + structure.storedFoodItems + " / " + barnCap + " шт. | " + provStr + " прод.", guiLeft + 20, guiTop + 49, 0xAAAAAA);
-
-        this.drawString(this.fontRendererObj, "Казарма (Ур. " + structure.barracksLevel + "): " + structure.barracksCapacity + " мест", guiLeft + 20, guiTop + 69, 0xAAAAAA);
-
-        long cooldownDays = 11 - structure.workshopLevel;
-        if (cooldownDays < 1) cooldownDays = 1;
-        long cooldownMs = cooldownDays * 24 * 60 * 60 * 1000L;
-        String wsStatus = "Готова";
-        if (System.currentTimeMillis() - structure.lastSiegePurchaseTime < cooldownMs) {
-            long timeLeft = cooldownMs - (System.currentTimeMillis() - structure.lastSiegePurchaseTime);
-            wsStatus = "КД: " + (timeLeft / (24 * 60 * 60 * 1000L)) + "д. " + ((timeLeft / (60 * 60 * 1000L)) % 24) + "ч.";
+        if (isMainFortress) {
+            this.drawCenteredString(this.fontRendererObj, "§a(Главная крепость)", width / 2, yPos - 12, 0x55FF55);
+            this.drawCenteredString(this.fontRendererObj, "Продовольствие: §6" + structure.provisions, width / 2, yPos + 24, 0xFFFFFF);
+            this.drawCenteredString(this.fontRendererObj, "Казарма: §3" + barracksPlayers.size() + " / " + structure.barracksCapacity, width / 2, yPos + 36, 0xFFFFFF);
+        } else {
+            this.drawCenteredString(this.fontRendererObj, "§e(Доп. крепость)", width / 2, yPos - 12, 0xFFFF55);
+            this.drawCenteredString(this.fontRendererObj, "Продовольствие: §6" + structure.provisions, width / 2, yPos + 24, 0xFFFFFF);
+            this.drawCenteredString(this.fontRendererObj, "Казарма: §3" + barracksPlayers.size() + " / " + structure.barracksCapacity, width / 2, yPos + 36, 0xFFFFFF);
         }
-        this.drawString(this.fontRendererObj, "Мастерская (Ур. " + structure.workshopLevel + "): " + wsStatus, guiLeft + 20, guiTop + 89, 0xAAAAAA);
-
-        double[] healthLevels = {18, 21, 24, 27, 30, 33, 36, 39, 42, 45};
-        int levelIndex = Math.max(0, Math.min(9, structure.stableLevel - 1));
-        this.drawString(this.fontRendererObj, "Конюшня (Ур. " + structure.stableLevel + "): " + healthLevels[levelIndex] + " ХП", guiLeft + 20, guiTop + 109, 0xAAAAAA);
     }
+
+
     private void drawFortressBarracksScreen(int guiLeft, int guiTop, int mouseX, int mouseY) {
-        int listWidth = 200;
-        int listHeight = 120;
-        int listX = guiLeft + (xSize - listWidth) / 2;
+        int listX = guiLeft + 10;
         int listY = guiTop + 40;
+        int listWidth = 160;
+        int listHeight = 120;
 
         this.drawCenteredString(this.fontRendererObj, "Управление гарнизоном", width / 2, guiTop + 25, 0xFFFFFF);
         Gui.drawRect(listX -1, listY -1, listX + listWidth + 1, listY + listHeight + 1, 0xFF000000);
@@ -792,22 +721,6 @@ public class GuiStructureBlock extends GuiScreen {
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
-    private void drawFortressSiegeScreen(int guiLeft, int guiTop) {
-        this.drawCenteredString(this.fontRendererObj, "Заказ осадных орудий", width / 2, guiTop + 25, 0xFFFFFF);
-
-        long cooldownDays = 11 - structure.workshopLevel;
-        if (cooldownDays < 1) cooldownDays = 1;
-        long cooldownMs = cooldownDays * 24 * 60 * 60 * 1000L;
-
-        if (System.currentTimeMillis() - structure.lastSiegePurchaseTime < cooldownMs) {
-            long timeLeft = cooldownMs - (System.currentTimeMillis() - structure.lastSiegePurchaseTime);
-            long daysLeft = timeLeft / (24 * 60 * 60 * 1000L);
-            long hoursLeft = (timeLeft / (60 * 60 * 1000L)) % 24;
-            this.drawCenteredString(this.fontRendererObj, "Производство занято! КД: §c" + daysLeft + " д. " + hoursLeft + " ч.", width / 2, guiTop + 50, 0xFFFFFF);
-        } else {
-            this.drawCenteredString(this.fontRendererObj, "Производство: §aГотово к заказам", width / 2, guiTop + 50, 0xFFFFFF);
-        }
-    }
 
     @Override
     public boolean doesGuiPauseGame() {

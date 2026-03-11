@@ -1,8 +1,6 @@
 package got.client.gui.faction;
 
 import java.util.*;
-
-import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;
 import got.client.GOTClientProxy;
 import got.common.GOTLevelData;
@@ -74,9 +72,6 @@ public class GOTGuiButtonPledge extends GuiButton {
     public void drawButton(Minecraft mc, int mouseX, int mouseY) {
         if (visible) {
             mc.getTextureManager().bindTexture(GOTClientProxy.alignmentTexture);
-
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
             field_146123_n = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
@@ -94,7 +89,7 @@ public class GOTGuiButtonPledge extends GuiButton {
                 }
             }
 
-            drawScaledCustomSizeModalRect(xPosition, yPosition, u, v, ICON_WIDTH, ICON_HEIGHT, width, height, 256.0F, 256.0F);
+            drawTexturedModalRect(xPosition + (width - ICON_WIDTH) / 2, yPosition + (height - ICON_HEIGHT) / 2, u, v, ICON_WIDTH, ICON_HEIGHT);
 
             mouseDragged(mc, mouseX, mouseY);
 
@@ -106,18 +101,6 @@ public class GOTGuiButtonPledge extends GuiButton {
                 zLevel = z;
             }
         }
-    }
-
-    private void drawScaledCustomSizeModalRect(int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
-        float f = 1.0F / tileWidth;
-        float f1 = 1.0F / tileHeight;
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x, y + height, this.zLevel, u * f, (v + (float)vHeight) * f1);
-        tessellator.addVertexWithUV(x + width, y + height, this.zLevel, (u + (float)uWidth) * f, (v + (float)vHeight) * f1);
-        tessellator.addVertexWithUV(x + width, y, this.zLevel, (u + (float)uWidth) * f, v * f1);
-        tessellator.addVertexWithUV(x, y, this.zLevel, u * f, v * f1);
-        tessellator.draw();
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import got.common.item.weapon.cother.ItemSmithKit;
 import org.apache.commons.lang3.StringUtils;
 
 import cpw.mods.fml.relauncher.Side;
@@ -154,9 +153,6 @@ public class GOTContainerAnvil extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer entityplayer) {
-        if (entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem() instanceof ItemSmithKit) {
-            return true;
-        }
         if (this.isTrader)
             return this.theNPC != null && entityplayer.getDistanceToEntity(this.theNPC) <= 12.0 && this.theNPC.isEntityAlive() && this.theNPC.getAttackTarget() == null && this.theTrader.canTradeWith(entityplayer);
         return this.theWorld.getBlock(this.xCoord, this.yCoord, this.zCoord) == Blocks.anvil && entityplayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
@@ -752,9 +748,9 @@ public class GOTContainerAnvil extends Container {
             }
             if (GOTEnchantmentHelper.isReforgeable(inputItem)) {
                 ItemStack reforgeCopy;
-                this.reforgeCost = 20;
+                this.reforgeCost = 2;
                 if (inputItem.getItem() instanceof ItemArmor) {
-                    this.reforgeCost = 30;
+                    this.reforgeCost = 3;
                 }
                 if (inputItem.isItemStackDamageable() && (oneItemRepair = Math.min((reforgeCopy = inputItem.copy()).getItemDamageForDisplay(), reforgeCopy.getMaxDamage() / 4)) > 0) {
                     int usedMaterials = 0;
@@ -766,7 +762,7 @@ public class GOTContainerAnvil extends Container {
                     }
                     this.reforgeCost += usedMaterials;
                 }
-                this.engraveOwnerCost = 20;
+                this.engraveOwnerCost = 2;
             } else {
                 this.reforgeCost = 0;
                 this.engraveOwnerCost = 0;

@@ -30,18 +30,6 @@ public class GOTItemArmor extends ItemArmor {
         this.slot = slotType;
     }
 
-    public GOTItemArmor(ArmorMaterial material, int slotType, String s, GOTCreativeTabs creativeTabs) {
-        super(material, 0, slotType);
-        setCreativeTab(creativeTabs);
-        this.extraName = s;
-        this.slot = slotType;
-    }
-    public GOTItemArmor(ArmorMaterial material, int slotType, GOTCreativeTabs creativeTabs) {
-        super(material, 0, slotType);
-        setCreativeTab(creativeTabs);
-        this.slot = slotType;
-    }
-
     @Override
     public void onArmorTick(World world, EntityPlayer entityplayer, ItemStack itemstack) {
         if (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.secondBreathBuff) && !entityplayer.isPotionActive(GOTEffects.secondBreath)) {

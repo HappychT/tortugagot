@@ -1578,7 +1578,7 @@ public class GOTRecipe{
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.celtigarAxe), "XXX", "XYX", " Y ", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.tyrionAxe), "XXX", "XYX", " Y ", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.gendryHammer), "XYX", "XYX", " Y ", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
-        unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.baratheonHammer), "XYX", "XYX", " Y ", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
+        unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.robertHammer), "XYX", "XYX", " Y ", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.daarioArakh), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.darkstar), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.dawn), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
@@ -1586,7 +1586,7 @@ public class GOTRecipe{
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.eddardSword), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.jaimeSword), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.needle), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
-        unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.nightkingSword), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
+        unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.nightKingSword), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.obaraSpear), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.rhaegarSword), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.robbSword), "X", "X", "Y", Character.valueOf('X'), "ingotIron", Character.valueOf('Y'), "stickWood"));
@@ -1603,7 +1603,7 @@ public class GOTRecipe{
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.justMaid), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.ladyForlorn), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.lamentation), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
-        unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.lightbringersec), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
+        unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.lightbringer), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.longclaw), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.nightfall), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));
         unsmelt.add(new ShapedOreRecipe(new ItemStack(GOTRegistry.oathkeeper), "X", "X", "Y", Character.valueOf('X'), GOTRegistry.valyrianIngot, Character.valueOf('Y'), "stickWood"));

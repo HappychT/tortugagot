@@ -8,13 +8,19 @@ buildscript {
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
+        maven {
+            url = "https://raw.githubusercontent.com/Migiht/pubmvn/refs/heads/main"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:[1.2-1.4.6-SNAPSHOT,)'
+        classpath 'tech.justagod:cutter:2.1.0-SNAPSHOT'
+
     }
 }
 
 apply plugin: 'forge'
+apply plugin: 'cutter'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -25,7 +31,7 @@ archivesBaseName = "Game of Thrones"
 dependencies {
     compile files("libs/slick.jar")
 }
-
+cutter.initializeDefault(true, false)
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "eclipse"
@@ -33,21 +39,21 @@ minecraft {
     targetCompat = JavaVersion.VERSION_1_8
 }
 
-//cutter {
-//    annotation = "brain.factions.Annot"
- //   def serverSide = side 'server'
- //   def clientSide = side 'client'
- //   builds {
- //       client {
- //           targetSides = [clientSide]
- //           primalSides = [clientSide, serverSide]
- //       }
- //       server {
- //           targetSides = [serverSide]
- //           primalSides = [clientSide, serverSide]
- //       }
- //   }
-//}
+cutter {
+    annotation = "brain.factions.Annot"
+    def serverSide = side 'server'
+    def clientSide = side 'client'
+    builds {
+        client {
+            targetSides = [clientSide]
+            primalSides = [clientSide, serverSide]
+        }
+        server {
+            targetSides = [serverSide]
+            primalSides = [clientSide, serverSide]
+        }
+    }
+}
 
 
 jar {

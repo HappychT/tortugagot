@@ -55,7 +55,7 @@ public class FactionAdminCommand extends CommandBase {
                 return;
             }
 
-            if (slot.category != FactionStructureSlot.StructureCategory.FORTRESS) {
+            if (slot.type != FactionStructureSlot.StructureType.FORTRESS) {
                 sender.addChatMessage(new ChatComponentText("§cэта структура не крепость."));
                 return;
             }

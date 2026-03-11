@@ -1,7 +1,9 @@
 package got.common.entity.other;
 
+import java.util.List;
 import java.util.Random;
 
+import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.network.*;
 import got.coremod.GOTReplacedMethods;
 import net.minecraft.entity.*;
@@ -34,6 +36,9 @@ public class GOTMountFunctions {
 		if (mount instanceof EntityHorse && ((EntityHorse) mount).isTame()) {
 			return true;
 		}
+		if (mount instanceof GOTEntityDirewolf && ((GOTEntityDirewolf) mount).isBridleTamed()) {
+			return true;
+		}
 		return mount instanceof GOTEntityNPCRideable && ((GOTEntityNPCRideable) mount).isNPCTamed();
 	}
 
@@ -58,7 +63,7 @@ public class GOTMountFunctions {
 			if (forward <= 0.0f) {
 				forward *= 0.25f;
 			}
-			entity.stepHeight = 1.0f;
+			entity.stepHeight = getRiddenStepHeight(mount, strafe, forward);
 			entity.jumpMovementFactor = entity.getAIMoveSpeed() * 0.1f;
 			if (GOTReplacedMethods.MountFunctions.canRiderControl_elseNoMotion(entity)) {
 				entity.setAIMoveSpeed((float) entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue());
@@ -78,6 +83,54 @@ public class GOTMountFunctions {
 			entity.jumpMovementFactor = 0.02f;
 			mount.super_moveEntityWithHeading(strafe, forward);
 		}
+	}
+
+	private static float getRiddenStepHeight(GOTNPCMount mount, float strafe, float forward) {
+		EntityLiving entity = (EntityLiving) mount;
+		float mountedStepHeight = mount.getStepHeightWhileRiddenByPlayer();
+		if (mountedStepHeight <= 0.0f) {
+			return 0.0f;
+		}
+		if (Math.abs(forward) < 0.001f && Math.abs(strafe) < 0.001f) {
+			return mountedStepHeight;
+		}
+
+		double yawRadians = Math.toRadians(entity.rotationYaw);
+		double moveX = -Math.sin(yawRadians) * forward + Math.cos(yawRadians) * strafe;
+		double moveZ = Math.cos(yawRadians) * forward + Math.sin(yawRadians) * strafe;
+		double moveLengthSq = moveX * moveX + moveZ * moveZ;
+		if (moveLengthSq < 1.0E-4) {
+			return mountedStepHeight;
+		}
+
+		double moveLength = Math.sqrt(moveLengthSq);
+		moveX /= moveLength;
+		moveZ /= moveLength;
+
+		double checkDistance = entity.width * 0.5 + 0.25;
+		AxisAlignedBB frontBox = entity.boundingBox.copy().offset(moveX * checkDistance, 0.0, moveZ * checkDistance).contract(0.001, 0.001, 0.001);
+		List collisionsAhead = entity.worldObj.getCollidingBoundingBoxes(entity, frontBox);
+		if (collisionsAhead.isEmpty()) {
+			return mountedStepHeight;
+		}
+
+		double obstacleHeight = 0.0;
+		for (Object obj : collisionsAhead) {
+			AxisAlignedBB box = (AxisAlignedBB) obj;
+			obstacleHeight = Math.max(obstacleHeight, box.maxY - entity.boundingBox.minY);
+		}
+
+		boolean isSingleFullBlockStep = obstacleHeight > 0.875 && obstacleHeight <= mountedStepHeight + 0.05f;
+		if (!isSingleFullBlockStep) {
+			return 0.0f;
+		}
+
+		AxisAlignedBB raisedFrontBox = frontBox.copy().offset(0.0, mountedStepHeight, 0.0);
+		if (!entity.worldObj.getCollidingBoundingBoxes(entity, raisedFrontBox).isEmpty()) {
+			return 0.0f;
+		}
+
+		return mountedStepHeight;
 	}
 
 	public static boolean sendControlToServer(EntityPlayer clientPlayer) {
@@ -120,7 +173,7 @@ public class GOTMountFunctions {
 				if (entity.riddenByEntity instanceof EntityLiving) {
 					target = ((EntityLiving) entity.riddenByEntity).getAttackTarget();
 					entity.setAttackTarget(target);
-				} else if (entity.riddenByEntity instanceof EntityPlayer) {
+				} else if (entity.riddenByEntity instanceof EntityPlayer && !(entity instanceof GOTEntityDirewolf)) {
 					entity.setAttackTarget(null);
 				}
 			}

@@ -16,7 +16,6 @@ public class GOTItemShieldPike extends GOTItemPolearm{
 
     public GOTItemShieldPike(Item.ToolMaterial material) {
         super(material);
-        this.bFull3D = true;
     }
 
     @Override
