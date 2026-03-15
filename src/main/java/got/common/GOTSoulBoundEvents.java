@@ -161,43 +161,21 @@ public class GOTSoulBoundEvents {
         }
     }
 
-    private ItemStack[] captureFullInventory(EntityPlayer player) {
+    public void manuallyTriggerSave(EntityPlayer player) {
+        String playerID = player.getUniqueID().toString();
+
         ItemStack[] mainCopy = player.inventory.mainInventory;
         ItemStack[] armorCopy = player.inventory.armorInventory;
         ItemStack[] fullInventory = new ItemStack[mainCopy.length + armorCopy.length];
         for (int i = 0; i < mainCopy.length; i++) {
-            if (mainCopy[i] != null) {
-                fullInventory[i + armorCopy.length] = mainCopy[i].copy();
-            }
+            if (mainCopy[i] != null) fullInventory[i + armorCopy.length] = mainCopy[i].copy();
         }
         for (int i = 0; i < armorCopy.length; i++) {
-            if (armorCopy[i] != null) {
-                fullInventory[i] = armorCopy[i].copy();
-            }
+            if (armorCopy[i] != null) fullInventory[i] = armorCopy[i].copy();
         }
-        return fullInventory;
-    }
 
-    private ItemStack[] getOrCreateFullInventory(String playerID, EntityPlayer player) {
-        ItemStack[] fullInventory = this.fullInventoryCache.get(playerID);
-        if (fullInventory == null) {
-            fullInventory = captureFullInventory(player);
-            this.fullInventoryCache.put(playerID, fullInventory);
-        }
-        return fullInventory;
-    }
-
-    private void queueFullInventoryRestore(EntityPlayer player, String playerID) {
-        ItemStack[] fullInventory = getOrCreateFullInventory(playerID, player);
-        this.itemsToRestore.put(playerID, fullInventory);
-        this.skipPenalty.add(playerID);
-        saveItemsToFile(player, fullInventory);
-    }
-
-    public void manuallyTriggerSave(EntityPlayer player) {
-        String playerID = player.getUniqueID().toString();
-        ItemStack[] fullInventory = captureFullInventory(player);
         this.fullInventoryCache.put(playerID, fullInventory);
+
         saveItemsToFile(player, fullInventory);
     }
 
@@ -212,10 +190,25 @@ public class GOTSoulBoundEvents {
                 boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
 
                 if (isInSafeZone) {
-                    queueFullInventoryRestore(player, playerID);
+                    player.removePotionEffect(GOTEffects.combatLog.id);
                     return;
                 }
-                getOrCreateFullInventory(playerID, player);
+                if (!this.fullInventoryCache.containsKey(playerID)) {
+                    ItemStack[] mainCopy = player.inventory.mainInventory;
+                    ItemStack[] armorCopy = player.inventory.armorInventory;
+                    ItemStack[] fullInventory = new ItemStack[mainCopy.length + armorCopy.length];
+                    for (int i = 0; i < mainCopy.length; i++) {
+                        if (mainCopy[i] != null) {
+                            fullInventory[i + armorCopy.length] = mainCopy[i].copy();
+                        }
+                    }
+                    for (int i = 0; i < armorCopy.length; i++) {
+                        if (armorCopy[i] != null) {
+                            fullInventory[i] = armorCopy[i].copy();
+                        }
+                    }
+                    this.fullInventoryCache.put(playerID, fullInventory);
+                }
 
                 boolean restore = false;
                 ItemStack[] main = player.inventory.mainInventory;
@@ -271,9 +264,7 @@ public class GOTSoulBoundEvents {
             boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
 
             if (isInSafeZone) {
-                queueFullInventoryRestore(player, playerID);
-                event.drops.clear();
-                this.fullInventoryCache.remove(playerID);
+                player.removePotionEffect(GOTEffects.combatLog.id);
                 return;
             }
             if (this.fullInventoryCache.containsKey(playerID)) {
@@ -293,6 +284,12 @@ public class GOTSoulBoundEvents {
         if (!event.entityPlayer.worldObj.isRemote) {
             EntityPlayer player = event.entityPlayer;
             String playerID = player.getUniqueID().toString();
+            boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
+
+            if (isInSafeZone) {
+                player.removePotionEffect(GOTEffects.combatLog.id);
+                return;
+            }
             if (this.fullInventoryCache.containsKey(playerID)) {
                 this.fullInventoryCache.remove(playerID);
             }

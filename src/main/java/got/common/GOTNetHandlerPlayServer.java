@@ -5,7 +5,6 @@ import com.google.common.primitives.Floats;
 
 import cpw.mods.fml.common.FMLLog;
 import got.common.entity.other.GOTMountFunctions;
-import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.item.GOTWeaponStats;
 import got.common.network.GOTPacketHandler;
 import got.common.network.GOTPacketMountControl;
@@ -48,9 +47,6 @@ public class GOTNetHandlerPlayServer extends NetHandlerPlayServer {
         float forward = packet.func_149616_d();
         float strafing = packet.func_149620_c();
         boolean jump = packet.func_149618_e();
-        if (jump && this.playerEntity.ridingEntity instanceof GOTEntityDirewolf) {
-            ((GOTEntityDirewolf) this.playerEntity.ridingEntity).riderJump();
-        }
         if (forward != 0.0f || strafing != 0.0f || jump) {
             GOTLevelData.getData(this.playerEntity).cancelFastTravel();
         }
@@ -104,19 +100,11 @@ public class GOTNetHandlerPlayServer extends NetHandlerPlayServer {
                 FMLLog.warning(mount.getCommandSenderName() + " (mount of " + this.playerEntity.getCommandSenderName() + ") moved wrongly! " + dx + ", " + dy + ", " + dz);
             }
             mount.setPositionAndRotation(x, y, z, yaw, pitch);
-            if (this.playerEntity.ridingEntity == mount) {
-                mount.updateRiderPosition();
-            } else {
-                this.playerEntity.setPositionAndRotation(x, y, z, yaw, pitch);
-            }
+            this.playerEntity.setPositionAndRotation(x, y, z, yaw, pitch);
             boolean noCollideAfterMove = world.getCollidingBoundingBoxes(mount, mount.boundingBox.copy().contract(check, check, check)).isEmpty();
             if (noCollideBeforeMove && (clientServerConflict || !noCollideAfterMove)) {
                 mount.setPositionAndRotation(d0, d1, d2, yaw, pitch);
-                if (this.playerEntity.ridingEntity == mount) {
-                    mount.updateRiderPosition();
-                } else {
-                    this.playerEntity.setPositionAndRotation(d0, d1, d2, yaw, pitch);
-                }
+                this.playerEntity.setPositionAndRotation(d0, d1, d2, yaw, pitch);
                 GOTPacketMountControlServerEnforce pktClient = new GOTPacketMountControlServerEnforce(mount);
                 GOTPacketHandler.networkWrapper.sendTo(pktClient, this.playerEntity);
                 return;
@@ -182,13 +170,6 @@ public class GOTNetHandlerPlayServer extends NetHandlerPlayServer {
                 if (packet.func_149565_c() == C02PacketUseEntity.Action.INTERACT) {
                     this.playerEntity.interactWith(target);
                 } else if (packet.func_149565_c() == C02PacketUseEntity.Action.ATTACK && (this.lastAttackTime <= 0 || !(target instanceof EntityLivingBase))) {
-                    if (this.playerEntity.ridingEntity instanceof GOTEntityDirewolf && target instanceof EntityLivingBase) {
-                        GOTEntityDirewolf direwolf = (GOTEntityDirewolf) this.playerEntity.ridingEntity;
-                        direwolf.setAttackTarget((EntityLivingBase) target);
-                        direwolf.attackEntityAsMob(target);
-                        this.lastAttackTime = attackTime;
-                        return;
-                    }
                     if (target instanceof EntityItem || target instanceof EntityXPOrb || target instanceof EntityArrow || target == this.playerEntity) {
                         kickPlayerFromServer("Attempting to attack an invalid entity");
                         this.theServer.logWarning("Player " + this.playerEntity.getCommandSenderName() + " tried to attack an invalid entity");

@@ -10,7 +10,6 @@ import got.client.gui.*;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import got.common.block.other.GOTBlockFlowerPot;
 import got.common.database.*;
-import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.entity.animal.GOTEntityHorse;
 import got.common.entity.other.*;
 import got.common.faction.*;
@@ -34,8 +33,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.*;
-import net.minecraftforge.common.MinecraftForge;
-import noname.weapons.events.OverlayEventHandler;
 
 public class GOTCommonProxy implements IGuiHandler {
 	public void addMapPlayerLocation(GameProfile player, double posX, double posZ) {
@@ -228,9 +225,6 @@ public class GOTCommonProxy implements IGuiHandler {
 			if (entity instanceof GOTEntityHorse) {
 				GOTEntityHorse horse = (GOTEntityHorse) entity;
 				return new GOTGuiMountInventory(entityplayer.inventory, new AnimalChest(horse.getCommandSenderName(), j), horse);
-			}
-			if (entity instanceof GOTEntityDirewolf) {
-				return new GOTGuiDirewolfInventory(entityplayer.inventory, (GOTEntityDirewolf) entity);
 			}
 			npc2 = (GOTEntityNPCRideable) entity;
 			if (entity instanceof GOTEntityNPCRideable && npc2.getMountInventory() != null) {
@@ -571,9 +565,6 @@ public class GOTCommonProxy implements IGuiHandler {
 			if (entity instanceof GOTEntityHorse) {
 				GOTEntityHorse horse = (GOTEntityHorse) entity;
 				return new GOTContainerMountInventory(entityplayer.inventory, GOTReflection.getHorseInv(horse), horse);
-			}
-			if (entity instanceof GOTEntityDirewolf) {
-				return new GOTContainerDirewolfInventory(entityplayer.inventory, ((GOTEntityDirewolf) entity).getMountInventory(), (GOTEntityDirewolf) entity);
 			}
 			if (entity instanceof GOTEntityNPCRideable && ((GOTEntityNPCRideable) entity).getMountInventory() != null) {
 				return new GOTContainerNPCMountInventory(entityplayer.inventory, ((GOTEntityNPCRideable) entity).getMountInventory(), (GOTEntityNPCRideable) entity);

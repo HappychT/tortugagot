@@ -1,7 +1,5 @@
 package got.common.network;
 
-import got.GOT;
-import got.common.entity.animal.GOTEntityDirewolf;
 import cpw.mods.fml.common.network.simpleimpl.*;
 import got.common.entity.other.GOTEntityNPCRideable;
 import io.netty.buffer.ByteBuf;
@@ -22,8 +20,6 @@ public class GOTPacketMountOpenInv implements IMessage {
 			EntityPlayerMP entityplayer = context.getServerHandler().playerEntity;
 			if (entityplayer.ridingEntity instanceof GOTEntityNPCRideable) {
 				((GOTEntityNPCRideable) entityplayer.ridingEntity).openGUI(entityplayer);
-			} else if (entityplayer.ridingEntity instanceof GOTEntityDirewolf) {
-				entityplayer.openGui(GOT.instance, 29, entityplayer.worldObj, entityplayer.ridingEntity.getEntityId(), 0, 0);
 			}
 			return null;
 		}

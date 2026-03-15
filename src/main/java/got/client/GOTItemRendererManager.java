@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import got.client.render.item.GOTItemShieldRenderer;
 import got.client.render.other.*;
 import got.common.database.GOTRegistry;
 import got.common.item.other.GOTItemAnimalJar;
@@ -22,15 +23,19 @@ public class GOTItemRendererManager implements IResourceManagerReloadListener {
 	public static GOTItemRendererManager INSTANCE;
 	public static List<GOTRenderLargeItem> largeItemRenderers = new ArrayList<>();
 
+
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager) {
 		largeItemRenderers.clear();
 		try {
 			for (Item item : GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Item.class)) {
 				boolean isLarge;
+
 				MinecraftForgeClient.registerItemRenderer(item, null);
+
 				GOTRenderLargeItem largeItemRenderer = GOTRenderLargeItem.getRendererIfLarge(item);
 				isLarge = largeItemRenderer != null;
+
 				if (item instanceof GOTItemCrossbow) {
 					MinecraftForgeClient.registerItemRenderer(item, new GOTRenderCrossbow());
 				} else if (item instanceof GOTItemBow) {
@@ -38,9 +43,14 @@ public class GOTItemRendererManager implements IResourceManagerReloadListener {
 				} else if (item instanceof GOTItemSword && ((GOTItemSword) item).isGlowing()) {
 					double d = 24.0;
 					MinecraftForgeClient.registerItemRenderer(item, new GOTRenderBlade(d, largeItemRenderer));
+
+				} else if (isShieldItem(item)) {
+					MinecraftForgeClient.registerItemRenderer(item, new GOTItemShieldRenderer(largeItemRenderer));
+
 				} else if (isLarge) {
 					MinecraftForgeClient.registerItemRenderer(item, largeItemRenderer);
 				}
+
 				if (largeItemRenderer != null) {
 					largeItemRenderers.add(largeItemRenderer);
 				}
@@ -48,27 +58,37 @@ public class GOTItemRendererManager implements IResourceManagerReloadListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		try {
 			for (Field field : GOTItems.class.getFields()) {
 				boolean isLarge;
 				if (!(field.get(null) instanceof Item)) continue;
 				Item item = (Item) field.get(null);
+
 				MinecraftForgeClient.registerItemRenderer(item, null);
+
 				GOTRenderLargeItem largeItemRenderer = GOTRenderLargeItem.getRendererIfLarge(item);
 				boolean bl = isLarge = largeItemRenderer != null;
+
 				if (item instanceof GOTItemCrossbow) {
 					MinecraftForgeClient.registerItemRenderer(item, new GOTRenderCrossbow());
 				} else if (item instanceof GOTItemBow) {
 					MinecraftForgeClient.registerItemRenderer(item, new GOTRenderBow(largeItemRenderer));
+
+				} else if (isShieldItem(item)) {
+					MinecraftForgeClient.registerItemRenderer(item, new GOTItemShieldRenderer(largeItemRenderer));
+
 				} else if (isLarge) {
 					MinecraftForgeClient.registerItemRenderer(item, largeItemRenderer);
 				}
+
 				if (largeItemRenderer == null) continue;
 				largeItemRenderers.add(largeItemRenderer);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(GOTRegistry.commandTable), new GOTRenderInvTableCommand());
 		MinecraftForgeClient.registerItemRenderer(GOTRegistry.pipe, new GOTRenderBlownItem());
 		MinecraftForgeClient.registerItemRenderer(GOTRegistry.commandHorn, new GOTRenderBlownItem());
@@ -82,6 +102,15 @@ public class GOTItemRendererManager implements IResourceManagerReloadListener {
 				MinecraftForgeClient.registerItemRenderer(item, new GOTRenderAnimalJar());
 			}
 		}
+	}
+
+	private boolean isShieldItem(Item item) {
+		return item instanceof GOTItemShieldPike ||
+				item instanceof GOTItemShieldSpear ||
+				item instanceof GOTItemShieldReachPike ||
+				item instanceof GOTItemShieldRiverlandsTrident ||
+				item instanceof GOTItemValyrianShieldHalbert ||
+				item instanceof GOTItemValyrianShieldSpear;
 	}
 
 	@SubscribeEvent

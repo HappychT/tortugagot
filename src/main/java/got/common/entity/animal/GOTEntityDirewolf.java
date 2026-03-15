@@ -1,37 +1,26 @@
 package got.common.entity.animal;
 
-import got.GOT;
+import java.util.List;
+
 import got.common.database.GOTRegistry;
 import got.common.entity.ai.GOTEntityAIAttackOnCollide;
-import got.common.entity.other.GOTMountFunctions;
-import got.common.entity.other.GOTNPCMount;
-import got.common.item.other.GOTBridleMountStats;
 import got.common.world.biome.GOTBiome;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
-import java.util.List;
-import java.util.UUID;
-
-public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneToFrost, GOTNPCMount {
+public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneToFrost {
 	public EntityAIBase attackAI = new GOTEntityAIAttackOnCollide(this, 1.4, false);
 	public EntityAIBase panicAI = new EntityAIPanic(this, 1.5);
 	public EntityAIBase targetNearAI = new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true);
 	public int hostileTick;
 	public boolean prevIsChild = true;
-	public UUID bridleTamer;
-    private int ownerLastAttackerTime;
-    private int ownerRevengeTimer;
-    private final InventoryBasic mountInventory = new InventoryBasic("DirewolfInv", false, 1);
 
 	public GOTEntityDirewolf(World world) {
 		super(world);
@@ -52,10 +41,9 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 	@Override
 	public void applyEntityAttributes() {
 		super.applyEntityAttributes();
-        GOTBridleMountStats stats = GOTBridleMountStats.getStats(getClass());
-		getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(stats.hp);
-		getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(stats.speed);
-		getAttributeMap().registerAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(stats.attack);
+		getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(50.0);
+		getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.23);
+		getAttributeMap().registerAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(5.0);
 	}
 
 	@Override
@@ -109,8 +97,6 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 	public void entityInit() {
 		super.entityInit();
 		dataWatcher.addObject(20, (byte) 0);
-		dataWatcher.addObject(21, (byte) 0);
-		dataWatcher.addObject(22, (byte) 0);
 	}
 
 	@Override
@@ -151,19 +137,8 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 		if (isHostile()) {
 			return false;
 		}
-		if (!worldObj.isRemote && isBridleTamed() && riddenByEntity == null) {
-			entityplayer.mountEntity(this);
-			setAttackTarget(null);
-			getNavigator().clearPathEntity();
-			return true;
-		}
 		return super.interact(entityplayer);
 	}
-
-    @Override
-    public int getTotalArmorValue() {
-        return 5;
-    }
 
 	@Override
 	public boolean isAIEnabled() {
@@ -177,51 +152,6 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 
 	public boolean isHostile() {
 		return dataWatcher.getWatchableObjectByte(20) == 1;
-	}
-
-	public boolean isBridleTamed() {
-		return dataWatcher.getWatchableObjectByte(22) == 1;
-	}
-
-	@Override
-	public boolean getBelongsToNPC() {
-		return false;
-	}
-
-    public IInventory getMountInventory() {
-        return mountInventory;
-    }
-
-	@Override
-	public String getMountArmorTexture() {
-		return null;
-	}
-
-	@Override
-	public float getStepHeightWhileRiddenByPlayer() {
-		return 1.0f;
-	}
-
-	@Override
-	public boolean isMountArmorValid(ItemStack itemstack) {
-		return false;
-	}
-
-	@Override
-	public boolean isMountSaddled() {
-		return dataWatcher.getWatchableObjectByte(21) == 1;
-	}
-
-	@Override
-	public void moveEntityWithHeading(float strafe, float forward) {
-		GOTMountFunctions.move(this, strafe, forward);
-	}
-
-	public void riderJump() {
-		if (onGround) {
-			motionY = 0.42D + GOTBridleMountStats.getStats(getClass()).jump * 0.1D;
-			isAirBorne = true;
-		}
 	}
 
 	@Override
@@ -249,8 +179,6 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 			setAttackTarget(null);
 		}
 		if (!worldObj.isRemote) {
-            setMountSaddled(mountInventory.getStackInSlot(0) != null && mountInventory.getStackInSlot(0).getItem() == Items.saddle);
-            updateOwnerCombatTarget();
 			if (hostileTick > 0 && getAttackTarget() == null) {
 				--hostileTick;
 			}
@@ -259,110 +187,21 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 				resetInLove();
 			}
 		}
-		GOTMountFunctions.update(this);
 	}
-
-    private void updateOwnerCombatTarget() {
-        if (!isBridleTamed() || bridleTamer == null || riddenByEntity != null) {
-            return;
-        }
-
-        EntityPlayer owner = getBridleTamerPlayer();
-        if (owner == null) {
-            return;
-        }
-
-        EntityLivingBase ownerTarget = owner.getLastAttacker();
-        int ownerAttackTime = owner.getLastAttackerTime();
-        if (ownerTarget != null && ownerAttackTime != ownerLastAttackerTime && canAttackOwnerTarget(owner, ownerTarget)) {
-            becomeAngryAt(ownerTarget);
-            ownerLastAttackerTime = ownerAttackTime;
-        }
-
-        EntityLivingBase revengeTarget = owner.getAITarget();
-        int revengeTime = owner.func_142015_aE();
-        if (revengeTarget != null && revengeTime != ownerRevengeTimer && canAttackOwnerTarget(owner, revengeTarget)) {
-            becomeAngryAt(revengeTarget);
-            ownerRevengeTimer = revengeTime;
-        }
-    }
-
-    private boolean canAttackOwnerTarget(EntityPlayer owner, EntityLivingBase target) {
-        return target != this &&
-                target.isEntityAlive() &&
-                GOT.canPlayerAttackEntity(owner, target, false) &&
-                boundingBox.expand(1.0, 1.0, 1.0).intersectsWith(target.boundingBox);
-    }
-
-    private EntityPlayer getBridleTamerPlayer() {
-        for (Object obj : worldObj.playerEntities) {
-            if (obj instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) obj;
-                if (player.getUniqueID().equals(bridleTamer)) {
-                    return player;
-                }
-            }
-        }
-        return null;
-    }
 
 	@Override
 	public void readEntityFromNBT(NBTTagCompound nbt) {
 		super.readEntityFromNBT(nbt);
 		hostileTick = nbt.getInteger("Angry");
-		setBridleTamed(nbt.getBoolean("BridleTamed"));
-        if (nbt.hasKey("MountSaddleItem")) {
-            ItemStack saddle = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("MountSaddleItem"));
-            mountInventory.setInventorySlotContents(0, saddle);
-        } else if (nbt.getBoolean("MountSaddled")) {
-            mountInventory.setInventorySlotContents(0, new ItemStack(Items.saddle));
-        }
-        setMountSaddled(mountInventory.getStackInSlot(0) != null);
-		if (nbt.hasKey("BridleTamer")) {
-			bridleTamer = UUID.fromString(nbt.getString("BridleTamer"));
-		}
 	}
 
 	public void setHostile(boolean flag) {
 		dataWatcher.updateObject(20, flag ? (byte) 1 : 0);
 	}
 
-	public void setMountSaddled(boolean flag) {
-		dataWatcher.updateObject(21, flag ? (byte) 1 : 0);
-	}
-
-	public void setBridleTamed(boolean flag) {
-		dataWatcher.updateObject(22, flag ? (byte) 1 : 0);
-	}
-
-	public void setBridleTamedBy(EntityPlayer entityplayer) {
-		setBridleTamed(true);
-		bridleTamer = entityplayer.getUniqueID();
-	}
-
-	@Override
-	public void setBelongsToNPC(boolean flag) {
-	}
-
-	@Override
-	public void super_moveEntityWithHeading(float strafe, float forward) {
-		super.moveEntityWithHeading(strafe, forward);
-	}
-
 	@Override
 	public void writeEntityToNBT(NBTTagCompound nbt) {
 		super.writeEntityToNBT(nbt);
 		nbt.setInteger("Angry", hostileTick);
-		nbt.setBoolean("MountSaddled", isMountSaddled());
-		nbt.setBoolean("BridleTamed", isBridleTamed());
-        ItemStack saddle = mountInventory.getStackInSlot(0);
-        if (saddle != null) {
-            NBTTagCompound saddleData = new NBTTagCompound();
-            saddle.writeToNBT(saddleData);
-            nbt.setTag("MountSaddleItem", saddleData);
-        }
-		if (bridleTamer != null) {
-			nbt.setString("BridleTamer", bridleTamer.toString());
-		}
 	}
 }

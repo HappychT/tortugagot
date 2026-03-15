@@ -6,16 +6,11 @@ import got.common.GOTLevelData;
 import got.common.GOTPlayerData;
 import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTEffects;
-import got.common.entity.animal.GOTEntityBridleHorse;
-import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.entity.animal.GOTEntityHorse;
-import got.common.util.GOTReflection;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.init.Items;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -28,21 +23,13 @@ public class GOTItemBridle extends Item {
     /** Длительность удержания ПКМ для призыва (тики). Для клиентского прогресс-бара. */
     public static final int SUMMON_TICKS = 20 * 8;
 
-    private final Class<? extends EntityLiving> entityClass;
-    private final GOTBridleMountStats summonStats;
-    private final String mountNameKey;
+    private final Class<? extends GOTEntityHorse> entityClass;
 
-    public GOTItemBridle(Class<? extends EntityLiving> entityClass) {
-        this(entityClass, null, "got.bridle_mount");
-    }
-
-    public GOTItemBridle(Class<? extends EntityLiving> entityClass, GOTBridleMountStats summonStats, String mountNameKey) {
+    public GOTItemBridle(Class<? extends GOTEntityHorse> entityClass) {
         super();
         setMaxStackSize(1);
         setCreativeTab(GOTCreativeTabs.tabMisc);
         this.entityClass = entityClass;
-        this.summonStats = summonStats;
-        this.mountNameKey = mountNameKey;
     }
 
     @Override
@@ -131,47 +118,22 @@ public class GOTItemBridle extends Item {
         if (player.isRiding() || data.getBridleMount() != -1) {
             return false;
         }
-        EntityLiving mount = createMount(world);
+        GOTEntityHorse mount = createMount(world);
         if (mount == null) {
             return false;
         }
+        mount.setTamedBy(player);
+        mount.setHorseSaddled(true);
         mount.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
-        mount.setCustomNameTag(StatCollector.translateToLocal(mountNameKey));
-        prepareMountForPlayer(mount, player);
+        mount.setCustomNameTag(StatCollector.translateToLocal("got.bridle_mount"));
+        GOTBridleMountStats.getStats(mount.getClass()).applyTo(mount);
         world.spawnEntityInWorld(mount);
-        (summonStats != null ? summonStats : GOTBridleMountStats.getStats(mount.getClass())).applyTo(mount);
-        applyPostSpawnMountSetup(mount);
         player.mountEntity(mount);
         data.setBridleMount(mount.getEntityId());
         return true;
     }
 
-    private void prepareMountForPlayer(EntityLiving mount, EntityPlayer player) {
-        if (mount instanceof GOTEntityHorse) {
-            GOTEntityHorse horse = (GOTEntityHorse) mount;
-            horse.setTamedBy(player);
-            if (horse instanceof GOTEntityBridleHorse) {
-                ((GOTEntityBridleHorse) horse).applyBridleAppearance();
-            }
-            GOTReflection.getHorseInv(horse).setInventorySlotContents(0, new ItemStack(Items.saddle));
-            GOTReflection.setupHorseInv(horse);
-            horse.setHorseSaddled(true);
-            return;
-        }
-        if (mount instanceof GOTEntityDirewolf) {
-            GOTEntityDirewolf direwolf = (GOTEntityDirewolf) mount;
-            direwolf.setBridleTamedBy(player);
-            direwolf.getMountInventory().setInventorySlotContents(0, new ItemStack(Items.saddle));
-            direwolf.setMountSaddled(true);
-            direwolf.setHostile(false);
-            direwolf.setAttackTarget(null);
-        }
-    }
-
-    private void applyPostSpawnMountSetup(EntityLiving mount) {
-    }
-
-    private EntityLiving createMount(World world) {
+    private GOTEntityHorse createMount(World world) {
         try {
             return entityClass.getConstructor(World.class).newInstance(world);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException

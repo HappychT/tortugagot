@@ -214,9 +214,7 @@ public class GOT {
         FMLCommonHandler.instance().bus().register(new BlockDamageTickHandler());
         FMLCommonHandler.instance().bus().register(StaminaServerHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockServerHandler.INSTANCE);
-        WarBlockHandler warBlockHandler = new WarBlockHandler();
-        MinecraftForge.EVENT_BUS.register(warBlockHandler);
-        FMLCommonHandler.instance().bus().register(warBlockHandler);
+        MinecraftForge.EVENT_BUS.register(new WarBlockHandler());
         FMLCommonHandler.instance().bus().register(BlockServerHandler.INSTANCE);
         GOTCoreBlockingSystem.registerWeapons();
         proxy.onLoad();

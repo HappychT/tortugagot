@@ -2,6 +2,7 @@ package brain.armors;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import got.common.database.GOTCreativeTabs;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
@@ -12,30 +13,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
 public class ItemKingGuardArmor extends ItemArmor {
-    @SideOnly(Side.CLIENT)
-    private IIcon itemIcon;
-    
+
     public ItemKingGuardArmor(ArmorMaterial material, int renderIndex, int armorType) {
         super(material, renderIndex, armorType);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) {
-        String itemName = this.getUnlocalizedName().substring(this.getUnlocalizedName().lastIndexOf(".") + 1);
-        this.itemIcon = register.registerIcon("armors:" + itemName);
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int damage) {
-        return this.itemIcon;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconIndex(ItemStack stack) {
-        return getIconFromDamage(stack.getItemDamage());
+        setCreativeTab(GOTCreativeTabs.tabCombat);
     }
     
     @Override

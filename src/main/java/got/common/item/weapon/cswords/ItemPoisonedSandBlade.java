@@ -26,6 +26,6 @@ public class ItemPoisonedSandBlade extends GOTItemPolearm {
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean advanced) {
         super.addInformation(stack, player, list, advanced);
         list.add("");
-        list.add(EnumChatFormatting.GREEN + "Нейротоксин" + EnumChatFormatting.WHITE + " – снижает регенерацию врага на 3 сек.");
+        list.add(EnumChatFormatting.GREEN + "Нейротоксин" + EnumChatFormatting.WHITE + " – снижает регенерацию врага при ударе.");
     }
 }

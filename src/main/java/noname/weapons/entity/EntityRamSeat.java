@@ -76,6 +76,9 @@ public class EntityRamSeat extends Entity implements IEntityAdditionalSpawnData 
             }
         }
 
+        if (this.riddenByEntity != null) {
+            this.riddenByEntity.rotationYaw = parent.rotationYaw;
+        }
     }
 
     @Override

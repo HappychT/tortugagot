@@ -104,15 +104,12 @@ public class GOTItemMountArmor extends Item {
 		if (mount instanceof GOTEntityGiraffe || mount instanceof GOTEntityDeer || mount instanceof GOTEntityElephant || mount instanceof GOTEntityMammoth || mount instanceof GOTEntityBoar || mount instanceof GOTEntityCamel) {
 			return false;
 		}
-        if (mount instanceof GOTEntityRhino || mount instanceof GOTEntityWoolyRhino) {
-            return mountType == Mount.RHINO;
-        }
-        if (mount instanceof GOTEntityMammoth) {
-            return mountType == Mount.RHINO;
-        }
-        if (mount instanceof GOTEntityHorse) {
-            return mountType == Mount.HORSE;
-        }
+		if (mount instanceof GOTEntityRhino || mount instanceof GOTEntityWoolyRhino) {
+			return mountType == Mount.RHINO;
+		}
+		if (mount instanceof GOTEntityHorse) {
+			return mountType == Mount.HORSE;
+		}
 		return false;
 	}
 

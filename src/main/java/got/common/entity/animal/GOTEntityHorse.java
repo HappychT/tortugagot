@@ -6,7 +6,6 @@ import got.GOT;
 import got.common.database.GOTRegistry;
 import got.common.entity.ai.*;
 import got.common.entity.other.*;
-import got.common.entity.other.GOTMountFunctions;
 import got.common.item.other.GOTItemMountArmor;
 import got.common.util.GOTReflection;
 import got.common.world.biome.essos.GOTBiomeDothrakiSea;
@@ -194,11 +193,7 @@ public class GOTEntityHorse extends EntityHorse implements GOTNPCMount {
 	public ItemStack getMountArmor() {
 		int ID = dataWatcher.getWatchableObjectInt(27);
 		byte meta = dataWatcher.getWatchableObjectByte(28);
-		Item item = Item.getItemById(ID);
-		if (item == null) {
-			return null;
-		}
-		return new ItemStack(item, 1, meta);
+		return new ItemStack(Item.getItemById(ID), 1, meta);
 	}
 
 	@Override
@@ -232,9 +227,6 @@ public class GOTEntityHorse extends EntityHorse implements GOTNPCMount {
 	@Override
 	public int getTotalArmorValue() {
 		ItemStack itemstack = GOTReflection.getHorseInv(this).getStackInSlot(1);
-		if (itemstack == null) {
-			itemstack = getMountArmor();
-		}
 		if (itemstack != null && itemstack.getItem() instanceof GOTItemMountArmor) {
 			GOTItemMountArmor armor = (GOTItemMountArmor) itemstack.getItem();
 			return armor.getDamageReduceAmount();
@@ -321,7 +313,7 @@ public class GOTEntityHorse extends EntityHorse implements GOTNPCMount {
 	@Override
 	public void moveEntityWithHeading(float f, float f1) {
 		isMoving = true;
-		GOTMountFunctions.move(this, f, f1);
+		super.moveEntityWithHeading(f, f1);
 		isMoving = false;
 	}
 

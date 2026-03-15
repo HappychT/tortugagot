@@ -63,6 +63,18 @@ public class PacketStructureAction implements IMessage {
                         case "upgrade":
                             StructureManager.handleUpgrade(player, message.structureId);
                             break;
+                        case "buy_siege":
+                            StructureManager.handleSiegePurchase(player, message.structureId, message.data1);
+                            break;
+                        case "buy_horse":
+                            StructureManager.handleHorsePurchase(player, message.structureId);
+                            break;
+                        case "upgrade_security":
+                            StructureManager.handleSecurityUpgrade(player, message.structureId, message.data1);
+                            break;
+                        case "upgrade_sub":
+                            brain.factions.servers.StructureManager.handleSubUpgrade(player, message.structureId, message.data1);
+                            break;
                     }
                 }
             });

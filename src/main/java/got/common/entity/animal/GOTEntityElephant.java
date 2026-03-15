@@ -152,8 +152,8 @@ public class GOTEntityElephant extends GOTEntityHorse {
 			if (riddenByEntity instanceof EntityLivingBase) {
 				EntityLivingBase rhinoRider = (EntityLivingBase) riddenByEntity;
 				float momentum = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
-				setSprinting(momentum > 0.16f);
-				if (momentum >= 0.18f) {
+				setSprinting(momentum > 0.2f);
+				if (momentum >= 0.32f) {
 					float strength = momentum * 15.0f;
 					Vec3.createVectorHelper(posX, posY, posZ);
 					Vec3 look = getLookVec();
@@ -183,7 +183,7 @@ public class GOTEntityElephant extends GOTEntityHorse {
 				}
 			} else if (getAttackTarget() != null) {
 				float momentum = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
-				setSprinting(momentum > 0.16f);
+				setSprinting(momentum > 0.2f);
 			} else {
 				setSprinting(false);
 			}

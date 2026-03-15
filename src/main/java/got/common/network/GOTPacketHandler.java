@@ -157,7 +157,6 @@ public class GOTPacketHandler {
 		networkWrapper.registerMessage(GOTPacketWaypointRegion.Handler.class, GOTPacketWaypointRegion.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketWaypointUseCount.Handler.class, GOTPacketWaypointUseCount.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketWeaponFX.Handler.class, GOTPacketWeaponFX.class, id++, Side.CLIENT);
-		networkWrapper.registerMessage(GOTPacketActivateRam.Handler.class, GOTPacketActivateRam.class, id++, Side.SERVER);
 
 		networkWrapper.registerMessage(PacketSyncWeaponHitCount.Handler.class, PacketSyncWeaponHitCount.class, id++, Side.CLIENT);
 	}

@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTEffects;
 import got.common.database.GOTMaterial;
 import got.common.dispense.GOTDispenseSpear;
@@ -25,6 +26,8 @@ public class GOTItemThiefKnife extends GOTItemSpear {
         super(GOTMaterial.THIEF_KNIFE);
         this.gotWeaponDamage = 5.0f;
         BlockDispenser.dispenseBehaviorRegistry.putObject(this, new GOTDispenseSpear());
+        setCreativeTab(GOTCreativeTabs.tabStory);
+
     }
 
     @Override

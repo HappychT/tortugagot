@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
-
 import net.minecraftforge.client.model.IModelCustom;
 import org.lwjgl.opengl.GL11;
 
@@ -17,7 +16,6 @@ public class RenderBalista extends Render {
     private IModelCustom model;
     private IModelCustom modelArm1;
     private static final ResourceLocation texture = new ResourceLocation("got", "textures/entity/noname/ballista.png");
-    private static final float Y_OFFSET = -0.1F;
 
     public RenderBalista() {
         this.shadowSize = 1.0F;
@@ -28,12 +26,9 @@ public class RenderBalista extends Render {
     @Override
     public void doRender(Entity entity, double x, double y, double z, float yaw, float partialTicks) {
         EntityBalista balista = (EntityBalista) entity;
-        float renderYaw = balista.prevRotationYaw + (balista.rotationYaw - balista.prevRotationYaw) * partialTicks;
-        float pitch = balista.prevRotationPitch + (balista.rotationPitch - balista.prevRotationPitch) * partialTicks;
         GL11.glPushMatrix();
-        GL11.glTranslated(x, y + Y_OFFSET, z);
-        GL11.glRotatef(180.0F - renderYaw, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(-pitch, 1.0F, 0.0F, 0.0F);
+        GL11.glTranslated(x, y + 0.5, z);
+        GL11.glRotatef(180.0F - yaw, 0.0F, 1.0F, 0.0F);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

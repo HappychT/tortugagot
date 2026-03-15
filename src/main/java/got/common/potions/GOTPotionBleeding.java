@@ -62,7 +62,7 @@ public class GOTPotionBleeding extends GOTCustomPotion {
     public void performEffect(EntityLivingBase entity, int amplifier) {
         if (isMoving(entity) || isJumping(entity)) {
             //if(entity.getRNG().nextFloat() < 0.1f) {
-            entity.attackEntityFrom(DamageSource.magic, DAMAGE_AMOUNT * (amplifier + 1));
+            entity.attackEntityFrom(DamageSource.magic, 1);
             //}
 
             if (!entity.worldObj.isRemote) {

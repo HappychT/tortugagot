@@ -98,6 +98,12 @@ public class GOTRenderShield {
 	}
 
 	public static void renderShield(GOTShields shield, EntityLivingBase entity, ModelBiped model) {
+		if (entity instanceof EntityPlayer) {
+			GOTShields customShield = GOTLevelData.getData((EntityPlayer) entity).getShield();
+			if (customShield != null) {
+				shield = customShield;
+			}
+		}
 		Minecraft mc = Minecraft.getMinecraft();
 		ResourceLocation shieldTexture = shield.shieldTexture;
 		ItemStack held = null;
@@ -161,5 +167,37 @@ public class GOTRenderShield {
 			doRenderShield(0.5f);
 			GL11.glPopMatrix();
 		}
+	}
+	public static void renderShieldFirstPerson(GOTShields shield, boolean blocking) {
+		Minecraft mc = Minecraft.getMinecraft();
+		ResourceLocation shieldTexture = shield.shieldTexture;
+
+		GL11.glPushMatrix();
+
+		mc.getTextureManager().bindTexture(shieldTexture);
+
+		if (blocking) {
+			GL11.glScalef(1.5F, 1.5F, 1.5F);
+			GL11.glTranslatef(0.3F, -0.3F, -0.4F);
+			GL11.glRotatef(10.0F, 0.0F, 1.0F, 0.0F);
+			GL11.glRotatef(-10.0F, 1.0F, 0.0F, 0.0F);
+		} else {
+			GL11.glScalef(1.5F, 1.5F, 1.5F);
+			GL11.glTranslatef(0.5F, -0.4F, -0.6F);
+			GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+			GL11.glRotatef(0.0F, 0.0F, 0.0F, 1.0F);
+		}
+
+		GL11.glScalef(-1.0f, 1.0f, 1.0f);
+
+		GL11.glEnable(3008); // GL_ALPHA_TEST
+
+		doRenderShield(0.0f);
+
+		GL11.glTranslatef(1.0f, 0.0f, 0.0f);
+		GL11.glScalef(-1.0f, 1.0f, 1.0f);
+		doRenderShield(0.5f);
+
+		GL11.glPopMatrix();
 	}
 }
