@@ -41,9 +41,16 @@ public class PlayerListPage implements IPageRenderer {
 
     @Override
     public void initGui(List<GuiButton> buttonList) {
-        buttonManageTitles = new GuiCustomButton(16, 0, 0, 150, 20, "Управление титулами");
-        buttonTitleHierarchy = new GuiCustomButton(17, 0, 0, 150, 20, "Иерархия титулов");
-        buttonApplications = new GuiCustomButton(18, 0, 0, 150, 20, "Заявки");
+        int frameWidth = (int) (202 / 1.2f);
+        int buttonHeight = 26 * 2;
+        int rightButtonsX = parent.getBaseWidth() - 65 - frameWidth;
+        int rightButtonsY = 60;
+        int gap = 7;
+
+        buttonManageTitles = new GuiCustomButton(16, rightButtonsX, rightButtonsY, frameWidth, buttonHeight, "Управление титулами");
+        buttonTitleHierarchy = new GuiCustomButton(17, rightButtonsX, rightButtonsY + buttonHeight + gap, frameWidth, buttonHeight, "Иерархия титулов");
+        buttonApplications = new GuiCustomButton(18, rightButtonsX, rightButtonsY + 2 * (buttonHeight + gap), frameWidth, buttonHeight, "Заявки");
+
         buttonPlayerKick = new GuiCustomButton(100, 0, 0, 100, 20, "Выгнать");
         buttonPlayerSetTitle = new GuiCustomButton(101, 0, 0, 100, 20, "Назначить титул");
 
@@ -60,18 +67,9 @@ public class PlayerListPage implements IPageRenderer {
 
         Faction factionData = parent.getFactionData();
         boolean isLeader = parent.isPlayerLeader();
-        int xSize = parent.getBaseWidth();
 
-        buttonManageTitles.xPosition = xSize - 170;
-        buttonManageTitles.yPosition = 40;
         buttonManageTitles.visible = isLeader;
-
-        buttonTitleHierarchy.xPosition = xSize - 170;
-        buttonTitleHierarchy.yPosition = 65;
         buttonTitleHierarchy.visible = isLeader;
-
-        buttonApplications.xPosition = xSize - 170;
-        buttonApplications.yPosition = 90;
         buttonApplications.visible = isLeader;
 
         if (factionData != null) {
@@ -81,10 +79,11 @@ public class PlayerListPage implements IPageRenderer {
 
         positionContextMenuButtons();
 
+        int rightButtonsX = parent.getBaseWidth() - 65 - (int) (202 / 1.2f);
         int listX = 25;
-        int listY = 40;
-        int listWidth = parent.getBaseWidth() - 200;
-        int listHeight = parent.getBaseHeight() - 80;
+        int listY = 60;
+        int listWidth = rightButtonsX - listX - 20;
+        int listHeight = 14 * 20;
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GuiApi.glScissor(
@@ -107,8 +106,9 @@ public class PlayerListPage implements IPageRenderer {
             if (parent.isHover(listX, currentY, listWidth, 20, scaledMouseX, scaledMouseY)) {
                 Gui.drawRect(listX, currentY, listX + listWidth, currentY + 20, 0x50FFFFFF);
             }
-            parent.drawString(entry.getKey() + " (" + entry.getValue().getTitle() + ")", listX + 5, currentY + 6, 0xFFFFFFFF);
-            parent.getFontRenderer().drawString("Вступил: " + parent.getDateFormat().format(new Date(entry.getValue().getJoinDate())), listX + listWidth - 120, currentY + 6, 0xAAAAAA);
+
+            parent.drawString(entry.getKey() + " (" + entry.getValue().getTitle() + ")", listX + 25, currentY + 6, 0xFFFFFFFF);
+            parent.getFontRenderer().drawString("Вступил: " + parent.getDateFormat().format(new Date(entry.getValue().getJoinDate())), listX + listWidth - 175, currentY + 6, 0xAAAAAA);
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
@@ -180,10 +180,11 @@ public class PlayerListPage implements IPageRenderer {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         if (button == 1 && parent.contextMenuObject == null && parent.isPlayerLeader()) {
+            int rightButtonsX = parent.getBaseWidth() - 65 - (int) (202 / 1.2f);
             int listX = 25;
-            int listY = 40;
-            int listWidth = parent.getBaseWidth() - 200;
-            int listHeight = parent.getBaseHeight() - 80;
+            int listY = 60;
+            int listWidth = rightButtonsX - listX - 20;
+            int listHeight = 14 * 20;
 
             if (parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)) {
                 int totalHeight = sortedPlayers.size() * 20;
@@ -207,7 +208,7 @@ public class PlayerListPage implements IPageRenderer {
     public void handleMouseInput() {
         int k = Mouse.getEventDWheel();
         if (k != 0) {
-            int listHeight = parent.getBaseHeight() - 80;
+            int listHeight = 14 * 20;
             int totalContentHeight = sortedPlayers.size() * 20;
 
             if (totalContentHeight > listHeight) {

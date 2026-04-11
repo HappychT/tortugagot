@@ -33,8 +33,9 @@ public class GOTClientStaminaHandler {
                 if (player.ridingEntity instanceof EntityBatteringRam) {
                     EntityBatteringRam batteringRam = (EntityBatteringRam) player.ridingEntity;
                     GOTPacketHandler.networkWrapper.sendToServer(new GOTPacketActivateRam(batteringRam.getEntityId(), swing));
-
                 }
+
+
             }
         }
     }

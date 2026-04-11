@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 
 import got.common.GOTConfig;
 import got.common.database.GOTRegistry;
+import got.common.item.other.GOTItemBridle;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
@@ -473,6 +474,7 @@ public class GOTEnchantmentHelper {
 	public static boolean isItemSoulBound(ItemStack itemstack) {
 		if (itemstack == null || itemstack.getItem() == null) return false;
 		if (itemstack.getItem() == GOTRegistry.wargCloak) return true;
+		if (itemstack.getItem() instanceof GOTItemBridle) return true;
 		return hasEnchant(itemstack, GOTEnchantment.valyrianSeal) || hasEnchant(itemstack, GOTEnchantment.soulbound);
 	}
 

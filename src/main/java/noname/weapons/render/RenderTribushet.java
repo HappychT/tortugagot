@@ -80,12 +80,47 @@ public class RenderTribushet extends Render {
         GL11.glPopMatrix();
     }
 
+    private static final float ARM1_REST_ANGLE = 85.0f;
+    private static final float ARM1_FIRE_ANGLE = -30.0f;
+    private static final float ARM2_REST_ANGLE = 85.0f;
+    private static final float ARM2_FIRE_ANGLE = 0.0f;
+
     private float calculateArmRotation(EntityTribushet tribushet, float partialTicks) {
-        return 0.0f;
+        int timer = tribushet.getFireAnimTimer();
+        if (timer <= 0) {
+            return ARM1_REST_ANGLE;
+        }
+
+        float progress = (EntityTribushet.FIRE_ANIM_DURATION - (timer - partialTicks)) / (float) EntityTribushet.FIRE_ANIM_DURATION;
+        progress = Math.max(0.0f, Math.min(1.0f, progress));
+
+        if (progress < 0.2f) {
+            float swingUp = progress / 0.2f;
+            return ARM1_REST_ANGLE + (ARM1_FIRE_ANGLE - ARM1_REST_ANGLE) * swingUp;
+        } else {
+            float returnProgress = (progress - 0.2f) / 0.8f;
+            float eased = returnProgress * returnProgress;
+            return ARM1_FIRE_ANGLE + (ARM1_REST_ANGLE - ARM1_FIRE_ANGLE) * eased;
+        }
     }
 
     private float calculateArm2Spin(EntityTribushet tribushet, float partialTicks) {
-        return 0.0f;
+        int timer = tribushet.getFireAnimTimer();
+        if (timer <= 0) {
+            return ARM2_REST_ANGLE;
+        }
+
+        float progress = (EntityTribushet.FIRE_ANIM_DURATION - (timer - partialTicks)) / (float) EntityTribushet.FIRE_ANIM_DURATION;
+        progress = Math.max(0.0f, Math.min(1.0f, progress));
+
+        if (progress < 0.15f) {
+            float swingUp = progress / 0.15f;
+            return ARM2_REST_ANGLE + (ARM2_FIRE_ANGLE - ARM2_REST_ANGLE) * swingUp;
+        } else {
+            float returnProgress = (progress - 0.15f) / 0.85f;
+            float eased = returnProgress * returnProgress;
+            return ARM2_FIRE_ANGLE + (ARM2_REST_ANGLE - ARM2_FIRE_ANGLE) * eased;
+        }
     }
 
     @Override

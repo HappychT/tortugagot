@@ -34,35 +34,37 @@ public class GOTCoreBlockingSystem {
         registerWeapon(ItemGendryHammer.class, 20.0f, 20.0f, 2.5, 3.0);
         registerWeapon(GOTItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
         registerWeapon(ItemSword.class, 30.0f, 30.0f, 1.5, 1.8);
-        registerWeapon(GOTItemArrynClaymore.class, 32.0f, 32.0f, 1.5, 1.8);
+        registerWeapon(GOTItemArrynClaymore.class, 32.0f, 32.0f, 1.8, 2.3);
         registerWeapon(ItemLightbringer.class, 35.0f, 35.0f, 1.8, 2.0);
         registerWeapon(ItemNightKingSword.class, 35.0f, 35.0f, 2.5, 3.0);
-        registerWeapon(ItemIceStarkSword.class, 35.0f, 35.0f, 2.0, 2.5);
-        registerWeapon(ItemPoisonedSandBlade.class, 15.0f, 90.0f, 1.5, 2.2);
-        registerWeapon(ItemSyrioForelSword.class, 30.0f, 30.0f, 1.5, 1.8);
-        registerWeapon(ItemStunningHammer.class, 20.0f, 20.0f, 2, 2.5);
-        registerWeapon(ItemDecoyClaymore.class, 38.0f, 38.0f, 1.8, 2.0);
+        registerWeapon(ItemIceStarkSword.class, 35.0f, 35.0f, 2.5, 3.0);
+        registerWeapon(ItemGregorCleganeSword.class, 35.0f, 35.0f, 2.5, 3.0);
+        registerWeapon(ItemPoisonedSandBlade.class, 15.0f, 90.0f, 3, 3.5);
+        registerWeapon(ItemSyrioForelSword.class, 30.0f, 30.0f, 2, 2.5);
+        registerWeapon(ItemStunningHammer.class, 20.0f, 20.0f, 3, 3.5);
+        registerWeapon(ItemDecoyClaymore.class, 38.0f, 38.0f, 1.8, 2.3);
+        registerWeapon(GOTItemNorthGreatSword.class, 35.0f, 35.0f, 2, 2.5);
 
-        registerWeapon(ItemBaratheonHammer.class, 15.0f, 15.0f, 3, 3.5);
+        registerWeapon(ItemBaratheonHammer.class, 15.0f, 15.0f, 4, 4.5);
         registerWeapon(GOTItemHammer.class, 20.0f, 20.0f, 2.4, 3.6);
-        registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 2.4, 3.6);
+        registerWeapon(GOTItemStormlandsHammer.class, 20.0f, 20.0f, 3.5, 4.0);
         
-        registerWeapon(GOTItemIronBornAxe.class, 28.0f, 28.0f, 1.8, 2.4);
+        registerWeapon(GOTItemIronBornAxe.class, 28.0f, 28.0f, 2.5, 3);
         registerWeapon(GOTItemAxe.class, 28.0f, 28.0f, 1.8, 2.4);
         registerWeapon(GOTItemBattleaxe.class, 28.0f, 28.0f, 1.8, 2.4);
 
-        registerWeapon(GOTItemDagger.class, 20.0f, 20.0f, 1.2, 1.2);
+        registerWeapon(GOTItemDagger.class, 10.0f, 10.0f, 0.5, 1);
 
-        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 3.0, 3.0);
+        registerWeapon(GOTItemDornePolearm.class, 10.0f, 90.0f, 4, 4.5);
 
-        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 2.1, 3.6);
-        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 2.1, 3.6);
-        registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 2.1, 3.6);
-        registerWeapon(GOTItemShieldPike.class, 40.0f, 40.0f, 2.4, 3.6);
-        registerWeapon(GOTItemShieldReachPike.class, 40.0f, 40.0f, 2.4, 3.6);
-        registerWeapon(GOTItemShieldRiverlandsTrident.class, 40.0f, 40.0f, 2.4, 3.6);
-        registerWeapon(GOTItemValyrianShieldHalbert.class, 40.0f, 40.0f, 2.4, 3.7);
-        registerWeapon(GOTItemValyrianShieldSpear.class, 40.0f, 40.0f, 2.4, 3.6);
+        registerWeapon(GOTItemPoleaxe.class, 25.0f, 25.0f, 2, 2.5);
+        registerWeapon(GOTItemPolearm.class, 25.0f, 25.0f, 4, 4.5);
+        registerWeapon(GOTItemShieldSpear.class, 40.0f, 40.0f, 5, 6);
+        registerWeapon(GOTItemShieldPike.class, 40.0f, 40.0f, 6, 8);
+        registerWeapon(GOTItemShieldReachPike.class, 40.0f, 40.0f, 7, 10);
+        registerWeapon(GOTItemShieldRiverlandsTrident.class, 40.0f, 40.0f, 6, 7);
+        registerWeapon(GOTItemValyrianShieldHalbert.class, 40.0f, 40.0f, 6, 8);
+        registerWeapon(GOTItemValyrianShieldSpear.class, 40.0f, 40.0f, 5, 6);
     }
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {

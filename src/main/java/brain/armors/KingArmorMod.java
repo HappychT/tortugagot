@@ -6,7 +6,6 @@ import brain.armors.weapons.ItemHammerValyrian;
 import brain.armors.weapons.ItemSpearValyrian;
 import brain.armors.weapons.ItemSwordIce;
 import brain.armors.weapons.ItemSwordPathkeeper;
-import brain.armors.weapons.ItemSwordPathkeeperRed;
 import brain.armors.weapons.ItemValyrianSword;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -36,7 +35,6 @@ public class KingArmorMod {
     public static Item valyrianSword;
     public static Item swordIce;
     public static Item swordPathkeeper;
-    public static Item swordPathkeeperRed;
     public static Item battleaxeValyrian;
     public static Item hammerValyrian;
     public static Item spearValyrian;
@@ -75,7 +73,7 @@ public class KingArmorMod {
             .setUnlocalizedName("king_guard_boots")
             .setTextureName("armors:king_guard/king_guard_boots")
             .setCreativeTab(CreativeTabs.tabCombat);
-        
+
         GameRegistry.registerItem(kingGuardHelmet, "king_guard_helmet");
         GameRegistry.registerItem(kingGuardChestplate, "king_guard_body");
         GameRegistry.registerItem(kingGuardLeggings, "king_guard_legs");
@@ -116,10 +114,6 @@ public class KingArmorMod {
             .setUnlocalizedName("sword_pathkeeper")
             .setCreativeTab(CreativeTabs.tabCombat);
         
-        swordPathkeeperRed = new ItemSwordPathkeeperRed()
-            .setUnlocalizedName("sword_pathkeeper_red")
-            .setCreativeTab(CreativeTabs.tabCombat);
-        
         battleaxeValyrian = new ItemBattleaxeValyrian()
             .setUnlocalizedName("battleaxe_valyrian")
             .setCreativeTab(CreativeTabs.tabCombat);
@@ -135,10 +129,10 @@ public class KingArmorMod {
         GameRegistry.registerItem(valyrianSword, "valyrian_sword");
         GameRegistry.registerItem(swordIce, "sword_ice");
         GameRegistry.registerItem(swordPathkeeper, "sword_pathkeeper");
-        GameRegistry.registerItem(swordPathkeeperRed, "sword_pathkeeper_red");
         GameRegistry.registerItem(battleaxeValyrian, "battleaxe_valyrian");
         GameRegistry.registerItem(hammerValyrian, "hammer_valyrian");
         GameRegistry.registerItem(spearValyrian, "spear_valyrian");
+
     }
     
     public static void init(FMLInitializationEvent event) {

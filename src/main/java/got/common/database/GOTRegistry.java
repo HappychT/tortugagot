@@ -3,6 +3,7 @@ package got.common.database;
 import java.util.EnumMap;
 import java.util.Map;
 
+import brain.armors.ItemKingGuardArmor;
 import com.google.common.base.CaseFormat;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -179,6 +180,7 @@ import got.common.entity.animal.GOTEntityBoar;
 import got.common.entity.animal.GOTEntityBridleDornishSteed;
 import got.common.entity.animal.GOTEntityBridleDothrakiStallion;
 import got.common.entity.animal.GOTEntityBridleLordHorse;
+import got.common.entity.animal.GOTEntityBridlePlotva;
 import got.common.entity.animal.GOTEntityBridleSerogriv;
 import got.common.entity.animal.GOTEntityCamel;
 import got.common.entity.animal.GOTEntityDirewolf;
@@ -199,6 +201,7 @@ import got.common.item.tool.GOTItemHoe;
 import got.common.item.tool.GOTItemPickaxe;
 import got.common.item.tool.GOTItemShovel;
 import got.common.item.weapon.*;
+import got.common.item.weapon.cother.ItemSmithKit;
 import got.common.item.weapon.cproj.ItemBoltHarpoon;
 import got.common.item.weapon.cswords.*;
 import got.common.itemreg.GOTItems;
@@ -1174,7 +1177,6 @@ public class GOTRegistry {
     public static Item lhazarLeggingsLion;
     public static Item lhazarSpear;
     public static Item lhazarSword;
-    public static Item lightbringer;
     public static Item lime;
     public static Item lingeringPotion;
     public static Item lionBedItem;
@@ -1259,7 +1261,6 @@ public class GOTRegistry {
     public static Item myrLeggings;
     public static Item mysteryWeb;
     public static Item needle;
-    public static Item nightKingSword;
     public static Item nightfall;
     public static Item nomadBattleaxe;
     public static Item nomadBow;
@@ -1355,7 +1356,6 @@ public class GOTRegistry {
     public static Item riverlandsHelmet;
     public static Item riverlandsLeggings;
     public static Item robbSword;
-    public static Item robertHammer;
     public static Item robertHelmet;
     public static Item robesBoots;
     public static Item robesChestplate;
@@ -1632,7 +1632,7 @@ public class GOTRegistry {
     public static Item freezeSplashPotion;
     public static Item thiefKnife;
     public static Item damnedCaptainSaber;
-    /** Поводья по списку маунтов: Плотва, Дорнийский Скакун, Дикий Кабан, Дотракийский Жеребец, Серогрив, Шерстистый Носорог, Слон с Эссоса, Лютоволк и Лошадь Лорда. */
+    /** Поводья по списку маунтов: Плотва, Дорнийский Скакун, Дикий Кабан, Дотракийский Жеребец, Серогрив, Шерстистый Носорог, Слон с Эссоса (Лютоволк — отдельная сущность, не через поводья). */
     public static Item bridle;
     public static Item bridleZebra;
     public static Item bridleCamel;
@@ -1665,6 +1665,8 @@ public class GOTRegistry {
     public static Item poisonedSandBlade;
     public static Item syrioForelSword;
     public static Item decoyClaymore;
+    public static Item battleaxeWestros;
+
     public static Item bandageTier1;
     public static Item bandageTier2;
     public static Item bandageTier3;
@@ -1672,6 +1674,12 @@ public class GOTRegistry {
     public static Item alchemicalJars;
     public static Item gauzeSet;
 
+    public static Item dublon;
+
+    public static Item barrel_beer;
+    public static Item barrel_whine;
+    public static Item bundle_firewood_modded;
+    public static Item bundle_ironwood;
     public static Item processedGold;
     public static Item processedSilver;
     public static Item processedIron;
@@ -1720,6 +1728,10 @@ public class GOTRegistry {
     public static Item apChestplate;
     public static Item apLeggins;
     public static Item apBoots;
+
+    public static Item wildfireBomb;
+    public static Item smithKit;
+
     public static void assignContent() {
         GOTEffects.registerPotions();
         planks1 = new GOTBlockPlanks1();
@@ -2404,10 +2416,10 @@ public class GOTRegistry {
         armorStandItem = new GOTItemArmorStand();
         arrowFire = new GOTItemArrowFire();
         arrowPoisoned = new GOTItemArrowPoisoned();
-        arrynBoots = new GOTItemFactionArmor(GOTMaterial.ARRYN, 3).setFactionArmor(GOTFaction.ARRYN);
-        arrynChestplate = new GOTItemFactionArmor(GOTMaterial.ARRYN, 1).setFactionArmor(GOTFaction.ARRYN);
-        arrynHelmet = new GOTItemFactionArmor(GOTMaterial.ARRYN, 0, "helmet").setFactionArmor(GOTFaction.ARRYN);
-        arrynLeggings = new GOTItemFactionArmor(GOTMaterial.ARRYN, 2).setFactionArmor(GOTFaction.ARRYN);
+        arrynBoots = new GOTItemCustomSetArmor(GOTMaterial.ARRYN, 3, "arryn", "arryn");
+        arrynChestplate = new GOTItemCustomSetArmor(GOTMaterial.ARRYN, 1, "arryn", "arryn");
+        arrynHelmet = new GOTItemCustomSetArmor(GOTMaterial.ARRYN, 0, "arryn", "arryn");
+        arrynLeggings = new GOTItemCustomSetArmor(GOTMaterial.ARRYN, 2, "arryn", "arryn");
         arrynguardBoots = new GOTItemArmor(GOTMaterial.ARRYNGUARD, 3);
         arrynguardChestplate = new GOTItemArmor(GOTMaterial.ARRYNGUARD, 1);
         arrynguardHelmet = new GOTItemArmor(GOTMaterial.ARRYNGUARD, 0);
@@ -2508,10 +2520,10 @@ public class GOTRegistry {
         crossbowBolt = new GOTItemCrossbowBolt();
         crossbowBoltPoisoned = new GOTItemCrossbowBolt().setPoisoned();
         crowbar = new GOTItemLegendaryCrowbar(GOTMaterial.IRON).setCreativeTab(null);
-        crownlandsBoots = new GOTItemArmor(GOTMaterial.CROWNLANDS, 3);
-        crownlandsChestplate = new GOTItemArmor(GOTMaterial.CROWNLANDS, 1);
-        crownlandsHelmet = new GOTItemArmor(GOTMaterial.CROWNLANDS, 0);
-        crownlandsLeggings = new GOTItemArmor(GOTMaterial.CROWNLANDS, 2);
+        crownlandsBoots = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 3, "kingslanding", "kingslanding");
+        crownlandsChestplate = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 1, "kingslanding", "kingslanding");
+        crownlandsHelmet = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 0, "kingslanding", "kingslanding");
+        crownlandsLeggings = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 2, "kingslanding", "kingslanding");
 
         bronzeChainmailBoots = new GOTItemArmor(GOTMaterial.BRONZE_CHAINMAIL, 3);
         bronzeChainmailChestplate = new GOTItemArmor(GOTMaterial.BRONZE_CHAINMAIL, 1);
@@ -2543,12 +2555,11 @@ public class GOTRegistry {
         dothrakiChestplate = new GOTItemArmor(GOTMaterial.DOTHRAKI, 1);
         dothrakiHelmet = new GOTItemArmor(GOTMaterial.DOTHRAKI, 0);
         dothrakiHorseArmor = new GOTItemMountArmor(ArmorMaterial.CLOTH, GOTItemMountArmor.Mount.HORSE, "horse_dothraki");
-        ((GOTItemMountArmor) dothrakiHorseArmor).damageReduceAmount = 5;
         dothrakiLeggings = new GOTItemArmor(GOTMaterial.DOTHRAKI, 2);
-        dragonstoneBoots = new GOTItemFactionArmor(GOTMaterial.DRAGONSTONE, 3).setFactionArmor(GOTFaction.DRAGONSTONE);
-        dragonstoneChestplate = new GOTItemFactionArmor(GOTMaterial.DRAGONSTONE, 1).setFactionArmor(GOTFaction.DRAGONSTONE);
-        dragonstoneHelmet = new GOTItemFactionArmor(GOTMaterial.DRAGONSTONE, 0).setFactionArmor(GOTFaction.DRAGONSTONE);
-        dragonstoneLeggings = new GOTItemFactionArmor(GOTMaterial.DRAGONSTONE, 2).setFactionArmor(GOTFaction.DRAGONSTONE);
+        dragonstoneBoots = new GOTItemCustomSetArmor(GOTMaterial.DRAGONSTONE, 3, "dragonstone", "dragonstone");
+        dragonstoneChestplate = new GOTItemCustomSetArmor(GOTMaterial.DRAGONSTONE, 1, "dragonstone", "dragonstone");
+        dragonstoneHelmet = new GOTItemCustomSetArmor(GOTMaterial.DRAGONSTONE, 0, "dragonstone", "dragonstone");
+        dragonstoneLeggings = new GOTItemCustomSetArmor(GOTMaterial.DRAGONSTONE, 2, "dragonstone", "dragonstone");
         dye = new GOTItemDye();
         eddardSword = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
         elderberry = new GOTItemBerry();
@@ -2588,7 +2599,7 @@ public class GOTRegistry {
         gemsbokHorn = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         gemsbokLeggings = new GOTItemArmor(GOTMaterial.GEMSBOK, 2);
         gendryHammer = new ItemGendryHammer();
-        gendryHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "gendry").setCreativeTab(GOTCreativeTabs.tabStory);
+        gendryHelmet = new GOTItemCustomSetArmor(GOTMaterial.HELMET, 0, "gendry", "gendry", GOTCreativeTabs.tabStory).setMaxDamage(7000);
         ghiscarBoots = new GOTItemArmor(GOTMaterial.GHISCAR, 3);
         ghiscarChestplate = new GOTItemArmor(GOTMaterial.GHISCAR, 1);
         ghiscarHelmet = new GOTItemArmor(GOTMaterial.GHISCAR, 0);
@@ -2630,7 +2641,6 @@ public class GOTRegistry {
         ibbenHarpoon = new GOTItemSpear(GOTMaterial.IRON);
         ibbenLeggings = new GOTItemArmor(GOTMaterial.IBBEN, 2);
         ibbenSword = new GOTItemSword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        ice = new GOTItemLegendaryGreatsword(GOTMaterial.VALYRIAN_TOOL);
         iceHeavySword = new GOTItemBattleaxe(GOTMaterial.ICE_TOOL).addWeaponDamage(-1.0f);
         iceShard = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         iceSpear = new GOTItemSpear(GOTMaterial.ICE_TOOL);
@@ -2644,10 +2654,10 @@ public class GOTRegistry {
         ironPike = new GOTItemPike(GOTMaterial.IRON);
         ironSpear = new GOTItemSpear(GOTMaterial.IRON);
         ironThrowingAxe = new GOTItemThrowingAxe(GOTMaterial.IRON);
-        ironbornBoots = new GOTItemFactionArmor(GOTMaterial.IRONBORN, 3).setFactionArmor(GOTFaction.IRONBORN);
-        ironbornChestplate = new GOTItemFactionArmor(GOTMaterial.IRONBORN, 1).setFactionArmor(GOTFaction.IRONBORN);
-        ironbornHelmet = new GOTItemFactionArmor(GOTMaterial.IRONBORN, 0).setFactionArmor(GOTFaction.IRONBORN);
-        ironbornLeggings = new GOTItemFactionArmor(GOTMaterial.IRONBORN, 2).setFactionArmor(GOTFaction.IRONBORN);
+        ironbornBoots = new GOTItemCustomSetArmor(GOTMaterial.IRONBORN, 3, "ironborn", "ironborn");
+        ironbornChestplate = new GOTItemCustomSetArmor(GOTMaterial.IRONBORN, 1, "ironborn", "ironborn");
+        ironbornHelmet = new GOTItemCustomSetArmor(GOTMaterial.IRONBORN, 0, "ironborn", "ironborn");
+        ironbornLeggings = new GOTItemCustomSetArmor(GOTMaterial.IRONBORN, 2, "ironborn", "ironborn");
         jaimeSword = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
         joffreyCrossbow = new GOTItemLegendaryCrossbow();
         jogosBoots = new GOTItemArmor(GOTMaterial.JOGOS, 3);
@@ -2659,10 +2669,10 @@ public class GOTRegistry {
         kaftanLeggings = new GOTItemKaftan(2);
         katana = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
         kebab = new GOTItemKebab(8, 0.8f, true, GOTEffects.rest.id, 3);
-        kingsguardBoots = new GOTItemArmor(GOTMaterial.KINGSGUARD, 3);
-        kingsguardChestplate = new GOTItemArmor(GOTMaterial.KINGSGUARD, 1);
-        kingsguardHelmet = new GOTItemArmor(GOTMaterial.KINGSGUARD, 0);
-        kingsguardLeggings = new GOTItemArmor(GOTMaterial.KINGSGUARD, 2);
+        kingsguardBoots = new ItemKingGuardArmor(GOTMaterial.KINGSGUARD, 0,3).setTextureName("armors:king_guard_boots");
+        kingsguardChestplate = new ItemKingGuardArmor(GOTMaterial.KINGSGUARD, 0,1).setTextureName("armors:king_guard_body");
+        kingsguardHelmet = new ItemKingGuardArmor(GOTMaterial.KINGSGUARD, 0,0).setTextureName("armors:king_guard_helmet");
+        kingsguardLeggings = new ItemKingGuardArmor(GOTMaterial.KINGSGUARD, 0, 2).setTextureName("armors:king_guard_legs");
         ladyForlorn = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         lamentation = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         lannisterBrooch = new GOTItemArmor(GOTMaterial.HAND, 1, "lannister").setCreativeTab(GOTCreativeTabs.tabStory);
@@ -2687,7 +2697,6 @@ public class GOTRegistry {
         lhazarLeggingsLion = new GOTItemArmor(GOTMaterial.LHAZAR_LION, 2);
         lhazarSpear = new GOTItemSpear(GOTMaterial.HORN_TOOL);
         lhazarSword = new GOTItemSword(GOTMaterial.BRONZE_TOOL).addWeaponDamage(-1.0f);
-        lightbringer = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         lime = new GOTItemFood(2, 0.2f, false);
         lingeringPotion = new GOTItemLingeringPotion();
         lionBedItem = new GOTItemBed(lionBed);
@@ -2772,16 +2781,15 @@ public class GOTRegistry {
         myrLeggings = new GOTItemArmor(GOTMaterial.MYR, 2);
         mysteryWeb = new GOTItemMysteryWeb();
         needle = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        nightKingSword = new GOTItemLegendarySword(GOTMaterial.ICE_TOOL).addWeaponDamage(-1.0f);
         nightfall = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         nomadBattleaxe = new GOTItemBattleaxe(GOTMaterial.IRON);
         nomadBow = new GOTItemBow(GOTMaterial.IRON);
         nomadSpear = new GOTItemSpear(GOTMaterial.IRON);
         nomadSword = new GOTItemSword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        northBoots = new GOTItemFactionArmor(GOTMaterial.NORTH, 3).setFactionArmor(GOTFaction.NORTH);
-        northChestplate = new GOTItemFactionArmor(GOTMaterial.NORTH, 1).setFactionArmor(GOTFaction.NORTH);
-        northHelmet = new GOTItemFactionArmor(GOTMaterial.NORTH, 0, "helmet").setFactionArmor(GOTFaction.NORTH);
-        northLeggings = new GOTItemFactionArmor(GOTMaterial.NORTH, 2).setFactionArmor(GOTFaction.NORTH);
+        northBoots = new GOTItemCustomSetArmor(GOTMaterial.NORTH, 3, "north", "north");
+        northChestplate = new GOTItemCustomSetArmor(GOTMaterial.NORTH, 1, "north", "north");
+        northHelmet = new GOTItemCustomSetArmor(GOTMaterial.NORTH, 0, "north", "north");
+        northLeggings = new GOTItemCustomSetArmor(GOTMaterial.NORTH, 2, "north", "north");
         northguardBoots = new GOTItemArmor(GOTMaterial.NORTHGUARD, 3);
         northguardChestplate = new GOTItemArmor(GOTMaterial.NORTHGUARD, 1);
         northguardHelmet = new GOTItemArmor(GOTMaterial.NORTHGUARD, 0);
@@ -2834,10 +2842,10 @@ public class GOTRegistry {
         rabbitStew = new GOTItemStew(10, 0.8f, true);
         raisins = new GOTItemFood(1, 0.1f, false);
         raspberry = new GOTItemBerry();
-        reachBoots = new GOTItemFactionArmor(GOTMaterial.REACH, 3).setFactionArmor(GOTFaction.REACH);
-        reachChestplate = new GOTItemFactionArmor(GOTMaterial.REACH, 1).setFactionArmor(GOTFaction.REACH);
-        reachHelmet = new GOTItemFactionArmor(GOTMaterial.REACH, 0, "helmet").setFactionArmor(GOTFaction.REACH);
-        reachLeggings = new GOTItemFactionArmor(GOTMaterial.REACH, 2).setFactionArmor(GOTFaction.REACH);
+        reachBoots = new GOTItemCustomSetArmor(GOTMaterial.REACH, 3, "reach", "reach");
+        reachChestplate = new GOTItemCustomSetArmor(GOTMaterial.REACH, 1, "reach", "reach");
+        reachHelmet = new GOTItemCustomSetArmor(GOTMaterial.REACH, 0, "reach", "reach");
+        reachLeggings = new GOTItemCustomSetArmor(GOTMaterial.REACH, 2, "reach", "reach");
         reachguardBoots = new GOTItemArmor(GOTMaterial.REACHGUARD, 3);
         reachguardChestplate = new GOTItemArmor(GOTMaterial.REACHGUARD, 1);
         reachguardHelmet = new GOTItemArmor(GOTMaterial.REACHGUARD, 0, "helmet");
@@ -2849,10 +2857,10 @@ public class GOTRegistry {
         redkingHelmet = new GOTItemArmor(GOTMaterial.REDKING, 0).setCreativeTab(GOTCreativeTabs.tabStory);
         redkingLeggings = new GOTItemArmor(GOTMaterial.REDKING, 2).setCreativeTab(GOTCreativeTabs.tabStory);
         reminder = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL);
-        renlyBoots = new GOTItemArmor(GOTMaterial.RENLY, 3).setCreativeTab(GOTCreativeTabs.tabStory);
-        renlyChestplate = new GOTItemArmor(GOTMaterial.RENLY, 1).setCreativeTab(GOTCreativeTabs.tabStory);
-        renlyHelmet = new GOTItemArmor(GOTMaterial.RENLY, 0, "helmet").setCreativeTab(GOTCreativeTabs.tabStory);
-        renlyLeggings = new GOTItemArmor(GOTMaterial.RENLY, 2).setCreativeTab(GOTCreativeTabs.tabStory);
+        renlyBoots = new GOTItemCustomSetArmor(GOTMaterial.RENLY, 3, "renly", "renly", GOTCreativeTabs.tabStory);
+        renlyChestplate = new GOTItemCustomSetArmor(GOTMaterial.RENLY, 1, "renly", "renly", GOTCreativeTabs.tabStory);
+        renlyHelmet = new GOTItemCustomSetArmor(GOTMaterial.RENLY, 0, "renly", "renly", GOTCreativeTabs.tabStory);
+        renlyLeggings = new GOTItemCustomSetArmor(GOTMaterial.RENLY, 2, "renly", "renly", GOTCreativeTabs.tabStory);
         rhaegarSword = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
         rhinoArmor = new GOTItemMountArmor(ArmorMaterial.CLOTH, GOTItemMountArmor.Mount.RHINO, "rhino");
         rhinoCooked = new GOTItemEffectFood(7, 0.4f, true, GOTEffects.rest.id, 5);
@@ -2862,13 +2870,12 @@ public class GOTRegistry {
         elephantRaw = new GOTItemFood(2, 0.1f, true);
         walrusLardCooked = new GOTItemEffectFood(7, 0.4f, true, GOTEffects.rest.id, 9);
         walrusLardRaw = new GOTItemFood(2, 0.1f, true);
-        riverlandsBoots = new GOTItemFactionArmor(GOTMaterial.RIVERLANDS, 3).setFactionArmor(GOTFaction.RIVERLANDS);
-        riverlandsChestplate = new GOTItemFactionArmor(GOTMaterial.RIVERLANDS, 1).setFactionArmor(GOTFaction.RIVERLANDS);
-        riverlandsHelmet = new GOTItemFactionArmor(GOTMaterial.RIVERLANDS, 0).setFactionArmor(GOTFaction.RIVERLANDS);
-        riverlandsLeggings = new GOTItemFactionArmor(GOTMaterial.RIVERLANDS, 2).setFactionArmor(GOTFaction.RIVERLANDS);
+        riverlandsBoots = new GOTItemCustomSetArmor(GOTMaterial.RIVERLANDS, 3, "riverlands", "riverlands");
+        riverlandsChestplate = new GOTItemCustomSetArmor(GOTMaterial.RIVERLANDS, 1, "riverlands", "riverlands");
+        riverlandsHelmet = new GOTItemCustomSetArmor(GOTMaterial.RIVERLANDS, 0, "riverlands", "riverlands");
+        riverlandsLeggings = new GOTItemCustomSetArmor(GOTMaterial.RIVERLANDS, 2, "riverlands", "riverlands");
         robbSword = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        robertHammer = new GOTItemLegendaryHammer(GOTMaterial.IRON);
-        robertHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "robert").setCreativeTab(GOTCreativeTabs.tabStory);
+        robertHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "king_robberts", "king_robberts", GOTCreativeTabs.tabStory).setMaxDamage(7000);
         robesBoots = new GOTItemRobes(3);
         robesChestplate = new GOTItemRobes(1);
         robesHelmet = new GOTItemTurban();
@@ -2882,8 +2889,8 @@ public class GOTRegistry {
         salt = new GOTItemSalt();
         saltedFlesh = new GOTItemFood(6, 0.6f, true);
         saltpeter = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
-        sandorCleganeSword = new GOTItemLegendarySword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
-        sandorHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "sandor").setCreativeTab(GOTCreativeTabs.tabStory);
+        sandorCleganeSword = new ItemSandorCleganeSword();
+        sandorHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "hound", "hound", GOTCreativeTabs.tabStory).setMaxDamage(7000);
         sapphire = new GOTItemGemWithAnvilNameColor(EnumChatFormatting.BLUE);
         seedsGrapeRed = new GOTItemGrapeSeeds(grapevineRed);
         seedsGrapeWhite = new GOTItemGrapeSeeds(grapevineWhite);
@@ -2931,10 +2938,10 @@ public class GOTRegistry {
         sothoryosSword = new GOTItemSword(GOTMaterial.OBSIDIAN_TOOL).addWeaponDamage(-1.0f);
         spawnEgg = new GOTItemSpawnEgg();
         stoneSpear = new GOTItemSpear(GOTMaterial.STONE);
-        stormlandsBoots = new GOTItemFactionArmor(GOTMaterial.STORMLANDS, 3).setFactionArmor(GOTFaction.STORMLANDS);
-        stormlandsChestplate = new GOTItemFactionArmor(GOTMaterial.STORMLANDS, 1).setFactionArmor(GOTFaction.STORMLANDS);
-        stormlandsHelmet = new GOTItemFactionArmor(GOTMaterial.STORMLANDS, 0).setFactionArmor(GOTFaction.STORMLANDS);
-        stormlandsLeggings = new GOTItemFactionArmor(GOTMaterial.STORMLANDS, 2).setFactionArmor(GOTFaction.STORMLANDS);
+        stormlandsBoots = new GOTItemCustomSetArmor(GOTMaterial.STORMLANDS, 3, "stormlands", "stormlands");
+        stormlandsChestplate = new GOTItemCustomSetArmor(GOTMaterial.STORMLANDS, 1, "stormlands", "stormlands");
+        stormlandsHelmet = new GOTItemCustomSetArmor(GOTMaterial.STORMLANDS, 0, "stormlands", "stormlands");
+        stormlandsLeggings = new GOTItemCustomSetArmor(GOTMaterial.STORMLANDS, 2, "stormlands", "stormlands");
         strawBedItem = new GOTItemBed(strawBed);
         structureSpawner = new GOTItemStructureSpawner();
         sulfur = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
@@ -2975,30 +2982,30 @@ public class GOTRegistry {
         unsulliedChestplate = new GOTItemArmor(GOTMaterial.UNSULLIED, 1);
         unsulliedHelmet = new GOTItemArmor(GOTMaterial.UNSULLIED, 0, "helmet");
         unsulliedLeggings = new GOTItemArmor(GOTMaterial.UNSULLIED, 2);
-        valyrianAxe = new GOTItemAxe(GOTMaterial.VALYRIAN_TOOL);
-        valyrianBattleaxe = new GOTItemBattleaxe(GOTMaterial.VALYRIAN_TOOL);
+        valyrianAxe = new GOTItemAxe(GOTMaterial.VALYRIAN_TOOL2);
+        valyrianBattleaxe = new GOTItemBattleaxe(GOTMaterial.VALYRIAN_TOOL2);
         valyrianBook = new GOTItemEnchantment(GOTEnchantment.protectValyrian);
         valyrianBoots = new GOTItemArmor(GOTMaterial.VALYRIAN, 3);
         valyrianChestplate = new GOTItemArmor(GOTMaterial.VALYRIAN, 1);
         valyrianChisel = new GOTItemChisel(signCarvedGlowing);
-        valyrianCrossbow = new GOTItemCrossbow(GOTMaterial.VALYRIAN_TOOL);
-        valyrianDagger = new GOTItemDagger(GOTMaterial.VALYRIAN_TOOL);
-        valyrianDaggerPoisoned = new GOTItemDagger(GOTMaterial.VALYRIAN_TOOL, GOTItemSword.HitEffect.POISON);
-        valyrianHalberd = new GOTItemPolearmLong(GOTMaterial.VALYRIAN_TOOL);
-        valyrianHammer = new GOTItemHammer(GOTMaterial.VALYRIAN_TOOL);
+        valyrianCrossbow = new GOTItemCrossbow(GOTMaterial.VALYRIAN_TOOL2);
+        valyrianDagger = new GOTItemDagger(GOTMaterial.VALYRIAN_TOOL2);
+        valyrianDaggerPoisoned = new GOTItemDagger(GOTMaterial.VALYRIAN_TOOL2, GOTItemSword.HitEffect.POISON);
+        valyrianHalberd = new GOTItemPolearmLong(GOTMaterial.VALYRIAN_TOOL2);
+        valyrianHammer = new GOTItemHammer(GOTMaterial.VALYRIAN_TOOL2);
         valyrianHelmet = new GOTItemArmor(GOTMaterial.VALYRIAN, 0, "helmet");
-        valyrianHoe = new GOTItemHoe(GOTMaterial.VALYRIAN_TOOL);
+        valyrianHoe = new GOTItemHoe(GOTMaterial.VALYRIAN_TOOL2);
         valyrianHorseArmor = new GOTItemMountArmor(GOTMaterial.VALYRIAN, GOTItemMountArmor.Mount.HORSE, "horse_valyrian");
         valyrianIngot = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         valyrianLeggings = new GOTItemArmor(GOTMaterial.VALYRIAN, 2);
-        valyrianMattock = new GOTItemMattock(GOTMaterial.VALYRIAN_TOOL);
+        valyrianMattock = new GOTItemMattock(GOTMaterial.VALYRIAN_TOOL2);
         valyrianNugget = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
-        valyrianPickaxe = new GOTItemPickaxe(GOTMaterial.VALYRIAN_TOOL);
+        valyrianPickaxe = new GOTItemPickaxe(GOTMaterial.VALYRIAN_TOOL2);
         valyrianPowder = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         valyrianRing = new GOTItemRing();
-        valyrianShovel = new GOTItemShovel(GOTMaterial.VALYRIAN_TOOL);
-        valyrianSpear = new GOTItemSpear(GOTMaterial.VALYRIAN_TOOL);
-        valyrianSword = new GOTItemSword(GOTMaterial.VALYRIAN_TOOL).addWeaponDamage(-1.0f);
+        valyrianShovel = new GOTItemShovel(GOTMaterial.VALYRIAN_TOOL2);
+        valyrianSpear = new GOTItemSpear(GOTMaterial.VALYRIAN_TOOL2);
+        valyrianSword = new GOTItemSword(GOTMaterial.VALYRIAN_TOOL2).addWeaponDamage(-1.0f);
         velaryonBrooch = new GOTItemArmor(GOTMaterial.HAND, 1, "velaryon").setCreativeTab(GOTCreativeTabs.tabStory);
         victarionAxe = new GOTItemVictarionAxe();
         victarionHelmet = new GOTItemArmor(GOTMaterial.HELMET, 0, "victarion").setCreativeTab(GOTCreativeTabs.tabStory);
@@ -3010,10 +3017,10 @@ public class GOTRegistry {
         walkingStick = new GOTItemSword(GOTMaterial.WOOD).addWeaponDamage(-1.0f);
         conquestHorn = new GOTItemConquestHorn();
         waterskin = new GOTItemVessel();
-        westerlandsBoots = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 3).setFactionArmor(GOTFaction.WESTERLANDS);
-        westerlandsChestplate = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 1).setFactionArmor(GOTFaction.WESTERLANDS);
-        westerlandsHelmet = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 0, "helmet").setFactionArmor(GOTFaction.WESTERLANDS);
-        westerlandsLeggings = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 2).setFactionArmor(GOTFaction.WESTERLANDS);        westerlandsguardBoots = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 3);
+        westerlandsBoots = new GOTItemCustomSetArmor(GOTMaterial.WESTERLANDS, 3, "westerlands", "westerlands");
+        westerlandsChestplate = new GOTItemCustomSetArmor(GOTMaterial.WESTERLANDS, 1, "westerlands", "westerlands");
+        westerlandsHelmet = new GOTItemCustomSetArmor(GOTMaterial.WESTERLANDS, 0, "westerlands", "westerlands");
+        westerlandsLeggings = new GOTItemCustomSetArmor(GOTMaterial.WESTERLANDS, 2, "westerlands", "westerlands");        westerlandsguardBoots = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 3);
         westerlandsguardChestplate = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 1);
         westerlandsguardHelmet = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 0);
         westerlandsguardLeggings = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 2);
@@ -3092,41 +3099,42 @@ public class GOTRegistry {
         stormlandsHammer = new GOTItemStormlandsHammer(GOTMaterial.IRON).addWeaponDamage(0.5f);
         northGreatSword = new GOTItemNorthGreatSword(GOTMaterial.IRON).addWeaponDamage(-1.5f);
         whiteMammothSkin = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
-        millitaryCard = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
+        millitaryCard = new Item().setCreativeTab(GOTCreativeTabs.tabMisc).setMaxStackSize(1).setMaxDamage(3);
         frostSpiderString = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
 
-        fingers = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
-        scorpionTail = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
-        batWings = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
-        catFoot = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
-        deadRat = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
+        fingers = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
+        scorpionTail = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
+        batWings = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
+        catFoot = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
+        deadRat = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         bottleAntidote = new GOTItemBottleAntidote();
-        thiefBoots = new GOTItemArmor(GOTMaterial.THIEF, 3, "boots");
-        thiefChestplate = new GOTItemArmor(GOTMaterial.THIEF, 1, "chestplate");
-        thiefHelmet = new GOTItemArmor(GOTMaterial.THIEF, 0, "helmet");
-        thiefLeggings = new GOTItemArmor(GOTMaterial.THIEF, 2, "leggings");        thiefThrowingKnifePoison = new GOTItemThrowingKnife(GOTMaterial.THIEF_TOOL, 0);
+        thiefBoots = new GOTItemArmor(GOTMaterial.THIEF, 3, "boots", GOTCreativeTabs.tabStory);
+        thiefChestplate = new GOTItemArmor(GOTMaterial.THIEF, 1, "chestplate", GOTCreativeTabs.tabStory);
+        thiefHelmet = new GOTItemArmor(GOTMaterial.THIEF, 0, "helmet",  GOTCreativeTabs.tabStory);
+        thiefLeggings = new GOTItemArmor(GOTMaterial.THIEF, 2, "leggings",  GOTCreativeTabs.tabStory);
+        thiefThrowingKnifePoison = new GOTItemThrowingKnife(GOTMaterial.THIEF_TOOL, 0);
         thiefThrowingKnifeBleeding = new GOTItemThrowingKnife(GOTMaterial.THIEF_TOOL, 1);
         chiefNecklace = new GOTItemJewelryActive(20).addPotionEffect(Potion.damageBoost.id, 29 * 60 + 59, 1);
-        direwolfFang = new GOTItemJewelryActive(45).addPotionEffect(Potion.damageBoost.id, 120, 1);
+        direwolfFang = new GOTItemJewelryActive(45).addPotionEffect(Potion.damageBoost.id, 10, 1);
         ritualBlade = new GOTItemJewelryActive(45).addPotionEffect(Potion.regeneration.id, 3 * 6).addPotionEffect(GOTEffects.rage.id, 5 * 60);
         piratePipe = new GOTItemPiratePipe();
         dornePoison = new GOTItemDornePoison();
         corsairBow = new GOTItemBow(GOTMaterial.CORSAIR, 1.3).setDrawTime(30);
         chainMaester = new GOTItemJewelryActive(45).addPotionEffect(Potion.regeneration.id, 600).addPotionEffect(Potion.field_76434_w.id, 600);
-        eternalColdShard = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
+        eternalColdShard = new Item().setCreativeTab(GOTCreativeTabs.tabMaterials);
         eternalCold = new GOTItemEnchantment(GOTEnchantment.chill).setCreativeTab(GOTCreativeTabs.tabMisc);
         wildlingPotion = new GOTItemWildlingPotion();
-        firstPeopleBoots = new GOTItemArmor(GOTMaterial.FIRST_PEOPLE, 3);
-        firstPeopleChestplate = new GOTItemArmor(GOTMaterial.FIRST_PEOPLE, 1);
-        firstPeopleHelmet = new GOTItemArmor(GOTMaterial.FIRST_PEOPLE, 0, "helmet");
-        firstPeopleLeggings = new GOTItemArmor(GOTMaterial.FIRST_PEOPLE, 2);
+        firstPeopleBoots = new GOTItemCustomSetArmor(GOTMaterial.FIRST_PEOPLE, 3, "first_humans", "first_humans", GOTCreativeTabs.tabStory).setMaxDamage(7000);
+        firstPeopleChestplate = new GOTItemCustomSetArmor(GOTMaterial.FIRST_PEOPLE, 1, "first_humans", "first_humans", GOTCreativeTabs.tabStory).setMaxDamage(7000);
+        firstPeopleHelmet = new GOTItemCustomSetArmor(GOTMaterial.FIRST_PEOPLE, 0, "first_humans", "first_humans", GOTCreativeTabs.tabStory).setMaxDamage(7000);
+        firstPeopleLeggings = new GOTItemCustomSetArmor(GOTMaterial.FIRST_PEOPLE, 2, "first_humans", "first_humans", GOTCreativeTabs.tabStory).setMaxDamage(7000);
         mugBerserk = new GOTItemMug(3.0f).setDrinkStats(6, 0.6f).addPotionEffect(GOTEffects.rage.id, 5);
         mugNightWatch = new GOTItemMugNightWatch();
         firstPeopleCrossbow = new GOTItemCrossbowFirstPeople();
         battleHornStrength = new GOTItemBattleHorn(new PotionEffect(Potion.damageBoost.id, 6 * 60 * 20));
         battleHornSpeed = new GOTItemBattleHorn(new PotionEffect(Potion.moveSpeed.id, 6 * 60 * 20));
         amuletCatEye = new GOTItemJewelryActive(100).addPotionEffect(GOTEffects.catEye.id, 3 * 60);
-        firstPeopleBow = new GOTItemBow(GOTMaterial.FIRST_PEOPLE_WEAPON, 1.8).setDrawTime(22).setMaxDamage(7000);
+        firstPeopleBow = new GOTItemBow(GOTMaterial.FIRST_PEOPLE_WEAPON, 1.8, GOTCreativeTabs.tabStory).setDrawTime(22).setMaxDamage(7000);
         battleHornThenns = new GOTItemBattleHorn(new PotionEffect(GOTEffects.rage.id, 30 * 20)).setMaxDamage(150);
         battleBugle = new GOTItemBattleBugle();
         rabbitPaw = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
@@ -3134,7 +3142,7 @@ public class GOTRegistry {
         freezeSplashPotion = new GOTItemSplashPotionExtra(new double[] {4.0, 2.0, 4.0}, new PotionEffect(GOTEffects.freeze.id, 60 * 20));
         thiefKnife = new GOTItemThiefKnife();
         damnedCaptainSaber = new GOTItemDamnedCaptainSaber();
-        bridle = new GOTItemBridle(GOTEntityHorse.class, GOTBridleMountStats.getStats(GOTEntityHorse.class), "got.bridle_mount_horse");
+        bridle = new GOTItemBridle(GOTEntityBridlePlotva.class, GOTBridleMountStats.getStats(GOTEntityBridlePlotva.class), "got.bridle_mount_horse");
         bridleZebra = new GOTItemBridle(GOTEntityBridleDornishSteed.class, GOTBridleMountStats.getStats(GOTEntityBridleDornishSteed.class), "got.bridle_mount_zebra");
         bridleCamel = new GOTItemBridle(GOTEntityBridleDothrakiStallion.class, GOTBridleMountStats.getStats(GOTEntityBridleDothrakiStallion.class), "got.bridle_mount_camel");
         bridleBoar = new GOTItemBridle(GOTEntityBoar.class, GOTBridleMountStats.getStats(GOTEntityBoar.class), "got.bridle_mount_boar");
@@ -3145,7 +3153,7 @@ public class GOTRegistry {
         bridleLordHorse = new GOTItemBridle(GOTEntityBridleLordHorse.class, GOTBridleMountStats.getStats(GOTEntityBridleLordHorse.class), "got.bridle_mount_lord_horse");
         inversionSplashPotion = new GOTItemSplashPotionExtra(new double[] {4.0, 2.0, 4.0}, new PotionEffect(GOTEffects.inversion.id, 5 * 20));
         explosiveMixture = new GOTItemThrowingBomb(new double[] {3, 3, 3}, 0.0f, new PotionEffect(GOTEffects.inversion.id, 5 * 20));
-        buckshot = new GOTItemBuckshot(new double[] {4.0, 4.0, 4.0}, 5.0f);
+        buckshot = new GOTItemBuckshot(new double[] {4.0, 4.0, 4.0}, 5.0f, new PotionEffect[] {});
         valyrianSeal = new GOTItemEnchantment(GOTEnchantment.valyrianSeal).setCreativeTab(GOTCreativeTabs.tabCombat);
         siegeCrossbow = new GOTItemSiegeCrossbow();
         boltHarpoon = new ItemBoltHarpoon().setCreativeTab(GOTCreativeTabs.tabCombat);
@@ -3164,6 +3172,7 @@ public class GOTRegistry {
         iceStarkSword = new ItemIceStarkSword(GOTMaterial.ICESTARK);
         nightkingSword = new ItemNightKingSword(GOTMaterial.NIGHTKING);
         decoyClaymore = new ItemDecoyClaymore(GOTMaterial.DECOYCLAYMORE);
+        battleaxeWestros = new ItemBattleaxeWestros(GOTMaterial.BATTLEAXEWESTROS);
         poisonedSandBlade = new ItemPoisonedSandBlade(GOTMaterial.POISONEDGE);
         syrioForelSword = new ItemSyrioForelSword(GOTMaterial.SYRIO);
 
@@ -3174,6 +3183,10 @@ public class GOTRegistry {
         bandageTier2 = new GOTItemBandage(4.0f);
         bandageTier3 = new GOTItemBandage(6.0f);
 
+        barrel_beer = new GOTItemResource();
+        barrel_whine= new GOTItemResource();
+        bundle_firewood_modded = new GOTItemResource();
+        bundle_ironwood= new GOTItemResource();
         processedGold= new GOTItemResource();
         processedSilver= new GOTItemResource();
         processedIron= new GOTItemResource();
@@ -3218,6 +3231,11 @@ public class GOTRegistry {
         basketPlums= new GOTItemResource();
         cratePomegranates = new GOTItemResource();
         bundleFirewood = new GOTItemResource();
+
+        wildfireBomb = new GOTItemWildfireBomb().setUnlocalizedName("wildfireBomb");
+
+        smithKit = new ItemSmithKit();
+        dublon = new Item().setCreativeTab(GOTCreativeTabs.tabMisc);
 
     }
 
@@ -4452,13 +4470,11 @@ public class GOTRegistry {
         registerItem(lingeringPotion, "lingeringPotion");
         registerItem(bannerTab, "bannerTab");
         registerItem(crowbar, "crowbar");
-        registerItem(ice, "ice");
         registerItem(longclaw, "longclaw");
         registerItem(oathkeeper, "oathkeeper");
         registerItem(widowWail, "widowWail");
         registerItem(blackfyre, "blackfyre");
         registerItem(darkSister, "darkSister");
-        registerItem(lightbringer, "lightbringer");
         registerItem(heartsbane, "heartsbane");
         registerItem(nightfall, "nightfall");
         registerItem(brightroar, "brightroar");
@@ -4489,10 +4505,8 @@ public class GOTRegistry {
         registerItem(baelishDagger, "baelishDagger");
         registerItem(boltonDagger, "boltonDagger");
         registerItem(euronDagger, "euronDagger");
-        registerItem(nightKingSword, "nightKingSword");
         registerItem(blackArakh, "blackArakh");
         registerItem(gendryHammer, "gendryHammer");
-        registerItem(robertHammer, "robertHammer");
         registerItem(joffreyCrossbow, "joffreyCrossbow");
         registerItem(eddardSword, "eddardSword");
         registerItem(jaimeSword, "jaimeSword");
@@ -4757,8 +4771,10 @@ public class GOTRegistry {
         registerItem(baratheonHammer, "baratheonHammer");
         registerItem(iceStarkSword, "iceStarkSword");
         registerItem(poisonedSandBlade, "poisonedSandBlade");
+        poisonedSandBlade.setTextureName("got:neurotoxin");
         registerItem(syrioForelSword, "syrioForelSword");
         registerItem(decoyClaymore, "decoyClaymore");
+        registerItem(battleaxeWestros, "battleaxeWestros");
 
         registerItem(bandageTier1, "bandageTier1");
         registerItem(bandageTier2, "bandageTier2");
@@ -4768,6 +4784,10 @@ public class GOTRegistry {
         registerItem(firstAidKit, "firstAidKit");
         registerItem(alchemicalJars, "alchemicalJars");
 
+        registerItem(barrel_beer, "barrel_beer");
+        registerItem(barrel_whine, "barrel_whine");
+        registerItem(bundle_firewood_modded, "bundle_firewood_modded");
+        registerItem(bundle_ironwood, "bundle_ironwood");
         registerItem(processedGold, "processed_gold");
         registerItem(processedSilver, "processed_silver");
         registerItem(processedIron, "processed_iron");
@@ -4812,5 +4832,8 @@ public class GOTRegistry {
         registerItem(basketPlums, "basket_plums");
         registerItem(cratePomegranates, "crate_pomegranates");
         registerItem(bundleFirewood, "bundle_firewood");
+        registerItem(wildfireBomb, "wildfire_bomb");
+        registerItem(smithKit, "smith_kit");
+        registerItem(dublon, "dublon");
     }
 }

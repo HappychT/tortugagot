@@ -262,13 +262,10 @@ public class GOTLevelData {
 
 	public static NBTTagCompound loadNBTFromFile(File file) throws IOException {
 		if (file.exists()) {
-			try (FileInputStream fis = new FileInputStream(file)) {
-				return CompressedStreamTools.readCompressed(fis);
-			} catch (IOException e) {
-				FMLLog.severe("GOT: corrupted data file %s, resetting", file.getName());
-				file.delete();
-				return new NBTTagCompound();
-			}
+			FileInputStream fis = new FileInputStream(file);
+			NBTTagCompound nbt = CompressedStreamTools.readCompressed(fis);
+			fis.close();
+			return nbt;
 		}
 		return new NBTTagCompound();
 	}

@@ -1,5 +1,6 @@
 package brain.alchemy;
 
+import got.common.item.potions.GOTItemLingeringPotion;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
@@ -13,10 +14,12 @@ public class ContainerAlchemyBag extends Container {
 
     private IInventory bagInventory;
     private ItemStack bagStack;
+    private int bagSlotIndex;
 
     public ContainerAlchemyBag(InventoryPlayer playerInv, ItemStack bag) {
         this.bagStack = bag;
-        this.bagInventory = new InventoryBagAdapter(bag);
+        this.bagSlotIndex = playerInv.currentItem;
+        this.bagInventory = new InventoryBagAdapter(bag, playerInv.player);
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -37,7 +40,29 @@ public class ContainerAlchemyBag extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return true;
+        ItemStack held = player.getCurrentEquippedItem();
+        return held != null && held.getItem() instanceof ItemAlchemyBag;
+    }
+
+    @Override
+    public ItemStack slotClick(int slotId, int dragType, int clickTypeIn, EntityPlayer player) {
+        if (slotId == 36 + bagSlotIndex) {
+            return null;
+        }
+        if (clickTypeIn == 2 && dragType == bagSlotIndex) {
+            return null;
+        }
+        return super.slotClick(slotId, dragType, clickTypeIn, player);
+    }
+
+    @Override
+    public void onContainerClosed(EntityPlayer player) {
+        super.onContainerClosed(player);
+        if (!player.worldObj.isRemote) {
+            bagInventory.closeInventory();
+            player.inventory.markDirty();
+            player.inventoryContainer.detectAndSendChanges();
+        }
     }
 
     @Override
@@ -50,13 +75,14 @@ public class ContainerAlchemyBag extends Container {
             result = slotStack.copy();
 
             if (slotIndex < 9) {
-
                 if (!this.mergeItemStack(slotStack, 9, this.inventorySlots.size(), true)) {
                     return null;
                 }
             } else {
+                boolean isSplash = slotStack.getItem() == Items.potionitem && ItemPotion.isSplash(slotStack.getItemDamage());
+                boolean isLingering = slotStack.getItem() instanceof GOTItemLingeringPotion;
 
-                if (slotStack.getItem() == Items.potionitem && ItemPotion.isSplash(slotStack.getItemDamage())) {
+                if (isSplash || isLingering) {
                     if (!this.mergeItemStack(slotStack, 0, 9, false)) {
                         return null;
                     }
@@ -75,23 +101,22 @@ public class ContainerAlchemyBag extends Container {
         return result;
     }
 
-    @Override
-    public void onContainerClosed(EntityPlayer player) {
-        super.onContainerClosed(player);
-        if (!player.worldObj.isRemote) {
-            bagInventory.closeInventory();
-        }
-    }
-
     class SlotPotion extends Slot {
-
         public SlotPotion(IInventory inv, int index, int x, int y) {
             super(inv, index, x, y);
         }
 
         @Override
         public boolean isItemValid(ItemStack stack) {
-            return stack != null && stack.getItem() == Items.potionitem && ItemPotion.isSplash(stack.getItemDamage());
+            if (stack == null) return false;
+            boolean isSplash = stack.getItem() == Items.potionitem && ItemPotion.isSplash(stack.getItemDamage());
+            boolean isLingering = stack.getItem() instanceof GOTItemLingeringPotion;
+            return isSplash || isLingering;
+        }
+
+        @Override
+        public int getSlotStackLimit() {
+            return 1;
         }
     }
 }

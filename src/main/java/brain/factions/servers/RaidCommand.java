@@ -1,20 +1,13 @@
 package brain.factions.servers;
 
-import brain.factions.network.PacketFactionStructures;
 import brain.factions.structures.FactionStructureManager;
 import brain.factions.structures.FactionStructureSlot;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
-import java.util.List;
-
 public class RaidCommand extends CommandBase {
-
-    private static final int SIEGE_RAID_RADIUS = 250;
 
     @Override
     public String getCommandName() {
@@ -23,7 +16,7 @@ public class RaidCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/raid <start|stop|\"название точки\">";
+        return "/raid <start|stop|point_id>";
     }
 
     private int getSenderDimension(ICommandSender sender) {
@@ -37,40 +30,40 @@ public class RaidCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        if (args.length < 1) {
+        if (args.length != 1) {
             sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
             return;
         }
 
         if (args[0].equalsIgnoreCase("start")) {
             StructureManager.isRaidTimeFortress = true;
-            sender.addChatMessage(new ChatComponentText("§cРейд-тайм для крепостей начался!"));
-            updateClients();
+            StructureManager.isRaidTime = true;
+            SiegeActivationManager.getInstance().rebuildRaidZones(getSenderDimension(sender));
+            sender.addChatMessage(new ChatComponentText("§cГлобальный рейд-тайм начался!"));
         } else if (args[0].equalsIgnoreCase("stop")) {
             StructureManager.isRaidTimeFortress = false;
+            StructureManager.isRaidTime = false;
+            StructureManager.activeRaidPoints.clear();
             SiegeActivationManager.getInstance().clearRaidZones();
-            sender.addChatMessage(new ChatComponentText("§aРейд-тайм для крепостей окончен."));
-            updateClients();
+            sender.addChatMessage(new ChatComponentText("§aГлобальный рейд-тайм окончен."));
         } else {
-            StringBuilder sb = new StringBuilder(args[0]);
-            for (int i = 1; i < args.length; i++) sb.append(" ").append(args[i]);
-            String pointName = sb.toString().trim();
-            FactionStructureSlot slot = FactionStructureManager.getStructureByName(pointName);
-            if (slot != null) {
-                int dim = getSenderDimension(sender);
-                SiegeActivationManager.getInstance().addRaidZone(dim, slot.xCoord, slot.yCoord, slot.zCoord);
-                sender.addChatMessage(new ChatComponentText("§aОсадные машины включены в радиусе " + SIEGE_RAID_RADIUS + " блоков от точки \"" + slot.name + "\" (активны во время рейд-тайма)."));
-            } else {
-                sender.addChatMessage(new ChatComponentText("§cТочка не найдена: " + pointName));
-            }
-        }
-    }
+            String targetId = args[0];
+            FactionStructureSlot slot = FactionStructureManager.getStructureById(targetId);
 
-    private void updateClients() {
-        List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-        PacketFactionStructures packet = new PacketFactionStructures(FactionStructureManager.structureSlots);
-        for (EntityPlayerMP player : players) {
-            CoreFaction.brainChannel.sendTo(packet, player);
+            if (slot == null || slot.category == FactionStructureSlot.StructureCategory.FORTRESS) {
+                sender.addChatMessage(new ChatComponentText("§cРесурсная точка с таким ID не найдена."));
+                return;
+            }
+
+            if (StructureManager.activeRaidPoints.contains(targetId)) {
+                StructureManager.activeRaidPoints.remove(targetId);
+                SiegeActivationManager.getInstance().rebuildRaidZones(getSenderDimension(sender));
+                sender.addChatMessage(new ChatComponentText("§aРейд-тайм для точки " + slot.name + " отключен."));
+            } else {
+                StructureManager.activeRaidPoints.add(targetId);
+                SiegeActivationManager.getInstance().rebuildRaidZones(getSenderDimension(sender));
+                sender.addChatMessage(new ChatComponentText("§cРейд-тайм для точки " + slot.name + " включен! Уязвимость в радиусе 250 блоков."));
+            }
         }
     }
 

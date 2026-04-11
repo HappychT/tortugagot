@@ -102,6 +102,16 @@ public class GOTBlockArmorStand extends Block {
 			--j;
 		}
 		if (this.hasTileEntity(world.getBlockMetadata(i, j, k))) {
+			GOTTileEntityArmorStand stand = (GOTTileEntityArmorStand) world.getTileEntity(i, j, k);
+			if (stand == null) {
+				return false;
+			}
+			if (entityplayer.isSneaking()) {
+				if (!world.isRemote && stand.tryEquipFromPlayer(entityplayer)) {
+					world.playSoundEffect(i + 0.5, j + 0.5, k + 0.5, "random.click", 0.35f, 1.15f);
+				}
+				return true;
+			}
 			if (!world.isRemote) {
 				entityplayer.openGui(GOT.instance, 17, world, i, j, k);
 			}

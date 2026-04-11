@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import brain.factions.arenas.ArenaManager;
 import cpw.mods.fml.common.eventhandler.EventPriority;
+import got.common.entity.GOTEnchaldBlacksmith;
 import got.common.world.biome.GOTClimateType;
 import net.minecraft.block.*;
 import net.minecraft.entity.passive.*;
@@ -34,7 +35,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import got.GOT;
 import got.common.block.GOTVanillaSaplings;
-import got.common.block.factionblocks.BlockStructureHeart;
 import got.common.block.other.GOTBlockArmorStand;
 import got.common.block.other.GOTBlockBarrel;
 import got.common.block.other.GOTBlockBookshelfStorage;
@@ -96,6 +96,7 @@ import got.common.item.GOTWeaponStats;
 import got.common.item.other.GOTItemBrandingIron;
 import got.common.item.other.GOTItemDye;
 import got.common.item.other.GOTItemFeatherDyed;
+import got.common.item.other.GOTItemBridle;
 import got.common.item.other.GOTItemLeatherHat;
 import got.common.item.other.GOTItemMug;
 import got.common.item.other.GOTItemPartyHat;
@@ -126,6 +127,7 @@ import got.common.network.GOTPacketStopItemUse;
 import got.common.network.GOTPacketWeaponFX;
 import got.common.quest.GOTMiniQuest;
 import got.common.tileentity.GOTTileEntityPlate;
+import got.common.tileentity.GOTTileEntityArmorStand;
 import got.common.util.GOTEnumDyeColor;
 import got.common.util.GOTModChecker;
 import got.common.world.GOTTeleporter;
@@ -206,6 +208,7 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -382,6 +385,13 @@ public class GOTEventHandler implements IFuelHandler {
         int j = event.y;
         int k = event.z;
         if (!world.isRemote && entityplayer != null) {
+            boolean isDirtWar = WarBlockHandler.isDirtBlock(block) && WarBlockHandler.isWarActiveAt(world, i, j, k);
+            boolean protectedBlock = !isDirtWar && GOTBannerProtection.isProtected(world, i, j, k,
+                    GOTBannerProtection.forPlayer(entityplayer, GOTBannerProtection.Permission.FULL), true);
+            if (protectedBlock) {
+                event.setCanceled(true);
+                return;
+            }
             if (GOTBlockGrapevine.isFullGrownGrapes(block, meta)) {
                 GOTEntityReachSoldier.defendGrapevines(entityplayer, world, i, j, k);
             } else {
@@ -398,7 +408,6 @@ public class GOTEventHandler implements IFuelHandler {
                     GOTEntityReachSoldier.defendGrapevines(entityplayer, world, i, j + 1, k);
                 }
             }
-            WarBlockHandler.scheduleDirtColumnFallChecks(world, i, j + 1, k);
         }
     }
 
@@ -413,15 +422,6 @@ public class GOTEventHandler implements IFuelHandler {
         int side = event.face;
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             Block block = world.getBlock(i, j, k);
-            if (block instanceof BlockStructureHeart) {
-                if (!world.isRemote) {
-                    System.out.println("[DEBUG][StructureHeart] GOTEventHandler RIGHT_CLICK_BLOCK server " + i + " " + j + " " + k);
-                    entityplayer.addChatMessage(new ChatComponentText("[DEBUG] GOTEventHandler saw StructureHeart click on server"));
-                } else {
-                    System.out.println("[DEBUG][StructureHeart] GOTEventHandler RIGHT_CLICK_BLOCK client " + i + " " + j + " " + k);
-                }
-                return;
-            }
             int meta = world.getBlockMetadata(i, j, k);
             GOTBannerProtection.Permission perm = GOTBannerProtection.Permission.FULL;
             boolean mightBeAbleToAlterWorld = entityplayer.isSneaking() && itemstack != null;
@@ -457,7 +457,6 @@ public class GOTEventHandler implements IFuelHandler {
                     boolean protectedTarget = GOTBannerProtection.isProtected(world, placeX, placeY, placeZ, GOTBannerProtection.forPlayer(entityplayer, GOTBannerProtection.Permission.FULL), false);
                     if (protectedTarget && WarBlockHandler.isWarActiveAt(world, placeX, placeY, placeZ)) {
                         if (WarBlockHandler.canPlaceProtectedDirt(world, i, j, k, side)) {
-                            WarBlockHandler.scheduleDirtFallCheck(world, placeX, placeY, placeZ);
                             return;
                         }
                         event.setCanceled(true);
@@ -475,6 +474,32 @@ public class GOTEventHandler implements IFuelHandler {
                     world.markBlockForUpdate(i, j, k);
                 }
                 return;
+            }
+            if (!world.isRemote && entityplayer.isSneaking() && block instanceof GOTBlockArmorStand) {
+                int standY = j;
+                GOTBlockArmorStand standBlock = (GOTBlockArmorStand) block;
+                if (!standBlock.hasTileEntity(meta)) {
+                    --standY;
+                    block = world.getBlock(i, standY, k);
+                    meta = world.getBlockMetadata(i, standY, k);
+                    if (!(block instanceof GOTBlockArmorStand)) {
+                        return;
+                    }
+                    standBlock = (GOTBlockArmorStand) block;
+                }
+                if (standBlock.hasTileEntity(meta)) {
+                    TileEntity tileentity = world.getTileEntity(i, standY, k);
+                    if (tileentity instanceof GOTTileEntityArmorStand) {
+                        GOTTileEntityArmorStand armorStand = (GOTTileEntityArmorStand) tileentity;
+                        if (armorStand.tryEquipFromPlayer(entityplayer)) {
+                            world.playSoundEffect(i + 0.5, standY + 0.5, k + 0.5, "random.click", 0.35f, 1.15f);
+                            event.useBlock = Event.Result.DENY;
+                            event.useItem = Event.Result.DENY;
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
             }
             if (block == Blocks.flower_pot && meta == 0 && itemstack != null && GOTBlockFlowerPot.canAcceptPlant(itemstack)) {
                 GOT.proxy.placeFlowerInPot(world, i, j, k, side, itemstack);
@@ -737,36 +762,40 @@ public class GOTEventHandler implements IFuelHandler {
             event.setCanceled(true);
         }
 
-        if (!world.isRemote && heldItem != null && heldItem.getItem() instanceof GOTFactionWeaponChecker && !GOTEnchantmentHelper.hasEnchant(heldItem, GOTEnchantment.multifracConverter)) {
-
-            if (heldItem.getItem() instanceof GOTItemDornePolearm && pd.getPledgeFaction() != GOTFaction.DORNE) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
-            if (heldItem.getItem() instanceof GOTItemArrynClaymore && pd.getPledgeFaction() != GOTFaction.ARRYN) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
-            if (heldItem.getItem() instanceof GOTItemStormlandsHammer && pd.getPledgeFaction() != GOTFaction.STORMLANDS) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
-            if (heldItem.getItem() instanceof GOTItemIronBornAxe && pd.getPledgeFaction() != GOTFaction.IRONBORN) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
-            if ((heldItem.getItem() instanceof GOTItemReachPike|| heldItem.getItem() instanceof GOTItemShieldReachPike) && pd.getPledgeFaction() != GOTFaction.REACH) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
-            if ((heldItem.getItem() instanceof GOTItemRiverlandsTrident || heldItem.getItem() instanceof GOTItemShieldRiverlandsTrident) && pd.getPledgeFaction() != GOTFaction.RIVERLANDS) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
-            if (heldItem.getItem() instanceof GOTItemNorthGreatSword && pd.getPledgeFaction() != GOTFaction.NORTH) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
-                event.setCanceled(true);
-            }
+//        if (!world.isRemote && heldItem != null && heldItem.getItem() instanceof GOTFactionWeaponChecker && !GOTEnchantmentHelper.hasEnchant(heldItem, GOTEnchantment.multifracConverter)) {
+//
+//            if (heldItem.getItem() instanceof GOTItemDornePolearm && pd.getPledgeFaction() != GOTFaction.DORNE) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//            if (heldItem.getItem() instanceof GOTItemArrynClaymore && pd.getPledgeFaction() != GOTFaction.ARRYN) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//            if (heldItem.getItem() instanceof GOTItemStormlandsHammer && pd.getPledgeFaction() != GOTFaction.STORMLANDS) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//            if (heldItem.getItem() instanceof GOTItemIronBornAxe && pd.getPledgeFaction() != GOTFaction.IRONBORN) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//            if ((heldItem.getItem() instanceof GOTItemReachPike|| heldItem.getItem() instanceof GOTItemShieldReachPike) && pd.getPledgeFaction() != GOTFaction.REACH) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//            if ((heldItem.getItem() instanceof GOTItemRiverlandsTrident || heldItem.getItem() instanceof GOTItemShieldRiverlandsTrident) && pd.getPledgeFaction() != GOTFaction.RIVERLANDS) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//            if (heldItem.getItem() instanceof GOTItemNorthGreatSword && pd.getPledgeFaction() != GOTFaction.NORTH) {
+//                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+//                event.setCanceled(true);
+//            }
+//        }
+        if (!world.isRemote && heldItem != null && heldItem.getItem() instanceof GOTFactionWeaponChecker && ((GOTFactionWeaponChecker) heldItem.getItem()).getFaction() != pd.getPledgeFaction() && !GOTEnchantmentHelper.hasEnchant(heldItem, GOTEnchantment.multifracConverter)) {
+            entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+            event.setCanceled(true);
         }
 
     }
@@ -839,6 +868,23 @@ public class GOTEventHandler implements IFuelHandler {
             event.setCanceled(true);
             return;
         }
+
+        if (entity instanceof GOTEnchaldBlacksmith) {
+            if (entityplayer.getHeldItem() != null && entityplayer.getHeldItem().getItem() == Item.getItemFromBlock(Blocks.bedrock)) {
+                if (!world.isRemote) {
+                    entity.setDead();
+                }
+                event.setCanceled(true);
+                return;
+            }
+            
+            if (((GOTEnchaldBlacksmith) entity).getFaction() == GOTLevelData.getData(entityplayer).getPledgeFaction()) {
+                entityplayer.openGui(GOT.instance, 89, world, entity.getEntityId(), 0, 0);
+                event.setCanceled(true);
+                return;
+            }
+        }
+
         if (entity instanceof GOTMercenary && ((GOTMercenary) entity).canTradeWith(entityplayer) && ((GOTEntityNPC) entity).hiredNPCInfo.getHiringPlayerUUID() == null) {
             entityplayer.openGui(GOT.instance, 58, world, entity.getEntityId(), 0, 0);
             event.setCanceled(true);
@@ -986,6 +1032,13 @@ public class GOTEventHandler implements IFuelHandler {
     public void onItemPickup(EntityItemPickupEvent event) {
         EntityPlayer entityplayer = event.entityPlayer;
         ItemStack itemstack = event.item.getEntityItem();
+        if (!entityplayer.worldObj.isRemote && itemstack.getItem() instanceof GOTItemBridle) {
+            if (!GOTItemBridle.isOwner(itemstack, entityplayer)) {
+                event.setCanceled(true);
+                return;
+            }
+            GOTItemBridle.ensureOwner(itemstack, entityplayer);
+        }
         if (!entityplayer.worldObj.isRemote) {
             if (itemstack.stackSize > 0) {
                 for (int i = 0; i < entityplayer.inventory.getSizeInventory(); i++) {
@@ -1011,6 +1064,27 @@ public class GOTEventHandler implements IFuelHandler {
                 dechant(itemstack, entityplayer);
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onItemToss(ItemTossEvent event) {
+        EntityPlayer entityplayer = event.player;
+        ItemStack itemstack = event.entityItem.getEntityItem();
+        if (entityplayer == null || entityplayer.worldObj.isRemote || itemstack == null) {
+            return;
+        }
+
+        if (!(itemstack.getItem() instanceof GOTItemBridle)) {
+            return;
+        }
+
+        if (!GOTItemBridle.isOwner(itemstack, entityplayer)) {
+            return;
+        }
+
+        event.setCanceled(true);
+        entityplayer.inventory.addItemStackToInventory(itemstack.copy());
+        entityplayer.inventory.markDirty();
     }
 
     @SubscribeEvent
@@ -1322,8 +1396,12 @@ public class GOTEventHandler implements IFuelHandler {
             event.ammount -= event.ammount * 0.15f;
         }
 
-        if(entity.isPotionActive(GOTEffects.rage)) {
-            event.ammount += event.ammount * 0.5f;
+        if (entity.isPotionActive(GOTEffects.rage)) {
+            event.ammount += event.ammount * 0.15f;
+        }
+
+        if (attacker != null && attacker.isPotionActive(GOTEffects.rage)) {
+            event.ammount += event.ammount * 0.25f;
         }
 
         if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !(((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance) || entity.isPotionActive(GOTEffects.antiEffect.id))) {
@@ -1332,14 +1410,10 @@ public class GOTEventHandler implements IFuelHandler {
 
         if (attacker instanceof EntityPlayer) {
             if (entity instanceof EntityPlayer) {
-                boolean attackerInArena = ArenaManager.instance.isPlayerInAnyRegion((EntityPlayer) attacker);
-                boolean entityInArena = ArenaManager.instance.isPlayerInAnyRegion((EntityPlayer) entity);
-                if (!attackerInArena && !entityInArena) {
-                    PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
-                    effect.setCurativeItems(Lists.newArrayList());
-                    entity.addPotionEffect(effect);
-                    attacker.addPotionEffect(effect);
-                }
+                PotionEffect effect = new PotionEffect(GOTEffects.combatLog.id, 900);
+                effect.setCurativeItems(Lists.newArrayList());
+                entity.addPotionEffect(effect);
+                attacker.addPotionEffect(effect);
             }
         }
 
@@ -1455,48 +1529,34 @@ public class GOTEventHandler implements IFuelHandler {
         if (player.isPotionActive(GOTEffects.combatLog.id)) {
             boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
             if (isInSafeZone) {
+                player.removePotionEffect(GOTEffects.combatLog.id);
                 return;
             }
             if (GOTSoulBoundEvents.instance != null) {
-                GOTSoulBoundEvents.instance.setProcessingLogout(player.getUniqueID().toString());
-            }
-            List<ItemStack> mainToSave = new ArrayList<>();
-            List<Integer> mainSlots = new ArrayList<>();
-            List<ItemStack> armorToSave = new ArrayList<>();
-            List<Integer> armorSlots = new ArrayList<>();
-
-            for (int i = 0; i < player.inventory.mainInventory.length; ++i) {
-                ItemStack itemstack = player.inventory.mainInventory[i];
-                if (itemstack != null && GOTEnchantmentHelper.isItemSoulBound(itemstack)) {
-                    mainToSave.add(itemstack);
-                    mainSlots.add(i);
-                    player.inventory.mainInventory[i] = null;
-                }
+                String playerID = player.getUniqueID().toString();
+                GOTSoulBoundEvents.instance.setProcessingLogout(playerID);
+                GOTSoulBoundEvents.instance.queueSoulboundRestore(player);
             }
 
-            for (int i = 0; i < player.inventory.armorInventory.length; ++i) {
-                ItemStack itemstack = player.inventory.armorInventory[i];
-                if (itemstack != null && GOTEnchantmentHelper.isItemSoulBound(itemstack)) {
-                    armorToSave.add(itemstack);
-                    armorSlots.add(i);
-                    player.inventory.armorInventory[i] = null;
-                }
-            }
-
-            player.inventory.dropAllItems();
-
-            for (int i = 0; i < mainToSave.size(); ++i) {
-                player.inventory.setInventorySlotContents(mainSlots.get(i), mainToSave.get(i));
-            }
-            for (int i = 0; i < armorToSave.size(); ++i) {
-                player.inventory.setInventorySlotContents(armorSlots.get(i), armorToSave.get(i));
-            }
-
-            if (GOTSoulBoundEvents.instance != null) {
-                GOTSoulBoundEvents.instance.manuallyTriggerSave(player);
-            }
-
+            dropInventoryForCombatLogout(player.inventory.armorInventory, player);
+            dropInventoryForCombatLogout(player.inventory.mainInventory, player);
+            player.inventory.markDirty();
             player.setHealth(0);
+        }
+    }
+
+    private void dropInventoryForCombatLogout(ItemStack[] inventory, EntityPlayer player) {
+        for (int i = 0; i < inventory.length; ++i) {
+            ItemStack itemstack = inventory[i];
+            if (itemstack == null) {
+                continue;
+            }
+
+            if (!GOTEnchantmentHelper.isItemSoulBound(itemstack)) {
+                player.entityDropItem(itemstack.copy(), 0.0F);
+            }
+
+            inventory[i] = null;
         }
     }
 

@@ -3,7 +3,7 @@ package got.common.network;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import got.client.GOTClientProxy;
+import got.GOT;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.Item;
 
@@ -35,13 +35,7 @@ public class PacketSyncWeaponHitCount implements IMessage {
         @Override
         public IMessage onMessage(PacketSyncWeaponHitCount message, MessageContext ctx) {
             Item item = Item.getItemById(message.itemID);
-            if (item != null) {
-                if (message.hitCount <= 0) {
-                    GOTClientProxy.weaponHitCounts.remove(item);
-                } else {
-                    GOTClientProxy.weaponHitCounts.put(item, message.hitCount);
-                }
-            }
+            GOT.proxy.handleSyncWeaponHitCount(item, message.hitCount);
             return null;
         }
     }

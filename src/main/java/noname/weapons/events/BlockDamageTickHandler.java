@@ -55,18 +55,18 @@ public class BlockDamageTickHandler {
                         continue;
                     }
 
+                    if (EntityStoneProjectile.isProtectedSiegeBlock(world, x, y, z)) {
+                        BlockDamageStorage.removeBlockDamage(world, x, y, z);
+                        EntityStoneProjectile.clearCracksToBlock(world, x, y, z);
+                        continue;
+                    }
+
                     
                     
                     float storedDamage = BlockDamageStorage.getBlockDamage(world, x, y, z);
 
                     if (storedDamage == 0.0F) {
-                        
-                        long hash = ((long)x << 20) ^ ((long)y << 10) ^ (long)z;
-                        int entityId = -(int)(hash & 0x7FFFFFFF);
-                        if (entityId == 0 || entityId == -1) {
-                            entityId = -(Math.abs(x) % 10000 * 10000 + Math.abs(y) % 256 * 256 + Math.abs(z) % 10000) - 2;
-                        }
-                        world.destroyBlockInWorldPartially(entityId, x, y, z, -1);
+                        EntityStoneProjectile.clearCracksToBlock(world, x, y, z);
                         continue;
                     }
 

@@ -128,7 +128,6 @@ public class GOTArmorModels {
 			map = new HashMap<>();
 			map.put(GOTRegistry.targaryenHelmet, new GOTModelTargaryenHelmet());
 			map.put(GOTRegistry.targaryenChestplate, new GOTModelTargaryenChestplate());
-			map.put(GOTRegistry.arrynHelmet, new GOTModelArrynHelmet(1.0f));
 			map.put(GOTRegistry.asshaiHelmet, new GOTModelAsshaiHelmet(1.0f));
 			map.put(GOTRegistry.bittersteelHelmet, new GOTModelSandorHelmet(1.0f));
 			map.put(GOTRegistry.blackfyreHelmet, new GOTModelWingedHelmet(1.0f));
@@ -136,16 +135,10 @@ public class GOTArmorModels {
 			map.put(GOTRegistry.ceramicPlate, new GOTModelPlateHead());
 			map.put(GOTRegistry.gemsbokHelmet, new GOTModelGemsbokHelmet(1.0f));
 			map.put(GOTRegistry.harpy, new GOTModelHarpy(1.0f));
-			map.put(GOTRegistry.gendryHelmet, new GOTModelHarpy(1.0f));
-			map.put(GOTRegistry.renlyHelmet, new GOTModelDeerHelmet(1.0f));
-			map.put(GOTRegistry.robertHelmet, new GOTModelDeerHelmet(1.0f));
-			map.put(GOTRegistry.sandorHelmet, new GOTModelSandorHelmet(1.0f));
 			map.put(GOTRegistry.leatherHat, new GOTModelLeatherHat());
 			map.put(GOTRegistry.lhazarHelmetLion, new GOTModelSandorHelmet(1.0f));
-			map.put(GOTRegistry.northHelmet, new GOTModelNorthHelmet(1.0f));
 			map.put(GOTRegistry.partyHat, new GOTModelPartyHat(0.6f));
 			map.put(GOTRegistry.plate, new GOTModelPlateHead());
-			map.put(GOTRegistry.reachHelmet, new GOTModelReachHelmet(1.0f));
 			map.put(GOTRegistry.reachguardHelmet, new GOTModelReachHelmet(1.0f));
 			map.put(GOTRegistry.robesBoots, new GOTModelRobes(1.0f));
 			map.put(GOTRegistry.robesChestplate, new GOTModelRobes(1.0f));
@@ -159,12 +152,10 @@ public class GOTArmorModels {
 			map.put(GOTRegistry.unsulliedHelmet, new GOTModelUnsulliedHelmet(1.0f));
 			map.put(GOTRegistry.valyrianHelmet, new GOTModelWingedHelmet(1.0f));
 			map.put(GOTRegistry.victarionHelmet, new GOTModelWingedHelmet(1.0f));
-			map.put(GOTRegistry.westerlandsHelmet, new GOTModelWesterlandsHelmet(1.0f));
 			map.put(GOTRegistry.westkingHelmet, new GOTModelWesterlandsHelmet(1.0f));
 			map.put(GOTRegistry.woodPlate, new GOTModelPlateHead());
 			map.put(GOTRegistry.yitiHelmetSamurai, new GOTModelYiTiHelmet(1.0f, false));
 			map.put(GOTRegistry.yitiHelmetShogune, new GOTModelYiTiHelmet(1.0f, true));
-			map.put(GOTRegistry.firstPeopleHelmet, new GOTModelWingedHelmet(1.0f));
 			map.put(GOTRegistry.thiefHelmet, new GOTModelThiefHelmet());
 			map.put(GOTRegistry.thiefChestplate, new GOTModelThiefChestplate());
 			map.put(GOTRegistry.thiefLeggings, new GOTModelThiefLeggings());
@@ -203,6 +194,10 @@ public class GOTArmorModels {
 		model.bipedLeftLeg.showModel = slot == 2 || slot == 3;
 	}
 
+	public static boolean usesBowArmPose(ItemStack itemstack) {
+		return itemstack != null && itemstack.getItem() instanceof ItemBow;
+	}
+
 	public void setupHeldItem(ModelBiped model, EntityLivingBase entity, ItemStack itemstack, boolean rightArm) {
 		int value = 0;
 		boolean aimBow = false;
@@ -210,7 +205,7 @@ public class GOTArmorModels {
 			value = 1;
 			Item item = itemstack.getItem();
 			boolean isRanged = false;
-			if (itemstack.getItemUseAction() == EnumAction.bow) {
+			if (usesBowArmPose(itemstack)) {
 				if (item instanceof GOTItemSpear) {
 					isRanged = entity instanceof EntityPlayer;
 				} else {

@@ -126,6 +126,11 @@ public class GOTEntityElephant extends GOTEntityHorse {
 	}
 
 	@Override
+	public int getTotalArmorValue() {
+		return 15;
+	}
+
+	@Override
 	public void knockBack(Entity entity, float f, double d, double d1) {
 		super.knockBack(entity, f, d, d1);
 		motionX /= 2.0;

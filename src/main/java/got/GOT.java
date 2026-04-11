@@ -217,7 +217,6 @@ public class GOT {
         WarBlockHandler warBlockHandler = new WarBlockHandler();
         MinecraftForge.EVENT_BUS.register(warBlockHandler);
         FMLCommonHandler.instance().bus().register(warBlockHandler);
-        FMLCommonHandler.instance().bus().register(BlockServerHandler.INSTANCE);
         GOTCoreBlockingSystem.registerWeapons();
         proxy.onLoad();
         Set<Block> set = GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Block.class);
@@ -600,7 +599,9 @@ public class GOT {
         GOTLog.findLogger();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
         FMLCommonHandler.instance().bus().register(new ServerTickHandler());
-        FMLCommonHandler.instance().bus().register(new WarTicketHandler());
+        WarTicketHandler warTicketHandler = new WarTicketHandler();
+        FMLCommonHandler.instance().bus().register(warTicketHandler);
+        MinecraftForge.EVENT_BUS.register(warTicketHandler);
         tickHandler = new GOTTickHandlerServer();
         eventHandler = new GOTEventHandler();
         packetHandler = new GOTPacketHandler();

@@ -13,6 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 public class EntityBalista extends EntityLivingBase {
@@ -57,9 +59,11 @@ public class EntityBalista extends EntityLivingBase {
         this.dataWatcher.addObject(28, Float.valueOf(0.6F));
     }
 
-    private static final float RANGE_MIN = 0.2F;
+    private static final float RANGE_MIN = 0.0F;
     private static final float RANGE_MAX = 1.0F;
     private static final float RANGE_STEP = 0.015F;
+    private static final double SPEED_MIN_FACTOR = 0.3D;
+    private static final float RANGE_MIN_FACTOR = 0.05F;
 
     @Override
     public void onUpdate() {
@@ -95,7 +99,6 @@ public class EntityBalista extends EntityLivingBase {
                 if (player.isSwingInProgress && !lastSwingState && isReadyToFire()) {
                     fire();
                 }
-
                 lastSwingState = player.isSwingInProgress;
 
                 if (!isLoaded && hasAmmo(player)) {
@@ -220,43 +223,55 @@ public class EntityBalista extends EntityLivingBase {
         return isLoaded && !isReloading;
     }
 
+    public void tryFire() {
+        if (isReadyToFire()) {
+            fire();
+        }
+    }
+
     public void fire() {
         if (!this.worldObj.isRemote && this.riddenByEntity != null) {
-            if (!SiegeActivationManager.getInstance().isSiegeActive(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ)) return;
+            //if (!SiegeActivationManager.getInstance().isSiegeActive(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ)) return;
             EntityPlayer player = (EntityPlayer) this.riddenByEntity;
             if (!isReadyToFire()) return;
 
             float yaw = this.rotationYaw;
-            float pitch = player.rotationPitch;
+            float pitch = this.rotationPitch;
 
-            double dirX = -MathHelper.sin(yaw / 180.0F * (float)Math.PI) *
-                    MathHelper.cos(pitch / 180.0F * (float)Math.PI);
-            double dirY = -MathHelper.sin(pitch / 180.0F * (float)Math.PI);
-            double dirZ = MathHelper.cos(yaw / 180.0F * (float)Math.PI) *
-                    MathHelper.cos(pitch / 180.0F * (float)Math.PI);
+            float yawRad = yaw / 180.0F * (float) Math.PI;
+            float pitchRad = pitch / 180.0F * (float) Math.PI;
+            double dirX = -MathHelper.sin(yawRad) * MathHelper.cos(pitchRad);
+            double dirY = -MathHelper.sin(pitchRad);
+            double dirZ = MathHelper.cos(yawRad) * MathHelper.cos(pitchRad);
 
             float rangePower = this.dataWatcher.getWatchableObjectFloat(28);
-            double speed = WeaponsConfig.BalistaProjectileSpeed * (double)rangePower;
-            double motionX = dirX * speed;
-            double motionY = dirY * speed;
-            double motionZ = dirZ * speed;
+            double speedFactor = SPEED_MIN_FACTOR + (1.0D - SPEED_MIN_FACTOR) * rangePower;
+            double speed = WeaponsConfig.BalistaProjectileSpeed * speedFactor;
 
-            EntityBalistaProjectile projectile = new EntityBalistaProjectile(
-                    this.worldObj,
-                    player,
-                    motionX,
-                    motionY,
-                    motionZ
-            );
-            projectile.setMaxRange(WeaponsConfig.maxRangeBalsita * rangePower);
+            EntityBalistaProjectile projectile = new EntityBalistaProjectile(this.worldObj);
+            projectile.setThrower(player);
+            projectile.setMaxRange(WeaponsConfig.maxRangeBalsita * (RANGE_MIN_FACTOR + (1.0F - RANGE_MIN_FACTOR) * rangePower));
 
             double muzzleOffset = 3.0D;
-            double shootX = this.posX + dirX * muzzleOffset;
-            double shootY = this.posY + 1.0D + dirY * muzzleOffset;
-            double shootZ = this.posZ + dirZ * muzzleOffset;
+            double originX = this.posX;
+            double originY = this.posY + 1.0D;
+            double originZ = this.posZ;
+            double shootX = originX + dirX * muzzleOffset;
+            double shootY = originY + dirY * muzzleOffset;
+            double shootZ = originZ + dirZ * muzzleOffset;
+
+            Vec3 start = Vec3.createVectorHelper(originX, originY, originZ);
+            Vec3 end = Vec3.createVectorHelper(shootX, shootY, shootZ);
+            MovingObjectPosition rayTrace = this.worldObj.rayTraceBlocks(start, end);
+            if (rayTrace != null && rayTrace.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                return;
+            }
 
             projectile.setPosition(shootX, shootY, shootZ);
             projectile.setStartPosition(shootX, shootY, shootZ);
+            projectile.motionX = dirX * speed;
+            projectile.motionY = dirY * speed;
+            projectile.motionZ = dirZ * speed;
             this.worldObj.spawnEntityInWorld(projectile);
 
             isLoaded = false;
@@ -346,7 +361,7 @@ public class EntityBalista extends EntityLivingBase {
 
     @Override
     public double getMountedYOffset() {
-        return 0.5D;
+        return 0.3D;
     }
 
     @Override

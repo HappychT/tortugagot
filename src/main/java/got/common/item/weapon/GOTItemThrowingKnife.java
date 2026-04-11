@@ -2,14 +2,12 @@ package got.common.item.weapon;
 
 import java.util.List;
 
-import got.common.GOTLevelData;
 import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTEffects;
 import got.common.dispense.GOTDispenseThrowingKnife;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
 import got.common.entity.other.GOTEntityThrowingKnife;
-import got.common.faction.GOTFaction;
 import got.common.item.GOTMaterialFinder;
 import got.common.recipe.GOTRecipe;
 import net.minecraft.block.BlockDispenser;
@@ -50,14 +48,13 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
         String s1 = StatCollector.translateToLocal(potion.getEffectName()).trim();
         s1 = s1 + " (" + Potion.getDurationString(potion) + ")";
         list.add(EnumChatFormatting.RED + s1);
-        list.add(EnumChatFormatting.YELLOW + StatCollector.translateToLocalFormatted("got.faction.BANDITS.name"));
     }
 
     @Override
     public boolean getIsRepairable(ItemStack itemstack, ItemStack repairItem) {
         if (GOTRecipe.checkItemEquals(this.knifeMaterial.getRepairItemStack(), repairItem))
             return true;
-        return super.getIsRepairable(itemstack, repairItem);
+     return super.getIsRepairable(itemstack, repairItem);
     }
 
     @Override
@@ -77,40 +74,37 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
             itemstack.stackTagCompound = new NBTTagCompound();
             itemstack.stackTagCompound.setInteger("timer", 0);
         }
-        if(GOTLevelData.getData(entityplayer).isPledgedTo(GOTFaction.BANDITS) || true) {
-            if (itemstack.stackTagCompound.getInteger("timer") == 0) {
-                GOTEntityThrowingKnife knife = new GOTEntityThrowingKnife(world, entityplayer, itemstack.copy(), 2.0f);
-                knife.setIsCritical(true);
-                knife.effectType = this.effectType;
-                int fireAspect = EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, itemstack) + GOTEnchantmentHelper.calcFireAspect(itemstack);
-                if (fireAspect > 0) {
-                    knife.setFire(100);
-                }
-                for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-                    if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
-                        continue;
-                    }
-                    GOTEnchantmentHelper.setProjectileEnchantment(knife, ench);
-                }
-                if (entityplayer.capabilities.isCreativeMode) {
-                    knife.canBePickedUp = 2;
-                } else {
-                    knife.canBePickedUp = 0;
-                }
-                world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + 0.25f);
-                if (!world.isRemote) {
-                    world.spawnEntityInWorld(knife);
-                }
-                if (!entityplayer.capabilities.isCreativeMode) {
-                    itemstack.damageItem(10, entityplayer);
-                }
-                itemstack.stackTagCompound.setInteger("timer", 100);
+        if (itemstack.stackTagCompound.getInteger("timer") == 0) {
+            GOTEntityThrowingKnife knife = new GOTEntityThrowingKnife(world, entityplayer, itemstack.copy(), 2.0f);
+            knife.setIsCritical(true);
+            knife.effectType = this.effectType;
+            int fireAspect = EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, itemstack) + GOTEnchantmentHelper.calcFireAspect(itemstack);
+            if (fireAspect > 0) {
+                knife.setFire(100);
             }
-            else {
-                if(!world.isRemote) {
-                    entityplayer.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("got.jewelry.desc.cooldown")
-                            + ' ' + ticksToElapsedTime(itemstack.stackTagCompound.getInteger("timer"))));
+            for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
+                if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+                    continue;
                 }
+                GOTEnchantmentHelper.setProjectileEnchantment(knife, ench);
+            }
+            if (entityplayer.capabilities.isCreativeMode) {
+                knife.canBePickedUp = 2;
+            } else {
+                knife.canBePickedUp = 0;
+            }
+            world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + 0.25f);
+            if (!world.isRemote) {
+                world.spawnEntityInWorld(knife);
+            }
+            if (!entityplayer.capabilities.isCreativeMode) {
+                itemstack.damageItem(10, entityplayer);
+            }
+            itemstack.stackTagCompound.setInteger("timer", 100);
+        } else {
+            if(!world.isRemote) {
+                entityplayer.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("got.jewelry.desc.cooldown")
+                        + ' ' + ticksToElapsedTime(itemstack.stackTagCompound.getInteger("timer"))));
             }
         }
         return itemstack;

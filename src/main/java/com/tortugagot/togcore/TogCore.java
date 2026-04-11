@@ -1,5 +1,6 @@
 package com.tortugagot.togcore;
 
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,7 +13,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = TogCore.MODID, version = "0.1.0", name = "Tortuga Got Core-mod", acceptedMinecraftVersions = "[1.7.10]")
+@Mod(modid = TogCore.MODID, version = "1.0.0", name = "Tortuga GoT Core-mod", acceptedMinecraftVersions = "[1.7.10]")
 public class TogCore {
 
     public static final String MODID = "togcore";
@@ -22,6 +23,10 @@ public class TogCore {
 
     @SidedProxy(clientSide = "com.tortugagot.togcore.ClientProxy", serverSide = "com.tortugagot.togcore.CommonProxy")
     public static CommonProxy proxy;
+
+    public static ResourceLocation id(String name) {
+        return new ResourceLocation(MODID, name);
+    }
 
     @Mod.EventHandler
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the

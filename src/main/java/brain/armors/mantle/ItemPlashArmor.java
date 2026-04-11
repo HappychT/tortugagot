@@ -2,6 +2,7 @@ package brain.armors.mantle;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import got.common.database.GOTArmorModels;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
@@ -9,6 +10,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.EnumAction;
 import net.minecraft.util.IIcon;
 
 public class ItemPlashArmor extends ItemArmor {
@@ -49,6 +51,7 @@ public class ItemPlashArmor extends ItemArmor {
     @SideOnly(Side.CLIENT)
     public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, int armorSlot) {
         ModelBiped armorModel = null;
+        boolean hasEntity = entityLiving != null;
         
         if (itemStack != null && itemStack.getItem() == this) {
             switch (plashType) {
@@ -77,9 +80,11 @@ public class ItemPlashArmor extends ItemArmor {
                 armorModel.bipedRightLeg.showModel = false;
                 armorModel.bipedLeftLeg.showModel = false;
                 
-                armorModel.isSneak = entityLiving.isSneaking();
-                armorModel.isRiding = entityLiving.isRiding();
-                armorModel.isChild = entityLiving.isChild();
+                armorModel.isSneak = hasEntity && entityLiving.isSneaking();
+                armorModel.isRiding = hasEntity && entityLiving.isRiding();
+                armorModel.isChild = hasEntity && entityLiving.isChild();
+                armorModel.heldItemRight = 0;
+                armorModel.aimedBow = false;
                 
                 if (entityLiving instanceof EntityPlayer) {
                     EntityPlayer player = (EntityPlayer) entityLiving;
@@ -87,9 +92,14 @@ public class ItemPlashArmor extends ItemArmor {
                     ItemStack heldItem = player.getHeldItem();
                     if (heldItem != null) {
                         armorModel.heldItemRight = 1;
-                        
+
                         if (player.getItemInUseCount() > 0) {
-                            armorModel.aimedBow = true;
+                            EnumAction useAction = heldItem.getItemUseAction();
+                            if (useAction == EnumAction.block) {
+                                armorModel.heldItemRight = 3;
+                            } else if (GOTArmorModels.usesBowArmPose(heldItem)) {
+                                armorModel.aimedBow = true;
+                            }
                         } else {
                             armorModel.aimedBow = false;
                         }

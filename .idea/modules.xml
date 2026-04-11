@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagot.api.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagot.api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagot.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagot.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagot.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagot.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagotOriginal.api.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagotOriginal.api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagotOriginal.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagotOriginal.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagotOriginal.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagotOriginal.test.iml" />
     </modules>
   </component>
 </project>

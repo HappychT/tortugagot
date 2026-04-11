@@ -25,10 +25,10 @@ public class ItemThiefBoots extends GOTItemArmor {
         if (!Annot.SERVER) {
             final got.client.model.thiefArmor.GOTModelThiefBoots armorModel = new got.client.model.thiefArmor.GOTModelThiefBoots();
             if (armorModel != null) {
-                armorModel.isSneak = entityLiving.isSneaking();
-                armorModel.isRiding = entityLiving.isRiding();
-                armorModel.isChild = entityLiving.isChild();
-                armorModel.heldItemRight = entityLiving.getEquipmentInSlot(0) != null ? 1 : 0;
+                armorModel.isSneak = entityLiving != null && entityLiving.isSneaking();
+                armorModel.isRiding = entityLiving != null && entityLiving.isRiding();
+                armorModel.isChild = entityLiving != null && entityLiving.isChild();
+                armorModel.heldItemRight = entityLiving != null && entityLiving.getEquipmentInSlot(0) != null ? 1 : 0;
             }
             return armorModel;
         }

@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import got.client.handlers.ClientEventHandler;
+import got.client.render.item.GOTItemShieldRenderer;
+import got.common.database.GOTRegistry;
+import got.common.entity.other.*;
+import net.minecraft.client.renderer.entity.RenderSnowball;
 import noname.weapons.entity.*;
 import noname.weapons.events.OverlayEventHandler;
 import noname.weapons.render.*;
@@ -75,11 +79,7 @@ import got.common.decorations.base.Decoration;
 import got.common.entity.animal.GOTEntityElephant3DViewer;
 import got.common.entity.animal.GOTEntityMammoth3DViewer;
 import got.common.entity.dragon.GOTEntityDragon3DViewer;
-import got.common.entity.other.GOTEntityBanner;
-import got.common.entity.other.GOTEntityInvasionSpawner;
-import got.common.entity.other.GOTEntityNPC;
-import got.common.entity.other.GOTHiredNPCInfo;
-import got.common.entity.other.GOTInvasionStatus;
+import noname.weapons.entity.EntityBatteringRam3DViewer;
 import got.common.faction.GOTAlignmentBonusMap;
 import got.common.faction.GOTFaction;
 import got.common.network.GOTPacketClientInfo;
@@ -145,6 +145,7 @@ public class GOTClientProxy extends GOTCommonProxy {
     public static GOTEffectRenderer customEffectRenderer;
     public static GOTRenderPlayer specialPlayerRenderer = new GOTRenderPlayer();
     public static GOTSwingHandler swingHandler = new GOTSwingHandler();
+    public static GOTAutoRespawnHandler autoRespawnHandler = new GOTAutoRespawnHandler();
     public static GOTTickHandlerClient tickHandler = new GOTTickHandlerClient();
     public static GOTGuiHandler guiHandler = new GOTGuiHandler();
     public static GOTMusic musicHandler;
@@ -576,7 +577,10 @@ public class GOTClientProxy extends GOTCommonProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityBatteringRam.class, new RenderBatteringRam());
         RenderingRegistry.registerEntityRenderingHandler(EntityBalista.class, new RenderBalista());
         RenderingRegistry.registerEntityRenderingHandler(EntityBalistaProjectile.class, new RenderBalistaProjectile());
-
+        RenderingRegistry.registerEntityRenderingHandler(
+                GOTEntityWildfireBomb.class,
+                new RenderSnowball(GOTRegistry.wildfireBomb)
+        );
         for(Decoration d : DecorationsRegister.getDecorations()) {
             bindItemRender(d.getItem(), new DecorationTileEntity(), new DecorationRenderer(d.getItem()));
         }
@@ -591,10 +595,10 @@ public class GOTClientProxy extends GOTCommonProxy {
         MinecraftForge.EVENT_BUS.register(GOTClientStaminaHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new OverlayEventHandler());
         FMLCommonHandler.instance().bus().register(new GOTEntityElephant3DViewer());
+        FMLCommonHandler.instance().bus().register(new EntityBatteringRam3DViewer());
         FMLCommonHandler.instance().bus().register(new GOTKeyHandler(GOTPacketHandler.networkWrapper));
 
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
-
     }
     public static void bindItemRender(Block block, TileEntity tile, DecorationRenderer tesr){
         Item blockItem = ItemBlock.getItemFromBlock(block);
@@ -935,5 +939,27 @@ public class GOTClientProxy extends GOTCommonProxy {
         boolean showHiddenSWP = GOTGuiMap.showHiddenSWP;
         GOTPacketClientInfo packet = new GOTPacketClientInfo(viewingFaction, changedRegionMap, showWP, showCWP, showHiddenSWP);
         GOTPacketHandler.networkWrapper.sendToServer(packet);
+    }
+
+    @Override
+    public void handleSyncInventory(net.minecraft.item.ItemStack[] mainInventory, net.minecraft.item.ItemStack itemstack) {
+        net.minecraft.entity.player.EntityPlayer player = net.minecraft.client.Minecraft.getMinecraft().thePlayer;
+        if (player != null) {
+            for (int i = 0; i < mainInventory.length; i++) {
+                player.inventory.mainInventory[i] = mainInventory[i];
+            }
+            player.inventory.setItemStack(itemstack);
+        }
+    }
+
+    @Override
+    public void handleSyncWeaponHitCount(net.minecraft.item.Item item, int hitCount) {
+        if (item != null) {
+            if (hitCount <= 0) {
+                weaponHitCounts.remove(item);
+            } else {
+                weaponHitCounts.put(item, hitCount);
+            }
+        }
     }
 }

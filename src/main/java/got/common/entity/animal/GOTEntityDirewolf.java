@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.entity.EntityCreature;
 
 public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneToFrost, GOTNPCMount {
 	public EntityAIBase attackAI = new GOTEntityAIAttackOnCollide(this, 1.4, false);
@@ -31,6 +32,7 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 	public UUID bridleTamer;
     private int ownerLastAttackerTime;
     private int ownerRevengeTimer;
+    private int biteCooldown = 0;
     private final InventoryBasic mountInventory = new InventoryBasic("DirewolfInv", false, 1);
 
 	public GOTEntityDirewolf(World world) {
@@ -217,6 +219,10 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 		GOTMountFunctions.move(this, strafe, forward);
 	}
 
+	@Override
+	public void fall(float distance) {
+	}
+
 	public void riderJump() {
 		if (onGround) {
 			motionY = 0.42D + GOTBridleMountStats.getStats(getClass()).jump * 0.1D;
@@ -228,6 +234,44 @@ public class GOTEntityDirewolf extends EntityAnimal implements GOTBiome.ImmuneTo
 	public void onLivingUpdate() {
 		boolean isChild;
 		EntityLivingBase entity;
+		if (!worldObj.isRemote && biteCooldown > 0) {
+			biteCooldown--;
+		}
+		if (!worldObj.isRemote && riddenByEntity instanceof EntityPlayer) {
+			EntityPlayer rider = (EntityPlayer) riddenByEntity;
+			float momentum = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+			setSprinting(momentum > 0.15f);
+			if (biteCooldown <= 0 && momentum >= 0.1f) {
+				Vec3 look = getLookVec();
+				float sightWidth = 1.0f;
+				double range = 0.6;
+				List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(look.xCoord * range, look.yCoord * range, look.zCoord * range).expand(sightWidth, sightWidth, sightWidth));
+				float attackDmg = (float) getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
+				boolean hitAny = false;
+				for (Object element : list) {
+					Entity obj = (Entity) element;
+					if (!(obj instanceof EntityLivingBase)) continue;
+					EntityLivingBase target = (EntityLivingBase) obj;
+					if (target == rider) continue;
+					if (!GOT.canPlayerAttackEntity(rider, target, false)) continue;
+					if (!target.attackEntityFrom(DamageSource.causeMobDamage(this), attackDmg)) continue;
+					float knockback = attackDmg * 0.04f;
+					target.addVelocity(-MathHelper.sin(rotationYaw * 3.1415927f / 180.0f) * knockback, knockback * 0.3f, MathHelper.cos(rotationYaw * 3.1415927f / 180.0f) * knockback);
+					hitAny = true;
+					if (target instanceof EntityLiving) {
+						EntityLiving living = (EntityLiving) target;
+						if (living.getAttackTarget() == this) {
+							living.getNavigator().clearPathEntity();
+							living.setAttackTarget(rider);
+						}
+					}
+					break;
+				}
+                if (hitAny) {
+                    biteCooldown = 38;
+                }
+            }
+        }
 		if (!worldObj.isRemote && (isChild = isChild()) != prevIsChild) {
 			if (isChild) {
 				tasks.removeTask(attackAI);

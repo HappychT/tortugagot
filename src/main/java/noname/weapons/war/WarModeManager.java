@@ -11,6 +11,8 @@ public class WarModeManager {
 
     private static WarModeManager instance;
     private boolean warModeActive = false;
+    private String activeStructureId = null;
+    private int activeDimension = -1;
     private static final String SAVE_FILE_NAME = "war_mode.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -29,8 +31,26 @@ public class WarModeManager {
     }
 
     public void setWarMode(boolean active) {
+        setWarMode(active, this.activeStructureId, this.activeDimension);
+    }
+
+    public void setWarMode(boolean active, String structureId) {
+        setWarMode(active, structureId, this.activeDimension);
+    }
+
+    public void setWarMode(boolean active, String structureId, int dimension) {
         this.warModeActive = active;
+        this.activeStructureId = active ? structureId : null;
+        this.activeDimension = active ? dimension : -1;
         saveState();
+    }
+
+    public String getActiveStructureId() {
+        return activeStructureId;
+    }
+
+    public int getActiveDimension() {
+        return activeDimension;
     }
 
     public void loadState() {
@@ -40,6 +60,8 @@ public class WarModeManager {
                 WarModeState state = gson.fromJson(reader, WarModeState.class);
                 if (state != null) {
                     this.warModeActive = state.warModeActive;
+                    this.activeStructureId = state.activeStructureId;
+                    this.activeDimension = state.activeDimension;
                 }
             } catch (IOException e) {
                 System.err.println("[WarMode] Ошибка загрузки состояния: " + e.getMessage());
@@ -55,6 +77,8 @@ public class WarModeManager {
                 try (FileWriter writer = new FileWriter(saveFile)) {
                     WarModeState state = new WarModeState();
                     state.warModeActive = this.warModeActive;
+                    state.activeStructureId = this.activeStructureId;
+                    state.activeDimension = this.activeDimension;
                     gson.toJson(state, writer);
                 }
             } catch (IOException e) {
@@ -77,9 +101,13 @@ public class WarModeManager {
 
     public void reset() {
         this.warModeActive = false;
+        this.activeStructureId = null;
+        this.activeDimension = -1;
     }
 
     private static class WarModeState {
         boolean warModeActive;
+        String activeStructureId;
+        int activeDimension;
     }
 }

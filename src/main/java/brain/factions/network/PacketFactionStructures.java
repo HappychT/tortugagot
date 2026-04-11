@@ -45,6 +45,9 @@ public class PacketFactionStructures implements IMessage {
             FactionStructureSlot slot = new FactionStructureSlot();
             slot.id = ByteBufUtils.readUTF8String(buf);
             slot.name = ByteBufUtils.readUTF8String(buf);
+
+            slot.category = FactionStructureSlot.StructureCategory.values()[buf.readInt()];
+
             slot.mapX = buf.readInt();
             slot.mapY = buf.readInt();
             slot.xCoord = buf.readInt();
@@ -75,6 +78,9 @@ public class PacketFactionStructures implements IMessage {
         for (FactionStructureSlot slot : this.structures) {
             ByteBufUtils.writeUTF8String(buf, slot.id != null ? slot.id : "");
             ByteBufUtils.writeUTF8String(buf, slot.name != null ? slot.name : "Точка интереса");
+
+            buf.writeInt(slot.category != null ? slot.category.ordinal() : 0);
+
             buf.writeInt(slot.mapX);
             buf.writeInt(slot.mapY);
             buf.writeInt(slot.xCoord);
@@ -89,7 +95,6 @@ public class PacketFactionStructures implements IMessage {
             ByteBufUtils.writeUTF8String(buf, slot.raidTime != null ? slot.raidTime : "");
         }
     }
-
     public static class Handler implements IMessageHandler<PacketFactionStructures, IMessage> {
         @Override
         public IMessage onMessage(final PacketFactionStructures message, MessageContext ctx) {

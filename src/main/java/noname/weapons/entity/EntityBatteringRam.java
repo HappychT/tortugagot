@@ -8,7 +8,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -65,9 +64,9 @@ public class EntityBatteringRam extends Entity {
     private final Map<UUID, Integer> seatIndexByPassenger = new HashMap<>();
 
     private FakePlayer fakePlayer;
-    private final ItemStack ironPickaxe = new ItemStack(Items.iron_pickaxe);
-    private final ItemStack ironAxe = new ItemStack(Items.iron_axe);
-    private final ItemStack ironShovel = new ItemStack(Items.iron_shovel);
+    private final ItemStack woodenPickaxe = new ItemStack(Items.wooden_pickaxe);
+    private final ItemStack woodenAxe = new ItemStack(Items.wooden_axe);
+    private final ItemStack woodenShovel = new ItemStack(Items.wooden_shovel);
 
     private final Map<BlockTarget, Float> breakingBlocks = new HashMap<>();
     private boolean breakingActive;
@@ -121,6 +120,17 @@ public class EntityBatteringRam extends Entity {
 
     public void setStatus(boolean status){
         this.breakingActive = status;
+        if (!this.worldObj.isRemote) {
+            int current = this.dataWatcher.getWatchableObjectInt(25);
+            if (status) {
+                if (current == 0) {
+                    long currentTime = this.worldObj.getTotalWorldTime();
+                    this.dataWatcher.updateObject(25, Integer.valueOf((int) (currentTime % 999999) + 1));
+                }
+            } else if (current != 0) {
+                this.dataWatcher.updateObject(25, Integer.valueOf(0));
+            }
+        }
     }
 
     @Override
@@ -135,6 +145,10 @@ public class EntityBatteringRam extends Entity {
         if (source.getSourceOfDamage() instanceof EntityArrow) return false;
 
         if (source == DamageSource.inFire || source == DamageSource.onFire || source.isFireDamage()) return false;
+
+        this.motionX = 0.0D;
+        this.motionY = 0.0D;
+        this.motionZ = 0.0D;
 
         if (source.getSourceOfDamage() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) source.getSourceOfDamage();
@@ -208,8 +222,7 @@ public class EntityBatteringRam extends Entity {
                 this.dataWatcher.updateObject(18, Float.valueOf(this.prevRotationYaw));
                 clearBreakingState();
             }
-            this.motionY = 0.0D;
-            this.fallDistance = 0.0F;
+            applyGravityIfNeeded();
             this.moveEntityWithHeading(0.0F, 0.0F);
 
             if (this.ticksExisted % 6000 == 0) {
@@ -294,14 +307,30 @@ public class EntityBatteringRam extends Entity {
     }
 
     private void stabilizeIfUnsupported() {
+        if (!isSupported()) {
+            this.onGround = false;
+        }
+    }
+
+    private boolean isSupported() {
         int blockX = MathHelper.floor_double(this.posX);
         int blockY = MathHelper.floor_double(this.posY - 0.1D);
         int blockZ = MathHelper.floor_double(this.posZ);
-        if (this.worldObj.isAirBlock(blockX, blockY, blockZ)) {
-            this.motionY = 0.0D;
+        Block block = this.worldObj.getBlock(blockX, blockY, blockZ);
+        return block != null && !block.isAir(this.worldObj, blockX, blockY, blockZ);
+    }
+
+    private void applyGravityIfNeeded() {
+        if (isSupported()) {
+            if (this.motionY < 0.0D) {
+                this.motionY = 0.0D;
+            }
             this.fallDistance = 0.0F;
-            this.onGround = true;
+            return;
         }
+        this.onGround = false;
+        this.motionY -= 0.08D;
+        this.motionY *= 0.98D;
     }
 
     private void updateRotation(EntityPlayer driver) {
@@ -322,11 +351,12 @@ public class EntityBatteringRam extends Entity {
         if (this.riddenByEntity instanceof EntityPlayer) {
             EntityPlayer driver = (EntityPlayer) this.riddenByEntity;
             float moveForward = driver.moveForward;
+            float crewFactor = getCrewSpeedFactor(getAllCrew().size());
 
             if (moveForward > 0.0F) {
-                targetSpeed = WeaponsConfig.movementSpeedBatteringRam;
+                targetSpeed = WeaponsConfig.movementSpeedBatteringRam * crewFactor;
             } else if (moveForward < 0.0F) {
-                targetSpeed = -WeaponsConfig.movementSpeedBatteringRam * 0.5F;
+                targetSpeed = -WeaponsConfig.movementSpeedBatteringRam * 0.5F * crewFactor;
             } else {
                 targetSpeed = 0.0F;
             }
@@ -348,9 +378,8 @@ public class EntityBatteringRam extends Entity {
                 horizontalMotionZ = Math.cos(yawRad) * currentSpeed;
             }
             this.motionX = horizontalMotionX;
-            this.motionY = 0.0D;
             this.motionZ = horizontalMotionZ;
-            this.moveEntity(this.motionX, 0.0D, this.motionZ);
+            this.moveEntity(this.motionX, this.motionY, this.motionZ);
         } else {
             targetSpeed = 0.0F;
             currentSpeed *= 0.9F;
@@ -360,8 +389,7 @@ public class EntityBatteringRam extends Entity {
             this.motionZ *= 0.9D;
             if (Math.abs(this.motionX) < 0.001D) this.motionX = 0.0D;
             if (Math.abs(this.motionZ) < 0.001D) this.motionZ = 0.0D;
-            this.motionY = 0.0D;
-            this.moveEntity(this.motionX, 0.0D, this.motionZ);
+            this.moveEntity(this.motionX, this.motionY, this.motionZ);
         }
 
         if (!this.worldObj.isRemote) {
@@ -369,6 +397,14 @@ public class EntityBatteringRam extends Entity {
             this.dataWatcher.updateObject(20, Float.valueOf((float) this.motionX));
             this.dataWatcher.updateObject(21, Float.valueOf((float) this.motionZ));
         }
+    }
+
+    private float getCrewSpeedFactor(int occupants) {
+        if (occupants <= 0) {
+            return 0.0F;
+        }
+        float factor = occupants / (float) MAX_PASSENGERS;
+        return MathHelper.clamp_float(factor, 1.0F / MAX_PASSENGERS, 1.0F);
     }
 
     public boolean isBreakingActive() {
@@ -383,14 +419,17 @@ public class EntityBatteringRam extends Entity {
     @Override
     public void updateRiderPosition() {
         if (this.riddenByEntity != null) {
-            double riderY = this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset();
-            this.riddenByEntity.setPosition(this.posX, riderY, this.posZ);
+            double yawRad = Math.toRadians(this.rotationYaw);
+            double leftX = Math.cos(yawRad) * 0.5D;
+            double leftZ = Math.sin(yawRad) * 0.5D;
+            double riderY = this.posY + this.getMountedYOffset() - 0.5D + this.riddenByEntity.getYOffset();
+            this.riddenByEntity.setPosition(this.posX + leftX, riderY, this.posZ + leftZ);
         }
     }
 
     private void applySlowness(EntityPlayer driver) {
         int occupants = getAllCrew().size();
-        if (occupants <= 0) return;
+        if (occupants == 0) return;
         int amplifier = Math.max(0, 6 - occupants);
         driver.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, amplifier, true));
     }
@@ -422,14 +461,15 @@ public class EntityBatteringRam extends Entity {
             return;
         }
 
-        List<BlockTarget> targets = getFrontBlockTargets();
-        if (targets == null || targets.isEmpty()) {
+        List<BlockTarget> allTargets = getFrontBlockTargets();
+        if (allTargets == null || allTargets.isEmpty()) {
             if (!breakingBlocks.isEmpty()) {
                 resetBlockBreaking();
             }
-            System.out.println("[RAM DEBUG] No block targets found in front");
             return;
         }
+
+        List<BlockTarget> targets = new ArrayList<>(allTargets);
 
         if (!(this.worldObj instanceof WorldServer)) {
             return;
@@ -437,13 +477,9 @@ public class EntityBatteringRam extends Entity {
 
         FakePlayer fake = getFakePlayer();
         if (fake == null) {
-            System.out.println("[RAM DEBUG] FakePlayer is null");
             resetBlockBreaking();
-            breakingActive = false;
             return;
         }
-
-        System.out.println("[RAM DEBUG] Breaking " + targets.size() + " blocks, active=" + breakingActive);
 
         Set<BlockTarget> targetSet = new HashSet<BlockTarget>(targets);
 
@@ -474,11 +510,15 @@ public class EntityBatteringRam extends Entity {
                 continue;
             }
 
+            if (EntityStoneProjectile.isProtectedSiegeBlock(worldObj, target.x, target.y, target.z)) {
+                worldObj.destroyBlockInWorldPartially(this.getEntityId(), target.x, target.y, target.z, -1);
+                progressIterator.remove();
+                continue;
+            }
+
             ItemStack toolStack = getToolForBlock(block, worldObj.getBlockMetadata(target.x, target.y, target.z));
             fake.inventory.mainInventory[fake.inventory.currentItem] = toolStack;
             float strength = ForgeHooks.blockStrength(block, fake, worldObj, target.x, target.y, target.z);
-
-            System.out.println("[RAM DEBUG] Block " + block.getLocalizedName() + " at " + target.x + "," + target.y + "," + target.z + " strength=" + strength + " progress=" + entry.getValue());
 
             if (strength <= 0.0F) {
                 worldObj.destroyBlockInWorldPartially(this.getEntityId(), target.x, target.y, target.z, -1);
@@ -505,7 +545,8 @@ public class EntityBatteringRam extends Entity {
         }
 
         if (breakingBlocks.isEmpty()) {
-            breakingActive = false;
+            // Keep breakingActive controlled by input (setStatus),
+            // so animation doesn't stop mid-hold.
         }
     }
 
@@ -555,28 +596,29 @@ public class EntityBatteringRam extends Entity {
         AxisAlignedBB boundingBox = this.boundingBox;
         double minY = boundingBox != null ? boundingBox.minY : this.posY;
         int baseY = MathHelper.floor_double(minY);
+        double reach = 1.6D;
+        for (int widthOffset = -1; widthOffset <= 1; widthOffset++) {
+            double worldX = this.posX + widthOffset * cos - reach * sin;
+            double worldZ = this.posZ + widthOffset * sin + reach * cos;
+            int blockX = MathHelper.floor_double(worldX);
+            int blockZ = MathHelper.floor_double(worldZ);
 
-        for (double reach = 1.5D; reach <= 3.5D; reach += 1.0D) {
-            for (int widthOffset = -1; widthOffset <= 1; widthOffset++) {
-                double worldX = this.posX + widthOffset * cos - reach * sin;
-                double worldZ = this.posZ + widthOffset * sin + reach * cos;
-                int blockX = MathHelper.floor_double(worldX);
-                int blockZ = MathHelper.floor_double(worldZ);
-
-                for (int heightOffset = 0; heightOffset < 3; heightOffset++) {
-                    int blockY = baseY + heightOffset;
-                    Block block = worldObj.getBlock(blockX, blockY, blockZ);
-                    if (block == null || block.isAir(worldObj, blockX, blockY, blockZ)) {
-                        continue;
-                    }
-                    float hardness = block.getBlockHardness(worldObj, blockX, blockY, blockZ);
-                    if (hardness < 0.0F) {
-                        continue;
-                    }
-                    BlockTarget target = new BlockTarget(blockX, blockY, blockZ);
-                    if (uniqueTargets.add(target)) {
-                        targets.add(target);
-                    }
+            for (int heightOffset = 0; heightOffset < 3; heightOffset++) {
+                int blockY = baseY + heightOffset;
+                Block block = worldObj.getBlock(blockX, blockY, blockZ);
+                if (block == null || block.isAir(worldObj, blockX, blockY, blockZ)) {
+                    continue;
+                }
+                if (EntityStoneProjectile.isProtectedSiegeBlock(worldObj, blockX, blockY, blockZ)) {
+                    continue;
+                }
+                float hardness = block.getBlockHardness(worldObj, blockX, blockY, blockZ);
+                if (hardness < 0.0F) {
+                    continue;
+                }
+                BlockTarget target = new BlockTarget(blockX, blockY, blockZ);
+                if (uniqueTargets.add(target)) {
+                    targets.add(target);
                 }
             }
         }
@@ -587,19 +629,19 @@ public class EntityBatteringRam extends Entity {
     private ItemStack getToolForBlock(Block block, int meta) {
         Material material = block.getMaterial();
         if (material == Material.wood || material == Material.gourd || material == Material.plants || material == Material.vine) {
-            return ironAxe;
+            return woodenAxe;
         }
         if (material == Material.ground || material == Material.grass || material == Material.clay || material == Material.sand || material == Material.snow || material == Material.craftedSnow) {
-            return ironShovel;
+            return woodenShovel;
         }
-        return ironPickaxe;
+        return woodenPickaxe;
     }
 
     private FakePlayer getFakePlayer() {
         if (this.fakePlayer == null && !this.worldObj.isRemote && this.worldObj instanceof WorldServer) {
             FakePlayer player = FakePlayerFactory.get((WorldServer) this.worldObj, FAKE_PROFILE);
             player.inventory.currentItem = 0;
-            player.inventory.setInventorySlotContents(0, ironPickaxe);
+            player.inventory.setInventorySlotContents(0, woodenPickaxe);
             this.fakePlayer = player;
         }
         return this.fakePlayer;
@@ -618,6 +660,10 @@ public class EntityBatteringRam extends Entity {
     }
 
     @Override
+    public void applyEntityCollision(Entity entity) {
+    }
+
+    @Override
     public boolean canBeCollidedWith() {
         return !this.isDead;
     }
@@ -630,9 +676,6 @@ public class EntityBatteringRam extends Entity {
             if (seat != null && seat.riddenByEntity != null) {
                 seat.riddenByEntity.mountEntity(null);
             }
-        }
-        if (!this.worldObj.isRemote) {
-            this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY + 0.5D, this.posZ, new ItemStack(RegItem.batteringRamSpawner)));
         }
         this.setDead();
     }

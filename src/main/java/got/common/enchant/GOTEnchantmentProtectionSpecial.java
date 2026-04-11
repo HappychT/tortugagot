@@ -42,7 +42,7 @@ public abstract class GOTEnchantmentProtectionSpecial extends GOTEnchantment {
 	public boolean isCompatibleWith(GOTEnchantment other) {
 		if (super.isCompatibleWith(other)) {
 			if (other instanceof GOTEnchantmentProtectionSpecial) {
-				return (!isWeaponProtection() || !((GOTEnchantmentProtectionSpecial) other).isWeaponProtection()) && (isCompatibleWithOtherProtection() || ((GOTEnchantmentProtectionSpecial) other).isCompatibleWithOtherProtection());
+				return (!isWeaponProtection() || !other.isWeaponProtection()) && (isCompatibleWithOtherProtection() || ((GOTEnchantmentProtectionSpecial) other).isCompatibleWithOtherProtection());
 			}
 			return true;
 		}
@@ -50,10 +50,6 @@ public abstract class GOTEnchantmentProtectionSpecial extends GOTEnchantment {
 	}
 
 	public boolean isCompatibleWithOtherProtection() {
-		return false;
-	}
-
-	public boolean isWeaponProtection() {
 		return false;
 	}
 

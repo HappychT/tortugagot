@@ -63,6 +63,8 @@ public class GOTWeaponStats {
 
 		GOTWeaponStats.registerMeleeSpeed(ItemLightbringer.class, 0.50f);
 		GOTWeaponStats.registerMeleeSpeed(ItemNightKingSword.class, 0.60f);
+		GOTWeaponStats.registerMeleeSpeed(ItemGregorCleganeSword.class, 0.25f);
+		GOTWeaponStats.registerMeleeSpeed(ItemSandorCleganeSword.class, 0.55f);
 
 		GOTWeaponStats.registerMeleeSpeed(ItemDecoyClaymore.class, 0.65f);
 		GOTWeaponStats.registerMeleeReach(ItemDecoyClaymore.class, 1.04f);
@@ -73,7 +75,8 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(ItemIceStarkSword.class, 0.25f);
 		GOTWeaponStats.registerMeleeReach(ItemIceStarkSword.class, 1.30f);
 
-		// Gregor Clegane sword uses default greatsword speed/reach (0.667, 1.5) like Ice in-game
+		GOTWeaponStats.registerMeleeReach(ItemGregorCleganeSword.class, 1.3f);
+		GOTWeaponStats.registerMeleeReach(ItemSandorCleganeSword.class, 1.1f);
 
 		GOTWeaponStats.registerMeleeSpeed(ItemHeartsbaneSword.class, 0.55f);
 		GOTWeaponStats.registerMeleeReach(ItemHeartsbaneSword.class, 1.1f);

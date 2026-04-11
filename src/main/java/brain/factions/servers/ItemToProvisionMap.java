@@ -2,6 +2,9 @@ package brain.factions.servers;
 
 import got.common.database.GOTRegistry;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemStack;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +66,21 @@ public class ItemToProvisionMap {
             CoreFaction.LOGGER.warning("Рег null item для провизий. беда в классе ItemToProvisionMap.java");
         }
     }
+    public static float getProvisionValue(ItemStack stack) {
+        if (stack == null || stack.getItem() == null) return 0f;
 
+        Item item = stack.getItem();
+
+        if (item instanceof ItemFood) {
+            ItemFood food = (ItemFood) item;
+            float heal = food.func_150905_g(stack);
+            float saturation = food.func_150906_h(stack);
+
+            return (heal + saturation) / 2.0f;
+        }
+
+        return itemToProvisionValue.getOrDefault(item, 0);
+    }
     public static int getProvisionValue(Item item) {
         return itemToProvisionValue.getOrDefault(item, 0);
     }

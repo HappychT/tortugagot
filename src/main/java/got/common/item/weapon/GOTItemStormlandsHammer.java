@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.faction.GOTFaction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,5 +16,9 @@ public class GOTItemStormlandsHammer extends GOTItemHammer implements GOTFaction
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean show) {
         list.add(EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted("got.faction.STORMLANDS.name"));
+    }
+    @Override
+    public GOTFaction getFaction() {
+        return GOTFaction.STORMLANDS;
     }
 }

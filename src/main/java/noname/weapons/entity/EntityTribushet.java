@@ -27,6 +27,9 @@ public class EntityTribushet extends EntityLivingBase {
     private EntityPlayer rider;
     private boolean lastSwingState = false;
 
+    public static final int FIRE_ANIM_DURATION = 30;
+    private int fireAnimTimer = 0;
+
     public EntityTribushet(World world) {
         super(world);
         this.setSize(2.4F, 1.5F);
@@ -48,6 +51,7 @@ public class EntityTribushet extends EntityLivingBase {
         this.dataWatcher.addObject(20, Float.valueOf(0.0F));
         this.dataWatcher.addObject(21, Byte.valueOf((byte)0));
         this.dataWatcher.addObject(28, Float.valueOf(0.6F));
+        this.dataWatcher.addObject(22, Integer.valueOf(0));
     }
 
     private static final float RANGE_MIN = 0.2F;
@@ -63,6 +67,11 @@ public class EntityTribushet extends EntityLivingBase {
         stabilizeIfUnsupported();
 
         if (!this.worldObj.isRemote) {
+            if (fireAnimTimer > 0) {
+                fireAnimTimer--;
+                this.dataWatcher.updateObject(22, Integer.valueOf(fireAnimTimer));
+            }
+
             if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) this.riddenByEntity;
                 this.rider = player;
@@ -119,6 +128,7 @@ public class EntityTribushet extends EntityLivingBase {
             this.rotationYaw = this.dataWatcher.getWatchableObjectFloat(19);
             isReloading = (this.dataWatcher.getWatchableObjectByte(17) & 1) != 0;
             reloadTimer = this.dataWatcher.getWatchableObjectInt(18);
+            fireAnimTimer = this.dataWatcher.getWatchableObjectInt(22);
         }
     }
 
@@ -232,38 +242,43 @@ public class EntityTribushet extends EntityLivingBase {
             if (!isReadyToFire()) return;
 
             float yaw = this.rotationYaw;
-            float pitch = Math.min(player.rotationPitch, -20.0F);
+            float yawRad = yaw / 180.0F * (float) Math.PI;
 
-            double motionX = -MathHelper.sin(yaw / 180.0F * (float)Math.PI) *
-                    MathHelper.cos(pitch / 180.0F * (float)Math.PI);
-            double motionY = -MathHelper.sin(pitch / 180.0F * (float)Math.PI);
-            double motionZ = MathHelper.cos(yaw / 180.0F * (float)Math.PI) *
-                    MathHelper.cos(pitch / 180.0F * (float)Math.PI);
+            float launchAngle = -55.0F;
+            float pitchRad = launchAngle / 180.0F * (float) Math.PI;
+            double dirX = -MathHelper.sin(yawRad) * MathHelper.cos(pitchRad);
+            double dirY = -MathHelper.sin(pitchRad);
+            double dirZ = MathHelper.cos(yawRad) * MathHelper.cos(pitchRad);
 
             float rangePower = this.dataWatcher.getWatchableObjectFloat(28);
-            double speed = WeaponsConfig.tribushetProjectileSpeed * (double)rangePower;
-            motionX *= speed;
-            motionY *= speed;
-            motionZ *= speed;
+            double speed = WeaponsConfig.tribushetProjectileSpeed * (double) rangePower;
 
             EntityStoneProjectile projectile = new EntityStoneProjectile(
                     this.worldObj,
                     player,
-                    motionX,
-                    motionY,
-                    motionZ
+                    dirX * speed,
+                    dirY * speed,
+                    dirZ * speed
             );
 
-            double shootX = this.posX + motionX * 2.0D;
-            double shootY = this.posY + 1.0D + motionY * 2.0D;
-            double shootZ = this.posZ + motionZ * 2.0D;
+            double backOffset = 3.0D;
+            double shootX = this.posX + MathHelper.sin(yawRad) * backOffset;
+            double shootY = this.posY + 5.0D;
+            double shootZ = this.posZ - MathHelper.cos(yawRad) * backOffset;
 
             projectile.setPosition(shootX, shootY, shootZ);
             this.worldObj.spawnEntityInWorld(projectile);
 
             isLoaded = false;
             this.dataWatcher.updateObject(21, Byte.valueOf((byte)0));
+
+            fireAnimTimer = FIRE_ANIM_DURATION;
+            this.dataWatcher.updateObject(22, Integer.valueOf(fireAnimTimer));
         }
+    }
+
+    public int getFireAnimTimer() {
+        return fireAnimTimer;
     }
 
     @Override

@@ -22,16 +22,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BlockStructureHeart extends BlockContainer {
 
@@ -48,50 +46,58 @@ public class BlockStructureHeart extends BlockContainer {
     public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityStructureHeart();
     }
+    @Override
+    public int quantityDropped(Random random) {
+        return 0;
+    }
 
     @Override
+    public Item getItemDropped(int meta, Random random, int fortune) {
+        return null;
+    }
+    @Override
+    public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
+    }
+    @Override
+    protected boolean canSilkHarvest() {
+        return false;
+    }
+    @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-        System.out.println("[DEBUG][StructureHeart] BlockStructureHeart.onBlockActivated remote=" + world.isRemote + " pos=" + x + "," + y + "," + z + " player=" + player.getCommandSenderName());
-        if (!world.isRemote) {
-            player.addChatMessage(new ChatComponentText("[DEBUG] BlockStructureHeart.onBlockActivated SERVER"));
-        }
         if (!world.isRemote) {
             FactionStructureSlot slot = FactionStructureManager.getStructureNearby(x, y, z);
             if (slot == null) {
-                System.out.println("[DEBUG][StructureHeart] slot == null");
-                player.addChatMessage(new ChatComponentText("[DEBUG] slot == null"));
                 return false;
             }
-            System.out.println("[DEBUG][StructureHeart] slot found id=" + slot.id + " owner=" + slot.ownerFactionID + " type=" + slot.type);
-            player.addChatMessage(new ChatComponentText("[DEBUG] slot found: " + slot.id));
 
             Faction playerFaction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
             Map<String, List<String>> availableStructures = new HashMap<>();
-            String allowedFaction = slot.for_fraction != null ? slot.for_fraction : "";
 
             if (slot.ownerFactionID == null) {
                 boolean canCapture = false;
-                if (playerFaction != null && ("ALL".equalsIgnoreCase(allowedFaction) || allowedFaction.equalsIgnoreCase(playerFaction.getID()))) {
-                    canCapture = true;
-                } else if (playerFaction == null && "ALL".equalsIgnoreCase(allowedFaction)) {
+                String forFrac = slot.for_fraction;
 
+                if (playerFaction != null && (forFrac == null || forFrac.isEmpty() || forFrac.equalsIgnoreCase("ALL") || forFrac.equalsIgnoreCase(playerFaction.getID()))) {
+                    canCapture = true;
                 }
 
                 if (canCapture) {
-                    Map<String, Map<String, String>> allStructureTypes = FactionStructureManager.structureTypes;
-                    if (slot.type == FactionStructureSlot.StructureType.FORTRESS && allStructureTypes.containsKey("FORTRESS")) {
-                        availableStructures.put("FORTRESS", new ArrayList<>(allStructureTypes.get("FORTRESS").keySet()));
-                    } else if (slot.type == FactionStructureSlot.StructureType.RESOURCE_POINT) {
-                        if (allStructureTypes.containsKey("FARMS")) availableStructures.put("FARMS", new ArrayList<>(allStructureTypes.get("FARMS").keySet()));
-                        if (allStructureTypes.containsKey("INDUSTRY")) availableStructures.put("INDUSTRY", new ArrayList<>(allStructureTypes.get("INDUSTRY").keySet()));
-                    } else if (slot.type == FactionStructureSlot.StructureType.BARN && allStructureTypes.containsKey("BARN")) {
-                        availableStructures.put("BARN", new ArrayList<>(allStructureTypes.get("BARN").keySet()));
-                    } else if (slot.type == FactionStructureSlot.StructureType.ENGINEERING_WORKSHOP && allStructureTypes.containsKey("ENGINEERING_WORKSHOP")) {
-                        availableStructures.put("ENGINEERING_WORKSHOP", new ArrayList<>(allStructureTypes.get("ENGINEERING_WORKSHOP").keySet()));
+                    Map<String, Map<String, String>> allStructureCategorys = FactionStructureManager.structureTypes;
+
+                    if (slot.category == FactionStructureSlot.StructureCategory.NONE) {
+                        if (allStructureCategorys.containsKey("FARMS")) availableStructures.put("FARMS", new ArrayList<>(allStructureCategorys.get("FARMS").keySet()));
+                        if (allStructureCategorys.containsKey("INDUSTRY")) availableStructures.put("INDUSTRY", new ArrayList<>(allStructureCategorys.get("INDUSTRY").keySet()));
+                        if (allStructureCategorys.containsKey("BARN")) availableStructures.put("BARN", new ArrayList<>(allStructureCategorys.get("BARN").keySet()));
+                        if (allStructureCategorys.containsKey("ENGINEERING_WORKSHOP")) availableStructures.put("ENGINEERING_WORKSHOP", new ArrayList<>(allStructureCategorys.get("ENGINEERING_WORKSHOP").keySet()));
+                        if (allStructureCategorys.containsKey("STABLE")) availableStructures.put("STABLE", new ArrayList<>(allStructureCategorys.get("STABLE").keySet()));
+                    } else {
+                        String catName = slot.category.name();
+                        if (allStructureCategorys.containsKey(catName)) {
+                            availableStructures.put(catName, new ArrayList<>(allStructureCategorys.get(catName).keySet()));
+                        }
                     }
                 } else {
                     player.addChatMessage(new ChatComponentText("§cЭта точка не предназначена для вашей фракции или вы не состоите во фракции."));
-                    System.out.println("[DEBUG][StructureHeart] cannot capture, sending sync");
                     CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(x, y, z, slot, availableStructures), (EntityPlayerMP) player);
                     return true;
                 }
@@ -111,18 +117,14 @@ public class BlockStructureHeart extends BlockContainer {
                 }
                 if (!canOpen) {
                     player.addChatMessage(new ChatComponentText("§cУ вас нет доступа к этой структуре."));
-                    System.out.println("[DEBUG][StructureHeart] cannot open, sending sync");
                     CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(x, y, z, slot, availableStructures), (EntityPlayerMP) player);
                     return true;
                 }
             }
 
-            System.out.println("[DEBUG][StructureHeart] sending PacketStructureGUISync");
-            player.addChatMessage(new ChatComponentText("[DEBUG] sending PacketStructureGUISync"));
             CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(x, y, z, slot, availableStructures), (EntityPlayerMP) player);
 
         } else if (!Annot.SERVER) {
-            System.out.println("[DEBUG][StructureHeart] client branch opening gui directly");
             Minecraft.getMinecraft().displayGuiScreen(new got.client.gui.faction.GuiStructureBlock(x, y, z, null));
         }
         return true;
@@ -148,54 +150,86 @@ public class BlockStructureHeart extends BlockContainer {
                     return;
                 }
 
-                boolean raidTimeActive = StructureManager.isRaidTimeNow(slot);
+                boolean isFortress = slot.category == FactionStructureSlot.StructureCategory.FORTRESS;
+                boolean canDestroy = false;
 
-                if (!raidTimeActive) {
+                if (isFortress) {
+                    if (brain.factions.servers.StructureManager.activeWarFortresses.contains(slot.id)) {
+                        double distanceSq = player.getDistanceSq(slot.xCoord + 0.5D, slot.yCoord + 0.5D, slot.zCoord + 0.5D);
+                        if (distanceSq <= 250000) { // 500^2
+                            canDestroy = true;
+                        } else {
+                            player.addChatMessage(new ChatComponentText("§cВы слишком далеко от центра крепости для атаки (нужно < 500 блоков)!"));
+                        }
+                    }
+                } else {
+                    boolean raidTimeActive = brain.factions.servers.StructureManager.isRaidTimeNow(slot) || brain.factions.servers.StructureManager.activeRaidPoints.contains(slot.id);
+                    if (raidTimeActive) {
+                        double distanceSq = player.getDistanceSq(slot.xCoord + 0.5D, slot.yCoord + 0.5D, slot.zCoord + 0.5D);
+                        if (distanceSq <= 62500) { // 250^2
+                            canDestroy = true;
+                        } else {
+                            player.addChatMessage(new ChatComponentText("§cВы слишком далеко от сердца точки для атаки (нужно < 250 блоков)!"));
+                        }
+                    }
+                }
+
+                if (!canDestroy) {
                     restoreBlock(world, x, y, z, meta, slot.id);
-                    player.addChatMessage(new ChatComponentText("§cСтруктуру можно разрушать только во время рейд-тайма!"));
+                    if (isFortress) {
+                        player.addChatMessage(new ChatComponentText("§cЭта крепость сейчас не находится в состоянии войны!"));
+                    } else {
+                        player.addChatMessage(new ChatComponentText("§cЭту точку можно атаковать только во время рейда!"));
+                    }
                     return;
                 }
 
-                if (GOTFactionRelations.areFactionsHostile(GOTFaction.forName(playerFaction.getID()), GOTFaction.forName(slot.ownerFactionID))) {
+                if (got.common.faction.GOTFactionRelations.areFactionsHostile(got.common.faction.GOTFaction.forName(playerFaction.getID()), got.common.faction.GOTFaction.forName(slot.ownerFactionID))) {
                     slot.destructionCount--;
                     player.addChatMessage(new ChatComponentText("§eПрочность структуры: " + slot.destructionCount));
 
+                    if (!isFortress && slot.securityLevel > 0) {
+                        if (slot.destructionCount > 0 && slot.destructionCount % 25 == 0) {
+                            brain.factions.servers.StructureManager.spawnSecurityNPCs(world, slot.xCoord, slot.yCoord, slot.zCoord, slot.ownerFactionID, slot.securityLevel);
+                            player.addChatMessage(new ChatComponentText("§cГарнизон точки поднят по тревоге!"));
+                        }
+                    }
+
                     if (slot.destructionCount <= 0) {
-                        boolean isFortress = slot.type == FactionStructureSlot.StructureType.FORTRESS;
                         if (isFortress) {
                             FactionStructureManager.setStructureOwner(slot.id, playerFaction.getID());
                             slot.ownerFactionID = playerFaction.getID();
-                            slot.destructionCount = StructureManager.config.structureBreakCounts.getOrDefault(slot.level, slot.level);
+                            slot.destructionCount = 100 + ((slot.level > 0 ? slot.level : 1) - 1) * 10;
+                            slot.barracksCapacity = (slot.level > 0 ? slot.level : 1) * 10;
 
                             restoreBlock(world, x, y, z, meta, slot.id);
                             TileEntity te = world.getTileEntity(x, y, z);
                             if (te instanceof TileEntityStructureHeart) {
-                                Arrays.fill(((TileEntityStructureHeart) te).getInventory(), null);
+                                java.util.Arrays.fill(((TileEntityStructureHeart) te).getInventory(), null);
                                 te.markDirty();
                             }
                             world.markBlockForUpdate(x, y, z);
                             slot.provisions = 0;
-                            player.addChatMessage(new ChatComponentText("§aВы захватили крепость!"));
+                            player.addChatMessage(new ChatComponentText("§aВаша фракция захватила крепость!"));
                         } else {
                             if (slot.structureFile != null && !slot.structureFile.isEmpty()) {
                                 try {
-                                    File structureFile = new File(new File(CoreFaction.configFolder, "structures"), slot.structureFile);
+                                    java.io.File structureFile = new java.io.File(new java.io.File(brain.factions.servers.CoreFaction.configFolder, "structures"), slot.structureFile);
                                     if (structureFile.exists()) {
-                                        String jsonContent = Files.toString(structureFile, Charsets.UTF_8);
-                                        StructureData structureData = new Gson().fromJson(jsonContent, StructureData.class);
+                                        String jsonContent = com.google.common.io.Files.toString(structureFile, com.google.common.base.Charsets.UTF_8);
+                                        brain.factions.structures.StructureData structureData = new com.google.gson.Gson().fromJson(jsonContent, brain.factions.structures.StructureData.class);
                                         int xOffset = structureData.getWidth() / 2;
                                         int zOffset = structureData.getDepth() / 2;
-                                        for (BlockData blockData : structureData.getBlocks()) {
+                                        for (brain.factions.structures.BlockData blockData : structureData.getBlocks()) {
                                             int blockX = slot.xCoord + blockData.getX() - xOffset;
                                             int blockY = slot.yCoord + blockData.getY() - 3;
                                             int blockZ = slot.zCoord + blockData.getZ() - zOffset;
-                                            if(world.getBlock(blockX, blockY, blockZ) != Blocks.air) {
+                                            if(world.getBlock(blockX, blockY, blockZ) != net.minecraft.init.Blocks.air) {
                                                 world.setBlockToAir(blockX, blockY, blockZ);
                                             }
                                         }
                                     }
                                 } catch (Exception e) {
-                                    CoreFaction.logger().severe("Error removing structure blocks: " + e.getMessage());
                                     e.printStackTrace();
                                 }
                             }
@@ -204,7 +238,7 @@ public class BlockStructureHeart extends BlockContainer {
                             TileEntity newTe = world.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
                             if (newTe instanceof TileEntityStructureHeart) {
                                 ((TileEntityStructureHeart) newTe).setStructureId(slot.id);
-                                Arrays.fill(((TileEntityStructureHeart) newTe).getInventory(), null);
+                                java.util.Arrays.fill(((TileEntityStructureHeart) newTe).getInventory(), null);
                                 newTe.markDirty();
                             }
                             world.markBlockForUpdate(slot.xCoord, slot.yCoord, slot.zCoord);
@@ -212,26 +246,26 @@ public class BlockStructureHeart extends BlockContainer {
                             FactionStructureManager.setStructureOwner(slot.id, null);
                             slot.ownerFactionID = null;
                             slot.level = 0;
+                            slot.securityLevel = 0;
                             slot.name = "Нейтральная территория";
-                            slot.category = FactionStructureSlot.StructureCategory.NONE;
+                            slot.category = brain.factions.structures.FactionStructureSlot.StructureCategory.NONE;
                             slot.structureFile = null;
-                            slot.destructionCount = 1;
+                            slot.destructionCount = 100;
 
-                            player.addChatMessage(new ChatComponentText("§cВы разрушили ресурсную точку!"));
+                            player.addChatMessage(new ChatComponentText("§cРесурсная точка была полностью разрушена!"));
                         }
                     } else {
                         restoreBlock(world, x, y, z, meta, slot.id);
                     }
                     FactionStructureManager.saveStructureOwnership();
-                    CoreFaction.sendAllGui();
+                    brain.factions.servers.CoreFaction.sendAllGui();
                 } else {
                     restoreBlock(world, x, y, z, meta, slot.id);
-                    player.addChatMessage(new ChatComponentText("§cВы не можете атаковать структуры союзных или нейтральных фракций!"));
+                    player.addChatMessage(new ChatComponentText("§cВы не можете атаковать союзников!"));
                 }
             }
         }
     }
-
     private void restoreBlock(World world, int x, int y, int z, int meta, String structureId) {
         world.setBlock(x, y, z, this, meta, 3);
         TileEntity te = world.getTileEntity(x, y, z);

@@ -57,6 +57,10 @@ public class GOTPacketSetOption implements IMessage {
 				flag = pd.getEnableConquestKills();
 				pd.setEnableConquestKills(!flag);
 				break;
+			case 6:
+				flag = pd.getAutoRespawn();
+				pd.setAutoRespawn(!flag);
+				break;
 			case 9:
 				flag = pd.getTableSwitched();
 				pd.setTableSwitched(!flag);

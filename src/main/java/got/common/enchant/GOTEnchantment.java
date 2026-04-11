@@ -12,8 +12,8 @@ public abstract class GOTEnchantment {
 	public static Map<String, GOTEnchantment> enchantsByName = new HashMap<>();
 	public static GOTEnchantment strong1 = new GOTEnchantmentDamage("strong1", 0.5F).setEnchantWeight(10);
 	public static GOTEnchantment strong2 = new GOTEnchantmentDamage("strong2", 1.0F).setEnchantWeight(5);
-	public static GOTEnchantment strong3 = new GOTEnchantmentDamage("strong3", 2.0F).setEnchantWeight(2);
-	public static GOTEnchantment strong4 = new GOTEnchantmentDamage("strong4", 3.0F).setEnchantWeight(1).setSkilful();
+	public static GOTEnchantment strong3 = new GOTEnchantmentDamage("strong3", 2.0F).setEnchantWeight(0);
+	public static GOTEnchantment strong4 = new GOTEnchantmentDamage("strong4", 3.0F).setEnchantWeight(0);
 	public static GOTEnchantment weak1 = new GOTEnchantmentDamage("weak1", -0.5F).setEnchantWeight(6);
 	public static GOTEnchantment weak2 = new GOTEnchantmentDamage("weak2", -1.0F).setEnchantWeight(4);
 	public static GOTEnchantment weak3 = new GOTEnchantmentDamage("weak3", -2.0F).setEnchantWeight(2);
@@ -106,7 +106,7 @@ public abstract class GOTEnchantment {
 	public static GOTEnchantment restBuff = new GOTEnchantmentRestBuff("restBuff").setEnchantWeight(1).setSkilful();
 	public static GOTEnchantment secondBreathBuff = new GOTEnchantmentSecondBreathBuff("secondBreathBuff").setEnchantWeight(1).setSkilful();
 	public static GOTEnchantment dexterityBuff = new GOTEnchantmentDexterityBuff("dexterityBuff").setEnchantWeight(1).setSkilful();
-	
+
 	public static GOTEnchantment valyrianSeal = new GOTEnchantmentValyrianSeal("valyrianSeal").setEnchantWeight(0);
 	public static GOTEnchantment soulbound = new GOTEnchantmentSoulbound("soulbound").setEnchantWeight(0);
 
@@ -222,6 +222,10 @@ public abstract class GOTEnchantment {
 
 	public boolean isCompatibleWith(GOTEnchantment other) {
 		return getClass() != other.getClass();
+	}
+
+	public boolean isWeaponProtection() {
+		return false;
 	}
 
 	public boolean isSkilful() {

@@ -1,9 +1,10 @@
 package noname.weapons.war;
 
-import brain.factions.servers.SiegeActivationManager;
+import brain.factions.servers.StructureManager;
+import brain.factions.structures.FactionStructureManager;
+import brain.factions.structures.FactionStructureSlot;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import got.common.GOTBannerProtection;
 import got.common.database.GOTRegistry;
 import net.minecraft.block.Block;
@@ -17,40 +18,41 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Обработчик блоков для военного режима.
  * Управляет размещением и ломанием земли в приватах во время войны.
  */
 public class WarBlockHandler {
 
-    private static final float WAR_DIG_SPEED = 1.0F;
-    private static final List<Object[]> PENDING_DIRT_FALL = new ArrayList<>();
-
-    public static void scheduleDirtFallCheck(World world, int x, int y, int z) {
-        synchronized (PENDING_DIRT_FALL) {
-            PENDING_DIRT_FALL.add(new Object[]{world, x, y, z});
-        }
-    }
-
-    public static void scheduleDirtColumnFallChecks(World world, int x, int y, int z) {
-        for (int checkY = y; checkY < y + 6; checkY++) {
-            if (!isDirtBlock(world.getBlock(x, checkY, z))) {
-                break;
-            }
-            scheduleDirtFallCheck(world, x, checkY, z);
-        }
-    }
-
-    public static boolean isWaterBlock(Block block) {
-        return block == Blocks.water || block == Blocks.flowing_water;
-    }
+    private static final float WAR_DIG_SPEED = 0.4f;
+    private static final int WAR_RADIUS = 500;
 
     public static boolean isWarActiveAt(World world, int x, int y, int z) {
-        return world != null && SiegeActivationManager.getInstance().isSiegeActive(world.provider.dimensionId, x, y, z);
+        if (world == null) {
+            return false;
+        }
+
+        if (StructureManager.activeWarFortresses.isEmpty()) {
+            return false;
+        }
+
+        for (String id : StructureManager.activeWarFortresses) {
+            if (id == null) {
+                continue;
+            }
+            FactionStructureSlot slot = FactionStructureManager.getStructureById(id);
+            if (slot == null) {
+                continue;
+            }
+            int dx = x - slot.xCoord;
+            int dy = y - slot.yCoord;
+            int dz = z - slot.zCoord;
+            if ((dx * dx + dy * dy + dz * dz) <= (WAR_RADIUS * WAR_RADIUS)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean canPlaceProtectedDirt(World world, int x, int y, int z, int side) {
@@ -81,10 +83,6 @@ public class WarBlockHandler {
                 return false;
         }
 
-        if (isWaterBlock(world.getBlock(targetX, targetY, targetZ))) {
-            return true;
-        }
-
         if (side != 1) {
             return false;
         }
@@ -93,7 +91,7 @@ public class WarBlockHandler {
             return false;
         }
 
-        return countRaisedDirtStack(world, x, y, z) < 4;
+        return countDirtBelow(world, x, y, z) < 4;
     }
 
     /**
@@ -169,28 +167,6 @@ public class WarBlockHandler {
             return;
         }
 
-        scheduleDirtFallCheck(world, targetX, targetY, targetZ);
-    }
-
-    @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
-        synchronized (PENDING_DIRT_FALL) {
-            Iterator<Object[]> it = PENDING_DIRT_FALL.iterator();
-            while (it.hasNext()) {
-                Object[] entry = it.next();
-                World w = (World) entry[0];
-                int px = (Integer) entry[1];
-                int py = (Integer) entry[2];
-                int pz = (Integer) entry[3];
-                it.remove();
-                if (w != null && w.blockExists(px, py, pz)) {
-                    tryFall(w, px, py, pz);
-                }
-            }
-        }
     }
 
     /**
@@ -222,7 +198,6 @@ public class WarBlockHandler {
         if (isProtected && isWarActiveAt(world, x, y, z)) {
             // В привате - разрешаем ломать землю
             event.setCanceled(false);
-            scheduleDirtColumnFallChecks(world, x, y + 1, z);
         }
     }
 
@@ -280,37 +255,18 @@ public class WarBlockHandler {
             // Блоки могут не существовать
         }
 
-        // Проверяем материал
-        if (block.getMaterial() == Material.ground ||
-                block.getMaterial() == Material.grass ||
+        // Явные исключения (материал слишком общий и включает несоответствующие блоки)
+        if (block == Blocks.hay_block) {
+            return false;
+        }
+
+        // Проверяем материал (как fallback для модовых "земляных" блоков)
+        if (block.getMaterial() == Material.grass ||
                 block.getMaterial() == Material.clay) {
             return true;
         }
 
         return false;
-    }
-
-    private static boolean isRaisedDirtSegment(World world, int x, int y, int z) {
-        if (!isDirtBlock(world.getBlock(x, y, z))) {
-            return false;
-        }
-
-        return !isDirtBlock(world.getBlock(x + 1, y, z)) ||
-                !isDirtBlock(world.getBlock(x - 1, y, z)) ||
-                !isDirtBlock(world.getBlock(x, y, z + 1)) ||
-                !isDirtBlock(world.getBlock(x, y, z - 1));
-    }
-
-    private static void tryFall(World world, int x, int y, int z) {
-        Block block = world.getBlock(x, y, z);
-        if (!isDirtBlock(block) || !canFall(world, x, y - 1, z)) {
-            return;
-        }
-        int meta = world.getBlockMetadata(x, y, z);
-        world.setBlockToAir(x, y, z);
-        net.minecraft.entity.item.EntityFallingBlock falling = new net.minecraft.entity.item.EntityFallingBlock(
-                world, x + 0.5, y + 0.5, z + 0.5, block, meta);
-        world.spawnEntityInWorld(falling);
     }
 
     public static int countDirtBelow(World world, int x, int y, int z) {
@@ -324,28 +280,5 @@ public class WarBlockHandler {
             }
         }
         return count;
-    }
-
-    public static int countRaisedDirtStack(World world, int x, int y, int z) {
-        int count = 0;
-        for (int checkY = y; checkY >= 0 && count < 5; checkY--) {
-            if (!isRaisedDirtSegment(world, x, checkY, z)) {
-                break;
-            }
-            count++;
-        }
-        return count;
-    }
-
-    private static boolean canFall(World world, int x, int y, int z) {
-        if (y < 0) {
-            return false;
-        }
-        Block block = world.getBlock(x, y, z);
-        return block.isAir(world, x, y, z) ||
-                block == Blocks.water ||
-                block == Blocks.flowing_water ||
-                block == Blocks.fire ||
-                block.getMaterial().isLiquid();
     }
 }

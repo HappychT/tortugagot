@@ -10,6 +10,7 @@ import got.client.gui.*;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import got.common.block.other.GOTBlockFlowerPot;
 import got.common.database.*;
+import got.common.entity.GOTEnchaldBlacksmith;
 import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.entity.animal.GOTEntityHorse;
 import got.common.entity.other.*;
@@ -25,6 +26,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.item.EntityMinecartContainer;
 import net.minecraft.entity.player.*;
 import net.minecraft.init.Blocks;
@@ -34,8 +36,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.*;
-import net.minecraftforge.common.MinecraftForge;
-import noname.weapons.events.OverlayEventHandler;
 
 public class GOTCommonProxy implements IGuiHandler {
 	public void addMapPlayerLocation(GameProfile player, double posX, double posZ) {
@@ -389,6 +389,12 @@ public class GOTCommonProxy implements IGuiHandler {
 			return new GOTGuiCraftingTable.Jogos(entityplayer.inventory, world, i, j, k);
 		case 88:
 			return new GOTGuiCraftingTable.Mossovy(entityplayer.inventory, world, i, j, k);
+		case 89:
+			entity = world.getEntityByID(i);
+			if (entity instanceof GOTEnchaldBlacksmith){
+				return new GOTGuiFactionBlacksmith(entityplayer, (EntityCreature) entity);
+			}
+			break;
 		default:
 			break;
 		}
@@ -698,6 +704,12 @@ public class GOTCommonProxy implements IGuiHandler {
 			return new GOTContainerCraftingTable.Jogos(entityplayer.inventory, world, i, j, k);
 		case 88:
 			return new GOTContainerCraftingTable.Mossovy(entityplayer.inventory, world, i, j, k);
+		case 89:
+			entity = world.getEntityByID(i);
+			if (entity instanceof GOTEnchaldBlacksmith) {
+				return new GOTContainerFactionBlacksmith(entityplayer, (EntityCreature) entity);
+			}
+			break;
 		default:
 			break;
 		}
@@ -851,5 +863,11 @@ public class GOTCommonProxy implements IGuiHandler {
 
 	public static int unpackSlot(int fullID) {
 		return fullID >> 16;
+	}
+
+	public void handleSyncInventory(net.minecraft.item.ItemStack[] mainInventory, net.minecraft.item.ItemStack itemstack) {
+	}
+
+	public void handleSyncWeaponHitCount(net.minecraft.item.Item item, int hitCount) {
 	}
 }

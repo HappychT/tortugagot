@@ -1,7 +1,11 @@
 package brain.factions.servers;
 
-import java.util.ArrayList;
+import brain.factions.structures.FactionStructureManager;
+import brain.factions.structures.FactionStructureSlot;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SiegeActivationManager {
@@ -34,6 +38,40 @@ public class SiegeActivationManager {
         raidZones.clear();
     }
 
+    public void rebuildRaidZones(int dimension) {
+        clearRaidZones();
+        if (FactionStructureManager.structureSlots == null) {
+            return;
+        }
+
+        Set<String> added = new HashSet<>();
+
+        if (StructureManager.isRaidTime) {
+            for (FactionStructureSlot slot : FactionStructureManager.structureSlots) {
+                if (slot == null || slot.category == FactionStructureSlot.StructureCategory.FORTRESS) {
+                    continue;
+                }
+                addRaidZone(dimension, slot.xCoord, slot.yCoord, slot.zCoord);
+                if (slot.id != null) {
+                    added.add(slot.id);
+                }
+            }
+        }
+
+        if (!StructureManager.activeRaidPoints.isEmpty()) {
+            for (String id : StructureManager.activeRaidPoints) {
+                if (id == null || added.contains(id)) {
+                    continue;
+                }
+                FactionStructureSlot slot = FactionStructureManager.getStructureById(id);
+                if (slot == null || slot.category == FactionStructureSlot.StructureCategory.FORTRESS) {
+                    continue;
+                }
+                addRaidZone(dimension, slot.xCoord, slot.yCoord, slot.zCoord);
+            }
+        }
+    }
+
     public boolean isSiegeActive(int dimension, double x, double y, double z) {
         int ix = (int) Math.floor(x);
         int iy = (int) Math.floor(y);
@@ -44,11 +82,9 @@ public class SiegeActivationManager {
             if (zone.contains(ix, iy, iz)) return true;
         }
 
-        if (StructureManager.isRaidTimeFortress) {
-            for (SiegeZone zone : raidZones) {
-                if (zone.dimension != dimension) continue;
-                if (zone.contains(ix, iy, iz)) return true;
-            }
+        for (SiegeZone zone : raidZones) {
+            if (zone.dimension != dimension) continue;
+            if (zone.contains(ix, iy, iz)) return true;
         }
 
         return false;

@@ -3,11 +3,11 @@ package got.common.entity.other;
 import java.util.List;
 import java.util.Random;
 
+import got.common.entity.animal.GOTEntityHorse;
 import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.network.*;
 import got.coremod.GOTReplacedMethods;
 import net.minecraft.entity.*;
-import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
@@ -33,8 +33,9 @@ public class GOTMountFunctions {
 	}
 
 	public static boolean isMountControllable(Entity mount) {
-		if (mount instanceof EntityHorse && ((EntityHorse) mount).isTame()) {
-			return true;
+		if (mount instanceof GOTEntityHorse) {
+			GOTEntityHorse horse = (GOTEntityHorse) mount;
+			return horse.isTame() && horse.getMountable() && !horse.getBelongsToNPC();
 		}
 		if (mount instanceof GOTEntityDirewolf && ((GOTEntityDirewolf) mount).isBridleTamed()) {
 			return true;

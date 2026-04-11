@@ -25,12 +25,8 @@ public class GOTItemShieldReachPike extends GOTItemShieldPike implements GOTFact
         list.add(EnumChatFormatting.GREEN + StatCollector.translateToLocalFormatted("got.faction.REACH.name"));
     }
 
-//    @Override
-//    public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer entityplayer, Entity entity) {
-//        GOTLevelData.getData(entityplayer);
-//        if (!GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.getEnchantmentByName("multifracConverter"))) {
-//            return GOTLevelData.getData(entityplayer).getPledgeFaction() != GOTFaction.REACH;
-//        }
-//        return false;
-//    }
+    @Override
+    public GOTFaction getFaction() {
+        return GOTFaction.REACH;
+    }
 }

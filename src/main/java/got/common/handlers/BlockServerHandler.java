@@ -61,10 +61,6 @@ public class BlockServerHandler {
                     StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(weapon.getClass(), player).getStaminaAttackPercent(), attackerPlayer);
                 }
 
-                if (weapon instanceof ItemPoisonedSandBlade) {
-                    player.addPotionEffect(new PotionEffect(GOTEffects.neurotoxin.id, 160, 0));
-                }
-
                 if (weapon instanceof ItemNightKingSword) {
                     player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 120, 0));
                 }

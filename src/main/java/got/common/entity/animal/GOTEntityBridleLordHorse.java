@@ -10,4 +10,9 @@ public class GOTEntityBridleLordHorse extends GOTEntityBridleHorse {
     @Override
     public void applyBridleAppearance() {
     }
+
+    @Override
+    public int getTotalArmorValue() {
+        return 5;
+    }
 }

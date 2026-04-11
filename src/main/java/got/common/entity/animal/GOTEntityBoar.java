@@ -23,6 +23,7 @@ import net.minecraft.world.World;
 
 public class GOTEntityBoar extends GOTEntityHorse implements GOTBiome.ImmuneToFrost {
 	private boolean allowRiddenStepUp = true;
+	private int ramCooldown = 0;
 
 	public GOTEntityBoar(World world) {
 		super(world);
@@ -83,6 +84,11 @@ public class GOTEntityBoar extends GOTEntityHorse implements GOTBiome.ImmuneToFr
 	@Override
 	public float getStepHeightWhileRiddenByPlayer() {
 		return allowRiddenStepUp ? super.getStepHeightWhileRiddenByPlayer() : 0.0f;
+	}
+
+	@Override
+	public int getTotalArmorValue() {
+		return 8;
 	}
 
 	@Override
@@ -153,11 +159,14 @@ public class GOTEntityBoar extends GOTEntityHorse implements GOTBiome.ImmuneToFr
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (!worldObj.isRemote) {
+			if (ramCooldown > 0) {
+				ramCooldown--;
+			}
 			if (riddenByEntity instanceof EntityLivingBase) {
 				EntityLivingBase boarRider = (EntityLivingBase) riddenByEntity;
 				float momentum = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
 				setSprinting(momentum > 0.16f);
-				if (momentum >= 0.18f) {
+				if (ramCooldown <= 0 && momentum >= 0.18f) {
 					float strength = momentum * 8.0f;
 					Vec3.createVectorHelper(posX, posY, posZ);
 					Vec3 look = getLookVec();
@@ -170,8 +179,8 @@ public class GOTEntityBoar extends GOTEntityHorse implements GOTBiome.ImmuneToFr
 						EntityLivingBase entity;
 						Entity obj = (Entity) element;
 						if (!(obj instanceof EntityLivingBase) || (entity = (EntityLivingBase) obj) == boarRider || boarRider instanceof EntityPlayer && !GOT.canPlayerAttackEntity((EntityPlayer) boarRider, entity, false) || boarRider instanceof EntityCreature && !GOT.canNPCAttackEntity((EntityCreature) boarRider, entity, false) || !entity.attackEntityFrom(DamageSource.causeMobDamage(this), strength)) {
-							continue;
-						}
+								continue;
+							}
 						float knockback = strength * 0.045f;
 						entity.addVelocity(-MathHelper.sin(rotationYaw * 3.1415927f / 180.0f) * knockback, knockback * 0.5f, MathHelper.cos(rotationYaw * 3.1415927f / 180.0f) * knockback);
 						hitAnyEntities = true;
@@ -182,6 +191,7 @@ public class GOTEntityBoar extends GOTEntityHorse implements GOTBiome.ImmuneToFr
 						entityliving.setAttackTarget(boarRider);
 					}
 					if (hitAnyEntities) {
+						ramCooldown = 20;
 						worldObj.playSoundAtEntity(this, "mob.pig.say", 1.0f, (rand.nextFloat() - rand.nextFloat()) * 0.2f + 0.8f);
 					}
 				}

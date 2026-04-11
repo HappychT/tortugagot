@@ -35,10 +35,10 @@ public class GOTEnchantmentWeaponSpecial extends GOTEnchantment {
 
     @Override
     public String getDescription(ItemStack itemstack) {
-        if (GOTWeaponStats.isMeleeWeapon(itemstack))
-            return StatCollector.translateToLocalFormatted("got.enchant." + this.enchantName + ".desc.melee");
+//        if (GOTWeaponStats.isMeleeWeapon(itemstack))
+//            return StatCollector.translateToLocalFormatted("got.enchant." + this.enchantName + ".desc.melee");
 
-        return StatCollector.translateToLocalFormatted("got.enchant." + this.enchantName + ".desc.ranged");
+        return StatCollector.translateToLocalFormatted("got.enchant." + this.enchantName + ".desc");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class GOTEnchantmentWeaponSpecial extends GOTEnchantment {
     }
 
     public static void doChillAttack(EntityLivingBase entity) {
-        if (entity instanceof EntityPlayerMP && !entity.isPotionActive(GOTEffects.antiEffect.id)) {
+        if (entity instanceof EntityPlayerMP) {
             GOTDamage.doFrostDamage((EntityPlayerMP) entity);
         }
 

@@ -16,6 +16,7 @@ import got.common.database.GOTEffects;
 import got.common.database.GOTRegistry;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
+import got.common.item.other.GOTItemBridle;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,6 +33,7 @@ public class GOTSoulBoundEvents {
     private Map<String, ItemStack[]> itemsToRestore = new HashMap<>();
     private Map<String, ItemStack[]> fullInventoryCache = new HashMap<>();
     private Set<String> skipPenalty = new HashSet<>();
+    private Set<String> fullInventoryRestore = new HashSet<>();
 
     public static GOTSoulBoundEvents instance;
 
@@ -40,6 +42,14 @@ public class GOTSoulBoundEvents {
     private Set<String> processingLogout = new HashSet<>();
     public GOTSoulBoundEvents() {
         instance = this;
+    }
+
+    private boolean shouldAlwaysRestoreOnDeath(ItemStack itemstack) {
+        return itemstack != null
+                && itemstack.getItem() != null
+                && (itemstack.getItem() == GOTRegistry.wargCloak
+                || itemstack.getItem() instanceof GOTItemBridle
+                || GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.soulbound));
     }
 
     @SubscribeEvent
@@ -189,9 +199,41 @@ public class GOTSoulBoundEvents {
 
     private void queueFullInventoryRestore(EntityPlayer player, String playerID) {
         ItemStack[] fullInventory = getOrCreateFullInventory(playerID, player);
-        this.itemsToRestore.put(playerID, fullInventory);
-        this.skipPenalty.add(playerID);
-        saveItemsToFile(player, fullInventory);
+        queueRestore(player, playerID, fullInventory, true, true);
+    }
+
+    public void queueFullInventoryRestore(EntityPlayer player) {
+        String playerID = player.getUniqueID().toString();
+        ItemStack[] fullInventory = captureFullInventory(player);
+        this.fullInventoryCache.put(playerID, fullInventory);
+        queueRestore(player, playerID, fullInventory, true, true);
+    }
+
+    public void queueSoulboundRestore(EntityPlayer player) {
+        String playerID = player.getUniqueID().toString();
+        ItemStack[] soulboundInventory = captureSoulboundInventory(player);
+        if (hasAnyItems(soulboundInventory)) {
+            queueRestore(player, playerID, soulboundInventory, false, false);
+        } else {
+            this.itemsToRestore.remove(playerID);
+            this.fullInventoryRestore.remove(playerID);
+            deleteSaveFile(player);
+        }
+    }
+
+    private void queueRestore(EntityPlayer player, String playerID, ItemStack[] items, boolean shouldSkipPenalty, boolean isFullInventoryRestore) {
+        this.itemsToRestore.put(playerID, items);
+        if (shouldSkipPenalty) {
+            this.skipPenalty.add(playerID);
+        } else {
+            this.skipPenalty.remove(playerID);
+        }
+        if (isFullInventoryRestore) {
+            this.fullInventoryRestore.add(playerID);
+        } else {
+            this.fullInventoryRestore.remove(playerID);
+        }
+        saveItemsToFile(player, items);
     }
 
     public void manuallyTriggerSave(EntityPlayer player) {
@@ -199,6 +241,91 @@ public class GOTSoulBoundEvents {
         ItemStack[] fullInventory = captureFullInventory(player);
         this.fullInventoryCache.put(playerID, fullInventory);
         saveItemsToFile(player, fullInventory);
+    }
+
+    public ItemStack[] captureSoulboundInventory(EntityPlayer player) {
+        ItemStack[] main = player.inventory.mainInventory;
+        ItemStack[] armor = player.inventory.armorInventory;
+        ItemStack[] itemsPerPlayer = new ItemStack[main.length + armor.length];
+
+        for (int mainIndex = 0; mainIndex < main.length; mainIndex++) {
+            ItemStack mainItem = main[mainIndex];
+            if (mainItem != null && GOTEnchantmentHelper.isItemSoulBound(mainItem)) {
+                itemsPerPlayer[mainIndex + armor.length] = mainItem.copy();
+            }
+        }
+
+        for (int armorIndex = 0; armorIndex < armor.length; armorIndex++) {
+            ItemStack armorItem = armor[armorIndex];
+            if (armorItem != null && GOTEnchantmentHelper.isItemSoulBound(armorItem)) {
+                itemsPerPlayer[armorIndex] = armorItem.copy();
+            }
+        }
+
+        return itemsPerPlayer;
+    }
+
+    private boolean hasAnyItems(ItemStack[] items) {
+        if (items == null) {
+            return false;
+        }
+        for (ItemStack item : items) {
+            if (item != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAnyInventoryItems(EntityPlayer player) {
+        for (ItemStack item : player.inventory.armorInventory) {
+            if (item != null) {
+                return true;
+            }
+        }
+        for (ItemStack item : player.inventory.mainInventory) {
+            if (item != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void replaceInventory(EntityPlayer player, ItemStack[] itemsPerPlayer) {
+        System.arraycopy(itemsPerPlayer, player.inventory.armorInventory.length, player.inventory.mainInventory, 0, player.inventory.mainInventory.length);
+        System.arraycopy(itemsPerPlayer, 0, player.inventory.armorInventory, 0, player.inventory.armorInventory.length);
+    }
+
+    private void mergeRestoredItems(EntityPlayer player, ItemStack[] itemsPerPlayer) {
+        int armorLength = player.inventory.armorInventory.length;
+
+        for (int armorIndex = 0; armorIndex < armorLength; armorIndex++) {
+            ItemStack restoredArmor = itemsPerPlayer[armorIndex];
+            if (restoredArmor == null) {
+                continue;
+            }
+
+            ItemStack currentArmor = player.inventory.armorInventory[armorIndex];
+            if (currentArmor == null) {
+                player.inventory.armorInventory[armorIndex] = restoredArmor;
+            } else if (!ItemStack.areItemStacksEqual(currentArmor, restoredArmor)) {
+                player.inventory.addItemStackToInventory(restoredArmor);
+            }
+        }
+
+        for (int mainIndex = 0; mainIndex < player.inventory.mainInventory.length; mainIndex++) {
+            ItemStack restoredMain = itemsPerPlayer[mainIndex + armorLength];
+            if (restoredMain == null) {
+                continue;
+            }
+
+            ItemStack currentMain = player.inventory.mainInventory[mainIndex];
+            if (currentMain == null) {
+                player.inventory.mainInventory[mainIndex] = restoredMain;
+            } else if (!ItemStack.areItemStacksEqual(currentMain, restoredMain)) {
+                player.inventory.addItemStackToInventory(restoredMain);
+            }
+        }
     }
 
 
@@ -209,9 +336,13 @@ public class GOTSoulBoundEvents {
 
                 EntityPlayer player = (EntityPlayer) event.entityLiving;
                 String playerID = player.getUniqueID().toString();
+                if (isProcessingLogout(playerID)) {
+                    return;
+                }
                 boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
+                boolean isKeepInventory = player.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory");
 
-                if (isInSafeZone) {
+                if (isInSafeZone || isKeepInventory) {
                     queueFullInventoryRestore(player, playerID);
                     return;
                 }
@@ -225,13 +356,13 @@ public class GOTSoulBoundEvents {
                 for (int mainIndex = 0; mainIndex < main.length; mainIndex++) {
                     ItemStack mainItem = main[mainIndex];
                     if (mainItem == null) continue;
-                    if (mainItem.getItem() == GOTRegistry.wargCloak || GOTEnchantmentHelper.hasEnchant(mainItem, GOTEnchantment.soulbound)) {
-                        itemsPerPlayer[mainIndex + armor.length] = mainItem;
+                    if (shouldAlwaysRestoreOnDeath(mainItem)) {
+                        itemsPerPlayer[mainIndex + armor.length] = mainItem.copy();
                         main[mainIndex] = null;
                         restore = true;
                     } else if (GOTEnchantmentHelper.getEnchantList(mainItem).contains(GOTEnchantment.valyrianSeal)) {
                         if (mainItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= mainItem.getTagCompound().getDouble("sealChance")) {
-                            itemsPerPlayer[mainIndex + armor.length] = mainItem;
+                            itemsPerPlayer[mainIndex + armor.length] = mainItem.copy();
                             main[mainIndex] = null;
                             restore = true;
                         }
@@ -240,13 +371,13 @@ public class GOTSoulBoundEvents {
                 for (int armorIndex = 0; armorIndex < armor.length; armorIndex++) {
                     ItemStack armorItem = armor[armorIndex];
                     if (armorItem == null) continue;
-                    if (armorItem.getItem() == GOTRegistry.wargCloak || GOTEnchantmentHelper.hasEnchant(armorItem, GOTEnchantment.soulbound)) {
-                        itemsPerPlayer[armorIndex] = armorItem;
+                    if (shouldAlwaysRestoreOnDeath(armorItem)) {
+                        itemsPerPlayer[armorIndex] = armorItem.copy();
                         armor[armorIndex] = null;
                         restore = true;
                     } else if (GOTEnchantmentHelper.getEnchantList(armorItem).contains(GOTEnchantment.valyrianSeal)) {
                         if (armorItem.hasTagCompound() && player.worldObj.rand.nextDouble() <= armorItem.getTagCompound().getDouble("sealChance")) {
-                            itemsPerPlayer[armorIndex] = armorItem;
+                            itemsPerPlayer[armorIndex] = armorItem.copy();
                             armor[armorIndex] = null;
                             restore = true;
                         }
@@ -254,10 +385,11 @@ public class GOTSoulBoundEvents {
                 }
 
                 if (restore) {
-                    this.itemsToRestore.put(playerID, itemsPerPlayer);
-                    saveItemsToFile(player, itemsPerPlayer);
+                    queueRestore(player, playerID, itemsPerPlayer, false, false);
                 } else {
                     this.fullInventoryCache.remove(playerID);
+                    this.itemsToRestore.remove(playerID);
+                    this.fullInventoryRestore.remove(playerID);
                 }
             }
         }
@@ -268,20 +400,31 @@ public class GOTSoulBoundEvents {
         if (!event.entityPlayer.worldObj.isRemote) {
             EntityPlayer player = event.entityPlayer;
             String playerID = player.getUniqueID().toString();
+            if (isProcessingLogout(playerID)) {
+                event.drops.clear();
+                this.fullInventoryCache.remove(playerID);
+                return;
+            }
             boolean isInSafeZone = ArenaManager.instance.isPlayerInAnyRegion(player);
+            boolean isKeepInventory = player.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory");
 
-            if (isInSafeZone) {
+            if (isInSafeZone || isKeepInventory) {
                 queueFullInventoryRestore(player, playerID);
                 event.drops.clear();
                 this.fullInventoryCache.remove(playerID);
                 return;
             }
+
+            event.drops.removeAll(event.drops.stream()
+                    .filter(drop -> drop != null
+                            && drop.getEntityItem() != null
+                            && drop.getEntityItem().getItem() instanceof GOTItemBridle)
+                    .collect(Collectors.toList()));
+
             if (this.fullInventoryCache.containsKey(playerID)) {
                 if (event.drops.isEmpty()) {
                     ItemStack[] fullInventory = this.fullInventoryCache.get(playerID);
-                    this.itemsToRestore.put(playerID, fullInventory);
-                    this.skipPenalty.add(playerID);
-                    saveItemsToFile(player, fullInventory);
+                    queueRestore(player, playerID, fullInventory, true, true);
                 }
                 this.fullInventoryCache.remove(playerID);
             }
@@ -298,6 +441,7 @@ public class GOTSoulBoundEvents {
             }
 
             boolean shouldSkipPenalty = this.skipPenalty.remove(playerID);
+            boolean shouldRestoreFullInventory = this.fullInventoryRestore.remove(playerID);
 
             if (event.wasDeath) {
                 ItemStack[] itemsPerPlayer = null;
@@ -323,13 +467,21 @@ public class GOTSoulBoundEvents {
                         }
                     }
 
-                    System.arraycopy(itemsPerPlayer, player.inventory.armorInventory.length, player.inventory.mainInventory, 0, player.inventory.mainInventory.length);
-                    System.arraycopy(itemsPerPlayer, 0, player.inventory.armorInventory, 0, player.inventory.armorInventory.length);
+                    if (shouldRestoreFullInventory) {
+                        if (!hasAnyInventoryItems(player)) {
+                            replaceInventory(player, itemsPerPlayer);
+                        } else {
+                            mergeRestoredItems(player, itemsPerPlayer);
+                        }
+                    } else {
+                        mergeRestoredItems(player, itemsPerPlayer);
+                    }
 
                     deleteSaveFile(player);
                 }
             }
 
+            clearProcessingLogout(playerID);
             this.skipPenalty.remove(playerID);
         }
     }
