@@ -153,16 +153,18 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		}
 
 		updateFactionDataCache();
-
-		this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
+		updateBackgroundTexture();
 
 		this.buttonList.clear();
 
-		int bottomButtonY = this.baseHeight - 70;
-		this.buttonBack = new GuiCustomButton(0, 60, bottomButtonY, 100, 60, "К списку фракций");
-		this.buttonPagePrev = new GuiCustomButton(1, 180, bottomButtonY, 20, 20, "<");
-		this.buttonPageNext = new GuiCustomButton(2, this.baseWidth - 320, bottomButtonY, 20, 20, ">");
-		this.buttonOpenMenu = new GuiCustomButton(3, this.baseWidth / 2 - 75, bottomButtonY, 150, 60, "Главное меню");
+		int btnW = 170;
+		int btnH = 39;
+		int bottomButtonY = this.baseHeight - btnH - 15;
+
+		this.buttonBack = new GuiTexturedButton(0, 60, bottomButtonY, btnW, btnH, "clanslist_button");
+		this.buttonPagePrev = new GuiTexturedButton(1, 250, bottomButtonY - 3, 45, 45, "back_button");
+		this.buttonPageNext = new GuiTexturedButton(2, this.baseWidth - 300, bottomButtonY - 3, 45, 45, "forward_button");
+		this.buttonOpenMenu = new GuiTexturedButton(3, this.baseWidth / 2 - btnW/2, bottomButtonY, btnW, btnH, "main_button");
 
 		this.buttonList.add(buttonBack);
 		this.buttonList.add(buttonPagePrev);
@@ -179,7 +181,21 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			this.buttonPledge.updatePledgeState();
 		}
 	}
-
+	private void updateBackgroundTexture() {
+		if (this.currentView == View.LIST) {
+			this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/clansinfo_menu2.png");
+		} else if (this.currentView == View.FACTION) {
+			if (this.currentPage == Page.PLAYER_LIST) {
+				this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/playersinfo_menu.png");
+			} else if (this.currentPage == Page.TITLE_HIERARCHY) {
+				this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/prefix_menu.png");
+			} else {
+				this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
+			}
+		} else {
+			this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
+		}
+	}
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawWorldBackground(0);
@@ -237,8 +253,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		int scaledMouseX = (int)((mouseX - guiLeft) / scaleFactor);
 		int scaledMouseY = (int)((mouseY - guiTop) / scaleFactor);
 
-		getActiveRenderer().mouseClicked(mouseX, mouseY, scaledMouseX, scaledMouseY, button);
-
+		// 1. СНАЧАЛА проверяем клики по кнопкам!
 		if (button == 0) {
 			for (Object obj : new ArrayList<>(this.buttonList)) {
 				GuiButton guiButton = (GuiButton) obj;
@@ -250,6 +265,8 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 				}
 			}
 		}
+
+		getActiveRenderer().mouseClicked(mouseX, mouseY, scaledMouseX, scaledMouseY, button);
 	}
 
 	public void drawScaledCustomSizeModalRect(int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float textureWidth, float textureHeight) {

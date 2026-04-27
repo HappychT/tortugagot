@@ -3,6 +3,7 @@ package brain.factions.network;
 import brain.factions.Faction;
 import brain.factions.servers.BarracksManager;
 import brain.factions.servers.CoreFaction;
+import brain.factions.servers.ServerTaskExecutor;
 import brain.factions.servers.StructureManager;
 import brain.factions.structures.FactionStructureManager;
 import brain.factions.structures.FactionStructureSlot;
@@ -505,42 +506,64 @@ public class PacketFactionManage implements IMessage {
             CoreFaction.saveFactions();
             CoreFaction.sendAllGui();
         }
-        private void handlePoliticsAction(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
+        private void handlePoliticsAction(final EntityPlayerMP player, final Faction faction, final PacketFactionManage message) {
             if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_USE_TREASURY)) {
                 player.addChatMessage(new ChatComponentText("§cУ вас нет прав на использование казны."));
                 return;
             }
 
-            String action = message.s_data1;
-            String targetFactionName = message.s_data2;
-            long cost = 0;
+            ServerTaskExecutor.addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    String action = message.s_data1;
+                    String targetFactionName = message.s_data2;
+                    long cost = 0;
 
-            switch(action) {
-                case "declare_war":
-                    cost = 10000;
-                    if(faction.getTreasury() >= cost) {
-                        faction.setTreasury(faction.getTreasury() - cost);
-                        GOTFactionRelations.overrideRelations(GOTFaction.forName(faction.getID()), GOTFaction.forName(targetFactionName), GOTFactionRelations.Relation.MORTAL_ENEMY);
-                        player.addChatMessage(new ChatComponentText("§aВы объявили войну фракции " + targetFactionName));
+                    switch(action) {
+                        case "declare_war":
+                            cost = 10000;
+                            if(faction.getTreasury() >= cost) {
+                                faction.setTreasury(faction.getTreasury() - cost);
 
-                        faction.setInWarState(true);
-                        faction.setUnpaidWarTaxDays(0);
-                        faction.setWarTaxOwed(0);
-                    } else {
-                        player.addChatMessage(new ChatComponentText("§cНедостаточно средств в казне."));
+                                // Выполнение команды от имени консоли сервера
+                                String command = "facRelations set " + faction.getID() + " " + targetFactionName + " MORTAL_ENEMY";
+                                MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), command);
+
+                                player.addChatMessage(new ChatComponentText("§aВы объявили войну фракции " + targetFactionName));
+
+                                faction.setInWarState(true);
+                                faction.setUnpaidWarTaxDays(0);
+                                faction.setWarTaxOwed(0);
+
+                                // Обязательное сохранение данных!
+                                CoreFaction.saveFactions();
+                                CoreFaction.sendAllGui();
+                            } else {
+                                player.addChatMessage(new ChatComponentText("§cНедостаточно средств в казне."));
+                            }
+                            break;
+
+                        case "declare_hostility":
+                            cost = 5000;
+                            if(faction.getTreasury() >= cost) {
+                                faction.setTreasury(faction.getTreasury() - cost);
+
+                                // Выполнение команды от имени консоли сервера
+                                String command = "facRelations set " + faction.getID() + " " + targetFactionName + " ENEMY";
+                                MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), command);
+
+                                player.addChatMessage(new ChatComponentText("§aВы объявили вражду фракции " + targetFactionName));
+
+                                // Обязательное сохранение данных!
+                                CoreFaction.saveFactions();
+                                CoreFaction.sendAllGui();
+                            } else {
+                                player.addChatMessage(new ChatComponentText("§cНедостаточно средств в казне."));
+                            }
+                            break;
                     }
-                    break;
-                case "declare_hostility":
-                    cost = 5000;
-                    if(faction.getTreasury() >= cost) {
-                        faction.setTreasury(faction.getTreasury() - cost);
-                        GOTFactionRelations.overrideRelations(GOTFaction.forName(faction.getID()), GOTFaction.forName(targetFactionName), GOTFactionRelations.Relation.ENEMY);
-                        player.addChatMessage(new ChatComponentText("§aВы объявили вражду фракции " + targetFactionName));
-                    } else {
-                        player.addChatMessage(new ChatComponentText("§cНедостаточно средств в казне."));
-                    }
-                    break;
-            }
+                }
+            });
         }
 
         private void handleTitleCreate(EntityPlayerMP player, Faction faction, PacketFactionManage message) {

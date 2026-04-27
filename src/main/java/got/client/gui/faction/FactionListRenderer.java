@@ -20,7 +20,7 @@ public class FactionListRenderer implements IPageRenderer {
     private float currentScroll = 0.0F;
     private boolean isScrolling = false;
 
-    private static final int BANNER_WIDTH = 87;
+    private static final int BANNER_WIDTH = 80;
     private static final int BANNER_HEIGHT = 450;
     private static final int BANNER_GAP = 1;
 
@@ -36,7 +36,12 @@ public class FactionListRenderer implements IPageRenderer {
 
     @Override
     public void initGui(List<GuiButton> buttonList) {
-        this.buttonFilterFactions = new GuiCustomButton(4, 15, 15, 150, 20, currentFilter.getButtonText());
+        this.buttonFilterFactions = new GuiTexturedButton(4, 15, 15, 150, 36, "otherclans_button");
+        if (currentFilter == GOTGuiFactions.FactionFilter.OTHER) {
+            ((GuiTexturedButton)this.buttonFilterFactions).setTexture("clan_button");
+            this.buttonFilterFactions.width = 100;
+            this.buttonFilterFactions.height = 41;
+        }
         buttonList.add(buttonFilterFactions);
 
         playableFactions.clear();
@@ -68,11 +73,15 @@ public class FactionListRenderer implements IPageRenderer {
     @Override
     public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
         buttonFilterFactions.visible = true;
-        parent.drawCenteredString("Фракции", parent.getBaseWidth() / 2, 15, 0xFFFFFFFF);
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/clansinfo_main_title.png"));
+        int titleW = 200;
+        int titleH = 34;
+        parent.drawScaledCustomSizeModalRect(parent.getBaseWidth() / 2 - titleW/2, 10, 0, 0, 1292, 222, titleW, titleH, 1292.0F, 222.0F);
 
-        int listX = 15;
-        int listY = 40;
-        int listWidth = parent.getBaseWidth() - 30;
+        // Координаты отрисовки
+        int listX = 70;
+        int listY = 50;
+        int listWidth = parent.getBaseWidth() - 140; // Исправлено: 70 слева + 70 справа = 140
         int listHeight = parent.getBaseHeight() - 85;
 
         int totalContentWidth = currentFactionList.size() * (BANNER_WIDTH + BANNER_GAP) - BANNER_GAP;
@@ -130,9 +139,10 @@ public class FactionListRenderer implements IPageRenderer {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         if (button == 0) {
-            int listX = 15;
-            int listY = 40;
-            int listWidth = parent.getBaseWidth() - 30;
+            // ИСПРАВЛЕНО: Теперь клики проверяются в тех же координатах, где и рисуются!
+            int listX = 70;
+            int listY = 50;
+            int listWidth = parent.getBaseWidth() - 140; // Аналогично исправлено
             int listHeight = parent.getBaseHeight() - 85;
 
             if (parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)) {
@@ -156,14 +166,24 @@ public class FactionListRenderer implements IPageRenderer {
     public void actionPerformed(GuiButton button) {
         if (button == buttonFilterFactions) {
             currentFilter = currentFilter.toggle();
-            buttonFilterFactions.displayString = currentFilter.getButtonText();
+            if (buttonFilterFactions instanceof GuiTexturedButton) {
+                GuiTexturedButton texBtn = (GuiTexturedButton) buttonFilterFactions;
+                if (currentFilter == GOTGuiFactions.FactionFilter.PLAYABLE) {
+                    texBtn.setTexture("otherclans_button");
+                    texBtn.width = 150; texBtn.height = 36;
+                } else {
+                    texBtn.setTexture("clan_button");
+                    texBtn.width = 100; texBtn.height = 41;
+                }
+            }
             updateCurrentFactionList();
         }
     }
 
     @Override
     public void handleMouseInput() {
-        int listWidth = parent.getBaseWidth() - 30;
+        // ИСПРАВЛЕНО: Ширина списка для правильной работы колесика мыши
+        int listWidth = parent.getBaseWidth() - 140;
         int totalContentWidth = currentFactionList.size() * (BANNER_WIDTH + BANNER_GAP) - BANNER_GAP;
 
         int scroll = Mouse.getEventDWheel();

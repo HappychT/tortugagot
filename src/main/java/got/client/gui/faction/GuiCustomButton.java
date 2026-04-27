@@ -29,8 +29,7 @@ public class GuiCustomButton extends GuiButton {
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-            drawScaledCustomSizeModalRect(this.xPosition, this.yPosition, 0, 0, 396, 143, this.width, this.height, 396.0F, 143.0F);
-
+            drawScaledCustomSizeModalRect(this.xPosition, this.yPosition, 0, 0, 396, 134, this.width, this.height, 396.0F, 134.0F);
             int textColor = 14737632;
             if (!this.enabled) {
                 textColor = 10526880;

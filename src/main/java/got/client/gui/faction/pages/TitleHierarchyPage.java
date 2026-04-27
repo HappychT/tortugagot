@@ -8,6 +8,7 @@ import got.client.gui.utils.GuiApi;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
@@ -57,16 +58,18 @@ public class TitleHierarchyPage implements IPageRenderer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
-        parent.drawCenteredString("Иерархия титулов", parent.getBaseWidth() / 2, 15, 0xFFFFFF);
-        saveButton.visible = true;
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/prefix_title.png"));
+        parent.drawScaledCustomSizeModalRect(parent.getBaseWidth() / 2 - 80, 10, 0, 0, 1474, 186, 160, 20, 1474.0F, 186.0F);        saveButton.visible = true;
         moveUpButton.visible = false;
         moveDownButton.visible = false;
 
-        int listX = 25;
-        int listY = 40;
-        int listWidth = parent.getBaseWidth() - 50;
-        int listHeight = 14 * 22;
-
+        int listX = 60;
+        int listY = 50;
+        int listWidth = parent.getBaseWidth() - 120;
+        int listHeight = 12 * 22;
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/playersinfo_plate.png"));
+        parent.drawScaledCustomSizeModalRect(listX - 5, listY - 15, 0, 0, 1090, 567, listWidth + 10, listHeight + 30, 1090.0F, 567.0F);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GuiApi.glScissor(parent.getGuiLeft() + (int)(listX * parent.getScaleFactor()), parent.getGuiTop() + (int)(listY * parent.getScaleFactor()), (int)(listWidth * parent.getScaleFactor()), (int)(listHeight * parent.getScaleFactor()), true);
 
@@ -112,10 +115,10 @@ public class TitleHierarchyPage implements IPageRenderer {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         if(button == 0) {
-            int listX = 25;
-            int listY = 40;
-            int listWidth = parent.getBaseWidth() - 50;
-            int listHeight = 14 * 22;
+            int listX = 60;
+            int listY = 50;
+            int listWidth = parent.getBaseWidth() - 120;
+            int listHeight = 12 * 22;
 
             if(parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)){
                 int totalContentHeight = titlesSortedByHierarchy.size() * 22;
@@ -140,7 +143,7 @@ public class TitleHierarchyPage implements IPageRenderer {
     public void handleMouseInput() {
         int k = Mouse.getEventDWheel();
         if (k != 0) {
-            int listHeight = 14 * 22;
+            int listHeight = 12 * 22;
             int totalContentHeight = titlesSortedByHierarchy.size() * 22;
             if (totalContentHeight > listHeight) {
                 float scrollAmount = (k > 0 ? -1 : 1) * 20.0f / (totalContentHeight - listHeight);

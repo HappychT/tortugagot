@@ -4,11 +4,13 @@ import brain.factions.Faction;
 import brain.factions.network.PacketFactionManage;
 import got.client.gui.faction.GOTGuiFactions;
 import got.client.gui.faction.GuiCustomButton;
+import got.client.gui.faction.GuiTexturedButton;
 import got.client.gui.utils.GuiApi;
 import got.client.utils.UtilO;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import java.awt.Color;
@@ -41,16 +43,15 @@ public class PlayerListPage implements IPageRenderer {
 
     @Override
     public void initGui(List<GuiButton> buttonList) {
-        int frameWidth = (int) (202 / 1.2f);
-        int buttonHeight = 26 * 2;
+        int frameWidth = 168;
+        int buttonHeight = 63;
         int rightButtonsX = parent.getBaseWidth() - 65 - frameWidth;
         int rightButtonsY = 60;
-        int gap = 7;
+        int gap = 10;
 
-        buttonManageTitles = new GuiCustomButton(16, rightButtonsX, rightButtonsY, frameWidth, buttonHeight, "Управление титулами");
-        buttonTitleHierarchy = new GuiCustomButton(17, rightButtonsX, rightButtonsY + buttonHeight + gap, frameWidth, buttonHeight, "Иерархия титулов");
-        buttonApplications = new GuiCustomButton(18, rightButtonsX, rightButtonsY + 2 * (buttonHeight + gap), frameWidth, buttonHeight, "Заявки");
-
+        buttonManageTitles = new GuiTexturedButton(16, rightButtonsX, rightButtonsY, frameWidth, buttonHeight, "prefixmanage_button");
+        buttonTitleHierarchy = new GuiTexturedButton(17, rightButtonsX, rightButtonsY + buttonHeight + gap, frameWidth, buttonHeight, "prefixinfo_button");
+        buttonApplications = new GuiTexturedButton(18, rightButtonsX, rightButtonsY + 2 * (buttonHeight + gap), frameWidth, buttonHeight, "request_button");
         buttonPlayerKick = new GuiCustomButton(100, 0, 0, 100, 20, "Выгнать");
         buttonPlayerSetTitle = new GuiCustomButton(101, 0, 0, 100, 20, "Назначить титул");
 
@@ -63,7 +64,9 @@ public class PlayerListPage implements IPageRenderer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, float partialTicks) {
-        parent.drawCenteredString("Список Участников", parent.getBaseWidth() / 2, 15, 0xFFFFFFFF);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/playersinfo_title.png"));
+        parent.drawScaledCustomSizeModalRect(parent.getBaseWidth() / 2 - 100, 10, 0, 0, 1474, 186, 200, 25, 1474.0F, 186.0F);
 
         Faction factionData = parent.getFactionData();
         boolean isLeader = parent.isPlayerLeader();
@@ -73,18 +76,22 @@ public class PlayerListPage implements IPageRenderer {
         buttonApplications.visible = isLeader;
 
         if (factionData != null) {
-            buttonApplications.displayString = "Заявки (" + factionData.getApplications().size() + ")";
             buttonApplications.enabled = !factionData.getApplications().isEmpty();
+            if (isLeader && !factionData.getApplications().isEmpty()) {
+                int rightButtonsX = parent.getBaseWidth() - 65 - 168;
+                parent.drawString("§e+" + factionData.getApplications().size(), rightButtonsX + 168 - 25, 60 + 2 * (63 + 10) + 5, 0xFFFFFF);
+            }
         }
-
         positionContextMenuButtons();
 
         int rightButtonsX = parent.getBaseWidth() - 65 - (int) (202 / 1.2f);
-        int listX = 25;
-        int listY = 60;
-        int listWidth = rightButtonsX - listX - 20;
+        int listX = 60;
+        int listY = 55;
+        int listWidth = rightButtonsX - listX - 80;
         int listHeight = 14 * 20;
 
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/playersinfo_plate.png"));
+        parent.drawScaledCustomSizeModalRect(listX - 5, listY - 20, 0, 0, 1090, 567, listWidth + 10, listHeight + 40, 1090.0F, 567.0F);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GuiApi.glScissor(
                 parent.getGuiLeft() + (int)(listX * parent.getScaleFactor()),
@@ -181,13 +188,11 @@ public class PlayerListPage implements IPageRenderer {
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
         if (button == 1 && parent.contextMenuObject == null && parent.isPlayerLeader()) {
             int rightButtonsX = parent.getBaseWidth() - 65 - (int) (202 / 1.2f);
-            int listX = 25;
-            int listY = 60;
-            int listWidth = rightButtonsX - listX - 20;
+            int listX = 60;
+            int listY = 55;
+            int listWidth = rightButtonsX - listX - 80;
             int listHeight = 14 * 20;
-
-            if (parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)) {
-                int totalHeight = sortedPlayers.size() * 20;
+            if (parent.isHover(listX, listY, listWidth, listHeight, scaledMouseX, scaledMouseY)) {                int totalHeight = sortedPlayers.size() * 20;
                 int scrollOffset = (totalHeight > listHeight) ? (int)(scroll * (totalHeight - listHeight)) : 0;
 
                 int index = (scaledMouseY - listY + scrollOffset) / 20;

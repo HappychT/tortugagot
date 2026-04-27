@@ -4,11 +4,13 @@ import brain.factions.Faction;
 import brain.factions.servers.CollectionGoal;
 import got.client.gui.faction.GOTGuiFactions;
 import got.client.gui.faction.GuiCustomButton;
+import got.client.gui.faction.GuiTexturedButton;
 import got.client.gui.utils.GuiApi;
 import got.client.utils.UtilO;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -39,10 +41,10 @@ public class CollectionsListOverlay implements IOverlayRenderer {
         this.scroll = 0f;
 
         int width = 350;
+        int height = 250;
         int x = (parent.getBaseWidth() - width) / 2;
-        int y = (parent.getBaseHeight() - 250) / 2;
-        buttonNewCollection = new GuiCustomButton(11, x + width - 115, y + 10, 100, 20, "Новый сбор");
-        buttonList.add(buttonNewCollection);
+        int y = (parent.getBaseHeight() - height) / 2;
+        buttonNewCollection = new GuiTexturedButton(11, x + (width / 2) - 56, y + height - 35, 112, 20, "tax_button");        buttonList.add(buttonNewCollection);
     }
 
     @Override
@@ -52,11 +54,12 @@ public class CollectionsListOverlay implements IOverlayRenderer {
         int x = (parent.getBaseWidth() - width) / 2;
         int y = (parent.getBaseHeight() - height) / 2;
 
-        UtilO.drawRoundedRectangle(x, y, width, height, 7, new Color(10, 10, 10, 220).getRGB(), 0);
-        parent.drawCenteredString("Казна и сборы", x + width / 2, y + 15, 0xFFFFFF);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/tax_plate.png"));
+        parent.drawScaledCustomSizeModalRect(x, y, 0, 0, 400, 300, width, height, 400.0F, 300.0F);
 
-        buttonNewCollection.visible = parent.isPlayerLeader();
-
+        parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/tax_title.png"));
+        parent.drawScaledCustomSizeModalRect(x + (width / 2) - 75, y + 10, 0, 0, 820, 146, 150, 26, 820.0F, 146.0F);        buttonNewCollection.visible = parent.isPlayerLeader();
         int listX = x + 15;
         int listY = y + 45;
         int listWidth = width - 30;

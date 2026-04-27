@@ -8,6 +8,7 @@ import got.client.gui.GOTGuiRendererMap;
 import got.client.gui.faction.GOTGuiButtonPledge;
 import got.client.gui.faction.GOTGuiFactions;
 import got.client.gui.faction.GuiCustomButton;
+import got.client.gui.faction.GuiTexturedButton;
 import got.client.gui.utils.GuiApi;
 import got.client.utils.UtilO;
 import got.common.GOTLevelData;
@@ -77,29 +78,26 @@ public class FrontPage implements IPageRenderer {
 
         this.buttonPledge = new GOTGuiButtonPledge(parent, 9, pledgeButtonX, pledgeButtonY, pledgeButtonWidth, pledgeButtonHeight, GOTGuiFactions.currentFaction);
 
-        int frameWidth = (int) (202 / 1.2f);
-        int frameHeight = (int) (134 / 1.2f);
+        int frameWidth = 168; // (int) (202 / 1.2f);
         int mapWidgetX = 65;
         int mapWidgetY = 60;
+        int frameHeight = 111; // (int) (134 / 1.2f);
 
-        int diplomacyButtonHeight = 26 * 2;
+        int diplomacyButtonHeight = 63;
         int diplomacyButtonY = mapWidgetY + frameHeight + 10;
 
-        this.buttonViewMap = new GuiCustomButton(11, mapWidgetX, diplomacyButtonY, frameWidth, diplomacyButtonHeight, "Дипломатия");
-
-        buttonWarCouncil = new GuiCustomButton(50, mapWidgetX, diplomacyButtonY + diplomacyButtonHeight + 10, frameWidth, diplomacyButtonHeight, "Военный совет");
+        this.buttonViewMap = new GuiTexturedButton(11, mapWidgetX, diplomacyButtonY, frameWidth, diplomacyButtonHeight, "diplomacy_button");
+        buttonWarCouncil = new GuiTexturedButton(50, mapWidgetX, diplomacyButtonY + diplomacyButtonHeight + 10, frameWidth, diplomacyButtonHeight, "warcouncil_button");
         buttonList.add(buttonWarCouncil);
-
 
         int rightButtonsX = parent.getBaseWidth() - mapWidgetX - frameWidth;
         int rightButtonsY = mapWidgetY;
         int rightGap = 10;
 
-        buttonMembers = new GuiCustomButton(7, rightButtonsX, rightButtonsY, frameWidth, diplomacyButtonHeight, "Участники");
-        buttonCollections = new GuiCustomButton(22, rightButtonsX, rightButtonsY + diplomacyButtonHeight + rightGap, frameWidth, diplomacyButtonHeight, "Казна и сборы");
-        buttonSetHome = new GuiCustomButton(6, rightButtonsX, rightButtonsY + 2 * (diplomacyButtonHeight + rightGap), frameWidth, diplomacyButtonHeight, "Установить дом");
-        buttonTeleportHome = new GuiCustomButton(5, rightButtonsX, rightButtonsY + 3 * (diplomacyButtonHeight + rightGap), frameWidth, diplomacyButtonHeight, "Телепорт домой");
-
+        buttonMembers = new GuiTexturedButton(7, rightButtonsX, rightButtonsY, frameWidth, diplomacyButtonHeight, "players_button");
+        buttonCollections = new GuiTexturedButton(22, rightButtonsX, rightButtonsY + diplomacyButtonHeight + rightGap, frameWidth, diplomacyButtonHeight, "treasure_button");
+        buttonSetHome = new GuiTexturedButton(6, rightButtonsX, rightButtonsY + 2 * (diplomacyButtonHeight + rightGap), frameWidth, diplomacyButtonHeight, "sethome_button");
+        buttonTeleportHome = new GuiTexturedButton(5, rightButtonsX, rightButtonsY + 3 * (diplomacyButtonHeight + rightGap), frameWidth, diplomacyButtonHeight, "tp_button");
         buttonList.add(buttonPledge);
         buttonList.add(buttonViewMap);
         buttonList.add(buttonMembers);
