@@ -98,10 +98,14 @@ public class GOTItemCustomSetArmor extends GOTItemArmor {
                 }
             }
         } else if (GOTArmorModels.INSTANCE != null) {
-            GOTArmorModels.INSTANCE.setupHeldItem(armorModel, entityLiving, hasEntity ? entityLiving.getHeldItem() : null, true);
-            if (entityLiving instanceof GOTEntityNPC) {
-                GOTArmorModels.INSTANCE.setupHeldItem(armorModel, entityLiving, ((GOTEntityNPC) entityLiving).getHeldItemLeft(), false);
+            GOTArmorModels.INSTANCE.setupHeldItem(armorModel, entityLiving, GOTArmorModels.INSTANCE.getHeldItemRight(entityLiving), true);
+            if (entityLiving instanceof GOTEntityNPC || GOTArmorModels.INSTANCE.getCustomNpc(entityLiving) != null) {
+                GOTArmorModels.INSTANCE.setupHeldItem(armorModel, entityLiving, GOTArmorModels.INSTANCE.getHeldItemLeft(entityLiving), false);
             }
+        }
+
+        if (GOTArmorModels.INSTANCE != null) {
+            GOTArmorModels.INSTANCE.syncArmorModelWithRenderer(armorModel, entityLiving);
         }
     }
 
