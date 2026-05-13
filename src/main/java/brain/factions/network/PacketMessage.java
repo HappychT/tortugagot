@@ -98,7 +98,6 @@ public class PacketMessage implements IMessage {
 		return null;
 	}
 
-
 	public static class Handler implements IMessageHandler<PacketMessage, IMessage> {
 		public IMessage onMessage(PacketMessage packet, MessageContext ctx) {
 			String[] args = packet.message.split("#");
@@ -199,8 +198,26 @@ public class PacketMessage implements IMessage {
 						if(faction.getAssistantName().equals(upprovePlayer)) {
 							faction.setAssistantName("");
 						}
-						GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer));
-						pd.revokePledgeFaction(player, true);
+
+						EntityPlayerMP targetPlayer = getPlayer(upprovePlayer);
+						if (targetPlayer == null) targetPlayer = MinecraftServer.getServer().getConfigurationManager().func_152612_a(upprovePlayer);
+
+						if (targetPlayer != null) {
+							GOTPlayerData pd = GOTLevelData.getData(targetPlayer);
+							if (pd != null) pd.revokePledgeFaction(targetPlayer, true);
+						} else {
+							java.util.UUID targetUUID = null;
+							for (Map.Entry<java.util.UUID, String> entry : net.minecraftforge.common.UsernameCache.getMap().entrySet()) {
+								if (upprovePlayer.contains(entry.getValue())) {
+									targetUUID = entry.getKey();
+									break;
+								}
+							}
+							if (targetUUID != null) {
+								GOTPlayerData pd = GOTLevelData.getData(targetUUID);
+								if (pd != null) pd.revokePledgeFaction(null, false);
+							}
+						}
 						break;
 					case 1:
 						if(faction.getLeaderName().equals((upprovePlayer))) {
@@ -248,9 +265,27 @@ public class PacketMessage implements IMessage {
 							faction.getApplications().remove(upprovePlayer);
 							faction.getPlayers().put(upprovePlayer, new Faction.PlayerData("", System.currentTimeMillis(), "Игрок"));
 							CoreFaction.updatePrefix(upprovePlayer);
-							GOTPlayerData pd = GOTLevelData.getData(invertMap(UsernameCache.getMap()).get(upprovePlayer));
 							GOTFaction fac = GOTFaction.forName(faction.getID());
-							pd.setPledgeFaction(fac);
+
+							EntityPlayerMP acceptedPlayer = getPlayer(upprovePlayer);
+							if (acceptedPlayer == null) acceptedPlayer = MinecraftServer.getServer().getConfigurationManager().func_152612_a(upprovePlayer);
+
+							if (acceptedPlayer != null) {
+								GOTPlayerData pd = GOTLevelData.getData(acceptedPlayer);
+								if (pd != null) pd.setPledgeFaction(fac);
+							} else {
+								java.util.UUID targetUUID = null;
+								for (Map.Entry<java.util.UUID, String> entry : net.minecraftforge.common.UsernameCache.getMap().entrySet()) {
+									if (upprovePlayer.contains(entry.getValue())) {
+										targetUUID = entry.getKey();
+										break;
+									}
+								}
+								if (targetUUID != null) {
+									GOTPlayerData pd = GOTLevelData.getData(targetUUID);
+									if (pd != null) pd.setPledgeFaction(fac);
+								}
+							}
 							break;
 						case -1:
 							faction.getApplications().remove(upprovePlayer);

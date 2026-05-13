@@ -71,6 +71,13 @@ public class FactionKickCommand extends CommandBase {
             CoreFaction.updatePrefix(targetPlayer.getCommandSenderName());
         } else {
             CoreFaction.updatePrefix(targetName);
+
+            java.util.UUID targetUUID = brain.factions.network.PacketMessage.invertMap(net.minecraftforge.common.UsernameCache.getMap()).get(targetName);
+            if (targetUUID != null) {
+                GOTPlayerData pd = GOTLevelData.getData(targetUUID);
+                if (pd != null) pd.revokePledgeFaction(null, false);
+            }
+
             sender.addChatMessage(new ChatComponentText("§eИгрок оффлайн, но он удален из фракции."));
         }
 

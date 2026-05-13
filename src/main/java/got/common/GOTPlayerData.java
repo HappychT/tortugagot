@@ -1724,7 +1724,7 @@ public class GOTPlayerData {
         this.pledgeKillCooldown += 24000;
         markDirty();
         if (this.pledgeKillCooldown > 24000) {
-            revokePledgeFaction(entityplayer, false);
+            //  revokePledgeFaction(entityplayer, false);
         } else if (this.pledgeFaction != null) {
             ChatComponentTranslation chatComponentTranslation = new ChatComponentTranslation("got.chat.pledgeKillWarn", this.pledgeFaction.factionName());
             entityplayer.addChatMessage(chatComponentTranslation);
@@ -2605,9 +2605,9 @@ public class GOTPlayerData {
             }
             checkAlignmentAchievements(faction, prevAlignment);
         }
-        if (entityplayer != null && !entityplayer.worldObj.isRemote && this.pledgeFaction != null && !canPledgeTo(this.pledgeFaction)) {
-            revokePledgeFaction(entityplayer, false);
-        }
+       // if (entityplayer != null && !entityplayer.worldObj.isRemote && this.pledgeFaction != null && !canPledgeTo(this.pledgeFaction)) {
+       //     revokePledgeFaction(entityplayer, false);
+       // }
     }
 
     public void setAlignmentFromCommand(GOTFaction faction, float set) {

@@ -11,6 +11,8 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import got.common.GOTLevelData;
+import got.common.GOTPlayerData;
 import got.common.faction.GOTFaction;
 import got.common.faction.GOTFactionRelations;
 import got.common.faction.GOTFactionRelations.Relation;
@@ -115,7 +117,7 @@ public class PacketFactionManage implements IMessage {
 
             if (faction == null) return null;
 
-            switch(message.action) {
+            switch (message.action) {
                 case TREASURY_ACTION:
                     handleTreasury(player, faction, message);
                     break;
@@ -156,6 +158,7 @@ public class PacketFactionManage implements IMessage {
             }
             return null;
         }
+
         private void handleIncreaseBarracksCapacity(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
             String structureId = message.s_data1;
             int amount = (int) message.l_data1;
@@ -185,6 +188,7 @@ public class PacketFactionManage implements IMessage {
                 player.addChatMessage(new ChatComponentText("§cНедостаточно продовольствия в крепости. Требуется: " + cost));
             }
         }
+
         private void handleProvisionsDeposit(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
             String structureId = message.s_data1;
             FactionStructureSlot slot = FactionStructureManager.getStructureById(structureId);
@@ -271,7 +275,7 @@ public class PacketFactionManage implements IMessage {
 
             switch (action) {
                 case "add_player":
-                    if(BarracksManager.getBarracksPlayers(structureId).size() >= slot.barracksCapacity){
+                    if (BarracksManager.getBarracksPlayers(structureId).size() >= slot.barracksCapacity) {
                         player.addChatMessage(new ChatComponentText("§cВместимость казармы полная (Лимит: " + slot.barracksCapacity + ")!"));
                         return;
                     }
@@ -436,12 +440,14 @@ public class PacketFactionManage implements IMessage {
             }
             return value;
         }
+
         private int getStackValue(ItemStack itemstack) {
             if (itemstack != null && itemstack.getItem() instanceof GOTItemCoin) {
                 return GOTItemCoin.values[itemstack.getItemDamage()] * itemstack.stackSize;
             }
             return 0;
         }
+
         private void handleTreasury(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
             long amount = message.l_data1;
             String goalName = message.s_data2;
@@ -456,7 +462,7 @@ public class PacketFactionManage implements IMessage {
                     if (faction.getTreasury() >= amount) {
                         faction.setTreasury(faction.getTreasury() - amount);
                         faction.logTreasuryTransaction(playerName, -amount);
-                        GOTItemCoin.giveCoins((int)amount, player);
+                        GOTItemCoin.giveCoins((int) amount, player);
                         player.addChatMessage(new ChatComponentText("§aВы сняли " + amount + " из казны."));
                     } else {
                         player.addChatMessage(new ChatComponentText("§cВ казне недостаточно средств."));
@@ -469,7 +475,7 @@ public class PacketFactionManage implements IMessage {
                                 if (g.getCurrentAmount() >= amount) {
                                     g.addAmount(-amount);
                                     g.logTransaction(playerName, -amount);
-                                    GOTItemCoin.giveCoins((int)amount, player);
+                                    GOTItemCoin.giveCoins((int) amount, player);
                                     player.addChatMessage(new ChatComponentText("§aВы сняли " + amount + " из сбора '" + g.getName() + "'."));
                                 } else {
                                     player.addChatMessage(new ChatComponentText("§cВ этом сборе недостаточно средств."));
@@ -482,12 +488,12 @@ public class PacketFactionManage implements IMessage {
 
                     Optional<brain.factions.servers.CollectionGoal> goalOpt = faction.getCollectionGoals().stream()
                             .filter(g -> g.getName().equals(goalName)).findFirst();
-                    if(goalOpt.isPresent() && goalOpt.get().isComplete()){
+                    if (goalOpt.isPresent() && goalOpt.get().isComplete()) {
                         player.addChatMessage(new ChatComponentText("§cЭтот сбор уже завершен."));
                         return;
                     }
 
-                    GOTItemCoin.takeCoins((int)amount, player);
+                    GOTItemCoin.takeCoins((int) amount, player);
                     if (goalName.isEmpty()) {
                         faction.setTreasury(faction.getTreasury() + amount);
                         faction.logTreasuryTransaction(playerName, amount);
@@ -506,6 +512,7 @@ public class PacketFactionManage implements IMessage {
             CoreFaction.saveFactions();
             CoreFaction.sendAllGui();
         }
+
         private void handlePoliticsAction(final EntityPlayerMP player, final Faction faction, final PacketFactionManage message) {
             if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_USE_TREASURY)) {
                 player.addChatMessage(new ChatComponentText("§cУ вас нет прав на использование казны."));
@@ -519,10 +526,10 @@ public class PacketFactionManage implements IMessage {
                     String targetFactionName = message.s_data2;
                     long cost = 0;
 
-                    switch(action) {
+                    switch (action) {
                         case "declare_war":
                             cost = 10000;
-                            if(faction.getTreasury() >= cost) {
+                            if (faction.getTreasury() >= cost) {
                                 faction.setTreasury(faction.getTreasury() - cost);
 
                                 // Выполнение команды от имени консоли сервера
@@ -545,7 +552,7 @@ public class PacketFactionManage implements IMessage {
 
                         case "declare_hostility":
                             cost = 5000;
-                            if(faction.getTreasury() >= cost) {
+                            if (faction.getTreasury() >= cost) {
                                 faction.setTreasury(faction.getTreasury() - cost);
 
                                 // Выполнение команды от имени консоли сервера
@@ -582,12 +589,22 @@ public class PacketFactionManage implements IMessage {
             CoreFaction.saveFactions();
             CoreFaction.sendAllGui();
         }
+
         private void handlePlayerAction(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
             String targetName = message.s_data1;
             String[] actionData = message.s_data2.split("#");
             String action = actionData[0];
 
             if (action.equals("kick")) {
+                if (targetName.equals(player.getCommandSenderName())) {
+                    player.addChatMessage(new ChatComponentText("§cВы не можете выгнать самого себя!"));
+                    return;
+                }
+                if (targetName.equals(faction.getLeaderName())) {
+                    player.addChatMessage(new ChatComponentText("§cЛидера нельзя выгнать из фракции!"));
+                    return;
+                }
+
                 if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_KICK_MEMBERS)) {
                     player.addChatMessage(new ChatComponentText("§cУ вас нет прав выгонять игроков."));
                     return;
@@ -606,6 +623,32 @@ public class PacketFactionManage implements IMessage {
 
                 faction.getPlayers().remove(targetName);
                 CoreFaction.updatePrefix(targetName);
+
+                if (faction.getAssistantName().equals(targetName)) {
+                    faction.setAssistantName("");
+                }
+
+                EntityPlayerMP targetPlayer = PacketMessage.getPlayer(targetName);
+                if (targetPlayer == null)
+                    targetPlayer = MinecraftServer.getServer().getConfigurationManager().func_152612_a(targetName);
+
+                if (targetPlayer != null) {
+                    got.common.GOTPlayerData pd = got.common.GOTLevelData.getData(targetPlayer);
+                    if (pd != null) pd.revokePledgeFaction(targetPlayer, true);
+                } else {
+                    java.util.UUID targetUUID = null;
+                    for (java.util.Map.Entry<java.util.UUID, String> entry : net.minecraftforge.common.UsernameCache.getMap().entrySet()) {
+                        if (targetName.contains(entry.getValue())) {
+                            targetUUID = entry.getKey();
+                            break;
+                        }
+                    }
+                    if (targetUUID != null) {
+                        got.common.GOTPlayerData pd = got.common.GOTLevelData.getData(targetUUID);
+                        if (pd != null) pd.revokePledgeFaction(null, false);
+                    }
+                }
+
                 player.addChatMessage(new ChatComponentText("§aИгрок " + targetName + " был изгнан из фракции."));
             } else if (action.equals("setTitle")) {
                 if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_CREATE_TITLES)) {
@@ -614,7 +657,7 @@ public class PacketFactionManage implements IMessage {
                 }
                 String titleName = actionData[1];
                 Faction.PlayerData pData = faction.getPlayers().get(targetName);
-                if(pData != null && faction.getTitles().containsKey(titleName)){
+                if (pData != null && faction.getTitles().containsKey(titleName)) {
                     pData.setTitle(titleName);
                     player.addChatMessage(new ChatComponentText("§aИгроку " + targetName + " назначен титул '" + titleName + "'."));
                     CoreFaction.updatePrefix(targetName);
