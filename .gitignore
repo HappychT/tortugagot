@@ -5,13 +5,19 @@
 .settings
 *.hprof
 bin
-build/libs
-build/classes
-build/resources
-build/sources
-build/taskLogs
-build/tmp
+build/
 eclipse
 lotr
 unreleased
 out
+
+# IDE
+.idea/
+.claude/
+
+# Карта
+advmap/
+
+# Архивы и мусор
+*.zip
+subtitles_decoded.txt
