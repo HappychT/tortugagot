@@ -55,7 +55,11 @@ public class GOTKeyHandler {
 	public void KeyInputEvent(InputEvent.KeyInputEvent event) {
 		GOTAttackTiming.doAttackTiming();
 		if (keyBindingMenu.getIsKeyPressed() && GOTKeyHandler.mc.currentScreen == null) {
-			GOTKeyHandler.mc.thePlayer.openGui(GOT.instance, 11, GOTKeyHandler.mc.theWorld, 0, 0, 0);
+			if (brain.tutorial.client.TutorialClientState.isMenuAllowed()) {
+				GOTKeyHandler.mc.thePlayer.openGui(GOT.instance, 11, GOTKeyHandler.mc.theWorld, 0, 0, 0);
+			} else {
+				GOTKeyHandler.mc.thePlayer.addChatMessage(new net.minecraft.util.ChatComponentText("§cВы не можете открыть меню на этом этапе обучения."));
+			}
 		}
 		GOTPlayerData pd = GOTLevelData.getData(GOTKeyHandler.mc.thePlayer);
 		boolean usedAlignmentKeys = false;

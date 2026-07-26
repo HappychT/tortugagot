@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
+
 import net.minecraftforge.client.model.IModelCustom;
 import org.lwjgl.opengl.GL11;
 
@@ -16,6 +17,7 @@ public class RenderTribushet extends Render {
     private IModelCustom modelArm1;
     private IModelCustom modelArm2;
     private static final ResourceLocation texture = new ResourceLocation("got", "textures/entity/noname/trebuchet.png");
+    private static final float Y_OFFSET = -0.1F;
 
     public RenderTribushet() {
         this.shadowSize = 1.0F;
@@ -44,9 +46,10 @@ public class RenderTribushet extends Render {
         }
 
         EntityTribushet tribushet = (EntityTribushet) entity;
+        float renderYaw = tribushet.prevRotationYaw + (tribushet.rotationYaw - tribushet.prevRotationYaw) * partialTicks;
         GL11.glPushMatrix();
-        GL11.glTranslated(x, y + 0.5, z);
-        GL11.glRotatef(180.0F - yaw, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslated(x, y + Y_OFFSET, z);
+        GL11.glRotatef(180.0F - renderYaw, 0.0F, 1.0F, 0.0F);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -77,17 +80,47 @@ public class RenderTribushet extends Render {
         GL11.glPopMatrix();
     }
 
+    private static final float ARM1_REST_ANGLE = 85.0f;
+    private static final float ARM1_FIRE_ANGLE = -30.0f;
+    private static final float ARM2_REST_ANGLE = 85.0f;
+    private static final float ARM2_FIRE_ANGLE = 0.0f;
+
     private float calculateArmRotation(EntityTribushet tribushet, float partialTicks) {
-        float maxRotation = 80.0f;
-        float time = (tribushet.ticksExisted + partialTicks) / 20.0f;
-        float progress = (float) Math.sin(time * 0.5f) * 0.5f + 0.5f;
-        return maxRotation * progress;
+        int timer = tribushet.getFireAnimTimer();
+        if (timer <= 0) {
+            return ARM1_REST_ANGLE;
+        }
+
+        float progress = (EntityTribushet.FIRE_ANIM_DURATION - (timer - partialTicks)) / (float) EntityTribushet.FIRE_ANIM_DURATION;
+        progress = Math.max(0.0f, Math.min(1.0f, progress));
+
+        if (progress < 0.2f) {
+            float swingUp = progress / 0.2f;
+            return ARM1_REST_ANGLE + (ARM1_FIRE_ANGLE - ARM1_REST_ANGLE) * swingUp;
+        } else {
+            float returnProgress = (progress - 0.2f) / 0.8f;
+            float eased = returnProgress * returnProgress;
+            return ARM1_FIRE_ANGLE + (ARM1_REST_ANGLE - ARM1_FIRE_ANGLE) * eased;
+        }
     }
 
     private float calculateArm2Spin(EntityTribushet tribushet, float partialTicks) {
-        float rotationSpeed = 2.0f;
-        float angle = (tribushet.ticksExisted + partialTicks) * rotationSpeed;
-        return angle % 360.0f;
+        int timer = tribushet.getFireAnimTimer();
+        if (timer <= 0) {
+            return ARM2_REST_ANGLE;
+        }
+
+        float progress = (EntityTribushet.FIRE_ANIM_DURATION - (timer - partialTicks)) / (float) EntityTribushet.FIRE_ANIM_DURATION;
+        progress = Math.max(0.0f, Math.min(1.0f, progress));
+
+        if (progress < 0.15f) {
+            float swingUp = progress / 0.15f;
+            return ARM2_REST_ANGLE + (ARM2_FIRE_ANGLE - ARM2_REST_ANGLE) * swingUp;
+        } else {
+            float returnProgress = (progress - 0.15f) / 0.85f;
+            float eased = returnProgress * returnProgress;
+            return ARM2_FIRE_ANGLE + (ARM2_REST_ANGLE - ARM2_FIRE_ANGLE) * eased;
+        }
     }
 
     @Override

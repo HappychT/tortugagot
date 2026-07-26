@@ -95,6 +95,11 @@ public class GOTEntityWoolyRhino extends GOTEntityHorse implements GOTBiome.Immu
 	}
 
 	@Override
+	public int getTotalArmorValue() {
+		return 10;
+	}
+
+	@Override
 	public boolean isBreedingItem(ItemStack itemstack) {
 		return itemstack != null && itemstack.getItem() == Items.wheat;
 	}

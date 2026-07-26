@@ -113,6 +113,7 @@ public class GOTPlayerData {
     public GOTShields shield;
     public boolean friendlyFire;
     public boolean hiredDeathMessages = true;
+    public boolean autoRespawn = true;
     public ChunkCoordinates deathPoint;
     public int deathDim;
     public int alcoholTolerance;
@@ -997,6 +998,10 @@ public class GOTPlayerData {
         return this.hiredDeathMessages;
     }
 
+    public boolean getAutoRespawn() {
+        return this.autoRespawn;
+    }
+
     public GOTFactionData getFactionData(GOTFaction faction) {
         return this.factionDataMap.computeIfAbsent(faction, k -> new GOTFactionData(this, faction));
     }
@@ -1483,6 +1488,9 @@ public class GOTPlayerData {
         }
         if (playerData.hasKey("HiredDeathMessages")) {
             this.hiredDeathMessages = playerData.getBoolean("HiredDeathMessages");
+        }
+        if (playerData.hasKey("AutoRespawn")) {
+            this.autoRespawn = playerData.getBoolean("AutoRespawn");
         }
         this.deathPoint = null;
         if (playerData.hasKey("DeathX") && playerData.hasKey("DeathY") && playerData.hasKey("DeathZ")) {
@@ -2260,6 +2268,7 @@ public class GOTPlayerData {
         }
         playerData.setBoolean("FriendlyFire", this.friendlyFire);
         playerData.setBoolean("HiredDeathMessages", this.hiredDeathMessages);
+        playerData.setBoolean("AutoRespawn", this.autoRespawn);
         if (this.deathPoint != null) {
             playerData.setInteger("DeathX", this.deathPoint.posX);
             playerData.setInteger("DeathY", this.deathPoint.posY);
@@ -2670,6 +2679,12 @@ public class GOTPlayerData {
         this.hiredDeathMessages = flag;
         markDirty();
         sendOptionsPacket(1, flag);
+    }
+
+    public void setAutoRespawn(boolean flag) {
+        this.autoRespawn = flag;
+        markDirty();
+        sendOptionsPacket(6, flag);
     }
 
     public void setFellowshipAdmin(GOTFellowship fs, UUID player, boolean flag, String granterUsername) {

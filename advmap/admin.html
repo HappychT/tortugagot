@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Панель управления — Tortuga</title>
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet.Draw -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <!-- Turf.js for GIS Boolean Operations (Union/Difference) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
+  <link rel="stylesheet" href="admin.css?v=20260707" />
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🛡</div>
+    <div class="login-title">Панель управления</div>
+    <div class="login-sub">Tortuga Admin</div>
+    <div id="login-error" class="login-error" style="display:none"></div>
+    <input type="password" id="login-pw" class="login-input" placeholder="Пароль доступа" autocomplete="off" />
+    <button class="login-btn" onclick="attemptLogin()">Войти</button>
+    <div class="login-hint">Нет доступа? Обратитесь к администратору.</div>
+  </div>
+</div>
+
+<!-- ── ADMIN PANEL ── -->
+<div id="admin-panel" style="display:none">
+
+  <!-- Header -->
+  <header class="adm-header">
+    <div class="adm-logo">🛡 Tortuga Admin</div>
+    <div class="adm-tabs">
+      <button class="adm-tab active" onclick="switchTab('points')">📍 Точки</button>
+      <button class="adm-tab" onclick="switchTab('territories')">🗺 Территории</button>
+      <button class="adm-tab" onclick="switchTab('sea')">⚓ Морские пути</button>
+      <button class="adm-tab" onclick="switchTab('mapsettings')">⚙️ Настройки карты</button>
+      <button class="adm-tab" onclick="switchTab('editor')">📝 Редактор файлов</button>
+      <button class="adm-tab" onclick="switchTab('export')">💾 Экспорт</button>
+    </div>
+    <button class="adm-logout" onclick="logout()">Выйти</button>
+  </header>
+
+  <!-- ── TAB: POINTS ── -->
+  <div id="tab-points" class="adm-tab-content active">
+    <div class="adm-layout">
+      <aside class="adm-side">
+        <div class="adm-card">
+          <div class="adm-card-title">Управление точкой</div>
+          <div class="adm-form-row">
+            <div class="adm-search-wrap" style="display:flex; gap:6px;">
+          <input id="pt-search" type="text" placeholder="Поиск точки (название, ID)..." oninput="filterPointsList()" style="flex:1;" />
+          <button class="adm-btn adm-btn-sm" onclick="startAddingNewPoint()" title="Создать новую крепость, ресурс или город" style="padding:0 10px; white-space:nowrap;">➕ Точка</button>
+        </div>
+        <div id="pt-list" class="pt-list"></div>
+        </div>
+
+        <!-- Selected point editor -->
+        <div id="pt-editor" class="adm-card" style="display:none">
+          <div class="adm-card-title">✏️ Редактор точки</div>
+          <div class="adm-form-row">
+            <label>ID</label>
+            <div id="pe-id" class="adm-readonly"></div>
+          </div>
+          <div class="adm-form-row">
+            <label>Название</label>
+            <input id="pe-name" type="text" placeholder="Русское название" />
+          </div>
+          <div class="adm-form-row">
+            <label>Тип</label>
+            <select id="pe-type">
+              <option value="city">🏘 Обычный город</option>
+              <option value="capital">★ Столица</option>
+              <option value="fortress">⚔ Крепость</option>
+              <option value="port">⚓ Порт</option>
+              <option value="resource">💎 Ресурс</option>
+            </select>
+          </div>
+          <div class="adm-form-row">
+            <label>Лидер (опционально)</label>
+            <input id="pe-leader" type="text" placeholder="Имя игрока или НПС" />
+          </div>
+          <div class="adm-form-row">
+            <label>Фракция (владелец точки)</label>
+            <select id="pe-faction">
+              <option value="">— По умолчанию (из кода) —</option>
+              <option value="NORTH">Север</option>
+              <option value="ARRYN">Дом Аррен</option>
+              <option value="RIVERLANDS">Речные земли</option>
+              <option value="WESTERLANDS">Ланнистеры</option>
+              <option value="REACH">Простор</option>
+              <option value="STORMLANDS">Баратеоны</option>
+              <option value="CROWNLANDS">Корол. Гвардия</option>
+              <option value="DORNE">Дорн</option>
+              <option value="IRONBORN">Железнорождённые</option>
+              <option value="DRAGONSTONE">Таргариены</option>
+              <option value="NIGHT_WATCH">Ночной дозор</option>
+              <option value="WILDLING">Одичалые</option>
+              <option value="WHITE_WALKER">Белые ходоки</option>
+              <option value="DOTHRAKI">Дотракийцы</option>
+              <option value="FREE">Вольные города</option>
+              <option value="UNALIGNED">Нейтральные</option>
+              <option value="HOSTILE">Враждебные</option>
+            </select>
+          </div>
+          <div class="adm-form-row">
+            <label>Положение (imgX, imgY)</label>
+            <div class="pos-row">
+              <input id="pe-x" type="number" placeholder="X" />
+              <input id="pe-y" type="number" placeholder="Y" />
+              <button class="adm-btn-sm" onclick="pickPositionOnMap()">🎯 С карты</button>
+            </div>
+          </div>
+          <div id="pe-pick-hint" class="pick-hint" style="display:none">Кликни на карте для выбора позиции</div>
+          <div style="display:flex; gap:6px; margin-top:12px; flex-wrap:wrap;">
+            <button class="adm-btn" onclick="savePointEdit()" style="flex:1;">Сохранить</button>
+            <button class="adm-btn adm-btn-secondary" onclick="cancelPointEdit()" style="flex:1;">Отмена</button>
+            <button id="pe-btn-delete" class="adm-btn" onclick="deleteCustomPoint()" style="background:rgba(240,122,122,0.15); color:#f07a7a; border:1px solid rgba(240,122,122,0.3); width:100%; margin-top:4px; display:none;">🗑 Удалить точку</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Map for point editing -->
+      <div id="adm-map-points" class="adm-map"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: TERRITORIES ── -->
+  <div id="tab-territories" class="adm-tab-content">
+    <div class="adm-layout">
+      <aside class="adm-side">
+        <div class="adm-card">
+          <div class="adm-card-title">Территории и Ландшафт</div>
+          <div class="terr-mode-toggle" style="display:flex; gap:6px; margin-bottom:12px; background:rgba(0,0,0,0.3); padding:4px; border-radius:8px;">
+            <button type="button" id="terr-mode-btn-factions" class="adm-btn adm-btn-sm active" onclick="switchTerritoryMode('factions')" style="flex:1; font-weight:bold;">🛡 Фракции</button>
+            <button type="button" id="terr-mode-btn-terrain" class="adm-btn adm-btn-sm" onclick="switchTerritoryMode('terrain')" style="flex:1; font-weight:bold;">🌲 Трудные территории</button>
+          </div>
+          <p id="terr-hint-text" class="adm-hint">Нарисуй полигон на карте справа, затем выбери фракцию и сохрани.</p>
+          
+          <div class="terr-tools-box" style="margin: 12px 0; padding: 12px; background: rgba(0,0,0,0.25); border-radius: 10px; border: 1px solid rgba(210,165,85,0.3);">
+            <div style="font-size:12px; font-weight:bold; color:#d2a555; margin-bottom:8px;">Инструменты выделения:</div>
+            
+            <div style="margin-bottom:10px; background:rgba(255,255,255,0.06); padding:8px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">
+              <div style="font-size:11px; color:#d8d4cc; margin-bottom:6px; font-weight:bold;">Режим:</div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <label style="font-size:11px; color:#90caf9; cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600;">
+                  <input type="radio" name="mw-mode" value="new" checked onchange="window.mwAddMode=false" /> 🔄 Новая зона
+                </label>
+                <label style="font-size:11px; color:#a5d6a7; cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600;" title="Объединить фигуру с территорией">
+                  <input type="radio" name="mw-mode" value="add" onchange="window.mwAddMode=true" /> ➕ Добавить
+                </label>
+                <label style="font-size:11px; color:#ff8a80; cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600;" title="Вычесть фигуру из территории">
+                  <input type="radio" name="mw-mode" value="subtract" onchange="window.mwAddMode=false" /> ➖ Вычесть
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+              <button id="btn-magic-wand" class="adm-btn adm-btn-sm" onclick="toggleMagicWand()" style="flex:1;">🎯 По цвету (клик)</button>
+              <button class="adm-btn adm-btn-sm adm-btn-secondary" onclick="autoHullTerritory()" style="flex:1;" title="Обвести контуром точки выбранной фракции">📍 По точкам фракции</button>
+            </div>
+            <div id="magic-wand-controls" style="display:none; font-size:11px; color:#d8d4cc; background: rgba(90,184,255,0.12); padding:10px; border-radius:8px; border:1px solid rgba(90,184,255,0.4);">
+              <div style="margin-bottom:6px; font-weight:bold; color:#90caf9; font-size:12px;">Режим выделения по цвету активен</div>
+              <div style="line-height:1.4;">Кликните по области на карте для создания контура.</div>
+              <div style="margin-top:8px; display:flex; align-items:center; gap:8px;">
+                <span>Порог: <strong id="mw-tol-val" style="color:#90caf9; font-size:13px;">45</strong></span>
+                <input id="mw-tol" type="range" min="10" max="120" value="45" oninput="document.getElementById('mw-tol-val').textContent=this.value" style="flex:1; accent-color: #5ab8ff; cursor:pointer;" />
+              </div>
+            </div>
+          </div>
+
+          <div id="terr-draw-status" class="terr-status">← Используй инструмент рисования или магические кнопки выше</div>
+          <div id="terr-form" style="display:none">
+            <div id="terr-multi-actions" style="margin-bottom:12px; padding:8px 12px; background:rgba(255,193,7,0.12); border-radius:8px; border:1px solid rgba(255,193,7,0.35); display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; color:#ffe082; font-weight:bold;">Выделено областей: <strong id="terr-part-count" style="color:#fff;">1</strong></span>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="adm-btn adm-btn-sm" onclick="undoLastTerritoryPart()" style="background:#ff9800; color:#000; padding:4px 8px; font-weight:bold;">↩️ Отменить шаг</button>
+                <button type="button" class="adm-btn adm-btn-sm adm-btn-danger" onclick="clearTerritorySelection()" style="padding:4px 8px;">🗑️ Сбросить</button>
+              </div>
+            </div>
+            <div class="adm-form-row">
+              <label>Название зоны</label>
+              <input id="terr-name" type="text" placeholder="Например: Север" />
+            </div>
+            <div id="terr-row-faction" class="adm-form-row">
+              <label>Фракция</label>
+              <select id="terr-faction" onchange="if(pendingTerritoryPoints) updateTerritoryPreview()">
+                <option value="NORTH">Север</option>
+                <option value="ARRYN">Дом Аррен</option>
+                <option value="RIVERLANDS">Речные земли</option>
+                <option value="WESTERLANDS">Ланнистеры</option>
+                <option value="REACH">Простор</option>
+                <option value="STORMLANDS">Баратеоны</option>
+                <option value="CROWNLANDS">Корол. Гвардия</option>
+                <option value="DORNE">Дорн</option>
+                <option value="IRONBORN">Железнорождённые</option>
+                <option value="DRAGONSTONE">Таргариены</option>
+                <option value="NIGHT_WATCH">Ночной дозор</option>
+                <option value="WILDLING">Одичалые</option>
+                <option value="WHITE_WALKER">Белые ходоки</option>
+                <option value="DOTHRAKI">Дотракийцы</option>
+                <option value="FREE">Вольные города</option>
+                <option value="UNALIGNED">Нейтральные</option>
+              </select>
+            </div>
+            <div id="terr-row-terrain" class="adm-form-row" style="display:none">
+              <label>Тип ландшафта (трудная территория)</label>
+              <select id="terr-type" onchange="if(pendingTerritoryPoints) updateTerritoryPreview()">
+                <option value="swamp">🍄 Болота (замедление)</option>
+                <option value="mountain">⛰ Горы (сильное замедление)</option>
+                <option value="hills">丘 Холмы (умеренное замедление)</option>
+                <option value="forest">🌲 Лес (небольшое замедление)</option>
+                <option value="ocean">🌊 Океан / Вода (только для морских путей)</option>
+              </select>
+            </div>
+            <div class="adm-btn-row">
+              <button class="adm-btn" onclick="saveTerritory()">💾 Сохранить</button>
+              <button class="adm-btn adm-btn-secondary" onclick="cancelTerrDraw()">Отмена</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="adm-card">
+          <div id="terr-list-title" class="adm-card-title">Существующие территории</div>
+          <div id="terr-list" class="terr-list"></div>
+        </div>
+      </aside>
+      <div id="adm-map-territories" class="adm-map"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: SEA ROUTES ── -->
+  <div id="tab-sea" class="adm-tab-content">
+    <div class="adm-layout">
+      <aside class="adm-side">
+        <div class="adm-card">
+          <div class="adm-card-title">⚓ Морские маршруты</div>
+          <p class="adm-hint">Добавляй пары портов для создания морских маршрутов. Маршрут двунаправленный.</p>
+          <p class="adm-hint" style="background:rgba(90,184,255,0.1);padding:8px;border-radius:6px;border:1px solid rgba(90,184,255,0.3);color:#90caf9;">💡 <strong>Подсказка:</strong> кликай прямо по якорям ⚓ на карте справа, чтобы быстро выбирать порты!</p>
+          <div class="adm-form-row">
+            <label>Порт A</label>
+            <select id="sea-a"></select>
+          </div>
+          <div class="adm-form-row">
+            <label>Порт B</label>
+            <select id="sea-b"></select>
+          </div>
+          <button class="adm-btn" onclick="addSeaRoute()">+ Добавить маршрут</button>
+        </div>
+
+        <div id="sea-edit-card" class="adm-card" style="display:none; border: 1px solid #38d4ff; background: rgba(56, 212, 255, 0.05);">
+          <div class="adm-card-title" style="color:#38d4ff">✏️ Траектория пути</div>
+          <div id="sea-edit-title" style="font-weight:600; margin-bottom:8px; color:var(--tx-w)"></div>
+          <p class="adm-hint" style="color:#b0e0e6">Кликай по воде на карте справа, чтобы ставить <strong>промежуточные якоря (буи)</strong>, огибая любые полуострова и горы точно как тебе нужно! Перетаскивай буи мышкой.</p>
+          
+          <div id="sea-anchors-list" style="display:flex; flex-direction:column; gap:6px; margin: 10px 0; max-height: 180px; overflow-y:auto;"></div>
+          
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+            <button class="adm-btn" style="background:#38d4ff; color:#000; font-weight:600; flex:1;" onclick="saveSeaRoutePath()">💾 Сохранить</button>
+            <button class="adm-btn adm-btn-secondary" style="flex:1;" onclick="resetSeaRoutePath()">🔄 Авто (A*)</button>
+            <button class="adm-btn adm-btn-secondary" style="width:100%; margin-top:4px;" onclick="cancelSeaRouteEdit()">Отмена</button>
+          </div>
+        </div>
+
+        <div class="adm-card">
+          <div class="adm-card-title">Список морских маршрутов</div>
+          <div id="sea-list" class="sea-list"></div>
+        </div>
+      </aside>
+      <div id="adm-map-sea" class="adm-map"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: MAP SETTINGS ── -->
+  <div id="tab-mapsettings" class="adm-tab-content">
+    <div class="adm-layout">
+      <aside class="adm-side">
+        <div class="adm-card">
+          <div class="adm-card-title">⚙️ Настройки карты</div>
+          <p class="adm-hint">Цвет фона вокруг карты и ограничение видимой области (границ) для игроков.</p>
+          
+          <div class="adm-form-row">
+            <label>Цвет фона вокруг карты</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="cfg-bg-color" type="color" value="#0f1c2d" onchange="updateBgColorPreview(this.value)" style="width:40px; height:32px; padding:0; border:none; cursor:pointer; background:none;" />
+              <input id="cfg-bg-hex" type="text" value="#0f1c2d" oninput="updateBgColorPreview(this.value)" style="flex:1;" />
+            </div>
+          </div>
+
+          <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin:12px 0;" />
+          <div class="adm-card-title" style="font-size:13px;">Границы карты (область видимости)</div>
+          <p class="adm-hint">Ограничивает камеру игроков, скрывая лишние края текстуры (в пикселях от 0 до 8192).</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11px; color:#aaa;">Min X (слева)</label>
+              <input id="cfg-min-x" type="number" placeholder="0" />
+            </div>
+            <div>
+              <label style="font-size:11px; color:#aaa;">Min Y (сверху)</label>
+              <input id="cfg-min-y" placeholder="0" type="number" />
+            </div>
+            <div>
+              <label style="font-size:11px; color:#aaa;">Max X (справа)</label>
+              <input id="cfg-max-x" type="number" placeholder="8192" />
+            </div>
+            <div>
+              <label style="font-size:11px; color:#aaa;">Max Y (снизу)</label>
+              <input id="cfg-max-y" type="number" placeholder="8192" />
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+            <button class="adm-btn adm-btn-sm adm-btn-secondary" onclick="startBoundsSelection()">🎯 Выбрать область мышкой на карте</button>
+            <button class="adm-btn adm-btn-sm adm-btn-secondary" onclick="previewMapBounds()">👁 Показать границу на карте</button>
+            <button class="adm-btn adm-btn-sm" onclick="resetMapBounds()" style="background:rgba(255,255,255,0.08); color:#ccc;">🔄 Сбросить на всю текстуру</button>
+          </div>
+
+          <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin:16px 0;" />
+          <div class="adm-card-title" style="font-size:13px;">⏳ Множители времени (трудные территории)</div>
+          <p class="adm-hint">Задайте во сколько раз замедляется передвижение (от 1.0x до 10.0x), если путь проходит через указанный ландшафт.</p>
+          
+          <div class="adm-form-row">
+            <label style="display:flex; justify-content:space-between;">🍄 Болота: <strong id="val-mult-swamp" style="color:#a5d6a7;">2.0x</strong></label>
+            <input id="cfg-mult-swamp" type="range" min="1.0" max="10.0" step="0.1" value="2.0" oninput="document.getElementById('val-mult-swamp').textContent=this.value+'x'" style="width:100%; accent-color:#a5d6a7; cursor:pointer;" />
+          </div>
+          <div class="adm-form-row">
+            <label style="display:flex; justify-content:space-between;">⛰ Горы: <strong id="val-mult-mountain" style="color:#b0bec5;">5.0x</strong></label>
+            <input id="cfg-mult-mountain" type="range" min="1.0" max="10.0" step="0.1" value="5.0" oninput="document.getElementById('val-mult-mountain').textContent=this.value+'x'" style="width:100%; accent-color:#b0bec5; cursor:pointer;" />
+          </div>
+          <div class="adm-form-row">
+            <label style="display:flex; justify-content:space-between;">丘 Холмы: <strong id="val-mult-hills" style="color:#ffe082;">1.5x</strong></label>
+            <input id="cfg-mult-hills" type="range" min="1.0" max="10.0" step="0.1" value="1.5" oninput="document.getElementById('val-mult-hills').textContent=this.value+'x'" style="width:100%; accent-color:#ffe082; cursor:pointer;" />
+          </div>
+          <div class="adm-form-row" style="margin-bottom:16px;">
+            <label style="display:flex; justify-content:space-between;">🌲 Лес: <strong id="val-mult-forest" style="color:#81c784;">1.3x</strong></label>
+            <input id="cfg-mult-forest" type="range" min="1.0" max="10.0" step="0.1" value="1.3" oninput="document.getElementById('val-mult-forest').textContent=this.value+'x'" style="width:100%; accent-color:#81c784; cursor:pointer;" />
+          </div>
+
+          <button class="adm-btn" onclick="saveMapSettings()">💾 Сохранить настройки карты</button>
+        </div>
+      </aside>
+      <div id="adm-map-settings" class="adm-map"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: FILE / CONFIG EDITOR ── -->
+  <div id="tab-editor" class="adm-tab-content">
+    <div class="adm-layout">
+      <aside class="adm-side" style="width: 320px;">
+        <div class="adm-card">
+          <div class="adm-card-title">📝 Редактор файлов и конфигов</div>
+          <p class="adm-hint">Прямое редактирование конфигурационных файлов в реальном времени.</p>
+          
+          <div class="adm-form-row">
+            <label>Выберите файл для редактирования:</label>
+            <select id="editor-file-select" onchange="loadEditorFile(this.value)" style="width:100%; padding:8px; background:var(--bg-input); color:var(--tx); border:1px solid var(--line); border-radius:4px;">
+              <option value="overrides">overrides.js (Столицы, крепости, порты, ресурсы, кастомные точки)</option>
+              <option value="admin_config">admin_config.js (Настройки безопасности и доступа)</option>
+              <option value="territories">territories.js (Координаты полигонов и границы)</option>
+              <option value="raw_storage">Сырые данные админки (localStorage JSON)</option>
+            </select>
+          </div>
+
+          <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+            <button class="adm-btn" onclick="saveEditorFile()">▶️ Применить и сохранить</button>
+            <button class="adm-btn adm-btn-secondary" onclick="downloadEditorFile()">📥 Скачать файл (.js / .json)</button>
+            <button class="adm-btn" onclick="resetEditorFile()" style="background:rgba(255,255,255,0.08); color:#ccc;">🔄 Сбросить изменения</button>
+          </div>
+          
+          <div id="editor-status" style="margin-top:12px; font-size:12px; text-align:center; line-height:1.4;"></div>
+        </div>
+      </aside>
+      <div class="adm-map" style="padding:16px; display:flex; flex-direction:column; background:#080c14;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span id="editor-filename-display" style="font-family:var(--monospace); font-size:14px; color:#5ab8ff; font-weight:bold;">overrides.js</span>
+          <span style="font-size:11px; color:#aaa;">Редактируйте код ниже. Нажмите «Применить» для мгновенного обновления сайта.</span>
+        </div>
+        <textarea id="editor-code" style="flex:1; width:100%; background:#05070c; color:#d8d4cc; font-family:Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size:13px; line-height:1.5; padding:12px; border:1px solid rgba(210,165,85,0.3); border-radius:6px; resize:none; outline:none; white-space:pre; overflow:auto;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: EXPORT ── -->
+  <div id="tab-export" class="adm-tab-content">
+    <div class="adm-export-page">
+      <div class="adm-card export-card">
+        <div class="adm-card-title">💾 Экспорт и Синхронизация данных</div>
+        <p class="adm-hint">Админ-панель в реальном времени синхронизирует все изменения с сервером <strong>FastAPI + PostgreSQL</strong>. Для резервного копирования вы можете скачать данные ниже.</p>
+        
+        <div class="export-block" style="background:rgba(46,232,192,0.1); border:1px solid rgba(46,232,192,0.3);">
+          <div class="export-label" style="color:#2ee8c0;">⚡ Статус: Живая синхронизация с БД активна</div>
+          <div class="export-desc">Игроки на сайте мгновенно получают обновленную карту, ландшафт и маршруты.</div>
+        </div>
+
+        <div class="export-block">
+          <div class="export-label">Резервный дамп БД (JSON)</div>
+          <div class="export-desc">Полный дамп всех территорий, трудного ландшафта, множителей времени и настроек</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="adm-btn" onclick="exportBackupJSON()">⬇ Скачать резервную копию JSON</button>
+            <button class="adm-btn adm-btn-secondary" onclick="importBackupJSON()">⬆ Загрузить JSON (Импорт всего)</button>
+            <button class="adm-btn" style="background:#00e5ff; color:#000; font-weight:600;" onclick="importOnlySeaRoutes()">⬆ Импорт ТОЛЬКО морских путей (без потери территорий!)</button>
+          </div>
+        </div>
+
+        <div class="export-block">
+          <div class="export-label">overrides.js</div>
+          <div class="export-desc">Типы точек, порты, столицы, крепости, переименования, лидеры, морские маршруты</div>
+          <button class="adm-btn" onclick="exportOverrides()">⬇ Скачать overrides.js</button>
+        </div>
+
+        <div class="export-block">
+          <div class="export-label">territories.js</div>
+          <div class="export-desc">Фракциональные территории (полигоны)</div>
+          <button class="adm-btn" onclick="exportTerritories()">⬇ Скачать territories.js</button>
+        </div>
+
+        <div class="export-block export-danger">
+          <div class="export-label">⚠ Сброс всех изменений</div>
+          <div class="export-desc">Удаляет все изменения из браузера. Файлы на сервере не затрагиваются.</div>
+          <button class="adm-btn adm-btn-danger" onclick="resetAllData()">Сбросить данные браузера</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Data & scripts -->
+<script src="data/admin_config.js?v=20260707"></script>
+<script src="data/waypoints.js?v=20260707"></script>
+<script src="data/overrides.js?v=20260707"></script>
+<script src="data/territories.js?v=20260707"></script>
+<script src="admin.js?v=20260707"></script>
+</body>
+</html>

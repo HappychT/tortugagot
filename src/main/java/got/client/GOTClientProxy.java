@@ -79,6 +79,7 @@ import got.common.decorations.base.Decoration;
 import got.common.entity.animal.GOTEntityElephant3DViewer;
 import got.common.entity.animal.GOTEntityMammoth3DViewer;
 import got.common.entity.dragon.GOTEntityDragon3DViewer;
+import noname.weapons.entity.EntityBatteringRam3DViewer;
 import got.common.faction.GOTAlignmentBonusMap;
 import got.common.faction.GOTFaction;
 import got.common.network.GOTPacketClientInfo;
@@ -144,6 +145,7 @@ public class GOTClientProxy extends GOTCommonProxy {
     public static GOTEffectRenderer customEffectRenderer;
     public static GOTRenderPlayer specialPlayerRenderer = new GOTRenderPlayer();
     public static GOTSwingHandler swingHandler = new GOTSwingHandler();
+    public static GOTAutoRespawnHandler autoRespawnHandler = new GOTAutoRespawnHandler();
     public static GOTTickHandlerClient tickHandler = new GOTTickHandlerClient();
     public static GOTGuiHandler guiHandler = new GOTGuiHandler();
     public static GOTMusic musicHandler;
@@ -592,7 +594,11 @@ public class GOTClientProxy extends GOTCommonProxy {
         FMLCommonHandler.instance().bus().register(GOTClientStaminaHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(GOTClientStaminaHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new OverlayEventHandler());
+        MinecraftForge.EVENT_BUS.register(brain.tutorial.client.TutorialGuiOverlay.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(brain.tutorial.client.TutorialClientManager.INSTANCE);
+        FMLCommonHandler.instance().bus().register(brain.tutorial.client.TutorialClientManager.INSTANCE);
         FMLCommonHandler.instance().bus().register(new GOTEntityElephant3DViewer());
+        FMLCommonHandler.instance().bus().register(new EntityBatteringRam3DViewer());
         FMLCommonHandler.instance().bus().register(new GOTKeyHandler(GOTPacketHandler.networkWrapper));
 
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
@@ -936,5 +942,47 @@ public class GOTClientProxy extends GOTCommonProxy {
         boolean showHiddenSWP = GOTGuiMap.showHiddenSWP;
         GOTPacketClientInfo packet = new GOTPacketClientInfo(viewingFaction, changedRegionMap, showWP, showCWP, showHiddenSWP);
         GOTPacketHandler.networkWrapper.sendToServer(packet);
+    }
+
+    @Override
+    public void handleSyncInventory(net.minecraft.item.ItemStack[] mainInventory, net.minecraft.item.ItemStack itemstack) {
+        net.minecraft.entity.player.EntityPlayer player = net.minecraft.client.Minecraft.getMinecraft().thePlayer;
+        if (player != null) {
+            for (int i = 0; i < mainInventory.length; i++) {
+                player.inventory.mainInventory[i] = mainInventory[i];
+            }
+            player.inventory.setItemStack(itemstack);
+        }
+    }
+
+    @Override
+    public void handleSyncWeaponHitCount(net.minecraft.item.Item item, int hitCount) {
+        if (item != null) {
+            if (hitCount <= 0) {
+                weaponHitCounts.remove(item);
+            } else {
+                weaponHitCounts.put(item, hitCount);
+            }
+        }
+    }
+
+    @Override
+    public void openTutorialWelcomeGui() {
+        net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(new got.client.gui.tutorial.GOTGuiTutorialWelcome());
+    }
+
+    @Override
+    public void openGOTGuiStructureHeart() {
+        net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(new got.client.gui.faction.GOTGuiStructureHeart());
+    }
+
+    @Override
+    public void openGuiStructureBlock(int x, int y, int z) {
+        net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(new got.client.gui.faction.GuiStructureBlock(x, y, z, null));
+    }
+
+    @Override
+    public boolean isTutorialStage9(net.minecraft.entity.player.EntityPlayer player) {
+        return brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 9;
     }
 }

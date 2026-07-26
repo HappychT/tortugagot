@@ -51,6 +51,11 @@ public class GOTPacketFastTravel implements IMessage {
 		@Override
 		public IMessage onMessage(GOTPacketFastTravel packet, MessageContext context) {
 			EntityPlayerMP entityplayer = context.getServerHandler().playerEntity;
+			got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+			if (ext != null && ext.isTutorialActive()) {
+				entityplayer.addChatMessage(new net.minecraft.util.ChatComponentText("§cБыстрое перемещение недоступно во время обучения."));
+				return null;
+			}
 			if (!GOTConfig.enableFastTravel) {
 				entityplayer.addChatMessage(new ChatComponentTranslation("got.chat.ftDisabled"));
 			} else {

@@ -10,6 +10,8 @@ import got.client.gui.*;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import got.common.block.other.GOTBlockFlowerPot;
 import got.common.database.*;
+import got.common.entity.GOTEnchaldBlacksmith;
+import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.entity.animal.GOTEntityHorse;
 import got.common.entity.other.*;
 import got.common.faction.*;
@@ -24,6 +26,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.item.EntityMinecartContainer;
 import net.minecraft.entity.player.*;
 import net.minecraft.init.Blocks;
@@ -226,6 +229,9 @@ public class GOTCommonProxy implements IGuiHandler {
 				GOTEntityHorse horse = (GOTEntityHorse) entity;
 				return new GOTGuiMountInventory(entityplayer.inventory, new AnimalChest(horse.getCommandSenderName(), j), horse);
 			}
+			if (entity instanceof GOTEntityDirewolf) {
+				return new GOTGuiDirewolfInventory(entityplayer.inventory, (GOTEntityDirewolf) entity);
+			}
 			npc2 = (GOTEntityNPCRideable) entity;
 			if (entity instanceof GOTEntityNPCRideable && npc2.getMountInventory() != null) {
 				return new GOTGuiNPCMountInventory(entityplayer.inventory, new AnimalChest(npc2.getCommandSenderName(), j), npc2);
@@ -383,6 +389,12 @@ public class GOTCommonProxy implements IGuiHandler {
 			return new GOTGuiCraftingTable.Jogos(entityplayer.inventory, world, i, j, k);
 		case 88:
 			return new GOTGuiCraftingTable.Mossovy(entityplayer.inventory, world, i, j, k);
+		case 89:
+			entity = world.getEntityByID(i);
+			if (entity instanceof GOTEnchaldBlacksmith){
+				return new GOTGuiFactionBlacksmith(entityplayer, (EntityCreature) entity);
+			}
+			break;
 		default:
 			break;
 		}
@@ -566,6 +578,9 @@ public class GOTCommonProxy implements IGuiHandler {
 				GOTEntityHorse horse = (GOTEntityHorse) entity;
 				return new GOTContainerMountInventory(entityplayer.inventory, GOTReflection.getHorseInv(horse), horse);
 			}
+			if (entity instanceof GOTEntityDirewolf) {
+				return new GOTContainerDirewolfInventory(entityplayer.inventory, ((GOTEntityDirewolf) entity).getMountInventory(), (GOTEntityDirewolf) entity);
+			}
 			if (entity instanceof GOTEntityNPCRideable && ((GOTEntityNPCRideable) entity).getMountInventory() != null) {
 				return new GOTContainerNPCMountInventory(entityplayer.inventory, ((GOTEntityNPCRideable) entity).getMountInventory(), (GOTEntityNPCRideable) entity);
 			}
@@ -689,6 +704,12 @@ public class GOTCommonProxy implements IGuiHandler {
 			return new GOTContainerCraftingTable.Jogos(entityplayer.inventory, world, i, j, k);
 		case 88:
 			return new GOTContainerCraftingTable.Mossovy(entityplayer.inventory, world, i, j, k);
+		case 89:
+			entity = world.getEntityByID(i);
+			if (entity instanceof GOTEnchaldBlacksmith) {
+				return new GOTContainerFactionBlacksmith(entityplayer, (EntityCreature) entity);
+			}
+			break;
 		default:
 			break;
 		}
@@ -842,5 +863,25 @@ public class GOTCommonProxy implements IGuiHandler {
 
 	public static int unpackSlot(int fullID) {
 		return fullID >> 16;
+	}
+
+	public void handleSyncInventory(net.minecraft.item.ItemStack[] mainInventory, net.minecraft.item.ItemStack itemstack) {
+	}
+
+	public void handleSyncWeaponHitCount(net.minecraft.item.Item item, int hitCount) {
+	}
+
+	public void openTutorialWelcomeGui() {
+	}
+
+	public void openGOTGuiStructureHeart() {
+	}
+
+	public void openGuiStructureBlock(int x, int y, int z) {
+	}
+
+	public boolean isTutorialStage9(net.minecraft.entity.player.EntityPlayer player) {
+		got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+		return ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 9;
 	}
 }

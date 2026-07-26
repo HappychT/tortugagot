@@ -1,5 +1,8 @@
 package noname.weapons.war;
 
+import brain.factions.servers.StructureManager;
+import brain.factions.structures.FactionStructureManager;
+import brain.factions.structures.FactionStructureSlot;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import got.common.GOTBannerProtection;
@@ -21,8 +24,75 @@ import net.minecraftforge.event.world.BlockEvent;
  */
 public class WarBlockHandler {
 
-    // Фиксированная скорость ломания земли во время войны
-    private static final float WAR_DIG_SPEED = 1.0F;
+    private static final float WAR_DIG_SPEED = 0.4f;
+    private static final int WAR_RADIUS = 500;
+
+    public static boolean isWarActiveAt(World world, int x, int y, int z) {
+        if (world == null) {
+            return false;
+        }
+
+        if (StructureManager.activeWarFortresses.isEmpty()) {
+            return false;
+        }
+
+        for (String id : StructureManager.activeWarFortresses) {
+            if (id == null) {
+                continue;
+            }
+            FactionStructureSlot slot = FactionStructureManager.getStructureById(id);
+            if (slot == null) {
+                continue;
+            }
+            int dx = x - slot.xCoord;
+            int dy = y - slot.yCoord;
+            int dz = z - slot.zCoord;
+            if ((dx * dx + dy * dy + dz * dz) <= (WAR_RADIUS * WAR_RADIUS)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean canPlaceProtectedDirt(World world, int x, int y, int z, int side) {
+        int targetX = x;
+        int targetY = y;
+        int targetZ = z;
+
+        switch (side) {
+            case 0:
+                targetY--;
+                break;
+            case 1:
+                targetY++;
+                break;
+            case 2:
+                targetZ--;
+                break;
+            case 3:
+                targetZ++;
+                break;
+            case 4:
+                targetX--;
+                break;
+            case 5:
+                targetX++;
+                break;
+            default:
+                return false;
+        }
+
+        if (side != 1) {
+            return false;
+        }
+
+        if (!isDirtBlock(world.getBlock(x, y, z))) {
+            return false;
+        }
+
+        return countDirtBelow(world, x, y, z) < 4;
+    }
 
     /**
      * Обрабатывает размещение блоков
@@ -30,10 +100,6 @@ public class WarBlockHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBlockPlace(PlayerInteractEvent event) {
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
-
-        if (!WarModeManager.getInstance().isWarModeActive()) {
             return;
         }
 
@@ -91,62 +157,16 @@ public class WarBlockHandler {
         boolean isProtected = GOTBannerProtection.isProtected(world, targetX, targetY, targetZ,
                 GOTBannerProtection.forPlayer(player, GOTBannerProtection.Permission.FULL), false);
 
-        if (!isProtected) {
+        if (!isProtected || !isWarActiveAt(world, targetX, targetY, targetZ)) {
             // Не в привате - обычное поведение
             return;
         }
 
-        Block targetBlock = world.getBlock(targetX, targetY, targetZ);
-
-        // Условие 5: Замена воды разрешена без ограничений
-        if (targetBlock == Blocks.water || targetBlock == Blocks.flowing_water) {
-            // Разрешаем замену воды
-            event.setCanceled(false);
-
-            // Размещаем блок
-            if (!world.isRemote) {
-                world.setBlock(targetX, targetY, targetZ, blockToPlace);
-                if (!player.capabilities.isCreativeMode) {
-                    heldItem.stackSize--;
-                }
-                // Планируем падение земли
-                scheduleFalling(world, targetX, targetY, targetZ);
-            }
+        if (!canPlaceProtectedDirt(world, x, y, z, side)) {
             event.setCanceled(true);
             return;
         }
 
-        // Условие 1: Земля ставится только СВЕРХУ другой земли
-        if (side != 1) {
-            // Не сверху - запрещаем
-            event.setCanceled(true);
-            return;
-        }
-
-        // Проверяем, что под местом размещения есть земля
-        Block blockBelow = world.getBlock(x, y, z);
-        if (!isDirtBlock(blockBelow)) {
-            // Под ногами не земля - запрещаем
-            event.setCanceled(true);
-            return;
-        }
-
-        // Условие 2: Максимум 4 блока земли в столбе
-        int dirtCount = countDirtBelow(world, x, y, z);
-        if (dirtCount >= 4) {
-            // Уже 4 блока земли - запрещаем
-            event.setCanceled(true);
-            return;
-        }
-
-        // Разрешаем размещение
-        event.setCanceled(false);
-
-        // После размещения - земля должна упасть как гравий
-        if (!world.isRemote) {
-            // Используем отложенное обновление для проверки падения
-            world.scheduleBlockUpdate(targetX, targetY, targetZ, blockToPlace, 2);
-        }
     }
 
     /**
@@ -154,10 +174,6 @@ public class WarBlockHandler {
      */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBlockBreak(BlockEvent.BreakEvent event) {
-        if (!WarModeManager.getInstance().isWarModeActive()) {
-            return;
-        }
-
         World world = event.world;
         if (world.isRemote) {
             return;
@@ -177,9 +193,9 @@ public class WarBlockHandler {
 
         // Проверяем, защищена ли позиция
         boolean isProtected = GOTBannerProtection.isProtected(world, x, y, z,
-                GOTBannerProtection.forPlayer(player, GOTBannerProtection.Permission.FULL), false);
+                GOTBannerProtection.anyBanner(), false);
 
-        if (isProtected) {
+        if (isProtected && isWarActiveAt(world, x, y, z)) {
             // В привате - разрешаем ломать землю
             event.setCanceled(false);
         }
@@ -188,12 +204,8 @@ public class WarBlockHandler {
     /**
      * Условие 3: Фиксированная скорость ломания земли в приватах во время войны
      */
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onBreakSpeed(PlayerEvent.BreakSpeed event) {
-        if (!WarModeManager.getInstance().isWarModeActive()) {
-            return;
-        }
-
         Block block = event.block;
 
         // Только для земли
@@ -207,9 +219,9 @@ public class WarBlockHandler {
         // Проверяем, защищена ли позиция
         boolean isProtected = GOTBannerProtection.isProtected(world,
                 (int) event.x, (int) event.y, (int) event.z,
-                GOTBannerProtection.forPlayer(player, GOTBannerProtection.Permission.FULL), false);
+                GOTBannerProtection.anyBanner(), false);
 
-        if (isProtected) {
+        if (isProtected && isWarActiveAt(world, (int) event.x, (int) event.y, (int) event.z)) {
             // В привате - фиксированная скорость
             event.newSpeed = WAR_DIG_SPEED;
         }
@@ -243,62 +255,30 @@ public class WarBlockHandler {
             // Блоки могут не существовать
         }
 
-        // Проверяем материал
-        if (block.getMaterial() == Material.ground ||
-                block.getMaterial() == Material.grass) {
+        // Явные исключения (материал слишком общий и включает несоответствующие блоки)
+        if (block == Blocks.hay_block) {
+            return false;
+        }
+
+        // Проверяем материал (как fallback для модовых "земляных" блоков)
+        if (block.getMaterial() == Material.grass ||
+                block.getMaterial() == Material.clay) {
             return true;
         }
 
         return false;
     }
 
-    /**
-     * Считает количество блоков земли под указанной позицией
-     */
-    private int countDirtBelow(World world, int x, int y, int z) {
+    public static int countDirtBelow(World world, int x, int y, int z) {
         int count = 0;
         for (int checkY = y; checkY >= 0 && count < 5; checkY--) {
             Block block = world.getBlock(x, checkY, z);
             if (isDirtBlock(block)) {
                 count++;
             } else {
-                break; // Прерываем при первом не-земляном блоке
+                break;
             }
         }
         return count;
-    }
-
-    /**
-     * Планирует падение земли
-     */
-    private void scheduleFalling(World world, int x, int y, int z) {
-        // Проверяем, может ли блок упасть
-        if (canFall(world, x, y - 1, z)) {
-            // Создаём падающий блок
-            Block block = world.getBlock(x, y, z);
-            int meta = world.getBlockMetadata(x, y, z);
-
-            world.setBlockToAir(x, y, z);
-
-            net.minecraft.entity.item.EntityFallingBlock fallingBlock = new net.minecraft.entity.item.EntityFallingBlock(
-                    world, x + 0.5, y + 0.5, z + 0.5, block, meta);
-
-            world.spawnEntityInWorld(fallingBlock);
-        }
-    }
-
-    /**
-     * Проверяет, может ли блок упасть в указанную позицию
-     */
-    private boolean canFall(World world, int x, int y, int z) {
-        if (y < 0) {
-            return false;
-        }
-        Block block = world.getBlock(x, y, z);
-        return block.isAir(world, x, y, z) ||
-                block == Blocks.water ||
-                block == Blocks.flowing_water ||
-                block == Blocks.fire ||
-                block.getMaterial().isLiquid();
     }
 }

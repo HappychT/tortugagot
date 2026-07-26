@@ -1411,10 +1411,12 @@ public class GOTRecipe{
         GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.yitiDaggerPoisoned, GOTRegistry.yitiDagger, GOTRegistry.bottlePoison));
         GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.summerDaggerPoisoned, GOTRegistry.summerDagger, GOTRegistry.bottlePoison));
         GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.valyrianChisel, GOTRegistry.chisel, GOTRegistry.valyrianPowder));
-        //		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosPike, GOTRegistry.essosPike, GOTRegistry.shield));
-        //		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorPike, GOTRegistry.shield, GOTRegistry.westerosPike));
-        //		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldEssosSpear, GOTRegistry.shield, GOTRegistry.essosSpear));
-        //		GameRegistry.addRecipe(new ShapelessOreRecipe(GOTRegistry.shieldWestorSpear, GOTRegistry.shield, GOTRegistry.westerosSpear));
+        GameRegistry.addRecipe(new net.minecraftforge.oredict.ShapelessOreRecipe(got.common.database.GOTRegistry.shieldEssosPike, new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.essosPike, 1, 32767), new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 1, 32767)));
+        GameRegistry.addRecipe(new net.minecraftforge.oredict.ShapelessOreRecipe(got.common.database.GOTRegistry.shieldWestorPike, new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 1, 32767), new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.westerosPike, 1, 32767)));
+        GameRegistry.addRecipe(new net.minecraftforge.oredict.ShapelessOreRecipe(got.common.database.GOTRegistry.shieldEssosSpear, new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 1, 32767), new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.essosSpear, 1, 32767)));
+        GameRegistry.addRecipe(new net.minecraftforge.oredict.ShapelessOreRecipe(got.common.database.GOTRegistry.shieldWestorSpear, new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 1, 32767), new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.westerosSpear, 1, 32767)));
+        GameRegistry.addRecipe(new net.minecraftforge.oredict.ShapelessOreRecipe(got.common.database.GOTRegistry.shieldWestorPike, new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 1, 32767), new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironPike, 1, 32767)));
+        GameRegistry.addRecipe(new net.minecraftforge.oredict.ShapelessOreRecipe(got.common.database.GOTRegistry.shieldWestorSpear, new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 1, 32767), new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironSpear, 1, 32767)));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.woodBeamRotten, 3, 0), "X", "X", "X", Character.valueOf('X'), new ItemStack(GOTRegistry.rottenLog, 1, 0)));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.fenceRotten, 3, 0), "XYX", "XYX", Character.valueOf('X'), new ItemStack(GOTRegistry.planksRotten, 1, 0), Character.valueOf('Y'), "stickWood"));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.meatBlock), "XXX", "XXX", "XXX", Character.valueOf('X'), "meat"));

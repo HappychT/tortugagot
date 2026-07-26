@@ -129,6 +129,21 @@ public class GOTPacketEditBanner implements IMessage {
 				}
 				List<GOTBannerProtection.Permission> defaultPerms = GOTBannerWhitelistEntry.static_decodePermBitFlags(packet.defaultPerms);
 				banner.setDefaultPermissions(defaultPerms);
+                
+                got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+                if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 4) {
+                    if (packet.playerSpecificProtection) {
+                        brain.tutorial.TutorialManager.getInstance().advanceStage4(entityplayer, 3);
+                    }
+                    if (packet.whitelistSlots != null) {
+                        for (String username : packet.whitelistSlots) {
+                            if (username != null && GOTFellowshipProfile.hasFellowshipCode(username)) {
+                                brain.tutorial.TutorialManager.getInstance().advanceStage4(entityplayer, 4);
+                                break;
+                            }
+                        }
+                    }
+                }
 			}
 			return null;
 		}

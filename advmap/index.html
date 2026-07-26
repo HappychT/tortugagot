@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Карта Вестероса — Tortuga</title>
+  <meta name="description" content="Интерактивная карта мира мода Tortuga: вейпоинты, маршруты, расстояния в блоках." />
+  <!-- Open Graph / Discord / VK -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Карта Вестероса — Tortuga" />
+  <meta property="og:description" content="Интерактивная карта с маршрутами, морскими путями и фильтрами по фракциям." />
+  <meta property="og:image" content="assets/map.png" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Карта Вестероса — Tortuga" />
+  <meta name="twitter:image" content="assets/map.png" />
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺</text></svg>" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=20260707" />
+</head>
+<body>
+
+<!-- ═══════════════════ MAP BACKGROUND ═══════════════════ -->
+<div id="map-container">
+  <div id="map"></div>
+</div>
+
+<!-- ═══════════════════ FLOATING HEADER ═══════════════════ -->
+<header id="site-header">
+  <div class="header-logo">
+    <div>
+      <div class="logo-title">Карта Вестероса</div>
+      <div class="logo-sub">Tortuga</div>
+    </div>
+  </div>
+
+  <div class="header-tools">
+    <div class="tool-group">
+      <button id="btn-route" class="tool-btn" onclick="toggleMode('route')" title="Построить маршрут">
+        <span class="ti">🛣</span><span>Маршрут</span>
+      </button>
+      <button id="btn-measure" class="tool-btn" onclick="toggleMode('measure')" title="Измерить расстояние">
+        <span class="ti">📏</span><span>Измерить</span>
+      </button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn tool-btn-danger" onclick="clearAll()" title="Сбросить всё">
+        <span class="ti">✕</span><span>Сброс</span>
+      </button>
+    </div>
+    <div class="hd-counter">
+      <strong id="stats-visible">0</strong> / <span id="stats-total">0</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════ FLOATING SIDEBAR WIDGETS ═══════════════════ -->
+<aside id="floating-sidebar">
+
+  <!-- Search Widget -->
+  <div class="sb-card widget-search">
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input id="search-input" type="text" placeholder="Найти локацию..." autocomplete="off" />
+      <button id="search-clear" class="search-x" style="display:none">✕</button>
+    </div>
+    <div id="search-results" class="search-dropdown" style="display:none"></div>
+  </div>
+
+  <!-- How-to Widget -->
+  <div class="sb-card">
+    <div class="card-head" onclick="toggleCard('howto-body')">
+      <span class="ci">💡</span>
+      <span class="ct">Справочник</span>
+      <span class="ca closed" id="arrow-howto-body">▾</span>
+    </div>
+    <div id="howto-body" class="card-body" style="display:none;">
+      <div class="howto-steps">
+        <div class="hs-item">
+          <div class="hs-num">1</div>
+          <div class="hs-txt">Нажми <strong>🛣 Маршрут</strong> вверху — затем кликай по точкам на карте</div>
+        </div>
+        <div class="hs-item">
+          <div class="hs-num">2</div>
+          <div class="hs-txt">Или открой точку и нажми <strong>«+ В маршрут»</strong></div>
+        </div>
+      </div>
+      <div class="howto-legend">
+        <div class="hl-row"><span class="ll ll-road"></span>По дороге</div>
+        <div class="hl-row"><span class="ll ll-sea"></span>По морю</div>
+        <div class="hl-row"><span class="ll ll-approach"></span>К дороге / порту</div>
+        <div class="hl-row"><span class="ll ll-straight"></span>Напрямую</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Panel (Route / Measure) -->
+  <div id="active-panel" style="display:none">
+
+    <!-- Route Panel -->
+    <div id="route-panel" class="sb-card mode-card" style="display:none">
+      <div class="card-head no-click">
+        <span class="ci">🛣</span>
+        <span class="ct">Маршрут</span>
+        <span class="cb" id="route-count">0</span>
+      </div>
+      <div id="route-hint" class="route-hint">
+        Кликни по точке на карте
+      </div>
+      <div id="route-list" class="route-list"></div>
+      <div id="route-info-box" style="display:none"></div>
+      <div id="route-stats" class="stats-block" style="display:none">
+        <div class="stats-grid">
+          <div class="sc"><div class="sv hi" id="stat-distance">—</div><div class="sk">блоков</div></div>
+          <div class="sc"><div class="sv" id="stat-chunks">—</div><div class="sk">чанков</div></div>
+          <div class="sc"><div class="sv" id="stat-walk">—</div><div class="sk">пешком</div></div>
+          <div class="sc"><div class="sv" id="stat-horse">—</div><div class="sk">лошадь</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Measure Panel -->
+    <div id="measure-panel" class="sb-card mode-card" style="display:none">
+      <div class="card-head no-click">
+        <span class="ci">📏</span>
+        <span class="ct">Измерение</span>
+      </div>
+      <div id="measure-hint" class="route-hint">
+        Кликни две точки на карте
+      </div>
+      <div id="measure-result" style="display:none">
+        <div class="mft">
+          <div class="mft-point"><span class="mft-dot mft-a">A</span><span id="m-from">—</span></div>
+          <div class="mft-arr">↓</div>
+          <div class="mft-point"><span class="mft-dot mft-b">B</span><span id="m-to">—</span></div>
+        </div>
+        <div class="stats-block" style="margin:0 12px 12px">
+          <div class="stats-grid">
+            <div class="sc"><div class="sv hi" id="m-blocks">—</div><div class="sk">блоков</div></div>
+            <div class="sc"><div class="sv" id="m-chunks">—</div><div class="sk">чанков</div></div>
+            <div class="sc"><div class="sv" id="m-walk">—</div><div class="sk">пешком</div></div>
+            <div class="sc"><div class="sv" id="m-horse">—</div><div class="sk">лошадь</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Widget -->
+  <div class="sb-card">
+    <div class="card-head" onclick="toggleCard('filter-body')">
+      <span class="ci">⚑</span>
+      <span class="ct">Фильтры</span>
+      <span class="ca closed" id="arrow-filter-body">▾</span>
+    </div>
+    <div id="filter-body" class="card-body" style="display:none">
+      <div class="filter-tabs">
+        <button class="ftab active" id="ftab-region" onclick="switchFilterTab('region')">Регионы</button>
+        <button class="ftab" id="ftab-faction" onclick="switchFilterTab('faction')">Фракции</button>
+      </div>
+      <div id="filter-region" class="filter-list"></div>
+      <div id="filter-faction" class="filter-list" style="display:none"></div>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ═══════════════════ FLOATING OVERLAYS ═══════════════════ -->
+<!-- Mode banner -->
+<div id="mode-banner" class="mode-banner" style="display:none">
+  <span class="mb-icon" id="mode-icon"></span>
+  <span id="mode-text"></span>
+  <button class="mb-cancel" onclick="cancelMode()">✕ Отмена</button>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- Coords -->
+<div class="coords-bar">
+  X <span id="coord-x">—</span>&emsp;Z <span id="coord-z">—</span>
+</div>
+
+<!-- Scripts -->
+<script src="data/waypoints.js?v=20260707"></script>
+<script src="data/roads.js?v=20260707"></script>
+<script src="data/overrides.js?v=20260707"></script>
+<script src="data/territories.js?v=20260707"></script>
+<script src="app.js?v=20260707"></script>
+</body>
+</html>

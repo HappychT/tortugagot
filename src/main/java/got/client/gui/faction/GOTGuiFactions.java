@@ -40,7 +40,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			return (index > 0) ? pages.get(index - 1) : this;
 		}
 		static List<Page> getAvailablePages(boolean isMember) {
-			List<Page> pages = new ArrayList<>(Arrays.asList(FRONT, POLITICS));
+			List<Page> pages = new ArrayList<>(Arrays.asList(FRONT));
 			if (isMember) {
 				pages.add(PLAYER_LIST);
 			}
@@ -102,6 +102,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		this.mapView = new MapView(this);
 
 		pageRenderers.put(Page.FRONT, new FrontPage(this));
+		pageRenderers.put(Page.POLITICS, new PoliticsPage(this));
 		pageRenderers.put(Page.APPLICATIONS, new ApplicationsPage(this));
 		pageRenderers.put(Page.PLAYER_LIST, new PlayerListPage(this));
 		pageRenderers.put(Page.WAR_COUNCIL, new WarCouncilPage(this));
@@ -218,6 +219,9 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		backgroundRenderer.drawScreen(mouseX, mouseY, scaledMouseX, scaledMouseY, partialTicks);
 
 		if (currentOverlay != Overlay.NONE) {
+			for(Object b : this.buttonList) {
+				if (b instanceof GuiButton) ((GuiButton)b).visible = false;
+			}
 			drawRect(0, 0, baseWidth, baseHeight, 0x90000000);
 			activeRenderer.drawScreen(mouseX, mouseY, scaledMouseX, scaledMouseY, partialTicks);
 		}
@@ -241,6 +245,10 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			((GuiButton)obj).drawButton(this.mc, scaledMouseX, scaledMouseY);
 		}
 
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            brain.tutorial.client.TutorialGuiFactionsHighlight.drawHighlight(this, scaledMouseX, scaledMouseY);
+        }
+
 		GL11.glPopMatrix();
 
 		if (activeRenderer instanceof MapView) {
@@ -252,6 +260,12 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	protected void mouseClicked(int mouseX, int mouseY, int button) {
 		int scaledMouseX = (int)((mouseX - guiLeft) / scaleFactor);
 		int scaledMouseY = (int)((mouseY - guiTop) / scaleFactor);
+
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            if (!brain.tutorial.client.TutorialGuiFactionsHighlight.handleMouseClick(this, scaledMouseX, scaledMouseY, button)) {
+                return; // Blocked by tutorial
+            }
+        }
 
 		// 1. СНАЧАЛА проверяем клики по кнопкам!
 		if (button == 0) {
@@ -292,7 +306,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 
-	private IGuiComponent getActiveRenderer() {
+	public IGuiComponent getActiveRenderer() {
 		if (currentOverlay != Overlay.NONE && overlayRenderers.containsKey(currentOverlay)) {
 			return overlayRenderers.get(currentOverlay);
 		}
@@ -323,6 +337,12 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	public void actionPerformed(GuiButton button) {
 		if (!button.enabled) return;
 
+		if (brain.tutorial.client.TutorialClientState.isTutorialActive) {
+			if (!brain.tutorial.client.TutorialGuiFactionsHighlight.isButtonAllowed(button.id)) {
+				return;
+			}
+		}
+
 		if (button == buttonOpenMenu) {
 			mc.displayGuiScreen(new GOTGuiMenu());
 			return;
@@ -330,6 +350,8 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		if (button == this.buttonBack) {
 			if (isOtherPlayer) {
 				mc.displayGuiScreen(null);
+			} else if (this.currentView == View.FACTION && this.currentPage != Page.FRONT) {
+				setCurrentPage(Page.FRONT);
 			} else if (this.currentView != View.LIST) {
 				setCurrentView(View.LIST);
 			}
@@ -348,13 +370,11 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			GOTGuiButtonPledge pledgeButton = (GOTGuiButtonPledge) button;
 			if (pledgeButton.enabled) {
 				if (pledgeButton.isPledgedToThisFaction) {
-					CoreFaction.brainChannel.sendToServer(new PacketMessage("quet"));
+					brain.factions.servers.CoreFaction.brainChannel.sendToServer(new brain.factions.network.PacketMessage("quet"));
 					this.mc.displayGuiScreen(null);
 				} else {
-					if (pledgeButton.targetFaction != null) {
-						CoreFaction.brainChannel.sendToServer(new PacketMessage("sendApplication#" + pledgeButton.targetFaction.codeName()));
-						pledgeButton.updatePledgeState();
-					}
+					got.common.network.GOTPacketHandler.networkWrapper.sendToServer(new got.common.network.GOTPacketPledgeSet(pledgeButton.targetFaction));
+					pledgeButton.updatePledgeState();
 				}
 			}
 			return;
@@ -365,6 +385,11 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 
 	@Override
 	public void keyTyped(char c, int key) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            if (!brain.tutorial.client.TutorialGuiFactionsHighlight.handleKeyTyped(this, c, key)) {
+                return; // Blocked by tutorial
+            }
+        }
 		IGuiComponent renderer = getActiveRenderer();
 
 		if (key == 1) {
@@ -527,10 +552,16 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		return GroupStatus.NONE;
 	}
 
-	public GroupStatus getPlayerStatus() { return playerStatus; }
+	public GroupStatus getPlayerStatus() { 
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            return GroupStatus.OWNER;
+        }
+        return playerStatus; 
+    }
 	public Faction getFactionData() { return factionDataCache; }
 
 	public boolean isPlayerMember() {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) return true;
 		return playerStatus == GroupStatus.PLAYER || playerStatus == GroupStatus.CO_OWNER || playerStatus == GroupStatus.OWNER;
 	}
 	public void refresh() {
@@ -545,6 +576,7 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 	}
 
 	public boolean isPlayerLeader() {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) return true;
 		return playerStatus == GroupStatus.CO_OWNER || playerStatus == GroupStatus.OWNER;
 	}
 
@@ -576,6 +608,18 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		this.currentView = view;
 		updateFactionDataCache();
 		initGui();
+	}
+
+	public View getCurrentView() {
+		return currentView;
+	}
+
+	public Page getCurrentPage() {
+		return currentPage;
+	}
+
+	public Overlay getCurrentOverlay() {
+		return currentOverlay;
 	}
 
 	public float getScaleFactor() {

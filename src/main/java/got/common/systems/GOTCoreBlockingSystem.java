@@ -38,6 +38,7 @@ public class GOTCoreBlockingSystem {
         registerWeapon(ItemLightbringer.class, 35.0f, 35.0f, 1.8, 2.0);
         registerWeapon(ItemNightKingSword.class, 35.0f, 35.0f, 2.5, 3.0);
         registerWeapon(ItemIceStarkSword.class, 35.0f, 35.0f, 2.5, 3.0);
+        registerWeapon(ItemGregorCleganeSword.class, 35.0f, 35.0f, 2.5, 3.0);
         registerWeapon(ItemPoisonedSandBlade.class, 15.0f, 90.0f, 3, 3.5);
         registerWeapon(ItemSyrioForelSword.class, 30.0f, 30.0f, 2, 2.5);
         registerWeapon(ItemStunningHammer.class, 20.0f, 20.0f, 3, 3.5);
@@ -68,8 +69,11 @@ public class GOTCoreBlockingSystem {
 
     public static WeaponBlockData getBlockData(Class<?> weaponClass, EntityPlayer player) {
         WeaponBlockData data = weaponBlockDataMap.getOrDefault(weaponClass, new WeaponBlockData(30.0f, 30.0f, 6.0, 3.6));
-        if (player.isPotionActive(GOTEffects.exhaustion) || player.isPotionActive(Potion.digSlowdown))
-            return new WeaponBlockData(data.getLeftBlockAngle() - 5.0f, data.getRightBlockAngle() - 5.0f, data.getStaminaHitPercent(), data.getStaminaAttackPercent());
+        if (player.isPotionActive(Potion.digSlowdown)) {
+            int level = player.getActivePotionEffect(Potion.digSlowdown).getAmplifier() + 1;
+            float angleReduction = level * 5.0f;
+            return new WeaponBlockData(data.getLeftBlockAngle() - angleReduction, data.getRightBlockAngle() - angleReduction, data.getStaminaHitPercent(), data.getStaminaAttackPercent());
+        }
         return data;
     }
 

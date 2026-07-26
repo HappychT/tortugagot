@@ -21,6 +21,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.MinecraftForge;
+import noppes.npcs.api.AbstractNpcAPI;
+import noppes.npcs.api.entity.ICustomNpc;
+import noppes.npcs.api.entity.IEntity;
+import noppes.npcs.api.handler.data.IAnimationData;
+import noppes.npcs.api.item.IItemStack;
 
 public class GOTArmorModels {
 	public static GOTArmorModels INSTANCE;
@@ -47,6 +52,48 @@ public class GOTArmorModels {
 		copyBoxRotations(target.bipedLeftArm, src.bipedLeftArm);
 		copyBoxRotations(target.bipedRightLeg, src.bipedRightLeg);
 		copyBoxRotations(target.bipedLeftLeg, src.bipedLeftLeg);
+	}
+
+	public ModelBiped getRendererMainBiped(EntityLivingBase entity) {
+		if (entity == null) {
+			return null;
+		}
+		try {
+			Render render = RenderManager.instance.getEntityRenderObject(entity);
+			if (!(render instanceof RendererLivingEntity)) {
+				return null;
+			}
+			Class<?> type = RendererLivingEntity.class;
+			while (type != null) {
+				try {
+					java.lang.reflect.Field field = type.getDeclaredField("mainModel");
+					field.setAccessible(true);
+					Object value = field.get(render);
+					if (value instanceof ModelBiped) {
+						return (ModelBiped) value;
+					}
+					return null;
+				} catch (NoSuchFieldException ignored) {
+					type = type.getSuperclass();
+				}
+			}
+		} catch (Throwable ignored) {
+		}
+		return null;
+	}
+
+	public void syncArmorModelWithRenderer(ModelBiped armorModel, EntityLivingBase entity) {
+		ModelBiped rendererModel = getRendererMainBiped(entity);
+		if (armorModel != null && rendererModel != null) {
+			copyModelRotations(armorModel, rendererModel);
+			armorModel.onGround = rendererModel.onGround;
+			armorModel.isRiding = rendererModel.isRiding;
+			armorModel.isChild = rendererModel.isChild;
+			armorModel.isSneak = rendererModel.isSneak;
+			armorModel.heldItemLeft = rendererModel.heldItemLeft;
+			armorModel.heldItemRight = rendererModel.heldItemRight;
+			armorModel.aimedBow = rendererModel.aimedBow;
+		}
 	}
 
 	public int getEntityArmorModel(RendererLivingEntity renderer, ModelBiped mainModel, EntityLivingBase entity, ItemStack armor, int slot) {
@@ -128,7 +175,6 @@ public class GOTArmorModels {
 			map = new HashMap<>();
 			map.put(GOTRegistry.targaryenHelmet, new GOTModelTargaryenHelmet());
 			map.put(GOTRegistry.targaryenChestplate, new GOTModelTargaryenChestplate());
-			map.put(GOTRegistry.arrynHelmet, new GOTModelArrynHelmet(1.0f));
 			map.put(GOTRegistry.asshaiHelmet, new GOTModelAsshaiHelmet(1.0f));
 			map.put(GOTRegistry.bittersteelHelmet, new GOTModelSandorHelmet(1.0f));
 			map.put(GOTRegistry.blackfyreHelmet, new GOTModelWingedHelmet(1.0f));
@@ -136,16 +182,10 @@ public class GOTArmorModels {
 			map.put(GOTRegistry.ceramicPlate, new GOTModelPlateHead());
 			map.put(GOTRegistry.gemsbokHelmet, new GOTModelGemsbokHelmet(1.0f));
 			map.put(GOTRegistry.harpy, new GOTModelHarpy(1.0f));
-			map.put(GOTRegistry.gendryHelmet, new GOTModelHarpy(1.0f));
-			map.put(GOTRegistry.renlyHelmet, new GOTModelDeerHelmet(1.0f));
-			map.put(GOTRegistry.robertHelmet, new GOTModelDeerHelmet(1.0f));
-			map.put(GOTRegistry.sandorHelmet, new GOTModelSandorHelmet(1.0f));
 			map.put(GOTRegistry.leatherHat, new GOTModelLeatherHat());
 			map.put(GOTRegistry.lhazarHelmetLion, new GOTModelSandorHelmet(1.0f));
-			map.put(GOTRegistry.northHelmet, new GOTModelNorthHelmet(1.0f));
 			map.put(GOTRegistry.partyHat, new GOTModelPartyHat(0.6f));
 			map.put(GOTRegistry.plate, new GOTModelPlateHead());
-			map.put(GOTRegistry.reachHelmet, new GOTModelReachHelmet(1.0f));
 			map.put(GOTRegistry.reachguardHelmet, new GOTModelReachHelmet(1.0f));
 			map.put(GOTRegistry.robesBoots, new GOTModelRobes(1.0f));
 			map.put(GOTRegistry.robesChestplate, new GOTModelRobes(1.0f));
@@ -159,12 +199,10 @@ public class GOTArmorModels {
 			map.put(GOTRegistry.unsulliedHelmet, new GOTModelUnsulliedHelmet(1.0f));
 			map.put(GOTRegistry.valyrianHelmet, new GOTModelWingedHelmet(1.0f));
 			map.put(GOTRegistry.victarionHelmet, new GOTModelWingedHelmet(1.0f));
-			map.put(GOTRegistry.westerlandsHelmet, new GOTModelWesterlandsHelmet(1.0f));
 			map.put(GOTRegistry.westkingHelmet, new GOTModelWesterlandsHelmet(1.0f));
 			map.put(GOTRegistry.woodPlate, new GOTModelPlateHead());
 			map.put(GOTRegistry.yitiHelmetSamurai, new GOTModelYiTiHelmet(1.0f, false));
 			map.put(GOTRegistry.yitiHelmetShogune, new GOTModelYiTiHelmet(1.0f, true));
-			map.put(GOTRegistry.firstPeopleHelmet, new GOTModelWingedHelmet(1.0f));
 			map.put(GOTRegistry.thiefHelmet, new GOTModelThiefHelmet());
 			map.put(GOTRegistry.thiefChestplate, new GOTModelThiefChestplate());
 			map.put(GOTRegistry.thiefLeggings, new GOTModelThiefLeggings());
@@ -203,6 +241,110 @@ public class GOTArmorModels {
 		model.bipedLeftLeg.showModel = slot == 2 || slot == 3;
 	}
 
+	public static boolean usesBowArmPose(ItemStack itemstack) {
+		return itemstack != null && itemstack.getItem() instanceof ItemBow;
+	}
+
+	public ICustomNpc<?> getCustomNpc(EntityLivingBase entity) {
+		if (entity == null || !AbstractNpcAPI.IsAvailable()) {
+			return null;
+		}
+		AbstractNpcAPI api = AbstractNpcAPI.Instance();
+		if (api == null) {
+			return null;
+		}
+		IEntity<?> wrapped = api.getIEntity(entity);
+		if (wrapped instanceof ICustomNpc) {
+			return (ICustomNpc<?>) wrapped;
+		}
+		return null;
+	}
+
+	public ItemStack unwrapItemStack(IItemStack itemStack) {
+		if (itemStack == null) {
+			return null;
+		}
+		return itemStack.getMCItemStack();
+	}
+
+	public boolean safeCustomNpcIsAttacking(ICustomNpc<?> customNpc) {
+		try {
+			return customNpc != null && customNpc.isAttacking();
+		} catch (Throwable ignored) {
+			return false;
+		}
+	}
+
+	public byte safeCustomNpcAimType(ICustomNpc<?> customNpc) {
+		try {
+			return customNpc == null ? 0 : customNpc.getAimType();
+		} catch (Throwable ignored) {
+			return 0;
+		}
+	}
+
+	public IAnimationData safeCustomNpcAnimationData(ICustomNpc<?> customNpc) {
+		try {
+			return customNpc == null ? null : customNpc.getAnimationData();
+		} catch (Throwable ignored) {
+			return null;
+		}
+	}
+
+	public boolean safeAnimationActive(IAnimationData animationData) {
+		try {
+			return animationData != null && animationData.isActive();
+		} catch (Throwable ignored) {
+			return false;
+		}
+	}
+
+	public ItemStack safeCustomNpcItem(IItemStack itemStack) {
+		try {
+			return unwrapItemStack(itemStack);
+		} catch (Throwable ignored) {
+			return null;
+		}
+	}
+
+	public boolean isCustomNpcAiming(EntityLivingBase entity) {
+		ICustomNpc<?> customNpc = getCustomNpc(entity);
+		if (customNpc == null) {
+			return false;
+		}
+		if (safeCustomNpcIsAttacking(customNpc)) {
+			return true;
+		}
+		return safeCustomNpcAimType(customNpc) != 0 || safeAnimationActive(safeCustomNpcAnimationData(customNpc));
+	}
+
+	public ItemStack getHeldItemLeft(EntityLivingBase entity) {
+		if (entity instanceof GOTEntityNPC) {
+			return ((GOTEntityNPC) entity).getHeldItemLeft();
+		}
+		ICustomNpc<?> customNpc = getCustomNpc(entity);
+		if (customNpc != null) {
+			try {
+				return safeCustomNpcItem(customNpc.getLeftItem());
+			} catch (Throwable ignored) {
+				return null;
+			}
+		}
+		return null;
+	}
+
+	public ItemStack getHeldItemRight(EntityLivingBase entity) {
+		ICustomNpc<?> customNpc = getCustomNpc(entity);
+		if (customNpc != null) {
+			try {
+				return safeCustomNpcItem(customNpc.getRightItem());
+			} catch (Throwable ignored) {
+				return entity == null ? null : entity.getHeldItem();
+			}
+		}
+		return entity == null ? null : entity.getHeldItem();
+	}
+
 	public void setupHeldItem(ModelBiped model, EntityLivingBase entity, ItemStack itemstack, boolean rightArm) {
 		int value = 0;
 		boolean aimBow = false;
@@ -210,7 +352,7 @@ public class GOTArmorModels {
 			value = 1;
 			Item item = itemstack.getItem();
 			boolean isRanged = false;
-			if (itemstack.getItemUseAction() == EnumAction.bow) {
+			if (usesBowArmPose(itemstack)) {
 				if (item instanceof GOTItemSpear) {
 					isRanged = entity instanceof EntityPlayer;
 				} else {
@@ -227,6 +369,9 @@ public class GOTArmorModels {
 				}
 				if (entity instanceof GOTEntityNPC) {
 					aiming = ((GOTEntityNPC) entity).clientCombatStance;
+				}
+				if (getCustomNpc(entity) != null) {
+					aiming = isCustomNpcAiming(entity);
 				}
 				if (aiming) {
 					value = 3;
@@ -266,25 +411,15 @@ public class GOTArmorModels {
 		if (entity instanceof GOTEntityNPC) {
 			model.bipedHeadwear.showModel = ((GOTEntityNPC) entity).shouldRenderNPCHair();
 		}
+		if (mainModel != null) {
+			model.aimedBow = mainModel.aimedBow;
+		}
 		if (entity instanceof EntityPlayer) {
 			ItemStack heldRight = entity.getHeldItem();
-			if (mainModel!= null) {
-				model.aimedBow = mainModel.aimedBow;
-			}
 			setupHeldItem(model, entity, heldRight, true);
 		} else {
-			ItemStack heldRight;
-			if (entity == null) {
-				heldRight = null;
-			} else {
-				heldRight = entity.getHeldItem();
-			}
-			ItemStack heldLeft;
-			if (!(entity instanceof GOTEntityNPC)) {
-				heldLeft = null;
-			} else {
-				heldLeft = ((GOTEntityNPC) entity).getHeldItemLeft();
-			}
+			ItemStack heldRight = getHeldItemRight(entity);
+			ItemStack heldLeft = getHeldItemLeft(entity);
 			setupHeldItem(model, entity, heldRight, true);
 			setupHeldItem(model, entity, heldLeft, false);
 		}

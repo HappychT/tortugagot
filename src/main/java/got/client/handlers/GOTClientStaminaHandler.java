@@ -2,11 +2,13 @@ package got.client.handlers;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import got.common.network.GOTPacketActivateRam;
+import got.common.network.GOTPacketHandler;
 import got.common.network.base.PacketDispatcher;
 import got.common.network.clientToServer.PacketBounceRequest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import org.lwjgl.Sys;
+import noname.weapons.entity.EntityBatteringRam;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -18,6 +20,23 @@ public class GOTClientStaminaHandler {
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             onClientTick();
+
+
+            Minecraft mc = Minecraft.getMinecraft();
+
+            EntityPlayer player = mc.thePlayer;
+
+            if (player != null && mc.currentScreen == null) {
+
+                boolean swing = Mouse.isButtonDown(0);
+
+                if (player.ridingEntity instanceof EntityBatteringRam) {
+                    EntityBatteringRam batteringRam = (EntityBatteringRam) player.ridingEntity;
+                    GOTPacketHandler.networkWrapper.sendToServer(new GOTPacketActivateRam(batteringRam.getEntityId(), swing));
+                }
+
+
+            }
         }
     }
 

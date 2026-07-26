@@ -71,7 +71,7 @@ public class DepositProvisionsOverlay implements IOverlayRenderer {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
-        amountField.mouseClicked(mouseX, mouseY, button);
+        amountField.mouseClicked(scaledMouseX, scaledMouseY, button);
     }
 
     @Override

@@ -23,6 +23,12 @@ public class GOTPacketAnvilReforge implements IMessage {
 			if (container instanceof GOTContainerAnvil) {
 				GOTContainerAnvil anvil = (GOTContainerAnvil) container;
 				anvil.reforgeItem();
+				
+				got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+				if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6 && ext.getTutorialProgress() == 0) {
+				    ext.setTutorialProgress(1);
+				    brain.tutorial.TutorialManager.getInstance().syncState(entityplayer);
+				}
 			}
 			return null;
 		}

@@ -200,4 +200,24 @@ public class FactionListRenderer implements IPageRenderer {
     @Override public void keyTyped(char c, int key) { }
     @Override public void onGuiClosed() { }
     @Override public boolean isTextFieldFocused() { return false; }
+
+    public int[] getFactionBounds(String factionCodeName) {
+        for (int i = 0; i < currentFactionList.size(); i++) {
+            if (currentFactionList.get(i).codeName().equalsIgnoreCase(factionCodeName)) {
+                int listX = 70;
+                int listY = 50;
+                int listWidth = parent.getBaseWidth() - 140;
+                int listHeight = parent.getBaseHeight() - 85;
+                int totalContentWidth = currentFactionList.size() * (BANNER_WIDTH + BANNER_GAP) - BANNER_GAP;
+                int scrollOffsetX = 0;
+                if (totalContentWidth > listWidth) {
+                    scrollOffsetX = (int) (this.currentScroll * (totalContentWidth - listWidth));
+                }
+                int x = listX + i * (BANNER_WIDTH + BANNER_GAP) - scrollOffsetX;
+                int y = listY + (listHeight - BANNER_HEIGHT) / 2;
+                return new int[]{x, y, BANNER_WIDTH, BANNER_HEIGHT};
+            }
+        }
+        return null;
+    }
 }

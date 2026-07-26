@@ -4,6 +4,7 @@ import got.common.item.GOTWeaponStats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 
+
 public class GOTEnchantmentValyrianSeal extends GOTEnchantment {
 
     public GOTEnchantmentValyrianSeal(String s) {

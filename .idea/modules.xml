@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagot.api.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagot.api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagot.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagot.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tortugagot.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tortugagot.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Game-of-Thrones.api.iml" filepath="$PROJECT_DIR$/.idea/modules/Game-of-Thrones.api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Game-of-Thrones.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Game-of-Thrones.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Game-of-Thrones.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Game-of-Thrones.test.iml" />
     </modules>
   </component>
 </project>

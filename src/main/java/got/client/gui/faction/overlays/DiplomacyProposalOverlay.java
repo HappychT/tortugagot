@@ -97,7 +97,7 @@ public class DiplomacyProposalOverlay implements IOverlayRenderer {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
-        costField.mouseClicked(mouseX, mouseY, button);
+        costField.mouseClicked(scaledMouseX, scaledMouseY, button);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.faction.GOTFaction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
@@ -14,6 +15,11 @@ public class GOTItemDornePolearm extends GOTItemPolearm implements GOTFactionWea
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean show) {
         list.add(EnumChatFormatting.GOLD + StatCollector.translateToLocalFormatted("got.faction.DORNE.name"));
+    }
+
+    @Override
+    public GOTFaction getFaction() {
+        return GOTFaction.DORNE;
     }
 
 }

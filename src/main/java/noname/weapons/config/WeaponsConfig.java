@@ -11,7 +11,7 @@ public class WeaponsConfig {
 
     public static int reloadTimeCatapult = 500;
     public static float rotationSpeedCatapult = 5.0F;
-	public static double catapultProjectileSpeed = 1.5D;
+    public static double catapultProjectileSpeed = 1.5D;
     public static float baseDamage = 1.0F;
     public static float damageFalloff = 0.1F;
     public static float explosionRadius = 5.0F;
@@ -24,7 +24,7 @@ public class WeaponsConfig {
     public static float reloadTimeTribushet = 500;
     public static float rotationSpeedTribushet = 5.0F;
     public static float maxHealthTribushet = 500.0F;
-	public static double tribushetProjectileSpeed = 2.5D;
+    public static double tribushetProjectileSpeed = 2.5D;
 
     public static float maxHealthBalista = 100.0F;
     public static float rotationSpeedBalista = 200.0F;
@@ -35,6 +35,8 @@ public class WeaponsConfig {
     public static float maxRangeBalsita = 250.0F;
     public static float rotationSpeedBatteringRam = 2.0F;
     public static float movementSpeedBatteringRam = 0.15F;
+    public static float maxHealthBatteringRam = 500.0F;
+    public static float armorBatteringRam = 20.0F;
 
 
     public static void loadConfig(FMLPreInitializationEvent event) {
@@ -58,9 +60,9 @@ public class WeaponsConfig {
                     "Rotation speed of catapult in degrees per tick. Default: 5.0 (higher = faster). Min: 0.1, Max: 180.0");
             rotationSpeedCatapult = (float) rotationSpeedProp.getDouble();
 
-			Property catapultProjectileSpeedProp = config.get("catapult", "projectileSpeed", 1.5D,
-					"Launch speed for catapult projectile. Default: 1.5");
-			catapultProjectileSpeed = catapultProjectileSpeedProp.getDouble();
+            Property catapultProjectileSpeedProp = config.get("catapult", "projectileSpeed", 1.5D,
+                    "Launch speed for catapult projectile. Default: 1.5");
+            catapultProjectileSpeed = catapultProjectileSpeedProp.getDouble();
 
             Property reloadTimeTribushetProp =config.get("tribushet", "reloadTimeTribushet", 600,
                     "Time in ticks for tribushet to reload (20 ticks = 1 second). Default: 600 (30 seconds)");
@@ -74,9 +76,9 @@ public class WeaponsConfig {
                     "Maximum health of tribushet. Default: 500.0");
             maxHealthTribushet = (float) maxHealthTribushetProp.getDouble();
 
-			Property tribushetProjectileSpeedProp = config.get("tribushet", "projectileSpeed", 2.5D,
-					"Launch speed for tribushet projectile. Default: 2.5");
-			tribushetProjectileSpeed = tribushetProjectileSpeedProp.getDouble();
+            Property tribushetProjectileSpeedProp = config.get("tribushet", "projectileSpeed", 2.5D,
+                    "Launch speed for tribushet projectile. Default: 2.5");
+            tribushetProjectileSpeed = tribushetProjectileSpeedProp.getDouble();
 
             Property maxHealthBalistaProp = config.get("balista", "maxHealthBalista", 100.0D,
                     "Maximum health of balista. Default: 100.0");
@@ -113,6 +115,14 @@ public class WeaponsConfig {
             Property MovementSpeedBatteringRamProp = config.get("battering_ram", "MovementSpeedBatteringRamProp", 0.15D,
                     "Maximum movement change per tick for the battering ram. Default: 0.15");
             movementSpeedBatteringRam = (float) MovementSpeedBatteringRamProp.getDouble();
+
+            Property maxHealthBatteringRamProp = config.get("battering_ram", "maxHealthBatteringRam", 500.0D,
+                    "Maximum health of battering ram. Default: 500.0");
+            maxHealthBatteringRam = (float) maxHealthBatteringRamProp.getDouble();
+
+            Property armorBatteringRamProp = config.get("battering_ram", "armorBatteringRam", 20.0D,
+                    "Armor of battering ram (reduces damage). Default: 20.0");
+            armorBatteringRam = (float) armorBatteringRamProp.getDouble();
 
             Property baseDamageProp = config.get("projectile", "baseDamage", 1.0D,
                     "Base damage dealt to blocks at epicenter. Default: 1.0");

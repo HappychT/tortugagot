@@ -4,6 +4,7 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
 
 import cpw.mods.fml.common.FMLLog;
+import got.common.entity.animal.GOTEntityDirewolf;
 import got.common.entity.other.GOTMountFunctions;
 import got.common.item.GOTWeaponStats;
 import got.common.network.GOTPacketHandler;
@@ -11,6 +12,7 @@ import got.common.network.GOTPacketMountControl;
 import got.common.network.GOTPacketMountControlServerEnforce;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -47,6 +49,9 @@ public class GOTNetHandlerPlayServer extends NetHandlerPlayServer {
         float forward = packet.func_149616_d();
         float strafing = packet.func_149620_c();
         boolean jump = packet.func_149618_e();
+        if (jump && this.playerEntity.ridingEntity instanceof GOTEntityDirewolf) {
+            ((GOTEntityDirewolf) this.playerEntity.ridingEntity).riderJump();
+        }
         if (forward != 0.0f || strafing != 0.0f || jump) {
             GOTLevelData.getData(this.playerEntity).cancelFastTravel();
         }
@@ -169,6 +174,10 @@ public class GOTNetHandlerPlayServer extends NetHandlerPlayServer {
             if (this.playerEntity.getDistanceSqToEntity(target) < reach * reach) {
                 if (packet.func_149565_c() == C02PacketUseEntity.Action.INTERACT) {
                     this.playerEntity.interactWith(target);
+                    if (target instanceof EntityHorse && !GOTMountFunctions.isMountControllable(target)
+                            && this.playerEntity.ridingEntity == target && target.riddenByEntity == this.playerEntity) {
+                        this.playerEntity.mountEntity(null);
+                    }
                 } else if (packet.func_149565_c() == C02PacketUseEntity.Action.ATTACK && (this.lastAttackTime <= 0 || !(target instanceof EntityLivingBase))) {
                     if (target instanceof EntityItem || target instanceof EntityXPOrb || target instanceof EntityArrow || target == this.playerEntity) {
                         kickPlayerFromServer("Attempting to attack an invalid entity");

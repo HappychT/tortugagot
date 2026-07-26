@@ -35,10 +35,9 @@ public class GOTEnchantmentDamage extends GOTEnchantment {
 
 	@Override
 	public String getDescription(ItemStack itemstack) {
-		if (itemstack != null && itemstack.getItem() instanceof GOTItemThrowingAxe) {
-			return StatCollector.translateToLocalFormatted("got.enchant.damage.desc.throw", formatAdditive(baseDamageBoost));
-		}
-
+//		if (itemstack != null && itemstack.getItem() instanceof GOTItemThrowingAxe) {
+//			return StatCollector.translateToLocalFormatted("got.enchant.damage.desc.throw", formatAdditive(baseDamageBoost));
+//		}
 		return StatCollector.translateToLocalFormatted("got.enchant.damage.desc", formatAdditive(baseDamageBoost));
 	}
 

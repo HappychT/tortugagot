@@ -2,6 +2,7 @@ package brain.armors;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import got.common.database.GOTArmorModels;
 import got.common.database.GOTCreativeTabs;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -10,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.EnumAction;
 import net.minecraft.util.IIcon;
 
 public class ItemKingGuardArmor extends ItemArmor {
@@ -18,12 +20,13 @@ public class ItemKingGuardArmor extends ItemArmor {
         super(material, renderIndex, armorType);
         setCreativeTab(GOTCreativeTabs.tabCombat);
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, int armorSlot) {
         ModelBiped armorModel = null;
-        
+        boolean hasEntity = entityLiving != null;
+
         if (itemStack != null && itemStack.getItem() == this) {
             switch (this.armorType) {
                 case 0: // Шлем
@@ -39,7 +42,7 @@ public class ItemKingGuardArmor extends ItemArmor {
                     armorModel = new KingGuardBoots(0F);
                     break;
             }
-            
+
             if (armorModel != null) {
                 armorModel.bipedHead.showModel = armorSlot == 0;
                 armorModel.bipedHeadwear.showModel = armorSlot == 0;
@@ -48,20 +51,27 @@ public class ItemKingGuardArmor extends ItemArmor {
                 armorModel.bipedLeftArm.showModel = armorSlot == 1;
                 armorModel.bipedRightLeg.showModel = armorSlot == 2 || armorSlot == 3;
                 armorModel.bipedLeftLeg.showModel = armorSlot == 2 || armorSlot == 3;
-                
-                armorModel.isSneak = entityLiving.isSneaking();
-                armorModel.isRiding = entityLiving.isRiding();
-                armorModel.isChild = entityLiving.isChild();
-                
+
+                armorModel.isSneak = hasEntity && entityLiving.isSneaking();
+                armorModel.isRiding = hasEntity && entityLiving.isRiding();
+                armorModel.isChild = hasEntity && entityLiving.isChild();
+                armorModel.heldItemRight = 0;
+                armorModel.aimedBow = false;
+
                 if (entityLiving instanceof EntityPlayer) {
                     EntityPlayer player = (EntityPlayer) entityLiving;
-                    
+
                     ItemStack heldItem = player.getHeldItem();
                     if (heldItem != null) {
                         armorModel.heldItemRight = 1;
-                        
+
                         if (player.getItemInUseCount() > 0) {
-                            armorModel.aimedBow = true;
+                            EnumAction useAction = heldItem.getItemUseAction();
+                            if (useAction == EnumAction.block) {
+                                armorModel.heldItemRight = 3;
+                            } else if (GOTArmorModels.usesBowArmPose(heldItem)) {
+                                armorModel.aimedBow = true;
+                            }
                         } else {
                             armorModel.aimedBow = false;
                         }
@@ -70,17 +80,18 @@ public class ItemKingGuardArmor extends ItemArmor {
                         armorModel.aimedBow = false;
                     }
                 }
-                
-                armorModel.setRotationAngles(0, 0, 0, 0, 0, 0.0625F, entityLiving);
-                
-                armorModel.bipedHead.rotateAngleX = entityLiving.prevRotationPitch * 0.017453292F;
-                armorModel.bipedHead.rotateAngleY = entityLiving.rotationYawHead * 0.017453292F;
+
+                if (hasEntity) {
+                    armorModel.setRotationAngles(0, 0, 0, 0, 0, 0.0625F, entityLiving);
+                    armorModel.bipedHead.rotateAngleX = entityLiving.prevRotationPitch * 0.017453292F;
+                    armorModel.bipedHead.rotateAngleY = entityLiving.rotationYawHead * 0.017453292F;
+                }
             }
         }
-        
+
         return armorModel;
     }
-    
+
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
         return "armors:textures/models/armor/king_guard.png";

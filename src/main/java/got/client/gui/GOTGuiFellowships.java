@@ -105,10 +105,16 @@ public class GOTGuiFellowships extends GOTGuiMenuBase {
 				String name = textFieldPlayer.getText();
 				if (checkValidPlayerName(name) == null) {
 					name = StringUtils.trim(name);
-					GOTPacketFellowshipInvitePlayer packet = new GOTPacketFellowshipInvitePlayer(viewingFellowship, name);
+					got.common.network.GOTPacketFellowshipInvitePlayer packet = new got.common.network.GOTPacketFellowshipInvitePlayer(viewingFellowship, name);
 					GOTPacketHandler.networkWrapper.sendToServer(packet);
 				}
 				page = Page.FELLOWSHIP;
+                if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+                    // Step 29 done, advance to 30.
+                    got.common.network.GOTPacketHandler.networkWrapper.sendToServer(new brain.tutorial.network.GOTPacketTutorialAdvance());
+                    brain.tutorial.client.TutorialClientState.tutorialProgress++;
+                    this.mc.displayGuiScreen(new got.client.gui.GOTGuiMenu()); // Redirect to menu
+                }
 			} else if (button == buttonDisband) {
 				page = Page.DISBAND;
 			} else if (button == buttonDisbandThis) {
@@ -734,6 +740,9 @@ public class GOTGuiFellowships extends GOTGuiMenuBase {
 				}
 			}
 		}
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            brain.tutorial.client.TutorialGuiFellowshipsHighlight.drawHighlight(buttonList, xSize, ySize, guiLeft, guiTop);
+        }
 	}
 
 	public GOTFellowshipClient getMouseOverFellowship() {
@@ -821,6 +830,11 @@ public class GOTGuiFellowships extends GOTGuiMenuBase {
 
 	@Override
 	public void keyTyped(char c, int i) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            if (!brain.tutorial.client.TutorialGuiFellowshipsHighlight.handleKeyTyped(c, i)) {
+                return; // Blocked by tutorial
+            }
+        }
 		if (page == Page.CREATE && textFieldName.textboxKeyTyped(c, i) || page == Page.INVITE && textFieldPlayer.textboxKeyTyped(c, i)) {
 			return;
 		}
@@ -845,7 +859,12 @@ public class GOTGuiFellowships extends GOTGuiMenuBase {
 	}
 
 	@Override
-	public void mouseClicked(int i, int j, int k) {
+	protected void mouseClicked(int i, int j, int k) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            if (!brain.tutorial.client.TutorialGuiFellowshipsHighlight.handleMouseClick(buttonList, i, j, k, guiLeft, guiTop, xSize, ySize)) {
+                return; // Blocked by tutorial
+            }
+        }
 		super.mouseClicked(i, j, k);
 		if (page == Page.LIST && mouseOverFellowship != null) {
 			buttonSound();

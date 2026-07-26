@@ -6,6 +6,7 @@ import got.common.potions.GOTPotionCombatlog;
 import got.common.potions.GOTPotionFreeze;
 import got.common.potions.GOTPotionPoisonKilling;
 import got.common.potions.GOTPotionRage;
+import got.common.potions.GOTPotionStupor;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
@@ -32,6 +33,7 @@ public class GOTEffects {
     public static Potion dexterity;
     public static Potion secondBreath;
     public static Potion exhaustion;
+    public static Potion stupor;
 
     private static int idCounter = 101;
 
@@ -86,6 +88,9 @@ public class GOTEffects {
 
         exhaustion = new GOTCustomPotion(idCounter, true, 8171463, new ResourceLocation("got", "textures/potion/exhaustion.png"), "got.potion.exhaustion");
         registerPotion(exhaustion);
+
+        stupor = new GOTPotionStupor(idCounter);
+        registerPotion(stupor);
 
         antiEffect = new GOTCustomPotion(idCounter, false, 4960121, "antiEffect");
         registerPotion(antiEffect);

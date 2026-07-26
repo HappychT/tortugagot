@@ -16,10 +16,10 @@ public class KingGuardBody extends ModelBiped {
     private final ModelRenderer armorCape9;
     private final ModelRenderer capeMid9;
     private final ModelRenderer capeLow;
-    
+
     private ModelRenderer leftArmPart;
     private ModelRenderer rightArmPart;
-    
+
     private float capeWave = 0.0F;
     private float prevCapeWave = 0.0F;
 
@@ -37,7 +37,7 @@ public class KingGuardBody extends ModelBiped {
 
         this.bipedLeftArm = new ModelRenderer(this);
         this.bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
-        
+
         leftArmPart = new ModelRenderer(this, 32, 96);
         leftArmPart.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, scale + 0.15F);
         leftArmPart.setTextureOffset(72, 32).addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, scale+ 0.15F);
@@ -54,7 +54,7 @@ public class KingGuardBody extends ModelBiped {
 
         this.bipedRightArm = new ModelRenderer(this);
         this.bipedRightArm.setRotationPoint(-5.0F, 2.0F, 0.0F);
-        
+
         rightArmPart = new ModelRenderer(this, 32, 96);
         rightArmPart.mirror = true;
         rightArmPart.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, scale + 0.1F);
@@ -118,30 +118,30 @@ public class KingGuardBody extends ModelBiped {
     @Override
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entity);
-        
+
 
         updateCapeAnimation(entity, limbSwing, limbSwingAmount, ageInTicks);
     }
 
     private void updateCapeAnimation(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks) {
         this.prevCapeWave = this.capeWave;
-        
+
         boolean isWalking = false;
         float walkIntensity = 0.0F;
-        
+
         if (entity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) entity;
-            
+
             isWalking = player.onGround && (Math.abs(player.motionX) > 0.05 || Math.abs(player.motionZ) > 0.05);
             walkIntensity = Math.min(1.0F, MathHelper.sqrt_double(player.motionX * player.motionX + player.motionZ * player.motionZ) * 10.0F);
         }
-        
+
         float wave = MathHelper.cos(ageInTicks * 0.1F) * 0.05F;
-        
+
         if (cape_template9 != null && armorCape9 != null && capeMid9 != null && capeLow != null) {
-            float baseAngle = 0.0873F; 
-            float walkAngle = (float) Math.toRadians(45.0F); 
-            
+            float baseAngle = 0.0873F;
+            float walkAngle = (float) Math.toRadians(45.0F);
+
             float walkSwing = 0.0F;
             float capeRotationX;
             if (isWalking) {
@@ -149,7 +149,7 @@ public class KingGuardBody extends ModelBiped {
             } else {
                 capeRotationX = baseAngle + wave;
             }
-              
+
             armorCape9.rotateAngleX = capeRotationX;
 
             float midCapeRotationX;
@@ -159,7 +159,7 @@ public class KingGuardBody extends ModelBiped {
                 midCapeRotationX = baseAngle + MathHelper.sin(ageInTicks * 0.1F + 0.5F) * 0.03F;
             }
             capeMid9.rotateAngleX = midCapeRotationX;
-            
+
             float lowCapeRotationX;
             if (isWalking) {
                 float lowSwing = MathHelper.sin(limbSwing * 1.2F + 1.0F) * 0.4F * limbSwingAmount * walkIntensity;
@@ -172,11 +172,11 @@ public class KingGuardBody extends ModelBiped {
             if (entity instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) entity;
                 float headYaw = MathHelper.wrapAngleTo180_float(player.rotationYawHead - player.renderYawOffset);
-                float influence = isWalking ? 0.0005F : 0.001F; 
+                float influence = isWalking ? 0.0005F : 0.001F;
                 armorCape9.rotateAngleY = headYaw * influence;
             }
         }
-        
+
         this.capeWave = wave;
     }
 

@@ -42,11 +42,11 @@ public class KingGuardHelmet extends ModelBiped {
         this.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, entity);
         this.bipedHead.render(scale);
     }
-    
+
     @Override
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entity);
-        
+
         this.bipedHead.rotateAngleX = headPitch * 0.017453292F;
         this.bipedHead.rotateAngleY = netHeadYaw * 0.017453292F;
     }

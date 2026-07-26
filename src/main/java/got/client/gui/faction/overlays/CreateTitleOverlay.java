@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class CreateTitleOverlay implements IOverlayRenderer {
     private final GOTGuiFactions parent;
-    private GuiTextField titleNameField;
+    public GuiTextField titleNameField;
     private GuiButton buttonCreateTitle, buttonCancelTitle;
     private final Map<Faction.Permission, Boolean> titlePermissions = new EnumMap<>(Faction.Permission.class);
 
@@ -113,24 +113,37 @@ public class CreateTitleOverlay implements IOverlayRenderer {
         parent.drawString(label, x + boxSize + 4, y + 1, 0xFFFFFFFF);
     }
 
+    private boolean hasError = false;
+
     @Override
     public void actionPerformed(GuiButton button) {
         if (button == buttonCreateTitle) {
-            String name = titleNameField.getText();
+            String name = titleNameField.getText().trim();
             if (StringUtils.isNotBlank(name)) {
+                brain.factions.Faction faction = brain.factions.network.PacketMessage.getCurrentFaction(net.minecraft.client.Minecraft.getMinecraft().thePlayer.getCommandSenderName());
+                if (faction != null && faction.getTitles().containsKey(name)) {
+                    titleNameField.setText("§cИмя занято!");
+                    hasError = true;
+                    return;
+                }
+
                 long perms = 0L;
                 for (Map.Entry<Faction.Permission, Boolean> entry : titlePermissions.entrySet()) {
                     if (entry.getValue()) perms |= entry.getKey().getBit();
                 }
                 brain.factions.servers.CoreFaction.brainChannel.sendToServer(PacketFactionManage.createTitle(name, perms));
+                hasError = false;
                 parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
             } else {
                 titleNameField.setText("§cИмя пустое!");
+                hasError = true;
             }
         } else if (button == buttonCancelTitle) {
+            hasError = false;
             parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
         }
     }
+
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
@@ -177,7 +190,18 @@ public class CreateTitleOverlay implements IOverlayRenderer {
 
     @Override
     public void keyTyped(char c, int key) {
-        if(titleNameField.isFocused()) titleNameField.textboxKeyTyped(c, key);
+        if(titleNameField.isFocused()) {
+            if (hasError) {
+                // Игнорируем backspace если там висит сообщение об ошибке, просто очищаем поле
+                titleNameField.setText("");
+                hasError = false;
+                if (key != 14 && key != 203 && key != 205) { // Не backspace/стрелки
+                    titleNameField.textboxKeyTyped(c, key);
+                }
+            } else {
+                titleNameField.textboxKeyTyped(c, key);
+            }
+        }
     }
 
     @Override

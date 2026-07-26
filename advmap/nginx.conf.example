@@ -1,0 +1,49 @@
+# ════════════════════════════════════════════════
+#  Tortuga Map — nginx.conf (production snippet)
+#  Paste inside your server {} block
+# ════════════════════════════════════════════════
+
+# server {
+#     listen 443 ssl http2;
+#     server_name map.yourdomain.com;
+#     root /var/www/tortuga/advmap;
+#     index index.html;
+#
+#     # ── Block admin_config.js from direct access ──
+#     location = /data/admin_config.js {
+#         deny all;
+#         return 403;
+#     }
+#
+#     # ── Require token query param for admin.html ──
+#     # (token is validated in JS, but this adds server-side check)
+#     location = /admin.html {
+#         # Allow only if token param is present and correct
+#         # Replace TOKEN_VALUE with your token from admin_config.js
+#         if ($arg_token != "t0rTuGaS3cr3tAdm1nAcc3ss2024K3y") {
+#             return 302 /;
+#         }
+#     }
+#
+#     # ── Block Python/script files ──
+#     location ~* \.(py|sh|json|log|md)$ {
+#         deny all;
+#         return 403;
+#     }
+#
+#     # ── Security headers ──
+#     add_header X-Frame-Options "SAMEORIGIN" always;
+#     add_header X-Content-Type-Options "nosniff" always;
+#     add_header X-XSS-Protection "1; mode=block" always;
+#     add_header Referrer-Policy "no-referrer" always;
+#
+#     # ── Cache ──
+#     location ~* \.(png|jpg|css|js)$ {
+#         expires 7d;
+#         add_header Cache-Control "public, immutable";
+#     }
+#
+#     # ── Gzip ──
+#     gzip on;
+#     gzip_types text/html text/css application/javascript;
+# }

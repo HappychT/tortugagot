@@ -158,6 +158,25 @@ public class PlayerListPage implements IPageRenderer {
         }
     }
 
+    public int[] getPlayerRowBounds(String playerName) {
+        int rightButtonsX = parent.getBaseWidth() - 65 - (int) (202 / 1.2f);
+        int listX = 60;
+        int listY = 55;
+        int listWidth = rightButtonsX - listX - 80;
+        int listHeight = 14 * 20;
+        int totalHeight = sortedPlayers.size() * 20;
+        int scrollOffset = (totalHeight > listHeight) ? (int)(scroll * (totalHeight - listHeight)) : 0;
+
+        for (int i = 0; i < sortedPlayers.size(); i++) {
+            if (sortedPlayers.get(i).getKey().equals(playerName)) {
+                int currentY = listY + i * 20 - scrollOffset;
+                if (currentY + 20 < listY || currentY > listY + listHeight) return null;
+                return new int[]{listX, currentY, listWidth, 20};
+            }
+        }
+        return null;
+    }
+
     @Override
     public void actionPerformed(GuiButton button) {
         if (button == buttonManageTitles) {

@@ -4,6 +4,8 @@ import got.common.database.GOTCreativeTabs;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
 import got.common.item.GOTMaterialFinder;
+import got.common.GOTBannerProtection;
+import noname.weapons.war.WarBlockHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -26,14 +28,19 @@ public class GOTItemPickaxe extends ItemPickaxe implements GOTMaterialFinder {
 	@Override
 	public boolean onBlockDestroyed(ItemStack itemstack, World world, Block block, int x, int y, int z, EntityLivingBase entityliving) {
 
-		if (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.extraMining)) {
-			if (!(entityliving instanceof EntityPlayer) || world.isRemote) {
-				return super.onBlockDestroyed(itemstack, world, block, x, y, z, entityliving);
-			}
+        if (GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.extraMining)) {
+            if (!(entityliving instanceof EntityPlayer) || world.isRemote) {
+                return super.onBlockDestroyed(itemstack, world, block, x, y, z, entityliving);
+            }
 
-			EntityPlayer entityplayer = (EntityPlayer) entityliving;
-			Vec3 vec3 = Vec3.createVectorHelper(entityplayer.posX, entityplayer.posY + entityplayer.getEyeHeight(), entityplayer.posZ);
-			Vec3 vec31 = entityplayer.getLook(1f);
+            EntityPlayer entityplayer = (EntityPlayer) entityliving;
+            if (WarBlockHandler.isDirtBlock(block)
+                    && WarBlockHandler.isWarActiveAt(world, x, y, z)
+                    && GOTBannerProtection.isProtected(world, x, y, z, GOTBannerProtection.anyBanner(), false)) {
+                return super.onBlockDestroyed(itemstack, world, block, x, y, z, entityliving);
+            }
+            Vec3 vec3 = Vec3.createVectorHelper(entityplayer.posX, entityplayer.posY + entityplayer.getEyeHeight(), entityplayer.posZ);
+            Vec3 vec31 = entityplayer.getLook(1f);
 			double distance = 5d;
 			Vec3 vec32 = vec3.addVector(vec31.xCoord * distance, vec31.yCoord * distance, vec31.zCoord * distance);
 

@@ -99,7 +99,9 @@ public class GOTItemBanner extends Item {
 				int protectRange;
 				if (GOTConfig.allowBannerProtection && !entityplayer.capabilities.isCreativeMode && (protectRange = GOTBannerProtection.getProtectionRange(block, meta)) > 0) {
 					GOTFaction faction = bannerType.faction;
-					if (GOTLevelData.getData(entityplayer).getAlignment(faction) < 1.0f) {
+					got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+					boolean inTutorial = ext != null && ext.isTutorialActive();
+					if (!inTutorial && GOTLevelData.getData(entityplayer).getAlignment(faction) < 1.0f) {
 						if (!world.isRemote) {
 							GOTAlignmentValues.notifyAlignmentNotHighEnough(entityplayer, 1.0f, faction);
 						}

@@ -3,6 +3,11 @@ package got.common.network;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.*;
 import cpw.mods.fml.relauncher.Side;
+import got.common.network.clientToServer.GOTPacketBlacksmithRename;
+import got.common.network.clientToServer.GOTPacketBlacksmithRepair;
+import got.common.network.clientToServer.GOTPacketBlacksmithUnlock;
+import got.common.network.serverToClient.GOTPacketBlacksmithInfo;
+import got.common.network.serverToClient.GOTPacketSyncInventory;
 import net.minecraft.entity.Entity;
 
 public class GOTPacketHandler {
@@ -28,6 +33,10 @@ public class GOTPacketHandler {
 		networkWrapper.registerMessage(LOTRPacketParticleFX.Handler.class, LOTRPacketParticleFX.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketBiomeVariantsUnwatch.Handler.class, GOTPacketBiomeVariantsUnwatch.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketBiomeVariantsWatch.Handler.class, GOTPacketBiomeVariantsWatch.class, id++, Side.CLIENT);
+		networkWrapper.registerMessage(GOTPacketBlacksmithUnlock.Handler.class, GOTPacketBlacksmithUnlock.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(GOTPacketBlacksmithInfo.Handler.class, GOTPacketBlacksmithInfo.class, id++, Side.CLIENT);
+		networkWrapper.registerMessage(GOTPacketBlacksmithRename.Handler.class, GOTPacketBlacksmithRename.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(GOTPacketBlacksmithRepair.Handler.class, GOTPacketBlacksmithRepair.class, id++, Side.SERVER);
 		networkWrapper.registerMessage(GOTPacketBlockFX.Handler.class, GOTPacketBlockFX.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketBrandingIron.Handler.class, GOTPacketBrandingIron.class, id++, Side.SERVER);
 		networkWrapper.registerMessage(GOTPacketBrewingButton.Handler.class, GOTPacketBrewingButton.class, id++, Side.SERVER);
@@ -157,8 +166,17 @@ public class GOTPacketHandler {
 		networkWrapper.registerMessage(GOTPacketWaypointRegion.Handler.class, GOTPacketWaypointRegion.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketWaypointUseCount.Handler.class, GOTPacketWaypointUseCount.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(GOTPacketWeaponFX.Handler.class, GOTPacketWeaponFX.class, id++, Side.CLIENT);
-
+		networkWrapper.registerMessage(GOTPacketActivateRam.Handler.class, GOTPacketActivateRam.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(GOTPacketFireBalista.Handler.class, GOTPacketFireBalista.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(GOTPacketSyncInventory.Handler.class, GOTPacketSyncInventory.class, id++, Side.CLIENT);
 		networkWrapper.registerMessage(PacketSyncWeaponHitCount.Handler.class, PacketSyncWeaponHitCount.class, id++, Side.CLIENT);
+		networkWrapper.registerMessage(brain.tutorial.network.GOTPacketTutorialState.Handler.class, brain.tutorial.network.GOTPacketTutorialState.class, id++, Side.CLIENT);
+		networkWrapper.registerMessage(brain.tutorial.network.GOTPacketTutorialAdvance.class, brain.tutorial.network.GOTPacketTutorialAdvance.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(brain.tutorial.network.GOTPacketTutorialRestart.Handler.class, brain.tutorial.network.GOTPacketTutorialRestart.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(got.common.network.clientToServer.GOTPacketTutorialAction.class, got.common.network.clientToServer.GOTPacketTutorialAction.class, id++, Side.SERVER);
+		networkWrapper.registerMessage(brain.tutorial.network.GOTPacketTutorialWelcomeOpen.Handler.class, brain.tutorial.network.GOTPacketTutorialWelcomeOpen.class, id++, Side.CLIENT);
+		networkWrapper.registerMessage(brain.tutorial.network.GOTPacketTutorialTexts.class, brain.tutorial.network.GOTPacketTutorialTexts.class, id++, Side.CLIENT);
+		networkWrapper.registerMessage(brain.tutorial.network.GOTPacketTutorialQueue.class, brain.tutorial.network.GOTPacketTutorialQueue.class, id++, Side.CLIENT);
 	}
 
 	public static NetworkRegistry.TargetPoint nearEntity(Entity entity, double range) {

@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.faction.GOTFaction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,5 +16,10 @@ public class GOTItemArrynClaymore extends GOTItemGreatsword implements GOTFactio
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean show) {
         list.add(EnumChatFormatting.DARK_BLUE + StatCollector.translateToLocalFormatted("got.faction.ARRYN.name"));
+    }
+
+    @Override
+    public GOTFaction getFaction() {
+        return GOTFaction.ARRYN;
     }
 }

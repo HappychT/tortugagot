@@ -59,7 +59,10 @@ public class CollectionsListOverlay implements IOverlayRenderer {
         parent.drawScaledCustomSizeModalRect(x, y, 0, 0, 400, 300, width, height, 400.0F, 300.0F);
 
         parent.mc.getTextureManager().bindTexture(new ResourceLocation("got", "textures/gui/faction/tax_title.png"));
-        parent.drawScaledCustomSizeModalRect(x + (width / 2) - 75, y + 10, 0, 0, 820, 146, 150, 26, 820.0F, 146.0F);        buttonNewCollection.visible = parent.isPlayerLeader();
+        parent.drawScaledCustomSizeModalRect(x + (width / 2) - 75, y + 10, 0, 0, 820, 146, 150, 26, 820.0F, 146.0F);
+        
+        buttonNewCollection.visible = parent.isPlayerLeader();
+        
         int listX = x + 15;
         int listY = y + 45;
         int listWidth = width - 30;

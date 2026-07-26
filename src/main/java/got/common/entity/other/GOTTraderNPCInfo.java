@@ -165,8 +165,10 @@ public class GOTTraderNPCInfo {
 	public void refreshTrades() {
 		GOTTradeable theTrader = (GOTTradeable) theEntity;
 		Random rand = theEntity.getRNG();
-		setBuyTrades(theTrader.getBuyPool().getRandomTrades(rand));
-		setSellTrades(theTrader.getSellPool().getRandomTrades(rand));
+		GOTTradeEntries buyPool = theTrader.getBuyPool();
+		GOTTradeEntries sellPool = theTrader.getSellPool();
+		setBuyTrades(buyPool != null ? buyPool.getRandomTrades(rand) : new GOTTradeEntry[0]);
+		setSellTrades(sellPool != null ? sellPool.getRandomTrades(rand) : new GOTTradeEntry[0]);
 		valueSinceRefresh = 0;
 		for (Object element : theEntity.worldObj.playerEntities) {
 			EntityPlayer entityplayer = (EntityPlayer) element;

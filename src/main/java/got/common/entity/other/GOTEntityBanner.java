@@ -77,10 +77,18 @@ public class GOTEntityBanner extends Entity {
 			setBeenAttacked();
 			worldObj.playSoundAtEntity(this, Blocks.planks.stepSound.getBreakSound(), (Blocks.planks.stepSound.getVolume() + 1.0f) / 2.0f, Blocks.planks.stepSound.getPitch() * 0.8f);
 			boolean drop = true;
-			if (damagesource.getEntity() instanceof EntityPlayer && ((EntityPlayer) damagesource.getEntity()).capabilities.isCreativeMode) {
+			if (isPlayerDamage && ((EntityPlayer) damagesource.getEntity()).capabilities.isCreativeMode) {
 				drop = false;
 			}
 			dropAsItem(drop);
+
+            if (isPlayerDamage) {
+                EntityPlayer entityplayer = (EntityPlayer) damagesource.getEntity();
+                got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+                if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 4) {
+                    brain.tutorial.TutorialManager.getInstance().advanceStage4(entityplayer, 5);
+                }
+            }
 		}
 		return true;
 	}
@@ -211,8 +219,14 @@ public class GOTEntityBanner extends Entity {
 
 	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
-		if (!worldObj.isRemote && isProtectingTerritory() && canPlayerEditBanner(entityplayer)) {
+		got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+		boolean isTut = ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 4;
+
+		if (!worldObj.isRemote && (isProtectingTerritory() || isTut) && canPlayerEditBanner(entityplayer)) {
 			sendBannerToPlayer(entityplayer, true, true);
+			if (isTut) {
+				brain.tutorial.TutorialManager.getInstance().advanceStage4(entityplayer, 2);
+			}
 		}
 		return true;
 	}

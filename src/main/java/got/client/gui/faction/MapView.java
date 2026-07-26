@@ -39,6 +39,8 @@ public class MapView implements IPageRenderer {
     private GuiButton[] diplomacyButtons;
     private List<GOTFaction> playableFactionsOnMap = new ArrayList<>();
 
+    public List<FactionStructureSlot> getStructureSlots() { return structureSlots; }
+
     public MapView(GOTGuiFactions parent) {
         this.parent = parent;
         this.mapGui = new GOTGuiMap();
@@ -370,7 +372,7 @@ public class MapView implements IPageRenderer {
         this.prevMapPosY = this.mapPosY;
     }
 
-    private float[] transformMapCoords(float x, float z) {
+    public float[] transformMapCoords(float x, float z) {
         x -= this.mapPosX;
         z -= this.mapPosY;
         x *= mapRenderer.zoomStable;

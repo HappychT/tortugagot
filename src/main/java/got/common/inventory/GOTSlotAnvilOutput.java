@@ -32,6 +32,17 @@ public class GOTSlotAnvilOutput extends Slot {
 
 	@Override
 	public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack itemstack) {
+		if (!entityplayer.worldObj.isRemote) {
+			got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+			if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
+				if (ext.getTutorialProgress() == 0 && itemstack.getItem() == got.common.database.GOTRegistry.bronzeChestplate) {
+					brain.tutorial.TutorialManager.getInstance().advanceStage6(entityplayer, 1);
+				} else if (ext.getTutorialProgress() == 1 && itemstack.getItem() == got.common.database.GOTRegistry.bronzeSword) {
+					brain.tutorial.TutorialManager.getInstance().startStage7(entityplayer, ext);
+				}
+			}
+		}
+
 		int materials = theAnvil.materialCost;
 		theAnvil.invInput.setInventorySlotContents(0, null);
 		boolean wasSmithCombine = theAnvil.isSmithScrollCombine;
@@ -47,9 +58,17 @@ public class GOTSlotAnvilOutput extends Slot {
 		if (materials > 0) {
 			theAnvil.takeMaterialOrCoinAmount(materials);
 		}
+		
+		got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+		if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6 && ext.getTutorialProgress() == 1) {
+		    brain.tutorial.TutorialManager.getInstance().startStage7(entityplayer, ext);
+		}
 		if (!entityplayer.worldObj.isRemote && wasSmithCombine) {
 			GOTLevelData.getData(entityplayer).addAchievement(GOTAchievement.combineSmithScrolls);
 		}
+        if (!entityplayer.worldObj.isRemote) {
+            // Unconditional Stage 6 skip removed here
+        }
 		theAnvil.materialCost = 0;
 		theAnvil.isSmithScrollCombine = false;
 		theAnvil.playAnvilSound();

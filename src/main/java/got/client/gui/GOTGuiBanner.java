@@ -257,6 +257,7 @@ public class GOTGuiBanner extends GOTGuiScreenBase {
 			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			zLevel = z;
 		}
+        brain.tutorial.client.TutorialGuiBannerHighlight.drawHighlight(this);
 	}
 
 	@Override
@@ -322,6 +323,9 @@ public class GOTGuiBanner extends GOTGuiScreenBase {
 
 	@Override
 	public void keyTyped(char c, int i) {
+        if (brain.tutorial.client.TutorialGuiBannerHighlight.handleKeyTyped(this, c, i)) {
+            return;
+        }
 		if (alignmentField.getVisible() && alignmentField.textboxKeyTyped(c, i)) {
 			return;
 		}
@@ -349,6 +353,9 @@ public class GOTGuiBanner extends GOTGuiScreenBase {
 
 	@Override
 	public void mouseClicked(int i, int j, int k) {
+        if (brain.tutorial.client.TutorialGuiBannerHighlight.handleMouseClick(this, i, j, k)) {
+            return;
+        }
 		int dx;
 		super.mouseClicked(i, j, k);
 		if (alignmentField.getVisible()) {

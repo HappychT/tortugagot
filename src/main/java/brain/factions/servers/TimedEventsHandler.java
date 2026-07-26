@@ -122,9 +122,11 @@ public class TimedEventsHandler {
 
             if (shouldBeRaidTime && !StructureManager.isRaidTime) {
                 StructureManager.isRaidTime = true;
+                SiegeActivationManager.getInstance().rebuildRaidZones(0);
                 MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§4[!] Началось время рейдов! Структуры врагов уязвимы!"));
             } else if (!shouldBeRaidTime && StructureManager.isRaidTime) {
                 StructureManager.isRaidTime = false;
+                SiegeActivationManager.getInstance().clearRaidZones();
                 MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§a[!] Время рейдов окончено! Структуры в безопасности."));
             }
         } catch (Exception e) {

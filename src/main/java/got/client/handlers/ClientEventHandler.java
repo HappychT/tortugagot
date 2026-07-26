@@ -37,17 +37,32 @@ public class ClientEventHandler {
         if (living.worldObj.isRemote && living instanceof EntityPlayerSP) {
             EntityPlayerSP player = (EntityPlayerSP) living;
 
+            // Оцепенение — блокирует все передвижение, приоритет над инверсией
+            boolean hasStupor = player.isPotionActive(GOTEffects.stupor);
+            boolean isUsingStuporInput = player.movementInput instanceof GOTMovementInputStupor;
 
-            boolean hasInversion = player.isPotionActive(GOTEffects.inversion);
-            boolean isUsingInvertedInput = player.movementInput instanceof GOTMovementInputInverted;
-
-            if (hasInversion && !isUsingInvertedInput) {
-                player.movementInput = new GOTMovementInputInverted(player.movementInput);
+            if (hasStupor && !isUsingStuporInput) {
+                // Если сейчас инвертированный input — достать оригинал
+                MovementInput base = player.movementInput;
+                if (base instanceof GOTMovementInputInverted) {
+                    base = ((GOTMovementInputInverted) base).originalInput;
+                }
+                player.movementInput = new GOTMovementInputStupor(base);
+            } else if (!hasStupor && isUsingStuporInput) {
+                player.movementInput = ((GOTMovementInputStupor) player.movementInput).originalInput;
             }
-            else if (!hasInversion && isUsingInvertedInput) {
-                player.movementInput = ((GOTMovementInputInverted) player.movementInput).originalInput;
-            }
 
+            // Инверсия — только если нет оцепенения
+            if (!hasStupor) {
+                boolean hasInversion = player.isPotionActive(GOTEffects.inversion);
+                boolean isUsingInvertedInput = player.movementInput instanceof GOTMovementInputInverted;
+
+                if (hasInversion && !isUsingInvertedInput) {
+                    player.movementInput = new GOTMovementInputInverted(player.movementInput);
+                } else if (!hasInversion && isUsingInvertedInput) {
+                    player.movementInput = ((GOTMovementInputInverted) player.movementInput).originalInput;
+                }
+            }
         }
     }
 
@@ -154,5 +169,46 @@ public class ClientEventHandler {
         int x = screenWidth / 2 - mc.fontRenderer.getStringWidth(text) / 2;
         int y = screenHeight - 58;
         mc.fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFF);
+    }
+
+    @SubscribeEvent
+    public void onRenderPlayerPre(net.minecraftforge.client.event.RenderPlayerEvent.Pre event) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive) {
+            if (event.entityPlayer != mc.thePlayer) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    private boolean isTutorialEntityType(net.minecraft.entity.Entity entity) {
+        return entity instanceof got.common.entity.westeros.GOTEntityWesterosBandit ||
+               entity instanceof got.common.entity.westeros.ironborn.GOTEntityIronbornMan;
+               //entity instanceof got.common.entity.other.GOTEntityJaqen;
+    }
+
+    @SubscribeEvent
+    public void onRenderLivingPre(net.minecraftforge.client.event.RenderLivingEvent.Pre event) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive) {
+            if (isTutorialEntityType(event.entity)) {
+                if (brain.tutorial.client.TutorialClientState.tutorialEntities == null || 
+                    !brain.tutorial.client.TutorialClientState.tutorialEntities.contains(event.entity.getEntityId())) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlaySoundAtEntity(net.minecraftforge.event.entity.PlaySoundAtEntityEvent event) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive) {
+            if (event.entity instanceof EntityPlayer && event.entity != mc.thePlayer) {
+                event.setCanceled(true);
+            } else if (isTutorialEntityType(event.entity)) {
+                if (brain.tutorial.client.TutorialClientState.tutorialEntities == null || 
+                    !brain.tutorial.client.TutorialClientState.tutorialEntities.contains(event.entity.getEntityId())) {
+                    event.setCanceled(true);
+                }
+            }
+        }
     }
 }

@@ -48,7 +48,7 @@ public class IncreaseCapacityOverlay implements IOverlayRenderer {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
-        increaseCapacityAmountField.mouseClicked(mouseX, mouseY, button);
+        increaseCapacityAmountField.mouseClicked(scaledMouseX, scaledMouseY, button);
     }
 
     @Override

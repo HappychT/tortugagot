@@ -138,68 +138,17 @@ public class GOTTradeEntries {
 		C_BAKER_S_L.add(new GOTTradeEntry(new ItemStack(Items.sugar, 2), 1));
 		C_BAKER_S_L.add(new GOTTradeEntry(new ItemStack(Items.water_bucket), 4));
 		C_BAKER_S_L.add(new GOTTradeEntry(new ItemStack(Items.wheat, 2), 1));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.aleHorn), 5));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.camelCooked), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.ceramicMug), 2));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.ceramicPlate), 2));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.deerCooked), 7));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.gammon), 7));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.gobletCopper), 3));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.gobletWood), 2));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.kebab), 8));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.lemonCakeItem), 12));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mug), 2));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugAle, 1, 9999), 8));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugAppleJuice), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugAraq, 1, 9999), 10));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugCactusLiqueur, 1, 9999), 12));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugChocolate), 4));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugCider, 1, 9999), 8));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugLemonLiqueur, 1, 9999), 12));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugLimeLiqueur, 1, 9999), 12));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugMead, 1, 9999), 8));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugOrangeJuice), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugPerry, 1, 9999), 8));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugRedWine, 1, 9999), 12));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.mugWhiteWine, 1, 9999), 12));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.muttonCooked), 7));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.oliveBread), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.orange), 3));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.plate), 4));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.plum), 3));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.rabbitCooked), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.rabbitStew), 10));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.shishKebab), 8));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.waterskin), 2));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.woodPlate), 2));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(Items.baked_potato, 2), 7));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(Items.bread), 5));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(Items.cooked_beef), 7));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(Items.cooked_chicken), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(Items.cooked_fished), 6));
-		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(Items.cooked_porkchop), 7));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.appleGreen), 1));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.clayMug), 1));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.clayPlate), 1));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.date), 2));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.deerRaw), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.lemon), 2));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.lime), 2));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.muttonRaw), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.orange), 2));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.pipeweed, 3), 10));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.rabbitRaw), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.salt), 10));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.apple), 1));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.beef), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.bucket), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.chicken), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.coal, 2, 32767), 1));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.fish), 2));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.porkchop), 3));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.potato, 2), 1));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.water_bucket), 4));
-		C_BARTENDER_S_L.add(new GOTTradeEntry(new ItemStack(Items.wheat, 2), 1));
+		// Трактирщик продаёт только 8 позиций еды
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.rhinoCooked), 5));      // Жареное мясо носорога
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.gingerbread), 8));      // Пряник
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.marzipanChocolate), 10)); // Шоколадный марципан
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.marzipan), 8));         // Марципан
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.elephantCooked), 7));   // Жареное мясо мамонта
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.walrusLardCooked), 9)); // Жареное сало моржа
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.pancakeMapleSyrup), 8)); // Блинчики с кленовым сиропом
+		C_BARTENDER_B_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.shishKebab), 6));       // Шашлык на шампуре
+		// Список покупки пуст — трактирщик ничего не принимает
+
 		C_BLACKSMITH_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.bronzeIngot), 6));
 		C_BLACKSMITH_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.copperIngot), 3));
 		C_BLACKSMITH_S_L.add(new GOTTradeEntry(new ItemStack(GOTRegistry.diamond), 25));

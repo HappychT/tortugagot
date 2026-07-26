@@ -5,6 +5,7 @@ import cpw.mods.fml.common.network.simpleimpl.*;
 import got.GOT;
 import got.common.*;
 import got.common.faction.GOTFaction;
+import got.rome.ExtendedPlayer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -37,16 +38,27 @@ public class GOTPacketPledgeSet implements IMessage {
 			GOTPlayerData pd = GOTLevelData.getData(entityplayer);
 			GOTFaction fac = packet.pledgeFac;
 			if (fac == null) {
-				// Отвергает
 				brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketMessage("quet"));
-				//pd.revokePledgeFaction(entityplayer, true);
 			} else if (pd.canPledgeTo(fac) && pd.canMakeNewPledge()) {
-				//Присягает
 				brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketMessage("sendApplication#" + fac.codeName()));
-				//pd.setPledgeFaction(fac);
+			} else {
+				ExtendedPlayer ext = ExtendedPlayer.get(entityplayer);
+				if (ext != null && ext.getTutorialStage() == 3) {
+					// FORCE JOIN FOR TUTORIAL
+					pd.setPledgeFaction(fac);
+					brain.factions.Faction factionData = brain.factions.servers.CoreFaction.factions.get(fac.codeName());
+					if (factionData != null) {
+						long perms = brain.factions.Faction.Permission.CAN_CREATE_TITLES.getBit() | 
+									 brain.factions.Faction.Permission.CAN_MANAGE_HIERARCHY.getBit() | 
+									 brain.factions.Faction.Permission.CAN_MANAGE_TREASURY.getBit();
+						brain.factions.Faction.Title tutTitle = new brain.factions.Faction.Title("\u041e\u0431\u0443\u0447\u0435\u043d\u0438\u0435", 0, perms);
+						factionData.getTitles().put("\u041e\u0431\u0443\u0447\u0435\u043d\u0438\u0435", tutTitle);
+						factionData.getPlayers().put(entityplayer.getCommandSenderName(), new brain.factions.Faction.PlayerData("", System.currentTimeMillis(), "\u041e\u0431\u0443\u0447\u0435\u043d\u0438\u0435"));
+						brain.factions.servers.CoreFaction.brainChannel.sendToAll(new brain.factions.network.PacketInfoFactions());
+					}
+				}
 			}
 			return null;
 		}
 	}
-
 }

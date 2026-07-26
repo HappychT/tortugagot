@@ -15,10 +15,10 @@ public abstract class GOTGuiMenuBase extends GOTGuiMenuWBBase {
 
 	@Override
 	public void actionPerformed(GuiButton button) {
+		super.actionPerformed(button);
 		if (button.enabled && button == buttonMenuReturn) {
 			mc.displayGuiScreen(new GOTGuiMenu());
 		}
-		super.actionPerformed(button);
 	}
 
 	@Override

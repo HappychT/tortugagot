@@ -11,9 +11,10 @@ import net.minecraft.world.*;
 import net.minecraftforge.common.DimensionManager;
 
 public enum GOTDimension {
-	GAME_OF_THRONES("GameOfThrones", 99, GOTWorldProvider.class, true, 99, EnumSet.of(DimensionRegion.WESTEROS));
+    GAME_OF_THRONES("GameOfThrones", 99, GOTWorldProvider.class, true, 99, EnumSet.of(DimensionRegion.WESTEROS)),
+    TUTORIAL("Tutorial", 100, brain.tutorial.world.GOTTutorialWorldProvider.class, false, 0, EnumSet.noneOf(DimensionRegion.class));
 
-	public String dimensionName;
+    public String dimensionName;
 	public int dimensionID;
 	public Class<? extends WorldProvider> providerClass;
 	public boolean loadSpawn;

@@ -214,8 +214,9 @@ public class GOT {
         FMLCommonHandler.instance().bus().register(new BlockDamageTickHandler());
         FMLCommonHandler.instance().bus().register(StaminaServerHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlockServerHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(new WarBlockHandler());
-        FMLCommonHandler.instance().bus().register(BlockServerHandler.INSTANCE);
+        WarBlockHandler warBlockHandler = new WarBlockHandler();
+        MinecraftForge.EVENT_BUS.register(warBlockHandler);
+        FMLCommonHandler.instance().bus().register(warBlockHandler);
         GOTCoreBlockingSystem.registerWeapons();
         proxy.onLoad();
         Set<Block> set = GOTAPI.getObjectFieldsOfType(GOTRegistry.class, Block.class);
@@ -295,6 +296,7 @@ public class GOT {
         GameRegistry.registerTileEntity(TileEntityStructureHeart.class, "tileStructureHeart");
         MinecraftForge.EVENT_BUS.register(this);
         KingArmorMod.init(event);
+        brain.tutorial.TutorialManager.init();
     }
 
     @SubscribeEvent
@@ -512,6 +514,7 @@ public class GOT {
         command.add(new GOTCommandWeather());
         command.add(new GOTCommandAlignment());
         command.add(new GOTCommandSummon());
+        command.add(new got.common.command.GOTCommandTutorial());
         command.add(new GOTCommandFastTravelClock());
         command.add(new GOTCommandWaypointCooldown());
         command.add(new GOTCommandDate());
@@ -598,7 +601,9 @@ public class GOT {
         GOTLog.findLogger();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
         FMLCommonHandler.instance().bus().register(new ServerTickHandler());
-        FMLCommonHandler.instance().bus().register(new WarTicketHandler());
+        WarTicketHandler warTicketHandler = new WarTicketHandler();
+        FMLCommonHandler.instance().bus().register(warTicketHandler);
+        MinecraftForge.EVENT_BUS.register(warTicketHandler);
         tickHandler = new GOTTickHandlerServer();
         eventHandler = new GOTEventHandler();
         packetHandler = new GOTPacketHandler();

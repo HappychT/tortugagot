@@ -23,7 +23,7 @@ public class KingGuardLegs extends ModelBiped {
         RightLegLayer_r1.mirror = true;
         RightLegLayer_r1.setRotationPoint(-0.1F, 12.0F, 0.0F);
         this.bipedRightLeg.addChild(RightLegLayer_r1);
-        setRotationAngle(RightLegLayer_r1, 0.0F, 0.0F, 0.0873F); 
+        setRotationAngle(RightLegLayer_r1, 0.0F, 0.0F, 0.0873F);
         RightLegLayer_r1.addBox(-3.4F, -12.0F, -2.5F, 5, 9, 5, scale + 0.09F);
         RightLegLayer_r1.setTextureOffset(32, 82).addBox(-3.4F, -12.0F, -2.5F, 5, 9, 5, scale + 0.05F);
 
@@ -33,7 +33,7 @@ public class KingGuardLegs extends ModelBiped {
         LeftLegLayer_r1 = new ModelRenderer(this, 96, 64);
         LeftLegLayer_r1.setRotationPoint(0.1F, 12.0F, 0.0F);
         this.bipedLeftLeg.addChild(LeftLegLayer_r1);
-        setRotationAngle(LeftLegLayer_r1, 0.0F, 0.0F, -0.0873F); 
+        setRotationAngle(LeftLegLayer_r1, 0.0F, 0.0F, -0.0873F);
         LeftLegLayer_r1.addBox(-1.6F, -12.0F, -2.5F, 5, 9, 5, scale + 0.09F);
         LeftLegLayer_r1.setTextureOffset(32, 82).addBox(-1.6F, -12.0F, -2.5F, 5, 9, 5, scale + 0.05F);
     }

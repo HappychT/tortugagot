@@ -5,9 +5,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
-import got.common.network.clientToServer.PacketBounceRequest;
-import got.common.network.clientToServer.PacketPunishSpamClick;
-import got.common.network.clientToServer.PacketSendAttackCooldown;
+import got.common.network.clientToServer.*;
 import got.common.network.serverToClient.PacketSendBounceCooldown;
 import got.common.network.serverToClient.PacketSendSecondBreathCooldown;
 import got.common.network.serverToClient.PacketSendStamina;
@@ -28,6 +26,8 @@ public class PacketDispatcher {
         registerMessage(PacketBounceRequest.class);
         registerMessage(PacketSendBounceCooldown.class);
         registerMessage(PacketSendSecondBreathCooldown.class);
+        registerMessage(GOTPacketBlacksmithForge.class);
+        registerMessage(GOTPacketBlacksmithEnchantmentButton.class);
     }
 
     private static final <T extends AbstractPacket<T> & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz) {

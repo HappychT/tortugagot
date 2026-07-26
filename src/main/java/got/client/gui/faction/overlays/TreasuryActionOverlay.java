@@ -14,6 +14,7 @@ public class TreasuryActionOverlay implements IOverlayRenderer {
 
     private String treasuryActionType = "deposit";
     public String treasuryGoalTarget = "";
+    private boolean hasError = false;
 
     public TreasuryActionOverlay(GOTGuiFactions parent) {
         this.parent = parent;
@@ -60,31 +61,48 @@ public class TreasuryActionOverlay implements IOverlayRenderer {
     public void actionPerformed(GuiButton button) {
         if (button == treasuryConfirmButton) {
             try {
-                long amount = Long.parseLong(treasuryAmountField.getText());
+                long amount = Long.parseLong(treasuryAmountField.getText().trim());
                 if (amount > 0) {
                     brain.factions.servers.CoreFaction.brainChannel.sendToServer(PacketFactionManage.treasury(treasuryActionType, amount, treasuryGoalTarget));
-                    parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
+                    hasError = false;
+                    parent.setCurrentOverlay(GOTGuiFactions.Overlay.TREASURY_DETAILS, true);
                 } else {
                     treasuryAmountField.setText("§cСумма должна быть > 0!");
+                    hasError = true;
                 }
             } catch (NumberFormatException e) {
                 treasuryAmountField.setText("§cНеверное число!");
+                hasError = true;
             }
         } else if (button == treasuryCancelButton) {
-            parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
+            hasError = false;
+            parent.setCurrentOverlay(GOTGuiFactions.Overlay.TREASURY_DETAILS, true);
         }
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
-        treasuryAmountField.mouseClicked(mouseX, mouseY, button);
+        treasuryAmountField.mouseClicked(scaledMouseX, scaledMouseY, button);
     }
 
     @Override
     public void keyTyped(char c, int key) {
         if (treasuryAmountField.isFocused()) {
-            if (Character.isDigit(c) || key == 14 || key == 203 || key == 205) {
+            if (Character.isDigit(c)) {
+                // Если раньше была ошибка — очищаем поле перед вводом
+                if (hasError) {
+                    treasuryAmountField.setText("");
+                    hasError = false;
+                }
                 treasuryAmountField.textboxKeyTyped(c, key);
+            } else if (key == 14 || key == 203 || key == 205) {
+                // Backspace / стрелки: если есть ошибка — просто очищаем
+                if (hasError) {
+                    treasuryAmountField.setText("");
+                    hasError = false;
+                } else {
+                    treasuryAmountField.textboxKeyTyped(c, key);
+                }
             }
         }
     }

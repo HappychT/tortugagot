@@ -36,9 +36,26 @@ public class GOTPacketFellowshipCreate implements IMessage {
 		public IMessage onMessage(GOTPacketFellowshipCreate packet, MessageContext context) {
 			EntityPlayerMP entityplayer = context.getServerHandler().playerEntity;
 			GOTPlayerData playerData = GOTLevelData.getData(entityplayer);
+
+			// Фикс туториала: если игрок на этапе создания братства (stage 4),
+			// принудительно расформировываем его старые братства-владельца,
+			// чтобы не упереться в лимит (например, если создал братство в очереди).
+			got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+			if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 4) {
+				java.util.List<java.util.UUID> fsIDs = new java.util.ArrayList<>(playerData.getFellowshipIDs());
+				for (java.util.UUID fsID : fsIDs) {
+					got.common.fellowship.GOTFellowship fs = got.common.fellowship.GOTFellowshipData.getActiveFellowship(fsID);
+					if (fs != null && !fs.isDisbanded() && fs.isOwner(entityplayer.getUniqueID())) {
+						fs.setDisbandedAndRemoveAllMembers();
+					}
+				}
+			}
+
 			playerData.createFellowship(packet.fellowshipName, true);
+			brain.tutorial.TutorialManager.getInstance().advanceStage4(entityplayer, 5);
 			return null;
 		}
 	}
+
 
 }

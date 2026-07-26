@@ -50,6 +50,8 @@ public class GOTLoader {
 
 	public static void preInit() {
 		GOTConfig.setupAndLoad();
+		brain.tutorial.TutorialConfig.setupAndLoad();
+		brain.tutorial.TutorialTexts.setupAndLoad();
 //		GOTEffects.registerPotions();
 		GOTRegistry.assignContent();
 		GOTRegistry.assignMetadata();

@@ -74,23 +74,23 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
                 }
                 long amount = Long.parseLong(this.collectionAmountField.getText());
                 if (amount > 0) {
-                    brain.factions.servers.CoreFaction.brainChannel.sendToServer(new PacketFactionCreateCollection(name, amount));
-                    parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
+                    brain.factions.servers.CoreFaction.brainChannel.sendToServer(new brain.factions.network.PacketFactionCreateCollection(name, amount));
+                    parent.setCurrentOverlay(GOTGuiFactions.Overlay.COLLECTIONS_LIST, true);
                 } else {
                     this.collectionAmountField.setText("§cСумма должна быть > 0!");
                 }
             } catch (NumberFormatException e) {
-                this.collectionAmountField.setText("§cНеверное число!");
+                this.collectionAmountField.setText("§cНеверный формат!");
             }
         } else if (button == buttonCancelCollection) {
-            parent.setCurrentOverlay(GOTGuiFactions.Overlay.NONE, true);
+            parent.setCurrentOverlay(GOTGuiFactions.Overlay.COLLECTIONS_LIST, true);
         }
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int scaledMouseX, int scaledMouseY, int button) {
-        collectionNameField.mouseClicked(mouseX, mouseY, button);
-        collectionAmountField.mouseClicked(mouseX, mouseY, button);
+        collectionNameField.mouseClicked(scaledMouseX, scaledMouseY, button);
+        collectionAmountField.mouseClicked(scaledMouseX, scaledMouseY, button);
     }
 
     @Override

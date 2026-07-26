@@ -22,7 +22,7 @@ public class ItemKingWeapon extends ItemSword {
         3, 
         2500, 
         9.0F, 
-        3.0F, 
+        2.0F,
         22 
     );
     

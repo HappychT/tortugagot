@@ -257,8 +257,13 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 		}
 
 		if(!focusSet) {
-			posX = 634;
-			posY = 1168;
+			if (mc.thePlayer != null) {
+				posX = (float) (mc.thePlayer.posX / GOTGenLayerWorld.scale) + 810.0f;
+				posY = (float) (mc.thePlayer.posZ / GOTGenLayerWorld.scale) + 730.0f;
+			} else {
+				posX = 810.0f;
+				posY = 730.0f;
+			}
 			zoomPower = -2;
 			focusSet = true;
 		} else {
@@ -777,7 +782,20 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 		}
 		boolean buttonVisible = buttonOverlayFunction.visible;
 		buttonOverlayFunction.visible = false;
-		super.drawScreen(i, j, f);
+        super.drawScreen(i, j, f);
+
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            brain.tutorial.client.TutorialGuiMapHighlight.drawHighlight(this, i, j);
+            if (brain.tutorial.client.TutorialClientState.tutorialProgress == 3 && buttonMenuReturn != null && buttonMenuReturn.visible) {
+                int alpha = (int)(Math.abs(Math.sin(System.currentTimeMillis() / 200.0)) * 255);
+                int borderColor = (alpha << 24) | 0xFFFF00; // Pulsating Yellow
+                drawRect(buttonMenuReturn.xPosition, buttonMenuReturn.yPosition, buttonMenuReturn.xPosition + buttonMenuReturn.width, buttonMenuReturn.yPosition + 1, borderColor);
+                drawRect(buttonMenuReturn.xPosition, buttonMenuReturn.yPosition + buttonMenuReturn.height - 1, buttonMenuReturn.xPosition + buttonMenuReturn.width, buttonMenuReturn.yPosition + buttonMenuReturn.height, borderColor);
+                drawRect(buttonMenuReturn.xPosition, buttonMenuReturn.yPosition, buttonMenuReturn.xPosition + 1, buttonMenuReturn.yPosition + buttonMenuReturn.height, borderColor);
+                drawRect(buttonMenuReturn.xPosition + buttonMenuReturn.width - 1, buttonMenuReturn.yPosition, buttonMenuReturn.xPosition + buttonMenuReturn.width, buttonMenuReturn.yPosition + buttonMenuReturn.height, borderColor);
+                org.lwjgl.opengl.GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+        }
 		buttonOverlayFunction.visible = buttonVisible;
 		renderMapWidgets(i, j);
 		if (hasOverlay) {
@@ -1064,6 +1082,9 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 
 	@Override
 	public void keyTyped(char c, int i) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            return; // Block all key input on map during tutorial
+        }
 		if (hasOverlay) {
 			if (creatingWaypointNew && nameWPTextField.textboxKeyTyped(c, i) || renamingWaypoint && nameWPTextField.textboxKeyTyped(c, i)) {
 				return;
@@ -1108,6 +1129,22 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 
 	@Override
 	public void mouseClicked(int i, int j, int k) {
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            if (!brain.tutorial.client.TutorialGuiMapHighlight.handleMouseClick(this, i, j, k)) {
+                return; // Blocked by tutorial
+            }
+            GOTGuiMapWidget mouseWidget = null;
+            for (GOTGuiMapWidget widget : mapWidgets) {
+                if (widget.isMouseOver(i - mapXMin, j - mapYMin, mapWidth, mapHeight)) {
+                    mouseWidget = widget;
+                    break;
+                }
+            }
+            if (mouseWidget != null && mouseWidget != widgetZoomIn && mouseWidget != widgetZoomOut) {
+                return; // Block other widgets during tutorial
+            }
+            // Allow drag and click
+        }
 		Object packet;
 		GOTGuiMapWidget mouseWidget = null;
 		for (GOTGuiMapWidget widget : mapWidgets) {
@@ -1476,7 +1513,8 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 	}
 
 	public void renderMapWidgets(int mouseX, int mouseY) {
-		widgetAddCWP.visible = !hasOverlay && isGameOfThrones();
+        boolean isTutorialWaypointStep = brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3 && brain.tutorial.client.TutorialClientState.tutorialProgress == 2;
+		widgetAddCWP.visible = !hasOverlay && (isGameOfThrones() || isTutorialWaypointStep);
 		widgetAddCWP.setTexVIndex(canCreateWaypointAtPosition() ? 0 : 1);
 		widgetDelCWP.visible = !hasOverlay && isGameOfThrones() && selectedWaypoint instanceof GOTCustomWaypoint && !((GOTCustomWaypoint) selectedWaypoint).isShared();
 		widgetRenameCWP.visible = !hasOverlay && isGameOfThrones() && selectedWaypoint instanceof GOTCustomWaypoint && !((GOTCustomWaypoint) selectedWaypoint).isShared();
@@ -1502,6 +1540,20 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 				mc.getTextureManager().bindTexture(mapIconsTexture);
 				GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				this.drawTexturedModalRect(mapXMin + widget.getMapXPos(mapWidth), mapYMin + widget.getMapYPos(mapHeight), widget.getTexU(), widget.getTexV(), widget.width, widget.width);
+                if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+                    if (brain.tutorial.client.TutorialClientState.tutorialProgress == 2 && widget == widgetAddCWP) {
+                        org.lwjgl.opengl.GL11.glPushMatrix();
+                        org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_TEXTURE_2D);
+                        org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_BLEND);
+                        float alpha = 0.5f + 0.5f * (float)Math.sin(net.minecraft.client.Minecraft.getSystemTime() / 200.0);
+                        org.lwjgl.opengl.GL11.glColor4f(1.0f, 0.8f, 0.2f, alpha);
+                        int wx = mapXMin + widget.getMapXPos(mapWidth);
+                        int wy = mapYMin + widget.getMapYPos(mapHeight);
+                        net.minecraft.client.gui.Gui.drawRect(wx - 2, wy - 2, wx + widget.width + 2, wy + widget.width + 2, new java.awt.Color(1.0f, 0.8f, 0.2f, alpha).getRGB());
+                        org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_TEXTURE_2D);
+                        org.lwjgl.opengl.GL11.glPopMatrix();
+                    }
+                }
 				if (widget.isMouseOver(mouseX - mapXMin, mouseY - mapYMin, mapWidth, mapHeight)) {
 					mouseOverWidget = widget;
 				}
@@ -2029,12 +2081,15 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 		this.drawCenteredString(name, stringX, stringY, 16777215);
 		stringY += fontRendererObj.FONT_HEIGHT + border;
 		if (selected) {
-			this.drawCenteredString(coords, stringX, stringY, 16777215);
+            if (!isConquestGrid) {
+                // Removed invalid call to this.drawMapCompassBottomLeft
+            }
+            this.drawCenteredString(coords, stringX, stringY, 16777215);
 			stringY += fontRendererObj.FONT_HEIGHT + border * 2;
 			if (loreText != null) {
 				GL11.glPushMatrix();
 				GL11.glScalef(loreScaleRel, loreScaleRel, 1.0f);
-				List loreLines = fontRendererObj.listFormattedStringToWidth(loreText, (int) (innerRectWidth * loreScaleRelInv));
+				java.util.List loreLines = fontRendererObj.listFormattedStringToWidth(loreText, (int) (innerRectWidth * loreScaleRelInv));
 				for (Object loreLine : loreLines) {
 					String line = (String) loreLine;
 					this.drawCenteredString(line, (int) (stringX * loreScaleRelInv), (int) (stringY * loreScaleRelInv), 16777215);
@@ -2043,6 +2098,7 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 				GL11.glPopMatrix();
 			}
 		}
+        // Removed hover advance logic
 		GL11.glTranslatef(0.0f, 0.0f, -300.0f);
 	}
 
@@ -2282,6 +2338,12 @@ public class GOTGuiMap extends GOTGuiMenuBase {
 
 	public void zoomIn() {
 		zoom(1);
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
+            if (brain.tutorial.client.TutorialClientState.tutorialProgress == 2) {
+                got.common.network.GOTPacketHandler.networkWrapper.sendToServer(new brain.tutorial.network.GOTPacketTutorialAdvance());
+                brain.tutorial.client.TutorialClientState.tutorialProgress++;
+            }
+        }
 	}
 
 	public void zoomOut() {

@@ -19,7 +19,7 @@ apply plugin: 'forge'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 version = "1.0"
-group= "com.yourname.modid"
+group = "com.yourname.modid"
 archivesBaseName = "Game of Thrones"
 
 dependencies {
@@ -32,23 +32,6 @@ minecraft {
     srcCompat = JavaVersion.VERSION_1_8
     targetCompat = JavaVersion.VERSION_1_8
 }
-
-//cutter {
-//    annotation = "brain.factions.Annot"
- //   def serverSide = side 'server'
- //   def clientSide = side 'client'
- //   builds {
- //       client {
- //           targetSides = [clientSide]
- //           primalSides = [clientSide, serverSide]
- //       }
- //       server {
- //           targetSides = [serverSide]
- //           primalSides = [clientSide, serverSide]
- //       }
- //   }
-//}
-
 
 jar {
     manifest {

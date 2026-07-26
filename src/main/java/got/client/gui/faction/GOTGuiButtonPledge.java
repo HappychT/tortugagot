@@ -51,7 +51,8 @@ public class GOTGuiButtonPledge extends GuiButton {
 
         isPledgedToThisFaction = currentPledge == targetFaction;
         float alignment = pd.getAlignment(targetFaction);
-        boolean hasEnoughAlignment = alignment >= ALIGNMENT_REQUIREMENT;
+        boolean isTutorial = brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3;
+        boolean hasEnoughAlignment = alignment >= ALIGNMENT_REQUIREMENT || isTutorial;
 
         canPledge = currentPledge == null;
         enabled = (canPledge && hasEnoughAlignment) || isPledgedToThisFaction;

@@ -99,19 +99,43 @@ public class StaminaServerHandler {
             }
         }
 
-        if (extendedPlayer.getStamina() <= MAX_STAMINA * 0.1) {
+        int currentStamina = extendedPlayer.getStamina();
+
+        // Пороги стамины — градуированные эффекты
+        if (currentStamina <= MAX_STAMINA * 0.03) {
+            // 0-3%: Оцепенение на 5 секунд (накладывается один раз)
+            if (!player.isPotionActive(GOTEffects.stupor)) {
+                player.addPotionEffect(new PotionEffect(GOTEffects.stupor.id, 100, 0, true));
+            }
+        } else if (currentStamina <= MAX_STAMINA * 0.05) {
+            // ≤5%: Утомление 3 + Медлительность 3
+            player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 40, 2, true));
+            player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 40, 2, true));
+        } else if (currentStamina <= MAX_STAMINA * 0.1) {
+            // ≤10%: secondBreath проверка + Утомление 2 + Медлительность 2
             if (player.isPotionActive(GOTEffects.secondBreath) && extendedPlayer.getSecondBreathCooldown() == 0) {
                 regainStamina((int) (MAX_STAMINA * 0.15), player);
                 player.removePotionEffect(GOTEffects.secondBreath.id);
                 extendedPlayer.setSecondBreathCooldown(SECONDBREATH_COOLDWON);
                 PacketDispatcher.sendTo(new PacketSendSecondBreathCooldown(extendedPlayer.getSecondBreathCooldown()), (EntityPlayerMP) player);
             } else {
-                player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1, true));
-                player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 20, 0, true));
-                if (player.isInWater()) {
-                    player.motionY = 0;
-                    player.jumpMovementFactor = 0.0F;
-                }
+                player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 40, 1, true));
+                player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 40, 1, true));
+            }
+        } else if (currentStamina <= MAX_STAMINA * 0.2) {
+            // ≤20%: Утомление 1 + Медлительность 1
+            player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 40, 0, true));
+            player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 40, 0, true));
+        } else if (currentStamina <= MAX_STAMINA * 0.3) {
+            // ≤30%: Утомление 1
+            player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 40, 0, true));
+        }
+
+        // Блокировка плавания при оцепенении
+        if (player.isPotionActive(GOTEffects.stupor)) {
+            if (player.isInWater()) {
+                player.motionY = 0;
+                player.jumpMovementFactor = 0.0F;
             }
         }
 

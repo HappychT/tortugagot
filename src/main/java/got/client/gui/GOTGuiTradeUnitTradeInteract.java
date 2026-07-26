@@ -28,6 +28,9 @@ public class GOTGuiTradeUnitTradeInteract extends GOTGuiTradeInteract {
 	public void initGui() {
 		super.initGui();
 		buttonHire = new GOTGuiButton(-1, width / 2 - 65, height / 5 * 3 + 50, 130, 20, StatCollector.translateToLocal("got.gui.npc.hire"));
+		if (theEntity instanceof got.common.entity.tutorial.GOTEntityTutorialBartender) {
+			buttonHire.enabled = false;
+		}
 		buttonList.add(buttonHire);
 	}
 }

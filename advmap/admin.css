@@ -1,0 +1,242 @@
+/* ══════════════════════════════════════════════
+   Tortuga Admin Panel — admin.css
+   ══════════════════════════════════════════════ */
+:root {
+  --bg:      #0a0d14;
+  --panel:   #111622;
+  --card:    #181f30;
+  --item:    #1e273d;
+  --hover:   #252f47;
+  --border:  rgba(255,255,255,0.08);
+  --amber:   #d2a555;
+  --amber-lt:#f0cf8e;
+  --amber-glow: rgba(210,165,85,0.2);
+  --danger:  #e05555;
+  --success: #55c882;
+  --blue:    #5a9cf0;
+  --tx:      #d8d4cc;
+  --tx-2:    #8890a5;
+  --tx-3:    #4a5268;
+  --r: 12px; --r-sm: 8px; --r-xs: 5px;
+  --sans: 'Inter', sans-serif;
+  --serif: 'Montserrat', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--sans); background: var(--bg); color: var(--tx); font-size: 13px; }
+button { font-family: var(--sans); cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: var(--sans); }
+
+/* ── Login Screen ─────────────────────────────── */
+#login-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.login-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 340px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.login-logo { font-size: 42px; }
+.login-title { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--amber-lt); }
+.login-sub { font-size: 11px; color: var(--tx-3); letter-spacing: 0.12em; text-transform: uppercase; }
+.login-error { width: 100%; background: rgba(224,85,85,0.1); border: 1px solid rgba(224,85,85,0.3); border-radius: var(--r-sm); padding: 10px 14px; color: var(--danger); font-size: 12px; text-align: center; }
+.login-input {
+  width: 100%; padding: 13px 16px;
+  background: var(--item); border: 1px solid var(--border);
+  border-radius: var(--r-sm); color: var(--tx); font-size: 14px;
+  outline: none; transition: 0.2s;
+}
+.login-input:focus { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-glow); }
+.login-btn {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, rgba(210,165,85,0.2), rgba(210,165,85,0.1));
+  border: 1px solid var(--amber);
+  border-radius: var(--r-sm); color: var(--amber-lt);
+  font-size: 14px; font-weight: 600; font-family: var(--serif);
+  transition: 0.2s;
+}
+.login-btn:hover { background: rgba(210,165,85,0.25); box-shadow: 0 0 20px var(--amber-glow); }
+.login-hint { font-size: 11px; color: var(--tx-3); text-align: center; }
+
+/* ── Admin Header ─────────────────────────────── */
+.adm-header {
+  height: 52px; flex-shrink: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; gap: 20px;
+}
+.adm-logo { font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--amber-lt); flex-shrink: 0; }
+.adm-tabs { display: flex; gap: 4px; }
+.adm-tab {
+  padding: 7px 16px; border-radius: var(--r-sm);
+  font-size: 12.5px; font-weight: 500; color: var(--tx-2);
+  transition: 0.2s;
+}
+.adm-tab:hover { background: var(--hover); color: var(--tx); }
+.adm-tab.active { background: rgba(210,165,85,0.15); color: var(--amber-lt); }
+.adm-logout { margin-left: auto; padding: 7px 16px; border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--tx-3); font-size: 12px; transition: 0.2s; }
+.adm-logout:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── Layout ───────────────────────────────────── */
+#admin-panel { display: flex; flex-direction: column; height: 100%; }
+.adm-tab-content { display: none; flex: 1; overflow: hidden; }
+.adm-tab-content.active { display: flex; flex-direction: column; }
+.adm-layout { display: flex; flex: 1; overflow: hidden; }
+
+.adm-side {
+  width: 320px; flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px;
+}
+.adm-side::-webkit-scrollbar { width: 3px; }
+.adm-side::-webkit-scrollbar-thumb { background: rgba(210,165,85,0.3); border-radius: 2px; }
+
+.adm-map { flex: 1; background: var(--map-bg, #0f1c2d); }
+.adm-map .leaflet-container { background: var(--map-bg, #0f1c2d) !important; }
+
+/* ── Cards ───────────────────────────────────── */
+.adm-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; }
+.adm-card-title { font-family: var(--serif); font-size: 13px; font-weight: 700; color: var(--amber-lt); margin-bottom: 12px; }
+.adm-hint { font-size: 11.5px; color: var(--tx-3); line-height: 1.5; margin-bottom: 10px; }
+.adm-readonly { font-size: 12px; color: var(--tx-3); padding: 6px 8px; background: var(--item); border-radius: var(--r-xs); }
+
+/* Forms */
+.adm-form-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.adm-form-row label { font-size: 11px; color: var(--tx-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.adm-form-row input, .adm-form-row select {
+  padding: 9px 11px; background: var(--item); border: 1px solid var(--border);
+  border-radius: var(--r-xs); color: var(--tx); font-size: 13px; outline: none; transition: 0.2s;
+}
+.adm-form-row input:focus, .adm-form-row select:focus { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-glow); }
+.adm-form-row select { appearance: none; cursor: pointer; }
+
+.pos-row { display: flex; gap: 6px; }
+.pos-row input { flex: 1; }
+.pick-hint { font-size: 11px; color: var(--amber); padding: 7px; text-align: center; background: var(--amber-glow); border-radius: var(--r-xs); animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+/* Buttons */
+.adm-btn {
+  padding: 9px 16px; border-radius: var(--r-sm);
+  background: rgba(210,165,85,0.12); border: 1px solid var(--amber);
+  color: var(--amber-lt); font-size: 12.5px; font-weight: 600;
+  transition: 0.2s; cursor: pointer;
+}
+.adm-btn:hover { background: rgba(210,165,85,0.22); box-shadow: 0 0 14px var(--amber-glow); }
+.adm-btn-sm { padding: 6px 10px; font-size: 11px; border-radius: var(--r-xs); background: var(--item); border: 1px solid var(--border); color: var(--tx-2); transition: 0.2s; }
+.adm-btn-sm:hover { border-color: var(--amber); color: var(--amber); }
+.adm-btn-danger { background: rgba(224,85,85,0.1); border-color: var(--danger); color: var(--danger); }
+.adm-btn-danger:hover { background: rgba(224,85,85,0.2); box-shadow: 0 0 14px rgba(224,85,85,0.2); }
+.adm-btn-secondary { background: transparent; border-color: var(--border); color: var(--tx-2); }
+.adm-btn-secondary:hover { border-color: var(--tx-2); color: var(--tx); }
+.adm-btn-row { display: flex; gap: 8px; margin-top: 6px; }
+
+/* Point list */
+.pt-list { display: flex; flex-direction: column; gap: 2px; max-height: 300px; overflow-y: auto; }
+.pt-list::-webkit-scrollbar { width: 3px; }
+.pt-list::-webkit-scrollbar-thumb { background: rgba(210,165,85,0.3); border-radius: 2px; }
+.pt-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: var(--r-xs); cursor: pointer; transition: 0.15s;
+}
+.pt-item:hover { background: var(--hover); }
+.pt-item.selected { background: rgba(210,165,85,0.1); }
+.pt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pt-name { font-size: 12.5px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-type { font-size: 10px; color: var(--tx-3); flex-shrink: 0; }
+
+/* Territory list */
+.terr-status { font-size: 12px; color: var(--amber); padding: 8px; text-align: center; background: var(--amber-glow); border-radius: var(--r-xs); margin-bottom: 8px; }
+.terr-list { display: flex; flex-direction: column; gap: 6px; }
+.terr-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: var(--item); border-radius: var(--r-xs);
+}
+.terr-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.terr-name { flex: 1; font-size: 12.5px; }
+.terr-del { color: var(--tx-3); font-size: 12px; padding: 2px 6px; border-radius: 3px; transition: 0.15s; }
+.terr-del:hover { color: var(--danger); background: rgba(224,85,85,0.1); }
+
+/* Sea routes list */
+.sea-list { display: flex; flex-direction: column; gap: 6px; }
+.sea-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: var(--item); border-radius: var(--r-xs); font-size: 12.5px;
+}
+.sea-ports { flex: 1; color: var(--blue); }
+.sea-del { color: var(--tx-3); font-size: 12px; padding: 2px 6px; border-radius: 3px; transition: 0.15s; }
+.sea-del:hover { color: var(--danger); background: rgba(224,85,85,0.1); }
+
+/* Export page */
+.adm-export-page { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 30px; overflow-y: auto; }
+.export-card { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 16px; }
+.export-block { padding: 16px; background: var(--item); border-radius: var(--r-sm); display: flex; flex-direction: column; gap: 8px; }
+.export-block.export-danger { border: 1px solid rgba(224,85,85,0.2); }
+.export-label { font-weight: 700; color: var(--tx); font-size: 13.5px; }
+.export-desc { font-size: 12px; color: var(--tx-2); line-height: 1.5; }
+
+/* Territory tooltip */
+.leaflet-tooltip.territory-tooltip { background: rgba(20,24,36,0.92); border: 1px solid rgba(210,165,85,0.3); color: var(--tx); font-family: var(--sans); }
+
+/* Remove outline/focus box on clicked polygons and SVG elements */
+path.leaflet-interactive:focus, path.leaflet-interactive:focus-visible, path.leaflet-interactive,
+svg:focus, svg:focus-visible, .leaflet-interactive:focus, .no-outline:focus, .no-outline {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* GPU Hardware Acceleration for ultra-smooth 60+ FPS map panning & zooming in admin panel */
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane,
+.leaflet-image-layer,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-interactive {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+.leaflet-image-layer {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Terrain & Factions mode switch and badges */
+.terr-mode-toggle button {
+  transition: all 0.2s ease;
+  color: var(--tx-2);
+}
+.terr-mode-toggle button.active {
+  background: var(--gold);
+  color: #000;
+  box-shadow: 0 0 10px rgba(210,165,85,0.4);
+}
+.terr-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.terr-badge-swamp { background: rgba(165,214,167,0.15); color: #a5d6a7; border: 1px solid rgba(165,214,167,0.3); }
+.terr-badge-mountain { background: rgba(176,190,197,0.15); color: #b0bec5; border: 1px solid rgba(176,190,197,0.3); }
+.terr-badge-hills { background: rgba(255,224,130,0.15); color: #ffe082; border: 1px solid rgba(255,224,130,0.3); }
+.terr-badge-forest { background: rgba(129,199,132,0.15); color: #81c784; border: 1px solid rgba(129,199,132,0.3); }
+.terr-badge-ocean { background: rgba(100,181,246,0.15); color: #64b5f6; border: 1px solid rgba(100,181,246,0.3); }
+

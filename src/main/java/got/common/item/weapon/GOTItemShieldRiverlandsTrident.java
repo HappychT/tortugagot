@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.faction.GOTFaction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,5 +18,10 @@ public class GOTItemShieldRiverlandsTrident extends GOTItemShieldPike implements
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean show) {
         list.add(EnumChatFormatting.DARK_AQUA + StatCollector.translateToLocalFormatted("got.faction.RIVERLANDS.name"));
+    }
+
+    @Override
+    public GOTFaction getFaction() {
+        return GOTFaction.RIVERLANDS;
     }
 }

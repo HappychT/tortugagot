@@ -20,12 +20,20 @@ public class ItemPoisonedSandBlade extends GOTItemPolearm {
         setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        boolean result = super.hitEntity(stack, target, attacker);
+        if (!target.isPotionActive(GOTEffects.antiEffect.id)) {
+            target.addPotionEffect(new PotionEffect(GOTEffects.neurotoxin.id, 200, 0));
+        }
+        return result;
+    }
 
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean advanced) {
         super.addInformation(stack, player, list, advanced);
         list.add("");
-        list.add(EnumChatFormatting.GREEN + "Нейротоксин" + EnumChatFormatting.WHITE + " – снижает регенерацию врага при ударе.");
+        list.add(EnumChatFormatting.GREEN + "Нейротоксин" + EnumChatFormatting.WHITE + " – снижает регенерацию врага на 10 сек.");
     }
 }

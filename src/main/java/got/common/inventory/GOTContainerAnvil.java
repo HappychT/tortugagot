@@ -649,7 +649,11 @@ public class GOTContainerAnvil extends Container {
                     if (!combinerMod.isBeneficial()) {
                         continue;
                     }
-                    combineCost = 20;
+                    if (this.isTrader) {
+                        combineCost = 20;
+                    } else {
+                        combineCost = 2;
+                    }
                 }
                 GOTEnchantmentHelper.setEnchantList(inputCopy, outputMods);
                 if(outputMods.contains(GOTEnchantment.valyrianSeal)) {
@@ -745,16 +749,23 @@ public class GOTContainerAnvil extends Container {
                 } else if (repairing) {
                     ++nextAnvilCost;
                 }
-                nextAnvilCost = Math.max(nextAnvilCost, 0);
+                        nextAnvilCost = Math.max(nextAnvilCost, 0);
                 if (nextAnvilCost > 0) {
                     GOTEnchantmentHelper.setAnvilCost(inputCopy, nextAnvilCost);
                 }
             }
             if (GOTEnchantmentHelper.isReforgeable(inputItem)) {
                 ItemStack reforgeCopy;
-                this.reforgeCost = 20;
-                if (inputItem.getItem() instanceof ItemArmor) {
-                    this.reforgeCost = 30;
+                if (this.isTrader) {
+                    this.reforgeCost = 200;
+                    if (inputItem.getItem() instanceof ItemArmor) {
+                        this.reforgeCost = 300;
+                    }
+                } else {
+                    this.reforgeCost = 2;
+                    if (inputItem.getItem() instanceof ItemArmor) {
+                        this.reforgeCost = 3;
+                    }
                 }
                 if (inputItem.isItemStackDamageable() && (oneItemRepair = Math.min((reforgeCopy = inputItem.copy()).getItemDamageForDisplay(), reforgeCopy.getMaxDamage() / 4)) > 0) {
                     int usedMaterials = 0;
@@ -766,7 +777,11 @@ public class GOTContainerAnvil extends Container {
                     }
                     this.reforgeCost += usedMaterials;
                 }
-                this.engraveOwnerCost = 20;
+                if (this.isTrader) {
+                    this.engraveOwnerCost = 20;
+                } else {
+                    this.engraveOwnerCost = 1;
+                }
             } else {
                 this.reforgeCost = 0;
                 this.engraveOwnerCost = 0;

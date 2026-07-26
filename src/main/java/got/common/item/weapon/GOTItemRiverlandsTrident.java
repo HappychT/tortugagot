@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import got.common.faction.GOTFaction;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -26,5 +27,10 @@ public class GOTItemRiverlandsTrident extends GOTItemTrident implements GOTFacti
     @Override
     public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
         return itemstack;
+    }
+
+    @Override
+    public GOTFaction getFaction() {
+        return GOTFaction.RIVERLANDS;
     }
 }

@@ -2,6 +2,8 @@ package got.common.handlers;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import got.common.database.GOTEffects;
 import got.common.database.GOTRegistry;
 import got.rome.ExtendedPlayer;
@@ -40,7 +42,7 @@ public class AttackHandler {
        // }
 
 
-   // }
+
     @SubscribeEvent
     public void onEntityConstructing(EntityEvent.EntityConstructing event) {
         if (event.entity instanceof EntityPlayer) {

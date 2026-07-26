@@ -19,6 +19,12 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
     private double previousPosX; // New field for previous X position
     private double previousPosZ; // New field for previous Z position
     private int bounceCooldown; // New field for bounce cooldown
+    
+    // Tutorial fields
+    private boolean isTutorialActive;
+    private int tutorialStage;
+    private int tutorialProgress;
+    private boolean tutorialReplay;
 
     public ExtendedPlayer(EntityPlayer player) {
         this.player = player;
@@ -29,6 +35,9 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         this.previousPosX = player.posX; // Initialize the previous X position
         this.previousPosZ = player.posZ; // Initialize the previous Z position
         this.bounceCooldown = 0; // Initialize bounce cooldown
+        this.isTutorialActive = false;
+        this.tutorialStage = 0;
+        this.tutorialProgress = 0;
     }
 
     public static void register(EntityPlayer player) {
@@ -49,6 +58,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         properties.setDouble("previousPosZ", this.previousPosZ); // Save the previous Z position
         properties.setInteger("bounceCooldown", this.bounceCooldown); // Save bounce cooldown
         properties.setInteger("secondBreathCooldown", this.secondBreathCooldown);
+        properties.setBoolean("isTutorialActive", this.isTutorialActive);
+        properties.setInteger("tutorialStage", this.tutorialStage);
+        properties.setInteger("tutorialProgress", this.tutorialProgress);
+        properties.setBoolean("tutorialReplay", this.tutorialReplay);
         compound.setTag(EXT_PROP_NAME, properties);
     }
 
@@ -62,6 +75,10 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
         this.previousPosZ = properties.getDouble("previousPosZ"); // Load the previous Z position
         this.bounceCooldown = properties.getInteger("bounceCooldown"); // Load bounce cooldown
         this.secondBreathCooldown = properties.getInteger("secondBreathCooldown");
+        this.isTutorialActive = properties.getBoolean("isTutorialActive");
+        this.tutorialStage = properties.getInteger("tutorialStage");
+        this.tutorialProgress = properties.getInteger("tutorialProgress");
+        this.tutorialReplay = properties.getBoolean("tutorialReplay");
     }
 
     @Override
@@ -122,5 +139,37 @@ public class ExtendedPlayer implements IExtendedEntityProperties {
 
     public void setBounceCooldown(int bounceCooldown) {
         this.bounceCooldown = bounceCooldown;
+    }
+
+    public boolean isTutorialActive() {
+        return isTutorialActive;
+    }
+
+    public void setTutorialActive(boolean tutorialActive) {
+        this.isTutorialActive = tutorialActive;
+    }
+
+    public int getTutorialStage() {
+        return tutorialStage;
+    }
+
+    public void setTutorialStage(int tutorialStage) {
+        this.tutorialStage = tutorialStage;
+    }
+
+    public int getTutorialProgress() {
+        return tutorialProgress;
+    }
+
+    public void setTutorialProgress(int tutorialProgress) {
+        this.tutorialProgress = tutorialProgress;
+    }
+
+    public boolean isTutorialReplay() {
+        return tutorialReplay;
+    }
+
+    public void setTutorialReplay(boolean tutorialReplay) {
+        this.tutorialReplay = tutorialReplay;
     }
 }

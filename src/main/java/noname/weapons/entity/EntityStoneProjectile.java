@@ -1,5 +1,6 @@
 package noname.weapons.entity;
 
+import got.common.block.factionblocks.BlockStructureHeart;
 import noname.weapons.config.WeaponsConfig;
 import noname.weapons.world.BlockDamageStorage;
 import net.minecraft.block.Block;
@@ -73,6 +74,12 @@ public class EntityStoneProjectile extends EntityThrowable {
 
                             Block block = this.worldObj.getBlock(currentX, currentY, currentZ);
                             if (block == null || block == Blocks.air) {
+                                continue;
+                            }
+
+                            if (isProtectedSiegeBlock(this.worldObj, currentX, currentY, currentZ)) {
+                                BlockDamageStorage.removeBlockDamage(this.worldObj, currentX, currentY, currentZ);
+                                clearCracksToBlock(this.worldObj, currentX, currentY, currentZ);
                                 continue;
                             }
 
@@ -188,6 +195,14 @@ public class EntityStoneProjectile extends EntityThrowable {
         world.destroyBlockInWorldPartially(entityId, x, y, z, crackProgress);
     }
 
+    public static void clearCracksToBlock(World world, int x, int y, int z) {
+        world.destroyBlockInWorldPartially(getCrackEntityId(x, y, z), x, y, z, -1);
+    }
+
+    public static boolean isProtectedSiegeBlock(World world, int x, int y, int z) {
+        return world.getBlock(x, y, z) instanceof BlockStructureHeart;
+    }
+
     
 
 
@@ -262,6 +277,17 @@ public class EntityStoneProjectile extends EntityThrowable {
             return 3.0F * WeaponsConfig.baseDamage;
         }
         return (harvestLevel + 1) * WeaponsConfig.damagePerHarvestLevel;
+    }
+
+    private static int getCrackEntityId(int x, int y, int z) {
+        long hash = ((long)x << 20) ^ ((long)y << 10) ^ (long)z;
+        int entityId = -(int)(hash & 0x7FFFFFFF);
+
+        if (entityId == 0 || entityId == -1) {
+            entityId = -(Math.abs(x) % 10000 * 10000 + Math.abs(y) % 256 * 256 + Math.abs(z) % 10000) - 2;
+        }
+
+        return entityId;
     }
 
     @Override

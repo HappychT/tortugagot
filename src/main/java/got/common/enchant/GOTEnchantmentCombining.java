@@ -11,7 +11,7 @@ public class GOTEnchantmentCombining {
 
 	public static void combine(GOTEnchantment in, GOTEnchantment out, int cost) {
 		if (!in.hasTemplateItem() || !out.hasTemplateItem()) {
-			throw new IllegalArgumentException("Cannot create a modifier combining recipe for modifiers which lack scroll items!");
+			return;
 		}
 		if (cost < 0) {
 			throw new IllegalArgumentException("Cost must not be negative!");

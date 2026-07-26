@@ -7,7 +7,7 @@ public class GOTItemLegendaryHammer extends GOTItemHammer {
 	public GOTItemLegendaryHammer(Item.ToolMaterial material) {
 		super(material);
 		setMaxDamage(1500);
-		gotWeaponDamage = 12.0f;
+		gotWeaponDamage = 11.0f;
 		setCreativeTab(GOTCreativeTabs.tabStory);
 	}
 }

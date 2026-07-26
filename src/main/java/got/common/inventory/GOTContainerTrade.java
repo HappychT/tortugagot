@@ -50,7 +50,7 @@ public class GOTContainerTrade extends Container {
 
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return false;
+		return theTraderNPC != null && theTraderNPC.isEntityAlive() && entityplayer.getDistanceSqToEntity(theTraderNPC) <= 64.0D;
 	}
 
 	@Override

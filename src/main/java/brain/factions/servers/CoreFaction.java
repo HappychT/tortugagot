@@ -6,6 +6,7 @@ import brain.factions.arenas.CommandSaveArena;
 import brain.factions.client.PacketStructureGUISyncHandler;
 import brain.factions.network.*;
 import brain.factions.structures.FactionStructureManager;
+import brain.factions.Annot;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;

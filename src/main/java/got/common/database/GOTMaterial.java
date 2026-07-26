@@ -85,8 +85,8 @@ public class GOTMaterial {
 	public static ToolMaterial ICE_TOOL = EnumHelper.addToolMaterial("GOT_ICE_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial OBSIDIAN_TOOL = EnumHelper.addToolMaterial("GOT_OBSIDIAN_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial SILVER_TOOL = EnumHelper.addToolMaterial("GOT_SILVER_TOOL", 2, 625, 6.0F, 2.0F, 14);
-	public static ToolMaterial VALYRIAN_TOOL = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL", 4, 6000, 9.0F, 4.0F, 8);
-	public static ToolMaterial VALYRIAN_TOOL2 = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL2", 4, 6000, 9.0F, 3.0F, 8);
+	public static ToolMaterial VALYRIAN_TOOL = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL", 4, 6000, 9.0F, 3.0F, 8);
+	public static ToolMaterial VALYRIAN_TOOL2 = EnumHelper.addToolMaterial("GOT_VALYRIAN_TOOL2", 4, 6000, 9.0F, 2.0F, 8);
 	public static ToolMaterial ASSHAI_TOOL = EnumHelper.addToolMaterial("GOT_ASSHAI_TOOL", 2, 625, 6.0F, 2.0F, 14);
 	public static ToolMaterial THIEF_TOOL = EnumHelper.addToolMaterial("GOT_THIEF_TOOL", 2, 625, 6.0F, 2.0F, 14);
     public static ToolMaterial CORSAIR = EnumHelper.addToolMaterial("GOT_CORSAIR", 2, 625, 6.0F, 4.0F, 14);

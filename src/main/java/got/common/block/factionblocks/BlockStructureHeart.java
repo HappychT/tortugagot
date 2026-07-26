@@ -18,7 +18,6 @@ import got.common.faction.GOTFaction;
 import got.common.faction.GOTFactionRelations;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -64,6 +63,13 @@ public class BlockStructureHeart extends BlockContainer {
     }
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+        if (got.GOT.proxy.isTutorialStage9(player)) {
+            if (world.isRemote) {
+                got.GOT.proxy.openGOTGuiStructureHeart();
+            }
+            return true;
+        }
+
         if (!world.isRemote) {
             FactionStructureSlot slot = FactionStructureManager.getStructureNearby(x, y, z);
             if (slot == null) {
@@ -125,7 +131,7 @@ public class BlockStructureHeart extends BlockContainer {
             CoreFaction.brainChannel.sendTo(new PacketStructureGUISync(x, y, z, slot, availableStructures), (EntityPlayerMP) player);
 
         } else if (!Annot.SERVER) {
-            Minecraft.getMinecraft().displayGuiScreen(new got.client.gui.faction.GuiStructureBlock(x, y, z, null));
+            got.GOT.proxy.openGuiStructureBlock(x, y, z);
         }
         return true;
     }

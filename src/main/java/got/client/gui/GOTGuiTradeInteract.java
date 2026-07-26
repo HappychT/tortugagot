@@ -37,5 +37,10 @@ public class GOTGuiTradeInteract extends GOTGuiNPCInteract {
 			buttonSmith = new GOTGuiButton(3, width / 2 + 40, height / 5 * 3, 60, 20, StatCollector.translateToLocal("got.gui.npc.smith"));
 			buttonList.add(buttonSmith);
 		}
+		if (theEntity instanceof got.common.entity.tutorial.GOTEntityTutorialBartender) {
+			buttonTalk.enabled = false;
+			buttonExchange.enabled = false;
+			if (buttonSmith != null) buttonSmith.enabled = false;
+		}
 	}
 }

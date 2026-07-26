@@ -1,8 +1,10 @@
 package got.common.tileentity;
 
 import cpw.mods.fml.relauncher.*;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.network.*;
@@ -111,6 +113,55 @@ public class GOTTileEntityArmorStand extends TileEntity implements IInventory {
 	public void openInventory() {
 	}
 
+	public int getSlotForItem(ItemStack itemstack, EntityPlayer entityplayer) {
+		if (itemstack == null) {
+			return -1;
+		}
+		Item item = itemstack.getItem();
+		for (int slot = 0; slot < inventory.length; ++slot) {
+			if (item.isValidArmor(itemstack, slot, entityplayer)) {
+				return slot;
+			}
+		}
+		return -1;
+	}
+
+	public boolean tryEquipFromPlayer(EntityPlayer entityplayer) {
+		ItemStack heldItem = entityplayer.getHeldItem();
+		if (heldItem == null) {
+			return false;
+		}
+		int slot = getSlotForItem(heldItem, entityplayer);
+		if (slot < 0) {
+			return false;
+		}
+		ItemStack standItem = getStackInSlot(slot);
+		if (standItem == null) {
+			ItemStack itemForStand;
+			if (entityplayer.capabilities.isCreativeMode) {
+				itemForStand = heldItem.copy();
+				itemForStand.stackSize = 1;
+			} else if (heldItem.stackSize == 1) {
+				itemForStand = heldItem;
+				entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, null);
+			} else {
+				itemForStand = heldItem.splitStack(1);
+			}
+			setInventorySlotContents(slot, itemForStand);
+			syncPlayerInventory(entityplayer);
+			return true;
+		}
+		if (heldItem.stackSize != 1) {
+			return false;
+		}
+		ItemStack playerItem = heldItem.copy();
+		playerItem.stackSize = 1;
+		setInventorySlotContents(slot, playerItem);
+		entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, standItem);
+		syncPlayerInventory(entityplayer);
+		return true;
+	}
+
 	public void readArmorStandFromNBT(NBTTagCompound nbt) {
 		NBTTagList items = nbt.getTagList("Items", 10);
 		inventory = new ItemStack[getSizeInventory()];
@@ -148,6 +199,13 @@ public class GOTTileEntityArmorStand extends TileEntity implements IInventory {
 	@Override
 	public void updateEntity() {
 		++ticksExisted;
+	}
+
+	private void syncPlayerInventory(EntityPlayer entityplayer) {
+		entityplayer.inventory.markDirty();
+		if (entityplayer instanceof EntityPlayerMP) {
+			((EntityPlayerMP) entityplayer).inventoryContainer.detectAndSendChanges();
+		}
 	}
 
 	public void writeArmorStandToNBT(NBTTagCompound nbt) {

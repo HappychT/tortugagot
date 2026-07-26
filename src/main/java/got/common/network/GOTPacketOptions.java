@@ -53,6 +53,9 @@ public class GOTPacketOptions implements IMessage {
 				case 5:
 					GOTLevelData.getData(entityplayer).setEnableConquestKills(enable);
 					break;
+				case 6:
+					GOTLevelData.getData(entityplayer).setAutoRespawn(enable);
+					break;
 				case 9:
 					GOTLevelData.getData(entityplayer).setTableSwitched(enable);
 					break;

@@ -3,7 +3,11 @@ package got.common.itemreg;
 import cpw.mods.fml.common.registry.GameRegistry;
 import got.common.block.base.BaseDecorBlock;
 import got.common.database.GOTCreativeTabs;
+import got.common.database.GOTMaterial;
 import got.common.decorations.DecorationsRegister;
+import got.common.item.other.GOTItemCustomSetArmor;
+import got.common.item.weapon.GOTItemBow;
+import got.common.item.weapon.GOTItemLegendarySword;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 
@@ -54,6 +58,112 @@ public class GOTItems {
     public static Block WOWCandle2 = new BaseDecorBlock(0.3F,0.4F,0.3F).setBlockName("got:CandleDouble").setCreativeTab(GOTCreativeTabs.tabUtil);
     public static Block WOWCandle3 = new BaseDecorBlock(0.4F,0.4F,0.4F).setBlockName("got:CandleTriple").setCreativeTab(GOTCreativeTabs.tabUtil);
     public static Block WOWCandle4 = new BaseDecorBlock(0.5F,0.4F,0.5F).setBlockName("got:CandleQuad").setCreativeTab(GOTCreativeTabs.tabUtil);
+
+    public static Item ygritteBow = new GOTItemBow(GOTMaterial.WOOD, 1.3, GOTCreativeTabs.tabStory)
+        .setDrawTime(25)
+        .setMaxDamage(777)
+        .setUnlocalizedName("got:ygritte_bow");
+    public static Item khalDrogoArakh = new GOTItemLegendarySword(GOTMaterial.VALYRIAN_TOOL)
+        .addWeaponDamage(-1.0f)
+        .setUnlocalizedName("got:khal_drogo_arakh");
+
+    public static Item starksHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "starks", "starks", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:starks_helmet");
+    public static Item starksChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "starks", "starks", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:starks_chestplate");
+    public static Item starksLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "starks", "starks", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:starks_leggings");
+    public static Item starksBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "starks", "starks", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:starks_boots");
+
+    public static Item nightKingHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "night_king", "night_king", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:night_king_helmet");
+    public static Item nightKingChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "night_king", "night_king", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:night_king_chestplate");
+    public static Item nightKingLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "night_king", "night_king", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:night_king_leggings");
+    public static Item nightKingBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "night_king", "night_king", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:night_king_boots");
+
+    public static Item mountainHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "mountain", "mountain", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:mountain_helmet");
+    public static Item mountainChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "mountain", "mountain", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:mountain_chestplate");
+    public static Item mountainLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "mountain", "mountain", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:mountain_leggings");
+    public static Item mountainBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "mountain", "mountain", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:mountain_boots");
+
+    public static Item houndChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "hound", "hound", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:sandor_chestplate");
+    public static Item houndLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "hound", "hound", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:sandor_leggings");
+    public static Item houndBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "hound", "hound", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:sandor_boots");
+
+    public static Item lannisterHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "westerlands", "lannister", "lannister", GOTCreativeTabs.tabStory, false)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:lannister_helmet");
+    public static Item lannisterChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "lannister", "lannister", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:lannister_chestplate");
+    public static Item lannisterLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "lannister", "lannister", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:lannister_leggings");
+    public static Item lannisterBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "lannister", "lannister", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:lannister_boots");
+
+    public static Item bronnHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "bronn", "bronn", GOTCreativeTabs.tabStory, true)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:bronn_helmet");
+    public static Item bronnChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "bronn", "bronn", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:bronn_chestplate");
+    public static Item bronnLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "bronn", "bronn", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:bronn_leggings");
+    public static Item bronnBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "bronn", "bronn", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:bronn_boots");
+
+    public static Item brienneHelmet = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 0, "brienne", "brienne", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:brienne_helmet");
+    public static Item brienneChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "brienne", "brienne", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:brienne_chestplate");
+    public static Item brienneLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "brienne", "brienne", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:brienne_leggings");
+    public static Item brienneBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "brienne", "brienne", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:brienne_boots");
+
+    public static Item robertChestplate = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 1, "king_robberts", "king_robberts", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:robert_chestplate");
+    public static Item robertLeggings = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 2, "king_robberts", "king_robberts", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:robert_leggings");
+    public static Item robertBoots = new GOTItemCustomSetArmor(GOTMaterial.BLACKFYRE, 3, "king_robberts", "king_robberts", GOTCreativeTabs.tabStory)
+        .setMaxDamage(7000)
+        .setUnlocalizedName("got:robert_boots");
 
 
 

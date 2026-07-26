@@ -604,6 +604,12 @@ public class PacketFactionManage implements IMessage {
                     player.addChatMessage(new ChatComponentText("§cЛидера нельзя выгнать из фракции!"));
                     return;
                 }
+                
+                got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+                if (ext != null && ext.isTutorialActive()) {
+                    player.addChatMessage(new ChatComponentText("§cВы не можете выгонять игроков во время обучения."));
+                    return;
+                }
 
                 if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_KICK_MEMBERS)) {
                     player.addChatMessage(new ChatComponentText("§cУ вас нет прав выгонять игроков."));
@@ -655,6 +661,13 @@ public class PacketFactionManage implements IMessage {
                     player.addChatMessage(new ChatComponentText("§cУ вас нет прав назначать титулы."));
                     return;
                 }
+                
+                got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+                if (ext != null && ext.isTutorialActive() && !targetName.equals(player.getCommandSenderName())) {
+                    player.addChatMessage(new ChatComponentText("§cВы не можете изменять титулы других игроков во время обучения."));
+                    return;
+                }
+                
                 String titleName = actionData[1];
                 Faction.PlayerData pData = faction.getPlayers().get(targetName);
                 if (pData != null && faction.getTitles().containsKey(titleName)) {

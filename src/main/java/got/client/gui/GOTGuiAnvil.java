@@ -165,7 +165,21 @@ public class GOTGuiAnvil extends GuiContainer {
 		buttonReforge.visible = buttonReforge.enabled = canReforge;
 		buttonEngraveOwner.enabled = canEngrave && theAnvil.canEngraveNewOwner(inputItem, mc.thePlayer);
 		buttonEngraveOwner.visible = buttonEngraveOwner.enabled;
+		
+        got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(mc.thePlayer);
+        if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
+            int prog = ext.getTutorialProgress();
+            if (prog == 4) {
+                // GUI opened
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(mc.thePlayer, 5);
+            } else if (prog == 5 && theAnvil.invInput.getStackInSlot(0) != null && theAnvil.invInput.getStackInSlot(1) != null && theAnvil.invInput.getStackInSlot(2) != null) {
+                // Items placed in slots (left, middle, right-top)
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(mc.thePlayer, 6);
+            }
+        }
+        
 		super.drawScreen(i, j, f);
+		brain.tutorial.client.TutorialGuiBlacksmithHighlight.drawAnvilHighlight(this);
 		if (buttonReforge.visible && buttonReforge.func_146115_a()) {
 			z = zLevel;
 			tooltip = StatCollector.translateToLocal("got.container.anvil.reforge");
@@ -224,6 +238,7 @@ public class GOTGuiAnvil extends GuiContainer {
 
 	@Override
 	public void mouseClicked(int i, int j, int k) {
+		if (brain.tutorial.client.TutorialGuiBlacksmithHighlight.handleAnvilMouseClick(this, i, j, k)) return;
 		super.mouseClicked(i, j, k);
 		textFieldRename.mouseClicked(i, j, k);
 	}

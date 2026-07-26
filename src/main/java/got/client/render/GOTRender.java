@@ -277,5 +277,14 @@ public class GOTRender {
         renders.put(GOTEntityToxinBomb.class, new GOTRenderLingeringPotion());
         renders.put(GOTEntitySmoke.class, new GOTRenderLingeringPotion());
         renders.put(GOTEntityBattleRam.class, new GOTRenderBattleRam());
+
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialDrunkard.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialCaptain.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialBartender.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialBoatswain.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialDummy.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialSailor.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialMutineer.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialJaqen.class, new GOTRenderFactionNPC("westeros/westeros"));
     }
 }
