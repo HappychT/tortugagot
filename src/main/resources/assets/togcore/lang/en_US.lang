@@ -1,0 +1,13 @@
+item.togcore:mastery_point_1.name=Mastery Token (1)
+item.togcore:mastery_point_10.name=Mastery Token (10)
+item.togcore:mastery_point_100.name=Mastery Token (100)
+item.togcore:steel.name=Steel
+item.togcore:steel_plate.name=Steel Plate
+item.togcore:hardened_steel_plate.name=Hardened Steel Plate
+item.togcore:mastery_point.desc=Grants %s mastery points when used.
+item.togcore:mastery_point.owner=Owner: %s
+item.togcore:mastery_point.unbound=Owner: unbound
+togcore.chat.masteryPointsAdded=Gained %s mastery points. New balance: %s.
+togcore.chat.masteryItemNoDrop=Failed action: drop a mastery point item. Reason: the item is bound to its owner and cannot be transferred. Required technology: none.
+togcore.chat.masteryItemNoTransfer=Failed action: transfer a mastery point item. Reason: the item is bound to its owner and cannot be placed in shared storage or trades. Required technology: none.
+togcore.chat.masteryItemWrongOwner=Failed action: use a mastery point item. Reason: the item is bound to %s. Required technology: none.

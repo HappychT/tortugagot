@@ -4,13 +4,16 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="corretto-1.8" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />
+        <option name="serviceDirectoryPath" value="$PROJECT_DIR$/.gradle-user-home" />
       </GradleProjectSettings>
     </option>
   </component>

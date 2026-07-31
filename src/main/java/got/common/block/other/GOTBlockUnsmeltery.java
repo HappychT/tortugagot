@@ -2,6 +2,8 @@ package got.common.block.other;
 
 import java.util.Random;
 
+import com.tortugagot.togcore.technology.TOGTechnologyLocks;
+import com.tortugagot.togcore.technology.TOGTechnologyNotifier;
 import cpw.mods.fml.relauncher.*;
 import got.GOT;
 import got.common.tileentity.GOTTileEntityUnsmeltery;
@@ -43,6 +45,14 @@ public class GOTBlockUnsmeltery extends GOTBlockForgeBase {
 	@Override
 	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer entityplayer, int side, float f, float f1, float f2) {
 		if (!world.isRemote) {
+			if (!TOGTechnologyLocks.has(entityplayer, TOGTechnologyLocks.SMELTER)) {
+				TOGTechnologyNotifier.notifyBlocked(entityplayer, "unsmeltery:open", "использовать плавильню", "не открыта технология для использования плавильни", TOGTechnologyLocks.SMELTER);
+				return true;
+			}
+			TileEntity tileEntity = world.getTileEntity(i, j, k);
+			if (tileEntity instanceof GOTTileEntityUnsmeltery) {
+				((GOTTileEntityUnsmeltery) tileEntity).setLastInteractingPlayer(entityplayer);
+			}
 			entityplayer.openGui(GOT.instance, 38, world, i, j, k);
 		}
 		return true;

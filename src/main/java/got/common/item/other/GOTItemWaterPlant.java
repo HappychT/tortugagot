@@ -1,5 +1,6 @@
 package got.common.item.other;
 
+import com.tortugagot.togcore.technology.TOGFarmingTechnology;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,11 +31,16 @@ public class GOTItemWaterPlant extends ItemBlock {
 			}
 			Block block = itemblock.field_150939_a;
 			int meta = itemblock.getMetadata(itemstack.getItemDamage());
-			if (world.getBlock(i, j, k).getMaterial() == Material.water && world.getBlockMetadata(i, j, k) == 0 && world.isAirBlock(i, j + 1, k) && block.canPlaceBlockAt(world, i, j + 1, k) && itemblock.placeBlockAt(itemstack, entityplayer, world, i, j + 1, k, 1, 0.5f, 0.5f, 0.5f, meta)) {
-				Block.SoundType stepsound = block.stepSound;
-				world.playSoundEffect(i + 0.5f, j + 0.5f, k + 0.5f, stepsound.func_150496_b(), (stepsound.getVolume() + 1.0f) / 2.0f, stepsound.getPitch() * 0.8f);
-				if (!entityplayer.capabilities.isCreativeMode) {
-					--itemstack.stackSize;
+			if (world.getBlock(i, j, k).getMaterial() == Material.water && world.getBlockMetadata(i, j, k) == 0 && world.isAirBlock(i, j + 1, k) && block.canPlaceBlockAt(world, i, j + 1, k)) {
+				if (TOGFarmingTechnology.denyIfPlantingLocked(entityplayer, itemstack, world, i, j, k)) {
+					return itemstack;
+				}
+				if (itemblock.placeBlockAt(itemstack, entityplayer, world, i, j + 1, k, 1, 0.5f, 0.5f, 0.5f, meta)) {
+					Block.SoundType stepsound = block.stepSound;
+					world.playSoundEffect(i + 0.5f, j + 0.5f, k + 0.5f, stepsound.func_150496_b(), (stepsound.getVolume() + 1.0f) / 2.0f, stepsound.getPitch() * 0.8f);
+					if (!entityplayer.capabilities.isCreativeMode) {
+						--itemstack.stackSize;
+					}
 				}
 			}
 		}

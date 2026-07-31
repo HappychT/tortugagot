@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Multimap;
 
+import com.tortugagot.togcore.technology.TOGWeaponTechnology;
 import got.GOT;
 import got.common.database.GOTRegistry;
 import got.common.handlers.PlayerParryData;
@@ -181,6 +182,9 @@ public class GOTWeaponStats {
 			if (parryData != null && player.worldObj.getTotalWorldTime() - parryData.getLastSyrioCounterTime() <= 100) {
 				time /= 1.1f;
 			}
+		}
+		if (TOGWeaponTechnology.hasUnskilledWarrior(player, itemstack)) {
+			time /= TOGWeaponTechnology.UNSKILLED_WARRIOR_SPEED_FACTOR;
 		}
 		return Math.round(Math.max(time, 1.0f));
 	}

@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
+import com.tortugagot.togcore.technology.TOGTechnologyNotifier;
 
 import codechicken.nei.NEIModContainer;
 import codechicken.nei.api.IConfigureNEI;
@@ -708,31 +709,31 @@ public class GOTEventHandler implements IFuelHandler {
         if (!world.isRemote && heldItem != null && heldItem.getItem() instanceof GOTFactionWeaponChecker && !GOTEnchantmentHelper.hasEnchant(heldItem, GOTEnchantment.multifracConverter)) {
 
             if (heldItem.getItem() instanceof GOTItemDornePolearm && pd.getPledgeFaction() != GOTFaction.DORNE) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:dorne_polearm");
                 event.setCanceled(true);
             }
             if (heldItem.getItem() instanceof GOTItemArrynClaymore && pd.getPledgeFaction() != GOTFaction.ARRYN) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:arryn_claymore");
                 event.setCanceled(true);
             }
             if (heldItem.getItem() instanceof GOTItemStormlandsHammer && pd.getPledgeFaction() != GOTFaction.STORMLANDS) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:stormlands_hammer");
                 event.setCanceled(true);
             }
             if (heldItem.getItem() instanceof GOTItemIronBornAxe && pd.getPledgeFaction() != GOTFaction.IRONBORN) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:ironborn_axe");
                 event.setCanceled(true);
             }
             if ((heldItem.getItem() instanceof GOTItemReachPike|| heldItem.getItem() instanceof GOTItemShieldReachPike) && pd.getPledgeFaction() != GOTFaction.REACH) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:reach_pike");
                 event.setCanceled(true);
             }
             if ((heldItem.getItem() instanceof GOTItemRiverlandsTrident || heldItem.getItem() instanceof GOTItemShieldRiverlandsTrident) && pd.getPledgeFaction() != GOTFaction.RIVERLANDS) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:riverlands_trident");
                 event.setCanceled(true);
             }
             if (heldItem.getItem() instanceof GOTItemNorthGreatSword && pd.getPledgeFaction() != GOTFaction.NORTH) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "attack:north_greatsword");
                 event.setCanceled(true);
             }
         }
@@ -999,11 +1000,11 @@ public class GOTEventHandler implements IFuelHandler {
         GOTPlayerData pd = GOTLevelData.getData(entityplayer);
         if (!world.isRemote && itemstack.getItem() instanceof GOTFactionWeaponChecker && !GOTEnchantmentHelper.hasEnchant(itemstack, GOTEnchantment.getEnchantmentByName("multifracConverter"))) {
             if (itemstack.getItem() instanceof GOTItemWesterlandsCrossbow && pd.getPledgeFaction() != GOTFaction.WESTERLANDS) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "use:westerlands_crossbow");
                 event.setCanceled(true);
             }
             if (itemstack.getItem() instanceof  GOTItemDragonStoneBow && pd.getPledgeFaction() != GOTFaction.DRAGONSTONE) {
-                entityplayer.addChatMessage(new ChatComponentTranslation("got.warning"));
+                notifyEquipmentWarning(entityplayer, "use:dragonstone_bow");
                 event.setCanceled(true);
             }
         }
@@ -2034,6 +2035,10 @@ public class GOTEventHandler implements IFuelHandler {
         if (world.provider instanceof GOTWorldProvider) {
             GOTBiomeVariantStorage.clearAllVariants(world);
         }
+    }
+
+    private static void notifyEquipmentWarning(EntityPlayer player, String key) {
+        TOGTechnologyNotifier.notifyComponent(player, "equipment:" + key, new ChatComponentTranslation("got.warning"));
     }
 
     public static boolean dechant(ItemStack itemstack, EntityPlayer entityplayer) {

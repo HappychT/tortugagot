@@ -1,6 +1,7 @@
 
 .classpath
 .gradle
+.gradle-user-home
 .project
 .settings
 *.hprof

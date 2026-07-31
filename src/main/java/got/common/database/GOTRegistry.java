@@ -1496,12 +1496,16 @@ public class GOTRegistry {
     public static Item westerlandsguardChestplate;
     public static Item westerlandsguardHelmet;
     public static Item westerlandsguardLeggings;
+    public static Item westerosBoots;
     public static Item westerosBow;
+    public static Item westerosChestplate;
     public static Item westerosDagger;
     public static Item westerosDaggerPoisoned;
     public static Item westerosHammer;
+    public static Item westerosHelmet;
     public static Item westerosHorseArmor;
     public static Item westerosLance;
+    public static Item westerosLeggings;
     public static Item westerosPike;
     public static Item westerosSpear;
     public static Item westerosSword;
@@ -3012,17 +3016,22 @@ public class GOTRegistry {
         westerlandsBoots = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 3).setFactionArmor(GOTFaction.WESTERLANDS);
         westerlandsChestplate = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 1).setFactionArmor(GOTFaction.WESTERLANDS);
         westerlandsHelmet = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 0, "helmet").setFactionArmor(GOTFaction.WESTERLANDS);
-        westerlandsLeggings = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 2).setFactionArmor(GOTFaction.WESTERLANDS);        westerlandsguardBoots = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 3);
+        westerlandsLeggings = new GOTItemFactionArmor(GOTMaterial.WESTERLANDS, 2).setFactionArmor(GOTFaction.WESTERLANDS);
+        westerlandsguardBoots = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 3);
         westerlandsguardChestplate = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 1);
         westerlandsguardHelmet = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 0);
         westerlandsguardLeggings = new GOTItemArmor(GOTMaterial.WESTERLANDSGUARD, 2);
         westerlandsCrossBow = new GOTItemWesterlandsCrossbow(GOTMaterial.IRON).setDrawTime(33);
+        westerosBoots = new GOTItemArmor(GOTMaterial.WESTEROS, 3);
         westerosBow = new GOTItemBow(GOTMaterial.WOOD, 1.125);
+        westerosChestplate = new GOTItemArmor(GOTMaterial.WESTEROS, 1);
         westerosDagger = new GOTItemDagger(GOTMaterial.IRON);
         westerosDaggerPoisoned = new GOTItemDagger(GOTMaterial.IRON, GOTItemSword.HitEffect.POISON);
         westerosHammer = new GOTItemHammer(GOTMaterial.IRON);
+        westerosHelmet = new GOTItemArmor(GOTMaterial.WESTEROS, 0, "helmet");
         westerosHorseArmor = new GOTItemMountArmor(ArmorMaterial.IRON, GOTItemMountArmor.Mount.HORSE, "horse_westeros");
         westerosLance = new GOTItemCavalryLance(GOTMaterial.IRON).addWeaponDamage(0.5f);
+        westerosLeggings = new GOTItemArmor(GOTMaterial.WESTEROS, 2);
         westerosPike = new GOTItemPike(GOTMaterial.IRON);
         westerosSpear = new GOTItemSpear(GOTMaterial.IRON);
         westerosSword = new GOTItemSword(GOTMaterial.IRON).addWeaponDamage(-1.0f);
@@ -4822,5 +4831,9 @@ public class GOTRegistry {
         registerItem(wildfireBomb, "wildfire_bomb");
         registerItem(smithKit, "smith_kit");
         registerItem(dublon, "dublon");
+        registerItem(westerosHelmet, "westerosHelmet");
+        registerItem(westerosChestplate, "westerosChestplate");
+        registerItem(westerosLeggings, "westerosLeggings");
+        registerItem(westerosBoots, "westerosBoots");
     }
 }

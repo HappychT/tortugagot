@@ -33,6 +33,103 @@ minecraft {
     targetCompat = JavaVersion.VERSION_1_8
 }
 
+def stripLocalVariableTablesFromJar = { File jarFile ->
+    if (!jarFile.isFile()) {
+        return
+    }
+
+    File tmpFile = new File(jarFile.parentFile, "${jarFile.name}.nolvt")
+    if (tmpFile.exists() && !tmpFile.delete()) {
+        throw new GradleException("Cannot delete stale temp jar: ${tmpFile}")
+    }
+
+    def changed = new java.util.concurrent.atomic.AtomicBoolean(false)
+    java.util.jar.JarFile inputJar = new java.util.jar.JarFile(jarFile)
+    try {
+        new java.util.jar.JarOutputStream(new FileOutputStream(tmpFile)).withCloseable { outputJar ->
+            inputJar.entries().each { entry ->
+                byte[] data = new byte[0]
+                if (!entry.directory) {
+                    inputJar.getInputStream(entry).withCloseable { input ->
+                        data = input.bytes
+                    }
+                }
+
+                if (entry.name.endsWith('.class')) {
+                    def reader = new org.objectweb.asm.ClassReader(data)
+                    def writer = new org.objectweb.asm.ClassWriter(0)
+                    reader.accept(new org.objectweb.asm.ClassVisitor(org.objectweb.asm.Opcodes.ASM5, writer) {
+                        org.objectweb.asm.MethodVisitor visitMethod(int access, String methodName, String methodDesc, String methodSignature, String[] exceptions) {
+                            def methodVisitor = super.visitMethod(access, methodName, methodDesc, methodSignature, exceptions)
+                            return new org.objectweb.asm.MethodVisitor(org.objectweb.asm.Opcodes.ASM5, methodVisitor) {
+                                void visitLocalVariable(String variableName, String variableDesc, String variableSignature, org.objectweb.asm.Label start, org.objectweb.asm.Label end, int index) {
+                                    changed.set(true)
+                                    // ForgeGradle 1.x can generate duplicate LVT entries that modern Java 8 rejects at runtime.
+                                }
+                            }
+                        }
+                    }, 0)
+                    data = writer.toByteArray()
+                }
+
+                def outputEntry = new java.util.jar.JarEntry(entry.name)
+                outputEntry.time = entry.time
+                outputJar.putNextEntry(outputEntry)
+                if (!entry.directory) {
+                    outputJar.write(data)
+                }
+                outputJar.closeEntry()
+            }
+        }
+    } finally {
+        inputJar.close()
+    }
+
+    if (changed.get()) {
+        java.nio.file.Files.move(tmpFile.toPath(), jarFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        logger.lifecycle("Stripped LocalVariableTable attributes from ${jarFile.name}")
+    } else if (!tmpFile.delete()) {
+        throw new GradleException("Cannot delete unchanged temp jar: ${tmpFile}")
+    }
+}
+
+task stripMinecraftDebugTables {
+    dependsOn deobfBinJar
+    outputs.upToDateWhen { false }
+    doLast {
+        stripLocalVariableTablesFromJar(file("$buildDir/tmp/deobfBinJar/deobfed.jar"))
+        stripLocalVariableTablesFromJar(file("$buildDir/tmp/deobfBinJar/excpeted.jar"))
+
+        def forgeBinJars = [] as Set
+        [new File(gradle.gradleUserHomeDir, 'caches/minecraft'), file("$rootDir/.gradle-user-home/caches/minecraft")].each { cacheRoot ->
+            if (cacheRoot.isDirectory()) {
+                forgeBinJars.addAll(fileTree(cacheRoot) {
+                    include 'net/minecraftforge/forge/**/forgeBin-*.jar'
+                }.files)
+            }
+        }
+        forgeBinJars.each { stripLocalVariableTablesFromJar(it) }
+    }
+}
+
+tasks.matching { it.name in ['sourceMainJava', 'compileJava', 'runClient'] }.all {
+    dependsOn stripMinecraftDebugTables
+}
+
+tasks.withType(JavaExec).matching { it.name in ['runClient', 'runServer', 'debugClient', 'debugServer'] }.all {
+    doFirst {
+        classpath = classpath.filter { it.name != 'cutter.jar' }
+    }
+}
+
+task techTreeLogicTest(type: JavaExec) {
+    dependsOn testClasses
+    main = 'com.tortugagot.togcore.technology.TOGTechnologyAuditTest'
+    classpath = sourceSets.test.runtimeClasspath
+}
+
+test.dependsOn techTreeLogicTest
+
 //cutter {
 //    annotation = "brain.factions.Annot"
  //   def serverSide = side 'server'
@@ -51,6 +148,7 @@ minecraft {
 
 
 jar {
+    exclude 'assets/got/geo/*.item.json'
     manifest {
         attributes 'FMLCorePlugin': 'got.coremod.GOTLoadingPlugin'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
@@ -68,5 +166,6 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+        exclude 'assets/got/geo/*.item.json'
     }
 }

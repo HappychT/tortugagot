@@ -16,6 +16,7 @@ public class GOTContainerUnsmeltery extends Container {
 	public GOTContainerUnsmeltery(InventoryPlayer inv, GOTTileEntityUnsmeltery unsmeltery) {
 		int i;
 		theUnsmeltery = unsmeltery;
+		theUnsmeltery.setLastInteractingPlayer(inv.player);
 		addSlotToContainer(new Slot(unsmeltery, 0, 56, 17));
 		addSlotToContainer(new Slot(unsmeltery, 1, 56, 53));
 		addSlotToContainer(new GOTSlotUnsmeltResult(unsmeltery, 2, 116, 35));

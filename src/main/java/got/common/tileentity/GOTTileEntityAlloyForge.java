@@ -2,6 +2,10 @@ package got.common.tileentity;
 
 import java.util.*;
 
+import com.tortugagot.togcore.registry.TOGItemRegistry;
+import com.tortugagot.togcore.technology.TOGTechnologyLocks;
+import com.tortugagot.togcore.technology.TOGTechnologyNotifier;
+import com.tortugagot.togcore.technology.TOGTechnologySavedData;
 import org.apache.commons.lang3.ArrayUtils;
 
 import cpw.mods.fml.relauncher.*;
@@ -20,6 +24,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.*;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
 
 public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInventory {
@@ -31,6 +36,8 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 	public int[] inputSlots;
 	public int[] outputSlots;
 	public int fuelSlot;
+	private UUID lastInteractingPlayerUuid;
+	private final Set<String> pendingSmeltingFailureMessages = new LinkedHashSet<String>();
 
 	public GOTTileEntityAlloyForge() {
 		setupForgeSlots();
@@ -64,17 +71,21 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 	}
 
 	public boolean canMachineInsertInput(ItemStack itemstack) {
-		return itemstack != null && getSmeltingResult(itemstack) != null;
+		return itemstack != null && (getSmeltingResult(itemstack) != null || isIron(itemstack) || isCoal(itemstack) || isSteelPlate(itemstack) || isAlloySteel(itemstack) || isCobalt(itemstack));
 	}
 
 	public boolean canSmelt(int i) {
-		ItemStack alloyResult;
+		AlloySmeltingRecipe alloyRecipe;
 		ItemStack result;
 		int resultSize;
 		if (inventory[i] == null) {
 			return false;
 		}
-		if (inventory[i - 4] != null && (alloyResult = getAlloySmeltingResult(inventory[i], inventory[i - 4])) != null) {
+		if (inventory[i - 4] != null && (alloyRecipe = getAlloySmeltingRecipe(inventory[i], inventory[i - 4])) != null) {
+			if (!alloyRecipe.isUnlocked(this)) {
+				return true;
+			}
+			ItemStack alloyResult = alloyRecipe.result;
 			if (inventory[i + 4] == null) {
 				return true;
 			}
@@ -101,6 +112,28 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 	public void closeInventory() {
 	}
 
+	public void setLastInteractingPlayer(EntityPlayer player) {
+		if (player == null || worldObj != null && worldObj.isRemote) {
+			return;
+		}
+		lastInteractingPlayerUuid = player.getUniqueID();
+		markDirty();
+	}
+
+	protected boolean isTechnologyUnlockedForForge(String requiredTechnologyId) {
+		if (requiredTechnologyId == null) {
+			return true;
+		}
+		if (worldObj == null || worldObj.isRemote) {
+			return true;
+		}
+		if (lastInteractingPlayerUuid != null) {
+			TOGTechnologySavedData data = TOGTechnologySavedData.get(worldObj);
+			return data != null && data.hasTechnology(lastInteractingPlayerUuid, requiredTechnologyId);
+		}
+		return TOGTechnologyLocks.isUnlockedNearby(worldObj, xCoord, yCoord, zCoord, requiredTechnologyId);
+	}
+
 	@Override
 	public ItemStack decrStackSize(int i, int j) {
 		if (inventory[i] != null) {
@@ -119,9 +152,14 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 	}
 
 	public void doSmelt() {
+		pendingSmeltingFailureMessages.clear();
 		for (int i = 4; i < 8; ++i) {
 			smeltItemInSlot(i);
 		}
+		for (String message : pendingSmeltingFailureMessages) {
+			notifyNearbyPlayers(message);
+		}
+		pendingSmeltingFailureMessages.clear();
 	}
 
 	@Override
@@ -159,20 +197,34 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 	}
 
 	public ItemStack getAlloySmeltingResult(ItemStack itemstack, ItemStack alloyItem) {
+		AlloySmeltingRecipe recipe = getAlloySmeltingRecipe(itemstack, alloyItem);
+		if (recipe == null || !recipe.isUnlocked(this)) {
+			return null;
+		}
+		return recipe.result.copy();
+	}
+
+	private AlloySmeltingRecipe getAlloySmeltingRecipe(ItemStack itemstack, ItemStack alloyItem) {
+		if (isIron(itemstack) && isCoal(alloyItem) || isCoal(itemstack) && isIron(alloyItem)) {
+			return new AlloySmeltingRecipe(new ItemStack(TOGItemRegistry.steel), TOGTechnologyLocks.STEEL, "получить сталь", "не открыта технология переплавки железа с углем");
+		}
+		if (isSteelPlate(itemstack) && isAlloySteel(alloyItem) || isAlloySteel(itemstack) && isSteelPlate(alloyItem)) {
+			return new AlloySmeltingRecipe(new ItemStack(TOGItemRegistry.hardenedSteelPlate), TOGTechnologyLocks.HARDENED_STEEL_PLATE, "получить закаленную стальную пластину", "не открыта технология переплавки стальной пластины с легированной сталью");
+		}
 		if (isCopper(itemstack) && isTin(alloyItem) || isTin(itemstack) && isCopper(alloyItem)) {
-			return new ItemStack(GOTRegistry.bronzeIngot, 2);
+			return new AlloySmeltingRecipe(new ItemStack(GOTRegistry.bronzeIngot, 2), null, null);
 		}
 		if (isIron(itemstack) && isGoldNugget(alloyItem) || isGoldNugget(itemstack) && isIron(alloyItem)) {
-			return new ItemStack(GOTRegistry.yitiSteelIngot);
+			return new AlloySmeltingRecipe(new ItemStack(GOTRegistry.yitiSteelIngot), null, null);
 		}
 		if (isSilver(itemstack) && isValyrianNugget(alloyItem) || isValyrianNugget(itemstack) && isSilver(alloyItem)) {
-			return new ItemStack(GOTRegistry.valyrianPowder);
+			return new AlloySmeltingRecipe(new ItemStack(GOTRegistry.valyrianPowder), null, null);
 		}
 		if (isWidowWail(itemstack) && isOathkeeper(alloyItem) || isOathkeeper(itemstack) && isWidowWail(alloyItem)) {
-			return new ItemStack(GOTRegistry.ice);
+			return new AlloySmeltingRecipe(new ItemStack(GOTRegistry.ice), null, null);
 		}
 		if (isCobalt(itemstack) && isIron(alloyItem) || isIron(itemstack) && isCobalt(alloyItem)) {
-			return new ItemStack(GOTRegistry.alloySteelIngot);
+			return new AlloySmeltingRecipe(new ItemStack(GOTRegistry.alloySteelIngot), TOGTechnologyLocks.ALLOY_STEEL, "получить легированную сталь", "не открыта технология обработки металлов");
 		}
 		return null;
 	}
@@ -259,7 +311,11 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 	}
 
 	public boolean isCoal(ItemStack itemstack) {
-		return itemstack.getItem() == Items.coal;
+		return itemstack.getItem() == Items.coal && itemstack.getItemDamage() == 0;
+	}
+
+	public boolean isAlloySteel(ItemStack itemstack) {
+		return itemstack.getItem() == GOTRegistry.alloySteelIngot;
 	}
 
 	public boolean isCobalt(ItemStack itemstack) {
@@ -276,6 +332,10 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 
 	public boolean isIron(ItemStack itemstack) {
 		return GOT.isOreNameEqual(itemstack, "oreIron") || GOT.isOreNameEqual(itemstack, "ingotIron");
+	}
+
+	public boolean isSteelPlate(ItemStack itemstack) {
+		return itemstack.getItem() == TOGItemRegistry.steelPlate;
 	}
 
 	@Override
@@ -352,6 +412,13 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 		if (nbt.hasKey("CustomName")) {
 			specialForgeName = nbt.getString("CustomName");
 		}
+		if (nbt.hasKey("TOGLastInteractingPlayer")) {
+			try {
+				lastInteractingPlayerUuid = UUID.fromString(nbt.getString("TOGLastInteractingPlayer"));
+			} catch (IllegalArgumentException ignored) {
+				lastInteractingPlayerUuid = null;
+			}
+		}
 	}
 
 	@Override
@@ -374,13 +441,18 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 
 	public void smeltItemInSlot(int i) {
 		if (canSmelt(i)) {
-			ItemStack alloyResult;
+			AlloySmeltingRecipe alloyRecipe;
 			boolean smeltedAlloyItem = false;
-			if (inventory[i - 4] != null && (alloyResult = getAlloySmeltingResult(inventory[i], inventory[i - 4])) != null && (inventory[i + 4] == null || inventory[i + 4].isItemEqual(alloyResult))) {
-				if (inventory[i + 4] == null) {
-					inventory[i + 4] = alloyResult.copy();
-				} else if (inventory[i + 4].isItemEqual(alloyResult)) {
-					inventory[i + 4].stackSize += alloyResult.stackSize;
+			if (inventory[i - 4] != null && (alloyRecipe = getAlloySmeltingRecipe(inventory[i], inventory[i - 4])) != null) {
+				if (alloyRecipe.isUnlocked(this)) {
+					ItemStack alloyResult = alloyRecipe.result;
+					if (inventory[i + 4] == null) {
+						inventory[i + 4] = alloyResult.copy();
+					} else if (inventory[i + 4].isItemEqual(alloyResult)) {
+						inventory[i + 4].stackSize += alloyResult.stackSize;
+					}
+				} else {
+					queueSmeltingFailure(alloyRecipe.lockedMessage);
 				}
 				--inventory[i].stackSize;
 				if (inventory[i].stackSize <= 0) {
@@ -403,6 +475,27 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 				if (inventory[i].stackSize <= 0) {
 					inventory[i] = null;
 				}
+			}
+		}
+	}
+
+	private void queueSmeltingFailure(String message) {
+		if (message != null && message.length() > 0) {
+			pendingSmeltingFailureMessages.add(message);
+		}
+	}
+
+	private void notifyNearbyPlayers(String message) {
+		if (worldObj == null || worldObj.isRemote || message == null || message.length() == 0) {
+			return;
+		}
+		for (Object obj : worldObj.playerEntities) {
+			if (!(obj instanceof EntityPlayer)) {
+				continue;
+			}
+			EntityPlayer player = (EntityPlayer) obj;
+			if (player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D) {
+				player.addChatMessage(new ChatComponentText(message));
 			}
 		}
 	}
@@ -469,6 +562,29 @@ public class GOTTileEntityAlloyForge extends TileEntity implements ISidedInvento
 		nbt.setShort("SmeltTime", (short) currentSmeltTime);
 		if (hasCustomInventoryName()) {
 			nbt.setString("CustomName", specialForgeName);
+		}
+		if (lastInteractingPlayerUuid != null) {
+			nbt.setString("TOGLastInteractingPlayer", lastInteractingPlayerUuid.toString());
+		}
+	}
+
+	private static class AlloySmeltingRecipe {
+		private final ItemStack result;
+		private final String requiredTechnologyId;
+		private final String lockedMessage;
+
+		private AlloySmeltingRecipe(ItemStack result, String requiredTechnologyId, String lockedMessage) {
+			this.result = result;
+			this.requiredTechnologyId = requiredTechnologyId;
+			this.lockedMessage = lockedMessage;
+		}
+
+		private AlloySmeltingRecipe(ItemStack result, String requiredTechnologyId, String lockedAction, String lockedReason) {
+			this(result, requiredTechnologyId, requiredTechnologyId != null ? TOGTechnologyNotifier.buildMessage(lockedAction, lockedReason, requiredTechnologyId) : null);
+		}
+
+		private boolean isUnlocked(GOTTileEntityAlloyForge forge) {
+			return forge.isTechnologyUnlockedForForge(requiredTechnologyId);
 		}
 	}
 }

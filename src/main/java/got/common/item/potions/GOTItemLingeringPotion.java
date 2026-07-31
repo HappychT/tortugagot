@@ -43,7 +43,7 @@ public class GOTItemLingeringPotion extends ItemPotion {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean isComplex) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean isComplex) {
         if (stack.getItemDamage() == 0)
             return;
 

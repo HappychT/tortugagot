@@ -135,7 +135,7 @@ public class GOTItemBuckshot extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> inf, boolean p_77624_4_) {
+    public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List inf, boolean p_77624_4_) {
         List<PotionEffect> list = this.getEffects(itemstack);
 
         HashMultimap<String, AttributeModifier> hashmultimap = HashMultimap.create();

@@ -50,7 +50,7 @@ public class GOTItemSmoke extends ItemPotion {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean isComplex) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean isComplex) {
         List<PotionEffect> effects = getEffects(stack);
         HashMultimap<String, AttributeModifier> attributes = HashMultimap.create();
 

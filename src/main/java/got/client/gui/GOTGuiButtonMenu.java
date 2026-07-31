@@ -11,12 +11,18 @@ public class GOTGuiButtonMenu extends GuiButton {
 	public GOTGuiMenu parentGUI;
 	public Class<? extends GOTGuiMenuWBBase> menuScreenClass;
 	public int menuKeyCode;
+	public int iconIndex;
 
 	public GOTGuiButtonMenu(GOTGuiMenu gui, int i, int x, int y, Class<? extends GOTGuiMenuWBBase> cls, String s, int key) {
+		this(gui, i, x, y, cls, s, key, i);
+	}
+
+	public GOTGuiButtonMenu(GOTGuiMenu gui, int i, int x, int y, Class<? extends GOTGuiMenuWBBase> cls, String s, int key, int icon) {
 		super(i, x, y, 32, 32, s);
 		parentGUI = gui;
 		menuScreenClass = cls;
 		menuKeyCode = key;
+		iconIndex = icon;
 	}
 
 	public boolean canDisplayMenu() {
@@ -33,7 +39,7 @@ public class GOTGuiButtonMenu extends GuiButton {
 			mc.getTextureManager().bindTexture(GOTGuiMenu.menuIconsTexture);
 			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			field_146123_n = i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
-			drawTexturedModalRect(xPosition, yPosition, 0 + (enabled ? 0 : width * 2) + (field_146123_n ? width : 0), id * height, width, height);
+			drawTexturedModalRect(xPosition, yPosition, 0 + (enabled ? 0 : width * 2) + (field_146123_n ? width : 0), iconIndex * height, width, height);
 			mouseDragged(mc, i, j);
 		}
 	}
