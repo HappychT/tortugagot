@@ -86,7 +86,7 @@ public abstract class GOTEnchantment {
 	public static GOTEnchantment ProtectHammer3 = new GOTEnchantmentProtectionHammer("getProtectHammer3", 4).setEnchantWeight(0).setSkilful();
 
 	public static GOTEnchantment rangedStrong1 = new GOTEnchantmentRangedDamage("rangedStrong1", 1.1F).setEnchantWeight(10);
-	public static GOTEnchantment rangedStrong2 = new GOTEnchantmentRangedDamage("rangedStrong2", 1.2F).setEnchantWeight(0);
+	public static GOTEnchantment rangedStrong2 = new GOTEnchantmentRangedDamage("rangedStrong2", 1.2F).setEnchantWeight(0).setApplyToProjectile();
 	public static GOTEnchantment rangedStrong3 = new GOTEnchantmentRangedDamage("rangedStrong3", 1.3F).setEnchantWeight(0).setSkilful();
 	public static GOTEnchantment rangedWeak1 = new GOTEnchantmentRangedDamage("rangedWeak1", 0.75F).setEnchantWeight(0);
 	public static GOTEnchantment rangedWeak2 = new GOTEnchantmentRangedDamage("rangedWeak2", 0.5F).setEnchantWeight(0);

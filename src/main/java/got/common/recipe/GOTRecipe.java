@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.tortugagot.togcore.recipe.TOGRecipeTechnologyShapedOre;
+import com.tortugagot.togcore.recipe.TOGRecipeTechnologyShapelessOre;
 import com.tortugagot.togcore.registry.TOGItemRegistry;
 import com.tortugagot.togcore.technology.TOGTechnologyLocks;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -646,7 +647,7 @@ public class GOTRecipe{
 
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.kebabStandSand), " X ", " Y ", "ZZZ", Character.valueOf('X'), "plankWood", Character.valueOf('Y'), "stickWood", Character.valueOf('Z'), Blocks.sandstone));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.kebabStand), " X ", " Y ", "ZZZ", Character.valueOf('X'), "plankWood", Character.valueOf('Y'), "stickWood", Character.valueOf('Z'), Blocks.cobblestone));
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.shishKebab, 2), "  X", " X ", "Y  ", Character.valueOf('X'), GOTRegistry.kebab, Character.valueOf('Y'), "stickWood"));
+        GameRegistry.addRecipe(TOGRecipeTechnologyShapedOre.shaped(new ItemStack(GOTRegistry.shishKebab, 2), new Object[] {"  X", " X ", "Y  ", Character.valueOf('X'), GOTRegistry.kebab, Character.valueOf('Y'), "stickWood"}, TOGTechnologyLocks.COOKING_I));
 
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.brick1, 4, 15), "XX", "XX", Character.valueOf('X'), new ItemStack(Blocks.sandstone, 1, 0)));
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.slabSingle4, 6, 0), "XXX", Character.valueOf('X'), new ItemStack(GOTRegistry.brick1, 1, 15)));
@@ -1290,9 +1291,11 @@ public class GOTRecipe{
         GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.kebab, 9), new ItemStack(GOTRegistry.kebabBlock, 1, 0));
         GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.leekSoup), Items.bowl, GOTRegistry.leek, GOTRegistry.leek, Items.potato);
         GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.mapleSyrup), new ItemStack(GOTRegistry.wood3, 1, 0), Items.bowl);
-        GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.marzipan), GOTRegistry.almond, GOTRegistry.almond, Items.sugar);
-        GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.marzipanChocolate), GOTRegistry.marzipan, new ItemStack(Items.dye, 1, 3));
-        GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.melonSoup), Items.bowl, Items.melon, Items.melon, Items.sugar);
+        GameRegistry.addRecipe(TOGRecipeTechnologyShapelessOre.shapeless(new ItemStack(GOTRegistry.marzipan), new Object[] {GOTRegistry.almond, GOTRegistry.almond, Items.sugar}, TOGTechnologyLocks.COOKING_II));
+        GameRegistry.addRecipe(TOGRecipeTechnologyShapelessOre.shapeless(new ItemStack(GOTRegistry.marzipanChocolate), new Object[] {GOTRegistry.marzipan, new ItemStack(Items.dye, 1, 3)}, TOGTechnologyLocks.COOKING_III));
+        GameRegistry.addRecipe(TOGRecipeTechnologyShapelessOre.shapeless(new ItemStack(GOTRegistry.melonSoup), new Object[] {Items.bowl, Items.melon, Items.melon, Items.sugar}, TOGTechnologyLocks.COOKING_I));
+        GameRegistry.addRecipe(TOGRecipeTechnologyShapelessOre.shapeless(new ItemStack(GOTRegistry.pancakeMapleSyrup), new Object[] {GOTRegistry.pancake, GOTRegistry.mapleSyrup}, TOGTechnologyLocks.COOKING_II));
+        GameRegistry.addRecipe(TOGRecipeTechnologyShapelessOre.shapeless(new ItemStack(GOTRegistry.gingerbread), new Object[] {Items.bread, Items.sugar, new ItemStack(Items.dye, 1, 3)}, TOGTechnologyLocks.COOKING_III));
         GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.mushroomPie), Items.egg, Blocks.red_mushroom, Blocks.brown_mushroom);
         GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.obsidianShard, 9), Blocks.obsidian);
         GameRegistry.addShapelessRecipe(new ItemStack(GOTRegistry.opal, 9), new ItemStack(GOTRegistry.blockGem, 1, 7));
@@ -1416,8 +1419,8 @@ public class GOTRecipe{
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.meatBlock), "XXX", "XXX", "XXX", Character.valueOf('X'), "meat"));
         GameRegistry.addRecipe(new ItemStack(GOTRegistry.eternalCold), "XXX", "XXX", "XXX", Character.valueOf('X'), GOTRegistry.eternalColdShard);
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.valyrianSeal), "XXX", "XYX", "XXX", Character.valueOf('X'), new ItemStack(GOTRegistry.blockMetal1, 1, 4), Character.valueOf('Y'), GOTRegistry.dragonGlassShard));
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.boltHarpoonBase), "XXX", " Y ", " Z ", Character.valueOf('X'), Items.iron_ingot, Character.valueOf('Y'), "stickWood", Character.valueOf('Z'), "feather"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(GOTRegistry.boltHarpoon), "XXX", "XYX", "XXX", Character.valueOf('X'), Items.string, Character.valueOf('Y'), GOTRegistry.boltHarpoonBase));
+        GameRegistry.addRecipe(new TOGRecipeTechnologyShapedOre(new ItemStack(GOTRegistry.boltHarpoonBase), new Object[] {"XXX", " Y ", " Z ", Character.valueOf('X'), Items.iron_ingot, Character.valueOf('Y'), "stickWood", Character.valueOf('Z'), "feather"}, TOGTechnologyLocks.APPRENTICE_ENGINEER));
+        GameRegistry.addRecipe(new TOGRecipeTechnologyShapedOre(new ItemStack(GOTRegistry.boltHarpoon), new Object[] {"XXX", "XYX", "XXX", Character.valueOf('X'), Items.string, Character.valueOf('Y'), GOTRegistry.boltHarpoonBase}, TOGTechnologyLocks.APPRENTICE_ENGINEER));
 
         GameRegistry.addRecipe(new GOTRecipeBanners());
         GameRegistry.addRecipe(new GOTRecipeFeatherDye());

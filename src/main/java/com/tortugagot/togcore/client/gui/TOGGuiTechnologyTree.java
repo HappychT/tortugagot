@@ -7,24 +7,65 @@ import com.tortugagot.togcore.network.TOGPacketTechnologyUnlock;
 import com.tortugagot.togcore.technology.TOGTechnology;
 import com.tortugagot.togcore.technology.TOGTechnologyBranch;
 import com.tortugagot.togcore.technology.TOGTechnologyRegistry;
+import com.tortugagot.togcore.technology.TOGTechnologyRules;
 import got.client.gui.GOTGuiButton;
 import got.client.gui.GOTGuiMenuBase;
+import got.client.gui.utils.GuiApi;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
 public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
-    private static final int NODE_SIZE = 16;
+    private static final int NODE_SIZE = 14;
+    private static final int NODE_ICON_INSET = 1;
+    private static final int CONNECTION_NODE_GAP = 2;
+    private static final int CONNECTION_BUS_OFFSET = 10;
     private static final int PANEL_BG = 0xDD151515;
     private static final int PANEL_BORDER = 0xFF3B342B;
+    private static final int TREE_VIEW_LEFT = 8;
+    private static final int TREE_VIEW_TOP = 28;
+    private static final int TREE_VIEW_MIN_RIGHT = 490;
+    private static final int TREE_NODE_X_OFFSET = 28;
+    private static final int TREE_NODE_Y_OFFSET = 18;
+    private static final int TREE_X_SCALE_NUMERATOR = 3;
+    private static final int TREE_X_SCALE_DENOMINATOR = 2;
+    private static final int TREE_Y_SCALE_NUMERATOR = 2;
+    private static final int TREE_Y_SCALE_DENOMINATOR = 1;
+    private static final int TREE_SCROLL_STEP = 32;
+    private static final int MIN_GUI_WIDTH = 720;
+    private static final int MIN_GUI_HEIGHT = 350;
+    private static final int MAX_GUI_WIDTH = 1040;
+    private static final int MAX_GUI_HEIGHT = 560;
+    private static final int SCREEN_MARGIN = 12;
+    private static final int DETAILS_MIN_WIDTH = 198;
+    private static final int DETAILS_MAX_WIDTH = 260;
+    private static final int DETAILS_MIN_COMPACT_WIDTH = 170;
+    private static final int DETAILS_TOP = 36;
+    private static final int DETAILS_RIGHT_MARGIN = 16;
+    private static final int DETAILS_GAP = 16;
+    private static final int DETAILS_BOTTOM_MARGIN = 44;
+    private static final int TREE_BOTTOM_MARGIN = 12;
 
     private TOGTechnology selectedTechnology;
     private TOGTechnology hoveredTechnology;
     private GOTGuiButton unlockButton;
+    private int treeViewRight = TREE_VIEW_MIN_RIGHT;
+    private int treeViewBottom = 338;
+    private int detailsLeft = 506;
+    private int detailsWidth = DETAILS_MIN_WIDTH;
+    private int treeScrollX;
+    private int treeScrollY;
+    private int currentMouseX;
+    private int currentMouseY;
+    private int previousMouseX;
+    private int previousMouseY;
+    private boolean draggingTree;
+    private boolean wasMouseDown;
 
     @Override
     public void actionPerformed(GuiButton button) {
@@ -37,11 +78,13 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        currentMouseX = mouseX;
+        currentMouseY = mouseY;
+        updateTreeDrag(mouseX, mouseY);
         drawDefaultBackground();
         drawFrame();
-        drawBranchLabels();
-        drawConnections();
-        drawNodes(mouseX, mouseY);
+        drawTreeViewport(mouseX, mouseY);
+        drawTreeScrollBars();
         drawDetails();
         updateUnlockButton();
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -50,10 +93,10 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
 
     @Override
     public void initGui() {
-        xSize = 620;
-        ySize = 320;
+        configureLayout();
         super.initGui();
-        unlockButton = new GOTGuiButton(2001, guiLeft + 458, guiTop + ySize - 32, 120, 20, "Открыть");
+        clampTreeScroll();
+        unlockButton = new GOTGuiButton(2001, guiLeft + detailsLeft + detailsWidth - 120, guiTop + ySize - 32, 120, 20, "Открыть");
         buttonList.add(unlockButton);
         if (selectedTechnology == null && !TOGTechnologyRegistry.getAll().isEmpty()) {
             selectedTechnology = TOGTechnologyRegistry.getAll().get(0);
@@ -62,9 +105,24 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
         updateUnlockButton();
     }
 
+    private void configureLayout() {
+        int availableWidth = Math.max(320, width - SCREEN_MARGIN * 2);
+        int availableHeight = Math.max(240, height - SCREEN_MARGIN * 2);
+        xSize = clamp(availableWidth, MIN_GUI_WIDTH, MAX_GUI_WIDTH);
+        ySize = clamp(availableHeight, MIN_GUI_HEIGHT, MAX_GUI_HEIGHT);
+        xSize = Math.min(xSize, availableWidth);
+        ySize = Math.min(ySize, availableHeight);
+        int preferredDetailsWidth = clamp(xSize / 4, DETAILS_MIN_WIDTH, DETAILS_MAX_WIDTH);
+        int maxDetailsWidth = Math.max(DETAILS_MIN_COMPACT_WIDTH, xSize - TREE_VIEW_MIN_RIGHT - DETAILS_GAP - DETAILS_RIGHT_MARGIN);
+        detailsWidth = Math.min(preferredDetailsWidth, maxDetailsWidth);
+        detailsLeft = xSize - DETAILS_RIGHT_MARGIN - detailsWidth;
+        treeViewRight = Math.max(TREE_VIEW_LEFT + 160, detailsLeft - DETAILS_GAP);
+        treeViewBottom = Math.max(TREE_VIEW_TOP + 160, ySize - TREE_BOTTOM_MARGIN);
+    }
+
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (mouseButton == 0) {
+        if (mouseButton == 0 && isMouseInTree(mouseX, mouseY)) {
             for (TOGTechnology technology : TOGTechnologyRegistry.getAll()) {
                 int x = nodeX(technology);
                 int y = nodeY(technology);
@@ -82,15 +140,58 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
         updateUnlockButton();
     }
 
+    @Override
+    public void handleMouseInput() {
+        super.handleMouseInput();
+        int wheel = Mouse.getEventDWheel();
+        if (wheel != 0 && isMouseInTree(currentMouseX, currentMouseY)) {
+            scrollTree(0, wheel > 0 ? -TREE_SCROLL_STEP : TREE_SCROLL_STEP);
+        }
+    }
+
     private void drawFrame() {
         Gui.drawRect(guiLeft, guiTop, guiLeft + xSize, guiTop + ySize, PANEL_BG);
         drawBorder(guiLeft, guiTop, xSize, ySize, PANEL_BORDER);
-        Gui.drawRect(guiLeft + 390, guiTop, guiLeft + 392, guiTop + ySize, 0xFF2D2922);
+        Gui.drawRect(guiLeft + TREE_VIEW_LEFT, guiTop + TREE_VIEW_TOP, guiLeft + treeViewRight, guiTop + treeViewBottom, 0x33000000);
+        drawBorder(guiLeft + TREE_VIEW_LEFT, guiTop + TREE_VIEW_TOP, treeViewRight - TREE_VIEW_LEFT, treeViewBottom - TREE_VIEW_TOP, 0x66443A2E);
+        Gui.drawRect(guiLeft + treeViewRight, guiTop, guiLeft + treeViewRight + 2, guiTop + ySize, 0xFF2D2922);
         fontRendererObj.drawString("Древо технологий", guiLeft + 14, guiTop + 12, 0xE8D9B8);
         String points = "Очки мастерства: " + TOGClientTechnologyData.getMasteryPoints();
         fontRendererObj.drawString(points, guiLeft + xSize - 14 - fontRendererObj.getStringWidth(points), guiTop + 12, 0xE8D9B8);
         if (!TOGClientTechnologyData.isSynced()) {
             fontRendererObj.drawString("Синхронизация...", guiLeft + 14, guiTop + ySize - 18, 0xAAAAAA);
+        }
+    }
+
+    private void drawTreeViewport(int mouseX, int mouseY) {
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GuiApi.glScissor(guiLeft + TREE_VIEW_LEFT, guiTop + TREE_VIEW_TOP, treeViewRight - TREE_VIEW_LEFT, treeViewBottom - TREE_VIEW_TOP, false);
+        drawBranchLabels();
+        drawConnections();
+        drawNodes(mouseX, mouseY);
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+    }
+
+    private void drawTreeScrollBars() {
+        int maxScrollX = getMaxTreeScrollX();
+        int maxScrollY = getMaxTreeScrollY();
+        if (maxScrollY > 0) {
+            int trackX = guiLeft + treeViewRight - 5;
+            int trackTop = guiTop + TREE_VIEW_TOP + 2;
+            int trackHeight = treeViewBottom - TREE_VIEW_TOP - 4;
+            int knobHeight = Math.max(20, trackHeight * (treeViewBottom - TREE_VIEW_TOP) / getTreeContentHeight());
+            int knobY = trackTop + treeScrollY * (trackHeight - knobHeight) / maxScrollY;
+            Gui.drawRect(trackX, trackTop, trackX + 3, trackTop + trackHeight, 0x552A2620);
+            Gui.drawRect(trackX, knobY, trackX + 3, knobY + knobHeight, 0xAA8C7A5E);
+        }
+        if (maxScrollX > 0) {
+            int trackLeft = guiLeft + TREE_VIEW_LEFT + 2;
+            int trackY = guiTop + treeViewBottom - 5;
+            int trackWidth = treeViewRight - TREE_VIEW_LEFT - 8;
+            int knobWidth = Math.max(24, trackWidth * (treeViewRight - TREE_VIEW_LEFT) / getTreeContentWidth());
+            int knobX = trackLeft + treeScrollX * (trackWidth - knobWidth) / maxScrollX;
+            Gui.drawRect(trackLeft, trackY, trackLeft + trackWidth, trackY + 3, 0x552A2620);
+            Gui.drawRect(knobX, trackY, knobX + knobWidth, trackY + 3, 0xAA8C7A5E);
         }
     }
 
@@ -120,28 +221,50 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
                     drawConnection(prerequisite, technology, color);
                 }
             }
+            String[] requiredChoiceGroup = TOGTechnologyRules.getRequiredStaminaChoiceGroup(technology.getId());
+            if (requiredChoiceGroup != null) {
+                for (String choiceId : requiredChoiceGroup) {
+                    TOGTechnology choice = TOGTechnologyRegistry.get(choiceId);
+                    if (choice != null) {
+                        int color = hasUnlocked(choice) && (hasUnlocked(technology) || getBlockedReason(technology) == null) ? 0xFF777777 : 0xFF484848;
+                        drawConnection(choice, technology, color);
+                    }
+                }
+            }
         }
     }
 
     private void drawConnection(TOGTechnology prerequisite, TOGTechnology technology, int color) {
         int startY = nodeCenterY(prerequisite);
         int endY = nodeCenterY(technology);
-        int startX = nodeX(prerequisite) + NODE_SIZE;
-        int endX = nodeX(technology);
+        int prerequisiteLeft = nodeX(prerequisite);
+        int prerequisiteRight = prerequisiteLeft + NODE_SIZE;
+        int technologyLeft = nodeX(technology);
+        int technologyRight = technologyLeft + NODE_SIZE;
+        int startX;
+        int endX;
+        int busXOffset;
+
+        if (technologyLeft > prerequisiteRight) {
+            startX = prerequisiteRight + CONNECTION_NODE_GAP;
+            endX = technologyLeft - CONNECTION_NODE_GAP;
+            busXOffset = CONNECTION_BUS_OFFSET;
+        } else if (technologyRight < prerequisiteLeft) {
+            startX = prerequisiteLeft - CONNECTION_NODE_GAP;
+            endX = technologyRight + CONNECTION_NODE_GAP;
+            busXOffset = -CONNECTION_BUS_OFFSET;
+        } else {
+            startX = prerequisiteLeft - CONNECTION_NODE_GAP;
+            endX = technologyLeft - CONNECTION_NODE_GAP;
+            busXOffset = -CONNECTION_BUS_OFFSET;
+        }
 
         if (startY == endY) {
             drawLine(startX, startY, endX, endY, color);
             return;
         }
 
-        int busX;
-        if (endX > startX) {
-            busX = startX + 8;
-        } else {
-            startX = nodeX(prerequisite);
-            endX = nodeX(technology);
-            busX = startX - 8;
-        }
+        int busX = startX + busXOffset;
 
         drawLine(startX, startY, busX, startY, color);
         drawLine(busX, startY, busX, endY, color);
@@ -159,17 +282,16 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
             int border = selected ? 0xFFFFFFFF : unlocked ? 0xFFEAD27D : available ? 0xFFB5D98A : 0xFF555555;
 
             if (unlocked) {
-                Gui.drawRect(x - 4, y - 4, x + NODE_SIZE + 4, y + NODE_SIZE + 4, 0x22FFF0A0);
-                Gui.drawRect(x - 3, y - 3, x + NODE_SIZE + 3, y + NODE_SIZE + 3, 0x33FFE6A6);
+                Gui.drawRect(x - 1, y - 1, x + NODE_SIZE + 1, y + NODE_SIZE + 1, 0x22FFF0A0);
             }
-            Gui.drawRect(x - 2, y - 2, x + NODE_SIZE + 2, y + NODE_SIZE + 2, border);
-            Gui.drawRect(x - 1, y - 1, x + NODE_SIZE + 1, y + NODE_SIZE + 1, 0xFF080808);
+            Gui.drawRect(x - 1, y - 1, x + NODE_SIZE + 1, y + NODE_SIZE + 1, border);
+            Gui.drawRect(x, y, x + NODE_SIZE, y + NODE_SIZE, 0xFF080808);
             if (!unlocked) {
                 Gui.drawRect(x, y, x + NODE_SIZE, y + NODE_SIZE, available ? 0x33000000 : 0x55000000);
             }
             drawTechnologyIcon(technology, x, y, unlocked, available);
 
-            if (mouseX >= x && mouseX < x + NODE_SIZE && mouseY >= y && mouseY < y + NODE_SIZE) {
+            if (isMouseInTree(mouseX, mouseY) && mouseX >= x && mouseX < x + NODE_SIZE && mouseY >= y && mouseY < y + NODE_SIZE) {
                 hoveredTechnology = technology;
             }
         }
@@ -186,26 +308,84 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
         } else {
             GL11.glColor4f(0.60F, 0.60F, 0.60F, 1.0F);
         }
-        Gui.func_152125_a(x, y, 0.0F, 0.0F, NODE_SIZE, NODE_SIZE, NODE_SIZE, NODE_SIZE, 16.0F, 16.0F);
+        int iconSize = NODE_SIZE - NODE_ICON_INSET * 2;
+        Gui.func_152125_a(x + NODE_ICON_INSET, y + NODE_ICON_INSET, 0.0F, 0.0F, 16, 16, iconSize, iconSize, 16.0F, 16.0F);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDisable(GL11.GL_BLEND);
     }
 
     private ResourceLocation iconTexture(TOGTechnology technology) {
-        return new ResourceLocation("togcore", "textures/gui/technology/" + technology.getId() + ".png");
+        String iconId = technology.getId();
+        if (isWarriorExtensionIcon(iconId)) {
+            iconId = warriorExtensionIcon(iconId);
+        }
+        return new ResourceLocation("togcore", "textures/gui/technology/" + iconId + ".png");
+    }
+
+    private boolean isWarriorExtensionIcon(String iconId) {
+        return iconId.indexOf("_final_damage_") >= 0
+                || TOGTechnologyRules.isWarriorStaminaChoice(iconId)
+                || iconId.endsWith("_passive")
+                || iconId.startsWith("bow_arrow_save_")
+                || "bow_stamina".equals(iconId)
+                || iconId.startsWith("crossbow_bolt_save_")
+                || "crossbow_stamina".equals(iconId);
+    }
+
+    private String warriorExtensionIcon(String iconId) {
+        if ("shield_passive".equals(iconId)) {
+            return "shield_passive";
+        }
+        if (iconId.startsWith("two_handed_sword_")) {
+            return "two_handed_sword_mastery";
+        }
+        if (iconId.startsWith("crossbow_")) {
+            return "crossbow_mastery";
+        }
+        if (iconId.startsWith("claymore_")) {
+            return "claymore_mastery";
+        }
+        if (iconId.startsWith("sword_")) {
+            return "sword_mastery";
+        }
+        if (iconId.startsWith("dagger_")) {
+            return "dagger_mastery";
+        }
+        if (iconId.startsWith("spear_")) {
+            return "spear_mastery";
+        }
+        if (iconId.startsWith("pike_")) {
+            return "pike_mastery";
+        }
+        if (iconId.startsWith("glaive_")) {
+            return "glaive_mastery";
+        }
+        if (iconId.startsWith("shield_")) {
+            return "shield_mastery";
+        }
+        if (iconId.startsWith("axe_")) {
+            return "axe_mastery";
+        }
+        if (iconId.startsWith("hammer_")) {
+            return "hammer_mastery";
+        }
+        if (iconId.startsWith("bow_")) {
+            return "bow_mastery";
+        }
+        return "sword_mastery";
     }
 
     private void drawHoveredTechnology(int mouseX, int mouseY) {
-        if (hoveredTechnology != null) {
+        if (hoveredTechnology != null && isMouseInTree(mouseX, mouseY)) {
             drawCreativeTabHoveringText(hoveredTechnology.getName(), mouseX, mouseY);
         }
     }
 
     private void drawDetails() {
-        int left = guiLeft + 406;
-        int top = guiTop + 36;
-        int width = 198;
-        Gui.drawRect(left - 8, top - 8, left + width + 8, guiTop + ySize - 44, 0xAA000000);
+        int left = guiLeft + detailsLeft;
+        int top = guiTop + DETAILS_TOP;
+        int width = detailsWidth;
+        Gui.drawRect(left - 8, top - 8, left + width + 8, guiTop + ySize - DETAILS_BOTTOM_MARGIN, 0xAA000000);
         if (selectedTechnology == null) {
             fontRendererObj.drawSplitString("Выберите технологию.", left, top, width, 0xD0D0D0);
             return;
@@ -294,6 +474,10 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
         if (hasUnlocked(technology)) {
             return "Технология уже открыта.";
         }
+        String exclusiveChoiceId = TOGTechnologyRules.getExclusiveStaminaChoiceId(technology.getId());
+        if (exclusiveChoiceId != null && TOGClientTechnologyData.hasUnlocked(exclusiveChoiceId)) {
+            return "уже выбран альтернативный узел стамины: " + getTechnologyName(exclusiveChoiceId) + ". Второй вариант доступен только после полного сброса древа.";
+        }
         int unlockCost = getUnlockCost(technology);
         if (TOGClientTechnologyData.getMasteryPoints() < unlockCost) {
             return "нужно " + unlockCost + " очков мастерства.";
@@ -304,19 +488,109 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
                 return "сначала откройте " + (prerequisite != null ? prerequisite.getName() : prerequisiteId) + ".";
             }
         }
+        String[] requiredChoiceGroup = TOGTechnologyRules.getRequiredStaminaChoiceGroup(technology.getId());
+        if (requiredChoiceGroup != null && !TOGClientTechnologyData.hasUnlocked(requiredChoiceGroup[0]) && !TOGClientTechnologyData.hasUnlocked(requiredChoiceGroup[1])) {
+            return "сначала выберите один из узлов " + TOGTechnologyRules.getRequiredStaminaChoiceName(technology.getId()) + ": " + getTechnologyName(requiredChoiceGroup[0]) + " или " + getTechnologyName(requiredChoiceGroup[1]) + ".";
+        }
         return null;
+    }
+
+    private String getTechnologyName(String id) {
+        TOGTechnology technology = TOGTechnologyRegistry.get(id);
+        return technology != null ? technology.getName() : id;
     }
 
     private int getUnlockCost(TOGTechnology technology) {
         return technology.getUnlockCost(TOGClientTechnologyData.getUnlockedCount());
     }
 
+    private void updateTreeDrag(int mouseX, int mouseY) {
+        boolean mouseDown = Mouse.isButtonDown(0);
+        if (mouseDown && !wasMouseDown && isMouseInTree(mouseX, mouseY)) {
+            draggingTree = true;
+            previousMouseX = mouseX;
+            previousMouseY = mouseY;
+        } else if (!mouseDown) {
+            draggingTree = false;
+        }
+        if (draggingTree) {
+            int deltaX = mouseX - previousMouseX;
+            int deltaY = mouseY - previousMouseY;
+            if (deltaX != 0 || deltaY != 0) {
+                scrollTree(-deltaX, -deltaY);
+                previousMouseX = mouseX;
+                previousMouseY = mouseY;
+            }
+        }
+        wasMouseDown = mouseDown;
+    }
+
+    private void scrollTree(int deltaX, int deltaY) {
+        treeScrollX += deltaX;
+        treeScrollY += deltaY;
+        clampTreeScroll();
+    }
+
+    private void clampTreeScroll() {
+        treeScrollX = clamp(treeScrollX, 0, getMaxTreeScrollX());
+        treeScrollY = clamp(treeScrollY, 0, getMaxTreeScrollY());
+    }
+
+    private int getMaxTreeScrollX() {
+        return Math.max(0, getTreeContentWidth() - treeViewRight);
+    }
+
+    private int getMaxTreeScrollY() {
+        return Math.max(0, getTreeContentHeight() - treeViewBottom);
+    }
+
+    private int getTreeContentWidth() {
+        int max = 0;
+        for (TOGTechnology technology : TOGTechnologyRegistry.getAll()) {
+            max = Math.max(max, TREE_NODE_X_OFFSET + scaledTreeX(technology) + NODE_SIZE + 20);
+        }
+        return max;
+    }
+
+    private int getTreeContentHeight() {
+        int max = 0;
+        for (TOGTechnology technology : TOGTechnologyRegistry.getAll()) {
+            max = Math.max(max, TREE_NODE_Y_OFFSET + scaledTreeY(technology) + NODE_SIZE + 20);
+        }
+        return max;
+    }
+
+    private int scaledTreeX(TOGTechnology technology) {
+        return technology.getX() * TREE_X_SCALE_NUMERATOR / TREE_X_SCALE_DENOMINATOR;
+    }
+
+    private int scaledTreeY(TOGTechnology technology) {
+        return technology.getY() * TREE_Y_SCALE_NUMERATOR / TREE_Y_SCALE_DENOMINATOR;
+    }
+
+    private boolean isMouseInTree(int mouseX, int mouseY) {
+        return mouseX >= guiLeft + TREE_VIEW_LEFT
+                && mouseX < guiLeft + treeViewRight
+                && mouseY >= guiTop + TREE_VIEW_TOP
+                && mouseY < guiTop + treeViewBottom;
+    }
+
+    private int clamp(int value, int min, int max) {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+        return value;
+    }
+
     private int nodeX(TOGTechnology technology) {
-        return guiLeft + 28 + technology.getX();
+        return guiLeft + TREE_NODE_X_OFFSET + scaledTreeX(technology) - treeScrollX;
     }
 
     private int nodeY(TOGTechnology technology) {
-        return guiTop + 26 + technology.getY();
+        return guiTop + TREE_NODE_Y_OFFSET + scaledTreeY(technology) - treeScrollY;
     }
 
     private int nodeCenterX(TOGTechnology technology) {

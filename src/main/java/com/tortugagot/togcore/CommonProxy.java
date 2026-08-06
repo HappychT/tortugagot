@@ -50,6 +50,9 @@ public class CommonProxy {
     public void receiveTechnologySync(int masteryPoints, Collection<String> unlockedTechnologies) {
     }
 
+    public void receivePassiveCounterUpdate(String label, int count, int threshold, boolean ready) {
+    }
+
     public boolean hasClientTechnology(String id) {
         return false;
     }

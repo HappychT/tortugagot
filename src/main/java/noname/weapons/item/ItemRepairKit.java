@@ -1,6 +1,7 @@
 package noname.weapons.item;
 
 import got.common.database.GOTCreativeTabs;
+import com.tortugagot.togcore.technology.TOGEngineeringTechnology;
 import noname.weapons.world.BlockDamageStorage;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -31,6 +32,11 @@ public class ItemRepairKit extends Item {
 
     @Override
     public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote && !TOGEngineeringTechnology.canUseRepairKit(player)) {
+            TOGEngineeringTechnology.notifyRepairKitBlocked(player);
+            return false;
+        }
+
         if (!player.canPlayerEdit(x, y, z, side, stack)) {
             return false;
         }

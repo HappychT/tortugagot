@@ -20,6 +20,37 @@ public final class TOGWeaponTechnology {
         if (stack == null) {
             return null;
         }
+        TOGWarriorTechnology.WeaponCategory category = TOGWarriorTechnology.getWeaponCategory(stack);
+        if (category != null) {
+            switch (category) {
+                case SWORD:
+                    return TOGTechnologyLocks.SWORD_MASTERY;
+                case CLAYMORE:
+                    return TOGTechnologyLocks.CLAYMORE_MASTERY;
+                case TWO_HANDED_SWORD:
+                    return TOGTechnologyLocks.TWO_HANDED_SWORD_MASTERY;
+                case DAGGER:
+                    return TOGTechnologyLocks.DAGGER_MASTERY;
+                case SPEAR:
+                    return TOGTechnologyLocks.SPEAR_MASTERY;
+                case PIKE:
+                    return TOGTechnologyLocks.PIKE_MASTERY;
+                case GLAIVE:
+                    return TOGTechnologyLocks.GLAIVE_MASTERY;
+                case SHIELD:
+                    return TOGTechnologyLocks.SHIELD_MASTERY;
+                case AXE:
+                    return TOGTechnologyLocks.AXE_MASTERY;
+                case HAMMER:
+                    return TOGTechnologyLocks.HAMMER_MASTERY;
+                case BOW:
+                    return TOGTechnologyLocks.BOW_MASTERY;
+                case CROSSBOW:
+                    return TOGTechnologyLocks.CROSSBOW_MASTERY;
+                default:
+                    break;
+            }
+        }
         Item item = stack.getItem();
         if (item == GOTRegistry.westerosSword) {
             return TOGTechnologyLocks.SWORD_MASTERY;
@@ -55,6 +86,10 @@ public final class TOGWeaponTechnology {
     public static boolean isMeleeWeapon(ItemStack stack) {
         if (stack == null) {
             return false;
+        }
+        TOGWarriorTechnology.WeaponCategory category = TOGWarriorTechnology.getWeaponCategory(stack);
+        if (category != null) {
+            return category != TOGWarriorTechnology.WeaponCategory.BOW && category != TOGWarriorTechnology.WeaponCategory.CROSSBOW;
         }
         Item item = stack.getItem();
         return item == GOTRegistry.westerosSword

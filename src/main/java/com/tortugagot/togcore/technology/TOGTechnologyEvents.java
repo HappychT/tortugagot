@@ -6,8 +6,11 @@ import java.util.Map;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.ItemSmeltedEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
+import com.tortugagot.togcore.recipe.TOGRecipeBallistaBolt;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import got.common.block.other.GOTBlockBerryBush;
 import got.common.block.other.GOTBlockCorn;
@@ -22,6 +25,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -55,7 +60,20 @@ public class TOGTechnologyEvents {
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.player.worldObj.isRemote || TOGTechnologyLocks.has(event.player, TOGTechnologyLocks.FACTION_ARMOR)) {
+        if (event.phase != TickEvent.Phase.END || event.player.worldObj.isRemote) {
+            return;
+        }
+        if (TOGWarriorTechnology.isStunned(event.player)) {
+            event.player.setSprinting(false);
+            event.player.clearItemInUse();
+            if (event.player.motionY > 0.0D) {
+                event.player.motionY = 0.0D;
+            }
+            event.player.jumpMovementFactor = 0.0F;
+        }
+        TOGWarriorTechnology.updateShieldWall(event.player);
+        TOGCookingTechnology.discardLockedCookingOutputs(event.player);
+        if (TOGTechnologyLocks.has(event.player, TOGTechnologyLocks.FACTION_ARMOR)) {
             return;
         }
         boolean changed = false;
@@ -79,6 +97,18 @@ public class TOGTechnologyEvents {
             event.player.inventory.markDirty();
             event.player.inventoryContainer.detectAndSendChanges();
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onAttackWhileStunned(AttackEntityEvent event) {
+        if (event.entityPlayer != null && !event.entityPlayer.worldObj.isRemote && TOGWarriorTechnology.isStunned(event.entityPlayer)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
+        TOGWarriorTechnology.updateSuppressedKnockback(event.entityLiving);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -116,13 +146,24 @@ public class TOGTechnologyEvents {
             return;
         }
         TOGGatheringTechnology.GatheringLock lock = TOGGatheringTechnology.getLock(event.block, event.blockMetadata);
-        if (lock == null || player != null && TOGTechnologyLocks.has(player, lock.getTechnologyId())) {
+        if (lock != null && (player == null || !TOGTechnologyLocks.has(player, lock.getTechnologyId()))) {
+            event.drops.clear();
+            if (player != null) {
+                notifyBlocked(player, lock);
+            }
             return;
         }
-        event.drops.clear();
-        if (player != null) {
-            notifyBlocked(player, lock);
-        }
+        TOGMiningTechnology.applyHarvestDrops(event);
+    }
+
+    @SubscribeEvent
+    public void onItemCrafted(ItemCraftedEvent event) {
+        TOGRecipeBallistaBolt.consumeExtraSteel(event.crafting, event.craftMatrix);
+    }
+
+    @SubscribeEvent
+    public void onItemSmelted(ItemSmeltedEvent event) {
+        TOGCookingTechnology.discardSmeltedItem(event.player, event.smelting);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 import got.GOT;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.multiplayer.WorldClient;
 
@@ -36,10 +37,19 @@ public class GOTGuiButtonMenu extends GuiButton {
 	@Override
 	public void drawButton(Minecraft mc, int i, int j) {
 		if (visible) {
-			mc.getTextureManager().bindTexture(GOTGuiMenu.menuIconsTexture);
 			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			field_146123_n = i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
-			drawTexturedModalRect(xPosition, yPosition, 0 + (enabled ? 0 : width * 2) + (field_146123_n ? width : 0), iconIndex * height, width, height);
+			if (iconIndex < 0) {
+				mc.getTextureManager().bindTexture(GOTGuiMenu.technologyMenuIconTexture);
+				if (!enabled) {
+					GL11.glColor4f(0.45f, 0.45f, 0.45f, 1.0f);
+				}
+				Gui.func_152125_a(xPosition, yPosition, 0.0f, 0.0f, width, height, width, height, 32.0f, 32.0f);
+			} else {
+				mc.getTextureManager().bindTexture(GOTGuiMenu.menuIconsTexture);
+				drawTexturedModalRect(xPosition, yPosition, 0 + (enabled ? 0 : width * 2) + (field_146123_n ? width : 0), iconIndex * height, width, height);
+			}
+			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			mouseDragged(mc, i, j);
 		}
 	}

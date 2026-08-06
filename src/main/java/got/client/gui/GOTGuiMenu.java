@@ -16,6 +16,7 @@ import net.minecraft.util.*;
 
 public class GOTGuiMenu extends GOTGuiScreenBase {
 	public static ResourceLocation menuIconsTexture = new ResourceLocation("got:textures/gui/menu_icons.png");
+	public static ResourceLocation technologyMenuIconTexture = new ResourceLocation("togcore:textures/gui/technology_menu.png");
 	public static Class<? extends GOTGuiMenuWBBase> lastMenuScreen = null;
 	public boolean sentCheckPacket = false;
 
@@ -62,7 +63,7 @@ public class GOTGuiMenu extends GOTGuiScreenBase {
 		buttonList.add(new GOTGuiButtonMenu(this, 6, 0, 0, GOTGuiFellowships.class, StatCollector.translateToLocal("got.gui.fellowships"), 25));
 		buttonList.add(new GOTGuiButtonMenu(this, 7, 0, 0, GOTGuiTitles.class, StatCollector.translateToLocal("got.gui.titles"), 20));
 		buttonList.add(new GOTGuiButtonMenu(this, 5, 0, 0, GOTGuiShields.class, StatCollector.translateToLocal("got.gui.atribute"), 31));
-		buttonList.add(new GOTGuiButtonMenu(this, 9, 0, 0, TOGGuiTechnologyTree.class, "Древо технологий", -1, 2));
+		buttonList.add(new GOTGuiButtonMenu(this, 9, 0, 0, TOGGuiTechnologyTree.class, "Древо технологий", -1, -1));
 		buttonList.add(new GOTGuiButtonMenu(this, 1, 0, 0, GOTGuiOptions.class, StatCollector.translateToLocal("got.gui.options"), 24));
 		ArrayList<GOTGuiButtonMenu> menuButtons = new ArrayList<>();
 		for (Object obj : buttonList) {

@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.tortugagot.togcore.technology.TOGTechnologyNotifier;
+import com.tortugagot.togcore.technology.TOGWarriorTechnology;
 
 import codechicken.nei.NEIModContainer;
 import codechicken.nei.api.IConfigureNEI;
@@ -1297,6 +1298,22 @@ public class GOTEventHandler implements IFuelHandler {
 
         if (attacker != null && attacker.isPotionActive(GOTEffects.rage)) {
             event.ammount += event.ammount * 0.25f;
+        }
+
+        if (!world.isRemote) {
+            float projectileDamageFactor = GOTEnchantmentHelper.calcProjectileRangedDamageFactor(event.source.getSourceOfDamage());
+            if (projectileDamageFactor != 1.0F) {
+                event.ammount *= projectileDamageFactor;
+            }
+            if (!event.isCanceled() && attacker instanceof EntityPlayer && !(entity instanceof EntityPlayer)) {
+                TOGWarriorTechnology.CombatAdjustment adjustment = TOGWarriorTechnology.prepareNonPlayerHit((EntityPlayer) attacker, entity, event.source, event.ammount);
+                event.ammount = adjustment.getAmount();
+                if (adjustment.suppressesKnockback()) {
+                    TOGWarriorTechnology.suppressKnockback(entity);
+                }
+                TOGWarriorTechnology.afterResolvedHit((EntityPlayer) attacker, entity, event.source, false);
+                TOGWarriorTechnology.afterProjectileHit((EntityPlayer) attacker, entity, event.source);
+            }
         }
 
         if (entity instanceof EntityPlayerMP && event.source == GOTDamage.frost && !(((EntityPlayerMP) entity).isPotionActive(GOTEffects.frostResistance) || entity.isPotionActive(GOTEffects.antiEffect.id))) {

@@ -1,5 +1,6 @@
 package got.common.handlers;
 
+import com.tortugagot.togcore.technology.TOGWarriorTechnology;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import got.common.database.GOTEffects;
@@ -34,12 +35,16 @@ public class BlockServerHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onLivingHurt(LivingHurtEvent event) {
         World world = event.entityLiving.worldObj;
+        if (TOGWarriorTechnology.isApplyingPureDamage()) {
+            return;
+        }
 
         if (!(event.entity instanceof EntityPlayer)) {
             if (event.source.getEntity() instanceof EntityPlayer) {
                 EntityPlayer attacker = (EntityPlayer) event.source.getEntity();
                 if (attacker.getHeldItem() != null && attacker.getHeldItem().getItem() instanceof ItemSword) {
-                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), attacker).getStaminaAttackPercent() / 5.0, attacker);
+                    double baseAttackCost = GOTCoreBlockingSystem.getBlockData(attacker.getHeldItem().getItem().getClass(), attacker).getStaminaAttackPercent() / 5.0;
+                    StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getAttackStaminaCost(attacker, attacker.getHeldItem(), baseAttackCost), attacker);
                 }
             }
             return;
@@ -51,6 +56,20 @@ public class BlockServerHandler {
         if (event.source.getEntity() instanceof EntityPlayer) {
             attackerPlayer = (EntityPlayer) event.source.getEntity();
         }
+        boolean targetBlocking = isBlocking(player);
+        boolean damageBlocked = false;
+        if (targetBlocking) {
+            float[] blockAngles = {
+                    GOTCoreBlockingSystem.getBlockData(player.getHeldItem().getItem().getClass(), player).getLeftBlockAngle(),
+                    GOTCoreBlockingSystem.getBlockData(player.getHeldItem().getItem().getClass(), player).getRightBlockAngle()
+            };
+            damageBlocked = isDamageBlocked(player, event.source, blockAngles);
+        }
+        TOGWarriorTechnology.CombatAdjustment togAdjustment = TOGWarriorTechnology.preparePlayerHit(attackerPlayer, player, event.source, event.ammount, damageBlocked);
+        event.ammount = togAdjustment.getAmount();
+        if (togAdjustment.suppressesKnockback()) {
+            TOGWarriorTechnology.suppressKnockback(player);
+        }
 
         if (attackerPlayer != null) {
             ItemStack attackerWeapon = attackerPlayer.getHeldItem();
@@ -58,7 +77,8 @@ public class BlockServerHandler {
                 Item weapon = attackerWeapon.getItem();
 
                 if (weapon instanceof ItemSword) {
-                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(weapon.getClass(), player).getStaminaAttackPercent(), attackerPlayer);
+                    double baseAttackCost = GOTCoreBlockingSystem.getBlockData(weapon.getClass(), player).getStaminaAttackPercent();
+                    StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getAttackStaminaCost(attackerPlayer, attackerWeapon, baseAttackCost), attackerPlayer);
                 }
 
                 if (weapon instanceof ItemPoisonedSandBlade) {
@@ -132,13 +152,8 @@ public class BlockServerHandler {
             }
         }
 
-        if (isBlocking(player)) {
-            float[] blockAngles = {
-                    GOTCoreBlockingSystem.getBlockData(player.getHeldItem().getItem().getClass(), player).getLeftBlockAngle(),
-                    GOTCoreBlockingSystem.getBlockData(player.getHeldItem().getItem().getClass(), player).getRightBlockAngle()
-            };
-
-            if (isDamageBlocked(player, event.source, blockAngles)) {
+        if (targetBlocking) {
+            if (damageBlocked && !togAdjustment.ignoresBlock()) {
 
                 int itemDamage = (attackerPlayer != null) ? 3 : 2;
                 player.getHeldItem().damageItem(itemDamage, player);
@@ -146,29 +161,32 @@ public class BlockServerHandler {
                 player.worldObj.playSoundAtEntity(player, "got:combat_block", 1, 1);
                 event.setCanceled(true);
                 player.addPotionEffect(new PotionEffect(GOTEffects.antiEffect.id, 1));
+                TOGWarriorTechnology.recordSuccessfulBlock(player);
 
                 if (attackerPlayer != null && attackerPlayer.getHeldItem() != null && attackerPlayer.getHeldItem().getItem() instanceof ItemSword) {
-                    StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attackerPlayer.getHeldItem().getItem().getClass(), player).getStaminaHitPercent(), player);
+                    double baseBlockCost = GOTCoreBlockingSystem.getBlockData(attackerPlayer.getHeldItem().getItem().getClass(), player).getStaminaHitPercent();
+                    StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getBlockingTargetStaminaDrain(attackerPlayer, player, event.source, baseBlockCost), player);
                 } else {
-                    StaminaServerHandler.drainStaminaByPercent(0.5, player);
+                    StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getBlockingTargetStaminaDrain(attackerPlayer, player, event.source, 0.5), player);
                 }
 
             } else {
-                if (!event.source.isUnblockable()) {
+                if (!event.source.isUnblockable() && !togAdjustment.skipsBlockVulnerability()) {
                     event.ammount += event.ammount;
                 }
 
                 if (attackerPlayer != null) {
                     if (attackerPlayer.getHeldItem() != null && attackerPlayer.getHeldItem().getItem() instanceof ItemSword) {
-                        StaminaServerHandler.drainStaminaByPercent(GOTCoreBlockingSystem.getBlockData(attackerPlayer.getHeldItem().getItem().getClass(), player).getStaminaHitPercent() / 5.0, player);
+                        double baseBlockCost = GOTCoreBlockingSystem.getBlockData(attackerPlayer.getHeldItem().getItem().getClass(), player).getStaminaHitPercent() / 5.0;
+                        StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getBlockingTargetStaminaDrain(attackerPlayer, player, event.source, baseBlockCost), player);
                     }
                     if (attackerPlayer.getHeldItem() != null && attackerPlayer.getHeldItem().getItem() == GOTRegistry.syrioForelSword) {
-                        StaminaServerHandler.drainStaminaByPercent(3.0, player);
+                        StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getBlockingTargetStaminaDrain(attackerPlayer, player, event.source, 3.0), player);
                         int amountToRegain = (int) (StaminaServerHandler.MAX_STAMINA * 0.03);
                         StaminaServerHandler.regainStamina(amountToRegain, attackerPlayer);
                     }
                 } else {
-                    StaminaServerHandler.drainStaminaByPercent(0.5, player);
+                    StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getBlockingTargetStaminaDrain(null, player, event.source, 0.5), player);
                 }
             }
 
@@ -182,12 +200,20 @@ public class BlockServerHandler {
             }
         }
 
+        if (attackerPlayer != null) {
+            TOGWarriorTechnology.applyShieldWallIfReady(attackerPlayer, player, targetBlocking);
+            if (!event.isCanceled()) {
+                TOGWarriorTechnology.afterResolvedHit(attackerPlayer, player, event.source, damageBlocked && togAdjustment.ignoresBlock());
+                TOGWarriorTechnology.afterProjectileHit(attackerPlayer, player, event.source);
+            }
+        }
+
         if (event.source.isProjectile()) {
             if (event.source.getSourceOfDamage() instanceof EntityArrow) {
-                StaminaServerHandler.drainStaminaByPercent(1, player);
+                StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getRangedTargetStaminaDrain(attackerPlayer, event.source, 1.0D), player);
             }
             if (event.source.getSourceOfDamage() instanceof GOTEntityCrossbowBolt)
-                StaminaServerHandler.drainStaminaByPercent(2, player);
+                StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getRangedTargetStaminaDrain(attackerPlayer, event.source, 2.0D), player);
         }
 
 
@@ -240,7 +266,7 @@ public class BlockServerHandler {
     }
 
     public boolean isBlocking(EntityPlayer player) {
-        return player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword && player.isBlocking();
+        return !TOGWarriorTechnology.isStunned(player) && player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword && player.isBlocking();
     }
 
     private boolean isDamageBlocked(EntityPlayer player, DamageSource source, float[] blockAngles) {

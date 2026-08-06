@@ -88,7 +88,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
                     knife.setFire(100);
                 }
                 for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-                    if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+                    if (!GOTEnchantmentHelper.shouldApplyProjectileEnchantment(itemstack, ench)) {
                         continue;
                     }
                     GOTEnchantmentHelper.setProjectileEnchantment(knife, ench);

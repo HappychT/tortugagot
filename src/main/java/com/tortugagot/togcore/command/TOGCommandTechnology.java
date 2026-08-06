@@ -4,6 +4,7 @@ import com.tortugagot.togcore.Config;
 import com.tortugagot.togcore.technology.TOGTechnology;
 import com.tortugagot.togcore.technology.TOGTechnologyPlayerData;
 import com.tortugagot.togcore.technology.TOGTechnologyRegistry;
+import got.common.GOTConfig;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -15,12 +16,14 @@ import net.minecraft.util.ChatComponentText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class TOGCommandTechnology extends CommandBase {
-    private static final String[] ROOT_COMMANDS = {"points", "tech", "reset", "openall", "list", "reload"};
+    private static final String[] ROOT_COMMANDS = {"points", "tech", "smithchance", "reset", "openall", "list", "reload"};
     private static final String[] POINT_COMMANDS = {"get", "add", "remove", "set"};
     private static final String[] TECH_COMMANDS = {"open", "close", "list"};
+    private static final String[] SMITH_CHANCE_COMMANDS = {"get", "set", "reload"};
 
     @Override
     public String getCommandName() {
@@ -29,7 +32,7 @@ public class TOGCommandTechnology extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/togtech points <get|add|remove|set> [player] [amount], /togtech tech <open|close|list> [player] [technology], /togtech reset [player], /togtech openall [player], /togtech list, /togtech reload";
+        return "/togtech points <get|add|remove|set> [player] [amount], /togtech tech <open|close|list> [player] [technology], /togtech smithchance <get|set|reload> [key] [percent], /togtech reset [player], /togtech openall [player], /togtech list, /togtech reload";
     }
 
     @Override
@@ -61,6 +64,15 @@ public class TOGCommandTechnology extends CommandBase {
         }
         if (args.length == 2 && "tech".equalsIgnoreCase(args[0])) {
             return CommandBase.getListOfStringsMatchingLastWord(args, TECH_COMMANDS);
+        }
+        if (args.length == 2 && "smithchance".equalsIgnoreCase(args[0])) {
+            return CommandBase.getListOfStringsMatchingLastWord(args, SMITH_CHANCE_COMMANDS);
+        }
+        if (args.length == 3 && "smithchance".equalsIgnoreCase(args[0]) && ("get".equalsIgnoreCase(args[1]) || "set".equalsIgnoreCase(args[1]))) {
+            return CommandBase.getListOfStringsMatchingLastWord(args, GOTConfig.getLegendarySmithChanceKeys());
+        }
+        if (args.length == 4 && "smithchance".equalsIgnoreCase(args[0]) && "set".equalsIgnoreCase(args[1])) {
+            return CommandBase.getListOfStringsMatchingLastWord(args, "0", "0.35", "2.5", "100");
         }
         if (args.length == 3 && "tech".equalsIgnoreCase(args[0]) && ("open".equalsIgnoreCase(args[1]) || "close".equalsIgnoreCase(args[1]))) {
             return CommandBase.getListOfStringsMatchingLastWord(args, combine(MinecraftServer.getServer().getAllUsernames(), getTechnologyIds()));
@@ -119,6 +131,10 @@ public class TOGCommandTechnology extends CommandBase {
         }
         if ("tech".equalsIgnoreCase(args[0])) {
             processTechCommand(sender, args);
+            return;
+        }
+        if ("smithchance".equalsIgnoreCase(args[0])) {
+            processSmithChanceCommand(sender, args);
             return;
         }
         throw new WrongUsageException(getCommandUsage(sender));
@@ -197,6 +213,56 @@ public class TOGCommandTechnology extends CommandBase {
             return;
         }
         throw new WrongUsageException(getCommandUsage(sender));
+    }
+
+    private void processSmithChanceCommand(ICommandSender sender, String[] args) {
+        if (args.length < 2) {
+            throw new WrongUsageException(getCommandUsage(sender));
+        }
+        String action = args[1];
+        if ("reload".equalsIgnoreCase(action)) {
+            requireLength(args, 2);
+            if (!GOTConfig.reload()) {
+                throw new CommandException("GOT config is not loaded.");
+            }
+            sender.addChatMessage(new ChatComponentText("GOT config reloaded. Legendary Smith chances are applied from config/GOT.cfg."));
+            return;
+        }
+        if ("get".equalsIgnoreCase(action)) {
+            requireLengthRange(args, 2, 3);
+            if (args.length == 3) {
+                sendSmithChance(sender, args[2]);
+                return;
+            }
+            for (String key : GOTConfig.getLegendarySmithChanceKeys()) {
+                sendSmithChance(sender, key);
+            }
+            return;
+        }
+        if ("set".equalsIgnoreCase(action)) {
+            requireLength(args, 4);
+            String key = args[2];
+            if (!GOTConfig.isLegendarySmithChanceKey(key)) {
+                throw new CommandException("Unknown Legendary Smith chance key: " + key);
+            }
+            double value = CommandBase.parseDoubleBounded(sender, args[3], 0.0D, 100.0D);
+            double applied = GOTConfig.setLegendarySmithChance(key, value);
+            sender.addChatMessage(new ChatComponentText("Legendary Smith chance " + key + " set to " + formatChance(applied) + "%. Saved to config/GOT.cfg."));
+            return;
+        }
+        throw new WrongUsageException(getCommandUsage(sender));
+    }
+
+    private void sendSmithChance(ICommandSender sender, String key) {
+        double chance = GOTConfig.getLegendarySmithChance(key);
+        if (Double.isNaN(chance)) {
+            throw new CommandException("Unknown Legendary Smith chance key: " + key);
+        }
+        sender.addChatMessage(new ChatComponentText("Legendary Smith chance " + key + " = " + formatChance(chance) + "%"));
+    }
+
+    private String formatChance(double chance) {
+        return String.format(Locale.ROOT, "%.3f", chance);
     }
 
     private void sendAllTechnologyList(ICommandSender sender) {

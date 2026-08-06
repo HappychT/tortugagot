@@ -112,7 +112,7 @@ public class GOTItemSarbacane extends Item {
 			dart.setFire(100);
 		}
 		for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-			if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+			if (!GOTEnchantmentHelper.shouldApplyProjectileEnchantment(itemstack, ench)) {
 				continue;
 			}
 			GOTEnchantmentHelper.setProjectileEnchantment(dart, ench);
@@ -122,7 +122,7 @@ public class GOTItemSarbacane extends Item {
 	public static float getSarbacaneLaunchSpeedFactor(ItemStack itemstack) {
 		float f = 1.0f;
 		if (itemstack != null) {
-			f *= GOTEnchantmentHelper.calcRangedDamageFactor(itemstack);
+			f *= GOTEnchantmentHelper.calcRangedLaunchDamageFactor(itemstack);
 		}
 		return f;
 	}

@@ -8,6 +8,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 public class TOGWeaponSkillClientEvents {
     private boolean shakeApplied;
@@ -39,6 +40,28 @@ public class TOGWeaponSkillClientEvents {
         camera.rotationPitch += appliedPitch;
         camera.rotationYaw += appliedYaw;
         shakeApplied = true;
+    }
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            TOGClientPassiveCounterData.tick();
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
+        if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR || !TOGClientPassiveCounterData.isVisible()) {
+            return;
+        }
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (minecraft.thePlayer == null || minecraft.fontRenderer == null) {
+            return;
+        }
+        String text = TOGClientPassiveCounterData.getDisplayText();
+        int x = event.resolution.getScaledWidth() / 2 - minecraft.fontRenderer.getStringWidth(text) / 2;
+        int y = event.resolution.getScaledHeight() - 68;
+        minecraft.fontRenderer.drawStringWithShadow(text, x, y, TOGClientPassiveCounterData.getColor());
     }
 
     private void removeShake() {

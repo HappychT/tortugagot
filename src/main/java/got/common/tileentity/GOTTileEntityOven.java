@@ -2,6 +2,7 @@ package got.common.tileentity;
 
 import java.util.*;
 
+import com.tortugagot.togcore.technology.TOGCookingTechnology;
 import cpw.mods.fml.relauncher.*;
 import got.common.block.other.GOTBlockOven;
 import got.common.database.GOTRegistry;
@@ -26,6 +27,7 @@ public class GOTTileEntityOven extends TileEntity implements ISidedInventory {
 	public int[] inputSlots = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 	public int[] outputSlots = { 9, 10, 11, 12, 13, 14, 15, 16, 17 };
 	public int fuelSlot = 18;
+	private UUID lastInteractingPlayerUuid;
 
 	public boolean canCook(int i) {
 		if (inventory[i] == null) {
@@ -72,13 +74,26 @@ public class GOTTileEntityOven extends TileEntity implements ISidedInventory {
 	public void closeInventory() {
 	}
 
+	public void setLastInteractingPlayer(EntityPlayer player) {
+		if (player == null || worldObj != null && worldObj.isRemote) {
+			return;
+		}
+		lastInteractingPlayerUuid = player.getUniqueID();
+		markDirty();
+	}
+
 	public void cookItem(int i) {
 		if (canCook(i)) {
 			ItemStack itemstack = FurnaceRecipes.smelting().getSmeltingResult(inventory[i]);
-			if (inventory[i + 9] == null) {
-				inventory[i + 9] = itemstack.copy();
-			} else if (inventory[i + 9].isItemEqual(itemstack)) {
-				inventory[i + 9].stackSize += itemstack.stackSize;
+			String requiredTechnologyId = TOGCookingTechnology.getRequiredTechnologyForResult(itemstack);
+			if (TOGCookingTechnology.isCookingUnlockedFor(worldObj, lastInteractingPlayerUuid, xCoord, yCoord, zCoord, itemstack)) {
+				if (inventory[i + 9] == null) {
+					inventory[i + 9] = itemstack.copy();
+				} else if (inventory[i + 9].isItemEqual(itemstack)) {
+					inventory[i + 9].stackSize += itemstack.stackSize;
+				}
+			} else {
+				TOGCookingTechnology.notifyNearbyCookingBlocked(worldObj, xCoord, yCoord, zCoord, itemstack, requiredTechnologyId);
 			}
 			--inventory[i].stackSize;
 			if (inventory[i].stackSize <= 0) {
@@ -233,6 +248,13 @@ public class GOTTileEntityOven extends TileEntity implements ISidedInventory {
 		if (nbt.hasKey("CustomName")) {
 			specialOvenName = nbt.getString("CustomName");
 		}
+		if (nbt.hasKey("TOGLastInteractingPlayer")) {
+			try {
+				lastInteractingPlayerUuid = UUID.fromString(nbt.getString("TOGLastInteractingPlayer"));
+			} catch (IllegalArgumentException ignored) {
+				lastInteractingPlayerUuid = null;
+			}
+		}
 	}
 
 	@Override
@@ -307,6 +329,9 @@ public class GOTTileEntityOven extends TileEntity implements ISidedInventory {
 		nbt.setShort("CookTime", (short) currentCookTime);
 		if (hasCustomInventoryName()) {
 			nbt.setString("CustomName", specialOvenName);
+		}
+		if (lastInteractingPlayerUuid != null) {
+			nbt.setString("TOGLastInteractingPlayer", lastInteractingPlayerUuid.toString());
 		}
 	}
 

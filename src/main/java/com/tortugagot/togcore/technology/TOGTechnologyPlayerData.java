@@ -184,6 +184,10 @@ public class TOGTechnologyPlayerData implements IExtendedEntityProperties {
         if (hasUnlocked(id)) {
             return "Технология уже открыта.";
         }
+        String exclusiveChoiceId = TOGTechnologyRules.getExclusiveStaminaChoiceId(id);
+        if (exclusiveChoiceId != null && hasUnlocked(exclusiveChoiceId)) {
+            return "Уже выбран альтернативный узел стамины: " + getTechnologyName(exclusiveChoiceId) + ". Второй вариант доступен только после полного сброса древа.";
+        }
         int unlockCost = getUnlockCost(id);
         if (masteryPoints < unlockCost) {
             return "Недостаточно очков мастерства: нужно " + unlockCost + ".";
@@ -194,6 +198,10 @@ public class TOGTechnologyPlayerData implements IExtendedEntityProperties {
                 String name = prerequisite != null ? prerequisite.getName() : prerequisiteId;
                 return "Не открыта предыдущая технология: " + name + ".";
             }
+        }
+        String[] requiredChoiceGroup = TOGTechnologyRules.getRequiredStaminaChoiceGroup(id);
+        if (requiredChoiceGroup != null && !hasUnlocked(requiredChoiceGroup[0]) && !hasUnlocked(requiredChoiceGroup[1])) {
+            return "Сначала выберите один из узлов " + TOGTechnologyRules.getRequiredStaminaChoiceName(id) + ": " + getTechnologyName(requiredChoiceGroup[0]) + " или " + getTechnologyName(requiredChoiceGroup[1]) + ".";
         }
         return null;
     }
@@ -347,9 +355,14 @@ public class TOGTechnologyPlayerData implements IExtendedEntityProperties {
             return;
         }
         for (TOGTechnology technology : TOGTechnologyRegistry.getAll()) {
-            if (hasUnlocked(technology.getId()) && technology.getPrerequisites().contains(id)) {
+            if (hasUnlocked(technology.getId()) && (technology.getPrerequisites().contains(id) || TOGTechnologyRules.isRequiredStaminaChoiceFor(id, technology.getId()))) {
                 collectTechnologyAndDependents(technology.getId(), toClose);
             }
         }
+    }
+
+    private String getTechnologyName(String id) {
+        TOGTechnology technology = TOGTechnologyRegistry.get(id);
+        return technology != null ? technology.getName() : id;
     }
 }

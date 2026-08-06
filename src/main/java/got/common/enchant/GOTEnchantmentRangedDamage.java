@@ -1,5 +1,8 @@
 package got.common.enchant;
 
+import got.common.item.weapon.GOTItemCrossbow;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 
@@ -14,6 +17,15 @@ public class GOTEnchantmentRangedDamage extends GOTEnchantment {
 		} else {
 			setValueModifier(damageFactor);
 		}
+	}
+
+	@Override
+	public boolean canApply(ItemStack itemstack, boolean considering) {
+		if (this == GOTEnchantment.rangedStrong2) {
+			Item item = itemstack != null ? itemstack.getItem() : null;
+			return item instanceof ItemBow || item instanceof GOTItemCrossbow;
+		}
+		return super.canApply(itemstack, considering);
 	}
 
 	@Override

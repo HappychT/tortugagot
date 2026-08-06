@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.tortugagot.togcore.technology.TOGBrewingTechnology;
 import got.common.inventory.GOTSlotStackSize;
 import got.common.item.GOTPoisonedDrinks;
 import got.common.item.other.GOTItemMug;
@@ -196,8 +197,15 @@ public class GOTTileEntityBarrel extends TileEntity implements ISidedInventory {
 		return null;
 	}
 
-	public void handleBrewingButtonPress() {
+	public boolean handleBrewingButtonPress() {
+		return handleBrewingButtonPress(getFallbackBrewingPlayer());
+	}
+
+	public boolean handleBrewingButtonPress(EntityPlayer entityplayer) {
 		if (barrelMode == 0 && inventory[9] != null) {
+			if (TOGBrewingTechnology.blockIfNeeded(entityplayer, inventory[9])) {
+				return false;
+			}
 			int i;
 			barrelMode = 1;
 			for (i = 0; i < 9; ++i) {
@@ -220,18 +228,25 @@ public class GOTTileEntityBarrel extends TileEntity implements ISidedInventory {
 			}
 			if (!worldObj.isRemote) {
 				for (i = 0; i < players.size(); ++i) {
-					EntityPlayerMP entityplayer = players.get(i);
-					entityplayer.openContainer.detectAndSendChanges();
-					entityplayer.sendContainerToPlayer(entityplayer.openContainer);
+					EntityPlayerMP watchingPlayer = players.get(i);
+					watchingPlayer.openContainer.detectAndSendChanges();
+					watchingPlayer.sendContainerToPlayer(watchingPlayer.openContainer);
 				}
 			}
+			return true;
 		} else if (barrelMode == 1 && inventory[9] != null && inventory[9].getItemDamage() > 0) {
 			barrelMode = 2;
 			brewingTime = 0;
 			ItemStack itemstack = inventory[9].copy();
 			itemstack.setItemDamage(itemstack.getItemDamage() - 1);
 			inventory[9] = itemstack;
+			return true;
 		}
+		return false;
+	}
+
+	private EntityPlayer getFallbackBrewingPlayer() {
+		return players.isEmpty() ? null : players.get(players.size() - 1);
 	}
 
 	@Override
