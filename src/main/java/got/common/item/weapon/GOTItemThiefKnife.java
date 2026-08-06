@@ -1,5 +1,6 @@
 package got.common.item.weapon;
 
+import com.tortugagot.togcore.technology.TOGWarriorTechnology;
 import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTEffects;
 import got.common.database.GOTMaterial;
@@ -78,7 +79,7 @@ public class GOTItemThiefKnife extends GOTItemSpear {
             knife.setFire(100);
         }
         for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-            if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+            if (!GOTEnchantmentHelper.shouldApplyProjectileEnchantment(itemstack, ench)) {
                 continue;
             }
             GOTEnchantmentHelper.setProjectileEnchantment(knife, ench);
@@ -89,7 +90,7 @@ public class GOTItemThiefKnife extends GOTItemSpear {
         world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
         if (!world.isRemote) {
             world.spawnEntityInWorld(knife);
-            StaminaServerHandler.drainStaminaByPercent(2, entityplayer);
+            StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getAttackStaminaCost(entityplayer, itemstack, 2.0D), entityplayer);
         }
         if (!entityplayer.capabilities.isCreativeMode) {
             itemstack.damageItem(itemstack.getMaxDamage() / 8, entityplayer);

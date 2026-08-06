@@ -43,7 +43,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
     }
 
     @Override
-    public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> list, boolean flag) {
+    public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List list, boolean flag) {
         PotionEffect potion = this.effectType == 0 ? new PotionEffect(Potion.poison.id, 5 * 20) : new PotionEffect(GOTEffects.bleeding.id, 3 * 20);
         String s1 = StatCollector.translateToLocal(potion.getEffectName()).trim();
         s1 = s1 + " (" + Potion.getDurationString(potion) + ")";
@@ -83,7 +83,7 @@ public class GOTItemThrowingKnife extends Item implements GOTMaterialFinder {
                 knife.setFire(100);
             }
             for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-                if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+                if (!GOTEnchantmentHelper.shouldApplyProjectileEnchantment(itemstack, ench)) {
                     continue;
                 }
                 GOTEnchantmentHelper.setProjectileEnchantment(knife, ench);

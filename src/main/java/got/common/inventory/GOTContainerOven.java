@@ -17,6 +17,7 @@ public class GOTContainerOven extends Container {
 	public GOTContainerOven(InventoryPlayer inv, GOTTileEntityOven oven) {
 		int i;
 		theOven = oven;
+		theOven.setLastInteractingPlayer(inv.player);
 		for (i = 0; i < 9; ++i) {
 			addSlotToContainer(new Slot(oven, i, 8 + i * 18, 21));
 		}

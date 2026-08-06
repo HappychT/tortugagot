@@ -4,6 +4,9 @@ import java.util.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.tortugagot.togcore.registry.TOGItemRegistry;
+import com.tortugagot.togcore.technology.TOGTechnologyLocks;
+import com.tortugagot.togcore.technology.TOGTechnologyNotifier;
 import com.mojang.authlib.GameProfile;
 
 import got.GOT;
@@ -28,6 +31,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.oredict.*;
 
 public class GOTTileEntityUnsmeltery extends GOTTileEntityAlloyForge {
+	private static final double UNSMELTERY_NOTIFICATION_RANGE_SQ = 64.0D;
 	public static Random unsmeltingRand = new Random();
 	public static Map<Pair<Item, Integer>, Integer> unsmeltableCraftingCounts = new HashMap<>();
 	public float prevRocking;
@@ -41,6 +45,9 @@ public class GOTTileEntityUnsmeltery extends GOTTileEntityAlloyForge {
 	public boolean canBeUnsmelted(ItemStack itemstack) {
 		if (itemstack == null) {
 			return false;
+		}
+		if (getFixedUnsmeltingResult(itemstack) != null) {
+			return true;
 		}
 		ItemStack material = getEquipmentMaterial(itemstack);
 		if (material != null) {
@@ -56,6 +63,9 @@ public class GOTTileEntityUnsmeltery extends GOTTileEntityAlloyForge {
 	public boolean canDoSmelting() {
 		ItemStack input = inventory[inputSlots[0]];
 		if (input == null) {
+			return false;
+		}
+		if (!hasSmelterTechnology()) {
 			return false;
 		}
 		ItemStack result = getLargestUnsmeltingResult(input);
@@ -237,7 +247,14 @@ public class GOTTileEntityUnsmeltery extends GOTTileEntityAlloyForge {
 	}
 
 	public ItemStack getLargestUnsmeltingResult(ItemStack itemstack) {
-		if (itemstack == null || !canBeUnsmelted(itemstack)) {
+		if (itemstack == null) {
+			return null;
+		}
+		ItemStack fixedResult = getFixedUnsmeltingResult(itemstack);
+		if (fixedResult != null) {
+			return fixedResult;
+		}
+		if (!canBeUnsmelted(itemstack)) {
 			return null;
 		}
 		ItemStack material = GOTTileEntityUnsmeltery.getEquipmentMaterial(itemstack);
@@ -300,6 +317,9 @@ public class GOTTileEntityUnsmeltery extends GOTTileEntityAlloyForge {
 
 	@Override
 	public void updateEntity() {
+		if (worldObj != null && !worldObj.isRemote) {
+			notifyBlockedIfNeeded();
+		}
 		super.updateEntity();
 		if (!worldObj.isRemote) {
 			prevServerActive = serverActive;
@@ -318,6 +338,166 @@ public class GOTTileEntityUnsmeltery extends GOTTileEntityAlloyForge {
 			}
 			rocking = MathHelper.clamp_float(rocking, 0.0F, 1.0F);
 		}
+	}
+
+	private boolean hasSmelterTechnology() {
+		return isTechnologyUnlockedForForge(TOGTechnologyLocks.SMELTER);
+	}
+
+	private void notifyBlockedIfNeeded() {
+		if (worldObj.getTotalWorldTime() % 20L != 0L) {
+			return;
+		}
+		String reasonKey = getBlockedReasonKey();
+		if (reasonKey != null) {
+			notifyNearbyPlayers("unsmeltery:" + reasonKey, getBlockedMessage(reasonKey));
+		}
+	}
+
+	private String getBlockedReasonKey() {
+		ItemStack input = inventory[inputSlots[0]];
+		if (input == null) {
+			return null;
+		}
+		if (!hasSmelterTechnology()) {
+			return "locked";
+		}
+		ItemStack result = getLargestUnsmeltingResult(input);
+		if (result == null) {
+			return "unsmeltable";
+		}
+		if (forgeSmeltTime <= 0 && (inventory[fuelSlot] == null || TileEntityFurnace.getItemBurnTime(inventory[fuelSlot]) <= 0)) {
+			return "no_fuel";
+		}
+		ItemStack output = inventory[outputSlots[0]];
+		if (output == null) {
+			return null;
+		}
+		if (!output.isItemEqual(result)) {
+			return "output_mismatch";
+		}
+		int resultSize = output.stackSize + result.stackSize;
+		if (resultSize > getInventoryStackLimit() || resultSize > result.getMaxStackSize()) {
+			return "output_full";
+		}
+		return null;
+	}
+
+	private String getBlockedMessage(String reasonKey) {
+		if ("locked".equals(reasonKey)) {
+			return TOGTechnologyNotifier.buildMessage("использовать плавильню", "не открыта технология для использования плавильни", TOGTechnologyLocks.SMELTER);
+		}
+		if ("unsmeltable".equals(reasonKey)) {
+			return "Плавильня не работает: этот предмет нельзя переплавить.";
+		}
+		if ("no_fuel".equals(reasonKey)) {
+			return "Плавильня не работает: нужно положить топливо.";
+		}
+		if ("output_mismatch".equals(reasonKey)) {
+			return "Плавильня не работает: выходной слот занят другим предметом.";
+		}
+		if ("output_full".equals(reasonKey)) {
+			return "Плавильня не работает: в выходном слоте недостаточно места.";
+		}
+		return "Плавильня не работает.";
+	}
+
+	private void notifyNearbyPlayers(String key, String message) {
+		if (message == null || message.length() == 0) {
+			return;
+		}
+		for (Object obj : worldObj.playerEntities) {
+			if (!(obj instanceof EntityPlayer)) {
+				continue;
+			}
+			EntityPlayer player = (EntityPlayer) obj;
+			if (player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= UNSMELTERY_NOTIFICATION_RANGE_SQ) {
+				TOGTechnologyNotifier.notifyMessage(player, key, message);
+			}
+		}
+	}
+
+	private static ItemStack getFixedUnsmeltingResult(ItemStack itemstack) {
+		if (itemstack == null) {
+			return null;
+		}
+		Item item = itemstack.getItem();
+		int factionArmorResources = getFactionArmorResources(item);
+		if (factionArmorResources > 0) {
+			return new ItemStack(TOGItemRegistry.steel, factionArmorResources);
+		}
+		int westerosIronResources = getWesterosIronResources(item);
+		if (westerosIronResources > 0) {
+			return new ItemStack(Items.iron_ingot, westerosIronResources);
+		}
+		return null;
+	}
+
+	private static int getWesterosIronResources(Item item) {
+		if (isItem(item, GOTRegistry.westerosDagger, GOTRegistry.westerosDaggerPoisoned, GOTRegistry.westerosSpear, GOTRegistry.shieldWestorSpear)) {
+			return 1;
+		}
+		if (isItem(item, GOTRegistry.westerosSword, GOTRegistry.westerosPike, GOTRegistry.shieldWestorPike, GOTRegistry.westerosLance)) {
+			return 2;
+		}
+		if (isItem(item, GOTRegistry.ironCrossbow, GOTRegistry.westerosLongsword)) {
+			return 3;
+		}
+		if (isItem(item, GOTRegistry.westerosHammer, GOTRegistry.westerosPolearm, GOTRegistry.westerosGreatsword)) {
+			return 4;
+		}
+		if (item == GOTRegistry.battleaxeWestros) {
+			return 5;
+		}
+		if (item == GOTRegistry.westerosHelmet) {
+			return 5;
+		}
+		if (item == GOTRegistry.westerosHorseArmor) {
+			return 6;
+		}
+		if (item == GOTRegistry.westerosChestplate) {
+			return 8;
+		}
+		if (item == GOTRegistry.westerosLeggings) {
+			return 7;
+		}
+		if (item == GOTRegistry.westerosBoots) {
+			return 4;
+		}
+		return 0;
+	}
+
+	private static int getFactionArmorResources(Item item) {
+		if (isItem(item, GOTRegistry.arrynHelmet, GOTRegistry.crownlandsHelmet, GOTRegistry.dorneHelmet, GOTRegistry.dragonstoneHelmet,
+				GOTRegistry.giftHelmet, GOTRegistry.ironbornHelmet, GOTRegistry.northHelmet, GOTRegistry.reachHelmet,
+				GOTRegistry.riverlandsHelmet, GOTRegistry.stormlandsHelmet, GOTRegistry.westerlandsHelmet)) {
+			return 5;
+		}
+		if (isItem(item, GOTRegistry.arrynChestplate, GOTRegistry.crownlandsChestplate, GOTRegistry.dorneChestplate, GOTRegistry.dragonstoneChestplate,
+				GOTRegistry.giftChestplate, GOTRegistry.ironbornChestplate, GOTRegistry.northChestplate, GOTRegistry.reachChestplate,
+				GOTRegistry.riverlandsChestplate, GOTRegistry.stormlandsChestplate, GOTRegistry.westerlandsChestplate)) {
+			return 8;
+		}
+		if (isItem(item, GOTRegistry.arrynLeggings, GOTRegistry.crownlandsLeggings, GOTRegistry.dorneLeggings, GOTRegistry.dragonstoneLeggings,
+				GOTRegistry.giftLeggings, GOTRegistry.ironbornLeggings, GOTRegistry.northLeggings, GOTRegistry.reachLeggings,
+				GOTRegistry.riverlandsLeggings, GOTRegistry.stormlandsLeggings, GOTRegistry.westerlandsLeggings)) {
+			return 7;
+		}
+		if (isItem(item, GOTRegistry.arrynBoots, GOTRegistry.crownlandsBoots, GOTRegistry.dorneBoots, GOTRegistry.dragonstoneBoots,
+				GOTRegistry.giftBoots, GOTRegistry.ironbornBoots, GOTRegistry.northBoots, GOTRegistry.reachBoots,
+				GOTRegistry.riverlandsBoots, GOTRegistry.stormlandsBoots, GOTRegistry.westerlandsBoots)) {
+			return 4;
+		}
+		return 0;
+	}
+
+	private static boolean isItem(Item item, Item... candidates) {
+		for (Item candidate : candidates) {
+			if (item == candidate) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static ItemStack getEquipmentMaterial(ItemStack itemstack) {

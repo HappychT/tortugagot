@@ -1,0 +1,13 @@
+item.togcore:mastery_point_1.name=Знак мастерства (1)
+item.togcore:mastery_point_10.name=Знак мастерства (10)
+item.togcore:mastery_point_100.name=Знак мастерства (100)
+item.togcore:steel.name=Сталь
+item.togcore:steel_plate.name=Стальная пластина
+item.togcore:hardened_steel_plate.name=Закалённая стальная пластина
+item.togcore:mastery_point.desc=При использовании дает очки мастерства: %s.
+item.togcore:mastery_point.owner=Владелец: %s
+item.togcore:mastery_point.unbound=Владелец: не закреплен
+togcore.chat.masteryPointsAdded=Получено очков мастерства: %s. Новый баланс: %s.
+togcore.chat.masteryItemNoDrop=Не удалось: выбросить предмет с очками мастерства. Причина: предмет закреплен за владельцем и не передается. Требуемая технология: не требуется.
+togcore.chat.masteryItemNoTransfer=Не удалось: передать предмет с очками мастерства. Причина: предмет закреплен за владельцем и не помещается в общие хранилища или обмены. Требуемая технология: не требуется.
+togcore.chat.masteryItemWrongOwner=Не удалось: использовать предмет с очками мастерства. Причина: предмет закреплен за игроком %s. Требуемая технология: не требуется.

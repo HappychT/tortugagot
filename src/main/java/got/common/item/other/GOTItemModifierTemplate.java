@@ -63,6 +63,9 @@ public class GOTItemModifierTemplate extends Item {
 	public static ItemStack getRandomCommonTemplate(Random random) {
 		ArrayList<GOTEnchantmentHelper.WeightedRandomEnchant> applicable = new ArrayList<>();
 		for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
+			if (GOTEnchantmentHelper.isLegendarySmithModifier(ench)) {
+				continue;
+			}
 			if (!ench.hasTemplateItem()) {
 				continue;
 			}

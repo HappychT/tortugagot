@@ -16,6 +16,7 @@ public class GOTContainerAlloyForge extends Container {
 	public GOTContainerAlloyForge(InventoryPlayer inv, GOTTileEntityAlloyForge forge) {
 		int i;
 		theForge = forge;
+		theForge.setLastInteractingPlayer(inv.player);
 		for (i = 0; i < 4; ++i) {
 			addSlotToContainer(new Slot(forge, i, 53 + i * 18, 21));
 		}

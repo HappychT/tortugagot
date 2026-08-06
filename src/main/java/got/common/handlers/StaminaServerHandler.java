@@ -2,6 +2,7 @@ package got.common.handlers;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import com.tortugagot.togcore.technology.TOGWarriorTechnology;
 import got.common.database.GOTEffects;
 import got.common.enchant.GOTEnchantment;
 import got.common.enchant.GOTEnchantmentHelper;
@@ -263,7 +264,7 @@ public class StaminaServerHandler {
         EntityPlayer player = event.entityPlayer;
         if (player.worldObj.isRemote)
             return;
-        drainStaminaByPercent(3, player);
+        drainStaminaByPercent(TOGWarriorTechnology.getBowShotStaminaCost(player, 3.0D), player);
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
         extendedPlayer.setStandingStillCooldown(ACTION_REGEN_DELAY);
     }

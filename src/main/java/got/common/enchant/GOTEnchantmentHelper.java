@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import got.common.GOTConfig;
 import got.common.database.GOTRegistry;
 import got.common.item.other.GOTItemBridle;
+import got.common.item.weapon.GOTItemCrossbow;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
@@ -19,6 +20,10 @@ public class GOTEnchantmentHelper {
 	public static Random backupRand;
 
 	public static void applyRandomEnchantments(ItemStack itemstack, Random random, boolean skilful, boolean keepBanes) {
+		applyRandomEnchantments(itemstack, random, skilful, keepBanes, false, false);
+	}
+
+	public static void applyRandomEnchantments(ItemStack itemstack, Random random, boolean skilful, boolean keepBanes, boolean preventNegative, boolean legendarySmith) {
 		if (!keepBanes) {
 			clearEnchantsAndProgress(itemstack);
 		} else {
@@ -46,8 +51,16 @@ public class GOTEnchantmentHelper {
 			enchants = 1;
 		}
 
+		List<GOTEnchantment> chosenEnchants = new ArrayList<>();
+		if (legendarySmith) {
+			rollLegendarySmithEnchantments(itemstack, random, chosenEnchants);
+		}
+
 		List<WeightedRandomEnchant> applicable = new ArrayList<>();
 		for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
+			if (preventNegative && !ench.isBeneficial()) {
+				continue;
+			}
 			if (ench.canApply(itemstack, true) && (!ench.isSkilful() || skilful)) {
 				int weight = ench.getEnchantWeight();
 				if (weight > 0) {
@@ -69,9 +82,8 @@ public class GOTEnchantmentHelper {
 		}
 
 		if (!applicable.isEmpty()) {
-			List<GOTEnchantment> chosenEnchants = new ArrayList<>();
-
 			for (int l = 0; l < enchants; l++) {
+				removeIncompatibleEnchantments(applicable, chosenEnchants);
 				if (applicable.isEmpty()) {
 					break;
 				}
@@ -81,21 +93,13 @@ public class GOTEnchantmentHelper {
 				chosenEnchants.add(chosenEnch);
 
 				applicable.remove(chosenWre);
-
-				List<WeightedRandomEnchant> nowIncompatibles = new ArrayList<>();
-				for (WeightedRandomEnchant wre : applicable) {
-					GOTEnchantment otherEnch = wre.theEnchant;
-					if (!otherEnch.isCompatibleWith(chosenEnch)) {
-						nowIncompatibles.add(wre);
-					}
-				}
-				applicable.removeAll(nowIncompatibles);
+				removeIncompatibleEnchantments(applicable, chosenEnchants);
 			}
+		}
 
-			for (GOTEnchantment ench : chosenEnchants) {
-				if (ench.canApply(itemstack, false)) {
-					setHasEnchant(itemstack, ench);
-				}
+		for (GOTEnchantment ench : chosenEnchants) {
+			if (ench.canApply(itemstack, false)) {
+				setHasEnchant(itemstack, ench);
 			}
 		}
 
@@ -245,6 +249,47 @@ public class GOTEnchantmentHelper {
 		}
 
 		return damage;
+	}
+
+	public static float calcRangedLaunchDamageFactor(ItemStack itemstack) {
+		float damage = 1.0F;
+
+		if (itemstack != null) {
+			List<GOTEnchantment> enchants = getEnchantList(itemstack);
+			for (GOTEnchantment ench : enchants) {
+				if (ench instanceof GOTEnchantmentRangedDamage && !isProjectileDamageCalculatedOnHit(ench)) {
+					damage *= ((GOTEnchantmentRangedDamage) ench).damageFactor;
+				}
+			}
+		}
+
+		return damage;
+	}
+
+	public static float calcProjectileRangedDamageFactor(Entity entity) {
+		float damage = 1.0F;
+
+		if (entity == null) {
+			return damage;
+		}
+		NBTTagList tags = getEntityEnchantTags(entity, false);
+		if (tags != null) {
+			for (int i = 0; i < tags.tagCount(); i++) {
+				GOTEnchantment ench = GOTEnchantment.getEnchantmentByName(tags.getStringTagAt(i));
+				if (ench instanceof GOTEnchantmentRangedDamage && isProjectileDamageCalculatedOnHit(ench)) {
+					damage *= ((GOTEnchantmentRangedDamage) ench).damageFactor;
+				}
+			}
+		}
+
+		return damage;
+	}
+
+	public static boolean shouldApplyProjectileEnchantment(ItemStack itemstack, GOTEnchantment ench) {
+		if (ench == null || !ench.applyToProjectile() || !hasEnchant(itemstack, ench)) {
+			return false;
+		}
+		return ench != GOTEnchantment.rangedStrong2 || isBowOrCrossbow(itemstack);
 	}
 
 	public static float calcRangedSpeed(ItemStack itemstack) {
@@ -462,6 +507,44 @@ public class GOTEnchantmentHelper {
 		return Math.max(weight, 1);
 	}
 
+	public static double getLegendarySmithChance(GOTEnchantment ench, ItemStack itemstack) {
+		if (!isLegendarySmithModifier(ench)) {
+			return 0.0D;
+		}
+		if (ench == GOTEnchantment.meleeSpeed2) {
+			return GOTConfig.legendarySmithMeleeSpeedChance;
+		}
+		if (ench == GOTEnchantment.meleeReach2) {
+			return GOTConfig.legendarySmithMeleeReachChance;
+		}
+		if (ench == GOTEnchantment.strong3) {
+			return GOTConfig.legendarySmithMightyChance;
+		}
+		if (ench == GOTEnchantment.protect1) {
+			return GOTConfig.legendarySmithArmorProtectionChance;
+		}
+		if (ench == GOTEnchantment.protectFall2) {
+			return GOTConfig.legendarySmithFallProtectionChance;
+		}
+		if (ench == GOTEnchantment.protectRanged2) {
+			return GOTConfig.legendarySmithProjectileProtectionChance;
+		}
+		if (ench == GOTEnchantment.rangedStrong2 && isBowOrCrossbow(itemstack)) {
+			return GOTConfig.legendarySmithRangedDamageChance;
+		}
+		return 0.0D;
+	}
+
+	public static boolean isLegendarySmithModifier(GOTEnchantment ench) {
+		return ench == GOTEnchantment.meleeSpeed2
+				|| ench == GOTEnchantment.meleeReach2
+				|| ench == GOTEnchantment.strong3
+				|| ench == GOTEnchantment.protect1
+				|| ench == GOTEnchantment.protectFall2
+				|| ench == GOTEnchantment.protectRanged2
+				|| ench == GOTEnchantment.rangedStrong2;
+	}
+
 	public static boolean hasAppliedRandomEnchants(ItemStack itemstack) {
 		NBTTagCompound nbt = itemstack.getTagCompound();
 		if (nbt != null && nbt.hasKey("GOTRandomEnch")) {
@@ -667,6 +750,52 @@ public class GOTEnchantmentHelper {
 			if (tags != null) {
 				String enchName = ench.enchantName;
 				tags.appendTag(new NBTTagString(enchName));
+			}
+		}
+	}
+
+	private static boolean isBowOrCrossbow(ItemStack itemstack) {
+		if (itemstack == null || itemstack.getItem() == null) {
+			return false;
+		}
+		Item item = itemstack.getItem();
+		return item instanceof ItemBow || item instanceof GOTItemCrossbow;
+	}
+
+	private static boolean isCompatibleWithAll(List<GOTEnchantment> chosenEnchants, GOTEnchantment ench) {
+		for (GOTEnchantment chosenEnch : chosenEnchants) {
+			if (!chosenEnch.isCompatibleWith(ench) || !ench.isCompatibleWith(chosenEnch)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean isProjectileDamageCalculatedOnHit(GOTEnchantment ench) {
+		return ench instanceof GOTEnchantmentRangedDamage && ench.applyToProjectile();
+	}
+
+	private static void removeIncompatibleEnchantments(List<WeightedRandomEnchant> applicable, List<GOTEnchantment> chosenEnchants) {
+		if (chosenEnchants.isEmpty()) {
+			return;
+		}
+		Iterator<WeightedRandomEnchant> iterator = applicable.iterator();
+		while (iterator.hasNext()) {
+			WeightedRandomEnchant wre = iterator.next();
+			if (!isCompatibleWithAll(chosenEnchants, wre.theEnchant)) {
+				iterator.remove();
+			}
+		}
+	}
+
+	private static void rollLegendarySmithEnchantments(ItemStack itemstack, Random random, List<GOTEnchantment> chosenEnchants) {
+		for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
+			if (!isLegendarySmithModifier(ench) || !ench.canApply(itemstack, false) || !isCompatibleWithAll(chosenEnchants, ench)) {
+				continue;
+			}
+			double chance = getLegendarySmithChance(ench, itemstack);
+			if (chance > 0.0D && random.nextDouble() < chance / 100.0D) {
+				chosenEnchants.add(ench);
 			}
 		}
 	}

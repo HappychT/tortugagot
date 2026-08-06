@@ -18,6 +18,14 @@ public class GOTConfig {
 	public static String CATEGORY_GUI = GOTConfig.getCategory("3_gui");
 	public static String CATEGORY_ENVIRONMENT = GOTConfig.getCategory("4_environment");
 	public static String CATEGORY_MISC = GOTConfig.getCategory("5_misc");
+	private static final String LEGENDARY_SMITH_SWIFT_CHANCE = "Legendary Smith: Swift reforge chance (%)";
+	private static final String LEGENDARY_SMITH_EXTENDED_CHANCE = "Legendary Smith: Extended reforge chance (%)";
+	private static final String LEGENDARY_SMITH_MIGHTY_CHANCE = "Legendary Smith: Mighty reforge chance (%)";
+	private static final String LEGENDARY_SMITH_ARMOR_PROTECTION_CHANCE = "Legendary Smith: Armor protection reforge chance (%)";
+	private static final String LEGENDARY_SMITH_FALL_PROTECTION_CHANCE = "Legendary Smith: Fall protection reforge chance (%)";
+	private static final String LEGENDARY_SMITH_PROJECTILE_PROTECTION_CHANCE = "Legendary Smith: Projectile protection reforge chance (%)";
+	private static final String LEGENDARY_SMITH_RANGED_DAMAGE_CHANCE = "Legendary Smith: Powerful ranged reforge chance (%)";
+	private static final String[] LEGENDARY_SMITH_CHANCE_KEYS = {"swift", "extended", "mighty", "armor_protection", "fall_protection", "projectile_protection", "powerful_ranged"};
 	public static boolean lgbt;
 	public static boolean strictFactionTitleRequirements;
 	public static int customWaypointMinY;
@@ -32,6 +40,13 @@ public class GOTConfig {
 	public static boolean enableDothrakiSkirmish;
 	public static boolean enchantingVanilla;
 	public static boolean enchantingGOT;
+	public static double legendarySmithMeleeSpeedChance;
+	public static double legendarySmithMeleeReachChance;
+	public static double legendarySmithMightyChance;
+	public static double legendarySmithArmorProtectionChance;
+	public static double legendarySmithFallProtectionChance;
+	public static double legendarySmithProjectileProtectionChance;
+	public static double legendarySmithRangedDamageChance;
 	public static boolean clearMap;
 	public static boolean enchantingAutoRemoveVanilla;
 	public static int bannerWarningCooldown;
@@ -153,6 +168,103 @@ public class GOTConfig {
 		return GOTLevelData.clientside_thisServer_enchantingGOT;
 	}
 
+	private static double clampPercent(double value) {
+		if (Double.isNaN(value)) {
+			return 0.0D;
+		}
+		return Math.max(0.0D, Math.min(100.0D, value));
+	}
+
+	public static String[] getLegendarySmithChanceKeys() {
+		return LEGENDARY_SMITH_CHANCE_KEYS.clone();
+	}
+
+	public static double getLegendarySmithChance(String key) {
+		if ("swift".equalsIgnoreCase(key)) {
+			return legendarySmithMeleeSpeedChance;
+		}
+		if ("extended".equalsIgnoreCase(key)) {
+			return legendarySmithMeleeReachChance;
+		}
+		if ("mighty".equalsIgnoreCase(key)) {
+			return legendarySmithMightyChance;
+		}
+		if ("armor_protection".equalsIgnoreCase(key)) {
+			return legendarySmithArmorProtectionChance;
+		}
+		if ("fall_protection".equalsIgnoreCase(key)) {
+			return legendarySmithFallProtectionChance;
+		}
+		if ("projectile_protection".equalsIgnoreCase(key)) {
+			return legendarySmithProjectileProtectionChance;
+		}
+		if ("powerful_ranged".equalsIgnoreCase(key)) {
+			return legendarySmithRangedDamageChance;
+		}
+		return Double.NaN;
+	}
+
+	public static boolean isLegendarySmithChanceKey(String key) {
+		return !Double.isNaN(getLegendarySmithChance(key));
+	}
+
+	public static boolean reload() {
+		if (config == null) {
+			return false;
+		}
+		config.load();
+		load();
+		return true;
+	}
+
+	public static double setLegendarySmithChance(String key, double chance) {
+		double clamped = clampPercent(chance);
+		if ("swift".equalsIgnoreCase(key)) {
+			legendarySmithMeleeSpeedChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_SWIFT_CHANCE, clamped);
+			return clamped;
+		}
+		if ("extended".equalsIgnoreCase(key)) {
+			legendarySmithMeleeReachChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_EXTENDED_CHANCE, clamped);
+			return clamped;
+		}
+		if ("mighty".equalsIgnoreCase(key)) {
+			legendarySmithMightyChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_MIGHTY_CHANCE, clamped);
+			return clamped;
+		}
+		if ("armor_protection".equalsIgnoreCase(key)) {
+			legendarySmithArmorProtectionChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_ARMOR_PROTECTION_CHANCE, clamped);
+			return clamped;
+		}
+		if ("fall_protection".equalsIgnoreCase(key)) {
+			legendarySmithFallProtectionChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_FALL_PROTECTION_CHANCE, clamped);
+			return clamped;
+		}
+		if ("projectile_protection".equalsIgnoreCase(key)) {
+			legendarySmithProjectileProtectionChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_PROJECTILE_PROTECTION_CHANCE, clamped);
+			return clamped;
+		}
+		if ("powerful_ranged".equalsIgnoreCase(key)) {
+			legendarySmithRangedDamageChance = clamped;
+			setGameplayDouble(LEGENDARY_SMITH_RANGED_DAMAGE_CHANCE, clamped);
+			return clamped;
+		}
+		return Double.NaN;
+	}
+
+	private static void setGameplayDouble(String propertyName, double value) {
+		if (config == null) {
+			return;
+		}
+		config.get(CATEGORY_GAMEPLAY, propertyName, value).set(Double.toString(value));
+		config.save();
+	}
+
 	public static void load() {
 		languageCode = config.getString("languageCode", CATEGORY_LANGUAGE, languageCode, "Choose:" + GOT.langsName + ".");
 		enableFellowshipCreation = config.get(CATEGORY_GAMEPLAY, "Enable Fellowship creation", true, "If disabled, admins can still create Fellowships using the command").getBoolean();
@@ -172,6 +284,13 @@ public class GOTConfig {
 		enchantingVanilla = config.get(CATEGORY_GAMEPLAY, "Enchanting: Vanilla System", false, "Enable the vanilla enchanting system: if disabled, prevents players from enchanting items, but does not affect existing enchanted items").getBoolean();
 		enchantingGOT = config.get(CATEGORY_GAMEPLAY, "Enchanting: GOT System", true, "Enable the GOT enchanting system: if disabled, prevents newly crafted items, loot chest items, etc. from having modifiers applied, but does not affect existing modified items").getBoolean();
 		enchantingAutoRemoveVanilla = config.get(CATEGORY_GAMEPLAY, "Enchanting: Auto-remove vanilla enchants", false, "Intended for servers. If enabled, enchantments will be automatically removed from items").getBoolean();
+		legendarySmithMeleeSpeedChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_SWIFT_CHANCE, 2.5D, "Exact percent chance per reforge for the Swift melee modifier unlocked by Legendary Smith").getDouble());
+		legendarySmithMeleeReachChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_EXTENDED_CHANCE, 2.0D, "Exact percent chance per reforge for the Extended melee reach modifier unlocked by Legendary Smith").getDouble());
+		legendarySmithMightyChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_MIGHTY_CHANCE, 0.35D, "Exact percent chance per reforge for the Mighty melee damage modifier unlocked by Legendary Smith. Keep this much lower than other positive modifiers").getDouble());
+		legendarySmithArmorProtectionChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_ARMOR_PROTECTION_CHANCE, 2.5D, "Exact percent chance per reforge for the +1 armor protection modifier unlocked by Legendary Smith").getDouble());
+		legendarySmithFallProtectionChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_FALL_PROTECTION_CHANCE, 2.0D, "Exact percent chance per reforge for the +6 fall protection modifier unlocked by Legendary Smith").getDouble());
+		legendarySmithProjectileProtectionChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_PROJECTILE_PROTECTION_CHANCE, 2.0D, "Exact percent chance per reforge for the +2 projectile protection modifier unlocked by Legendary Smith").getDouble());
+		legendarySmithRangedDamageChance = clampPercent(config.get(CATEGORY_GAMEPLAY, LEGENDARY_SMITH_RANGED_DAMAGE_CHANCE, 2.5D, "Exact percent chance per reforge for the Powerful bow and crossbow damage modifier unlocked by Legendary Smith").getDouble());
 		bannerWarningCooldown = config.get(CATEGORY_GAMEPLAY, "Protection Warning Cooldown", 20, "Cooldown time (in ticks) between appearances of the warning message for banner-public land").getInt();
 		dropMutton = config.get(CATEGORY_GAMEPLAY, "Mutton Drops", true, "Enable or disable sheep dropping the mod's mutton items").getBoolean();
 		drunkMessages = config.get(CATEGORY_GAMEPLAY, "Enable Drunken Messages", true).getBoolean();

@@ -6,6 +6,7 @@
 *.hprof
 bin
 build/
+logs/
 eclipse
 lotr
 unreleased

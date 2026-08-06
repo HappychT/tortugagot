@@ -2,6 +2,7 @@ package got.client.gui;
 
 import java.util.ArrayList;
 
+import com.tortugagot.togcore.client.gui.TOGGuiTechnologyTree;
 import got.client.gui.faction.GOTGuiFactions;
 import org.lwjgl.opengl.GL11;
 
@@ -15,6 +16,7 @@ import net.minecraft.util.*;
 
 public class GOTGuiMenu extends GOTGuiScreenBase {
 	public static ResourceLocation menuIconsTexture = new ResourceLocation("got:textures/gui/menu_icons.png");
+	public static ResourceLocation technologyMenuIconTexture = new ResourceLocation("togcore:textures/gui/technology_menu.png");
 	public static Class<? extends GOTGuiMenuWBBase> lastMenuScreen = null;
 	public boolean sentCheckPacket = false;
 
@@ -27,7 +29,7 @@ public class GOTGuiMenu extends GOTGuiScreenBase {
 		}
 		
 		GOTGuiMenuWBBase screen;
-		if (button instanceof GOTGuiButtonMenu && (screen = ((GOTGuiButtonMenu) button).openMenu()) != null) {
+		if (button.enabled && button instanceof GOTGuiButtonMenu && (screen = ((GOTGuiButtonMenu) button).openMenu()) != null) {
 			if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
                 int p = brain.tutorial.client.TutorialClientState.tutorialProgress;
                 
@@ -127,6 +129,7 @@ public class GOTGuiMenu extends GOTGuiScreenBase {
 			buttonList.add(new GOTGuiButtonMenu(this, 6, 0, 0, GOTGuiFellowships.class, StatCollector.translateToLocal("got.gui.fellowships"), 25));
 			buttonList.add(new GOTGuiButtonMenu(this, 7, 0, 0, GOTGuiTitles.class, StatCollector.translateToLocal("got.gui.titles"), 20));
 			buttonList.add(new GOTGuiButtonMenu(this, 5, 0, 0, GOTGuiShields.class, StatCollector.translateToLocal("got.gui.atribute"), 31));
+			buttonList.add(new GOTGuiButtonMenu(this, 9, 0, 0, TOGGuiTechnologyTree.class, "\u0414\u0440\u0435\u0432\u043e \u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0439", -1, -1));
 			buttonList.add(new GOTGuiButtonMenu(this, 1, 0, 0, GOTGuiOptions.class, StatCollector.translateToLocal("got.gui.options"), 24));
 			ArrayList<GOTGuiButtonMenu> menuButtons = new ArrayList<>();
 			for (Object obj : buttonList) {

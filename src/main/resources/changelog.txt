@@ -123,7 +123,7 @@ CHANGELOG
 * Recoded lots of NPC: now they can be women
 * Recoded biomes: now ArrayLists instead of Arrays needed
 
-* Fixed bug with white walkers attack ai
+* Fixed bug with white walkers attack behavior
 * Fixed bug with 2 names
 * Fixed bug with one westeros female name
 * Fixed bug with Si Qo Gate
@@ -217,7 +217,7 @@ CHANGELOG
 >>VERSION 17.7.1
 * Improved ukrainian translation (prod. DDPAT Knife Series)
 * Fixed bug with anvil texture
-* Fixed bug with agressive mobs AI
+* Fixed bug with agressive mobs behavior
 
 >>VERSION 17.7
 * Greatly improved the Ice Wall and the Yi Ti Wall
@@ -303,7 +303,7 @@ CHANGELOG
 * Improved Yi Ti Roads
 * Improved almost all biomes
 * Improved summer islands' strscans
-* Improved white walkers attack AI
+* Improved white walkers attack behavior
 * Improved massy and cracklaw
 * Improved forests and mountains
 * Improved spawning
@@ -374,7 +374,7 @@ CHANGELOG
 * Improved valyrian spears. Now can kill walkers and wights while is thrown
 * Improved gift mobs
 * Improved white walker skin
-* Improved children attack ai
+* Improved children attack behavior
 * Improved roads in Yi Ti and Asshai
 * Improved a lot of biomes
 * Improved forests
@@ -739,8 +739,8 @@ CHANGELOG
 + Added Red Castle
 + Added new waypoint
 * Improved Legendary Quest Mechanic: now they are given by characters immediately after reaching +100 alignment. Also, legendary quest can be taken only one time.
-* Improved Loras's, Jorah's AI
-* Improved AI NPC follow NPC
+* Improved Loras's, Jorah's behavior
+* Improved NPC follow behavior
 * Improved & optimized rendering system
 * Improved Legendary Mob spawning
 * Improved Craster's Skin
@@ -749,7 +749,7 @@ CHANGELOG
 * Fixed bug with Targaryen Armor
 * Fixed bug with double Tyrion Lannister
 * Fixed bug with russian names of Andesite & Diorite Buttons & Pressure slabs
-* Fixed bug with Hodor AI
+* Fixed bug with Hodor behavior
 * Fixed bug with dothraki horses
 - Removed Fast Quests Config
 * Twice reduced mob spawning
@@ -760,7 +760,7 @@ CHANGELOG
 + Added mount banner bearers
 + Added Beric Dondarrion's speechbank
 * Improved Dorne Armor
-* Improved legendary mobs' AI
+* Improved legendary mobs' behavior
 * Improved banner bearers' armor
 * Improved Iron Islands biome
 * Improved Mountains biomes
@@ -892,7 +892,7 @@ CHANGELOG
 * Improved all forest biomes' appearance
 * Improved barrel functions
 * Improved fixed ghiscar towns
-* Improved human's ai
+* Improved human's behavior
 * Improved map
 * Improved mob stats
 * Improved structure names (rus)
@@ -902,7 +902,7 @@ CHANGELOG
 * Optimized 5 Forts of Yi Ti
 * Optimized Map menu (eats less RAM)
 * Optimized all forest biomes
-* Fixed Legendary Mobs AI
+* Fixed Legendary Mobs behavior
 * Fixed Legendary Mobs spawning
 * Fixed Qarth desert
 * Fixed crash with armor stand
@@ -932,7 +932,7 @@ CHANGELOG
 * Improved Cotter Pyke, Jon Snow, Jeor Mormont & Denys Mallister spawning (in castles near waypoints)
 * Improved Daenerys & Jorah spawning
 * Improved Direwolves (breeding with fish)
-* Improved Giants AI
+* Improved Giants behavior
 * Improved Mammoths and Elephants attack
 * Improved Snow Bears (breeding with fish)
 * Improved Yi Ti biome
@@ -1055,7 +1055,7 @@ CHANGELOG
 
 >>VERSION 12.10
 + Added frost hood after walkers' and wights' attack
-* Optimized farmer's AI (-14% of lags on servers!)
+* Optimized farmer's behavior (-14% of lags on servers!)
 * Improved targaryen shield
 * Fixed bug with faction ranks
 * Fixed bug with UCP (coremod)
@@ -1082,7 +1082,7 @@ CHANGELOG
 * Improved Jeor mormont texture
 * Improved Cotter Pyke texture
 * Improved Denys Mallister texture
-* Improved Jon Snow's AI
+* Improved Jon Snow's behavior
 * Improved Craster's texture
 * Improved Giants names and speech
 * Improved Dragonstone textures
@@ -1187,7 +1187,7 @@ CHANGELOG
 * Fixed Mossovy spawning
 * Fixed fast travelling
 * Greatly improved GoT Map
-* Improved Asshai Shadowbinders' AI
+* Improved Asshai Shadowbinders' behavior
 * Improved Yi Ti textures and translations
 - Removed bugged achievements. Now servers running GoT Mod should not crash.
 

@@ -21,6 +21,9 @@ public class GOTEnchantmentDamage extends GOTEnchantment {
 
 	@Override
 	public boolean canApply(ItemStack itemstack, boolean considering) {
+		if (this == GOTEnchantment.strong3 && !GOTWeaponStats.isMeleeWeapon(itemstack)) {
+			return false;
+		}
 		if (super.canApply(itemstack, considering)) {
 			float dmg = GOTWeaponStats.getMeleeDamageBonus(itemstack);
 			dmg += baseDamageBoost;

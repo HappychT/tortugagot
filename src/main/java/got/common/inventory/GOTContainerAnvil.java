@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.tortugagot.togcore.technology.TOGSmithingTechnology;
+import com.tortugagot.togcore.technology.TOGTechnologyLocks;
+import com.tortugagot.togcore.technology.TOGTechnologyNotifier;
 import got.common.item.weapon.cother.ItemSmithKit;
 import org.apache.commons.lang3.StringUtils;
 
@@ -97,8 +100,18 @@ public class GOTContainerAnvil extends Container {
                 GOTContainerAnvil.this.onCraftMatrixChanged(this);
             }
         };
-        addSlotToContainer(new Slot(this.invInput, 0, 27, 58));
-        addSlotToContainer(new Slot(this.invInput, 1, 76, 47));
+        addSlotToContainer(new Slot(this.invInput, 0, 27, 58) {
+            @Override
+            public boolean isItemValid(ItemStack stack) {
+                return GOTContainerAnvil.this.canPutAnvilInput(stack, "anvil:valyrian:slot0");
+            }
+        });
+        addSlotToContainer(new Slot(this.invInput, 1, 76, 47) {
+            @Override
+            public boolean isItemValid(ItemStack stack) {
+                return GOTContainerAnvil.this.canPutAnvilInput(stack, "anvil:valyrian:slot1");
+            }
+        });
         if (!this.isTrader) {
             addSlotToContainer(new Slot(this.invInput, 2, 76, 70));
         }
@@ -124,6 +137,14 @@ public class GOTContainerAnvil extends Container {
         this.xCoord = i;
         this.yCoord = j;
         this.zCoord = k;
+    }
+
+    private boolean canPutAnvilInput(ItemStack stack, String key) {
+        if (!TOGSmithingTechnology.canUseValyrianSmithingItem(this.thePlayer, stack)) {
+            TOGSmithingTechnology.notifyValyrianBlocked(this.thePlayer, key, "поместить валирийское снаряжение в наковальню");
+            return false;
+        }
+        return true;
     }
 
     public boolean applyMischief(ItemStack itemstack) {
@@ -311,11 +332,15 @@ public class GOTContainerAnvil extends Container {
         ItemStack inputItem;
         long curTime = System.currentTimeMillis();
         if ((this.lastReforgeTime < 0L || curTime - this.lastReforgeTime >= 2000L) && (inputItem = this.invInput.getStackInSlot(0)) != null && this.reforgeCost > 0 && hasMaterialOrCoinAmount(this.reforgeCost)) {
+            if (!TOGSmithingTechnology.canUseValyrianSmithingItem(this.thePlayer, inputItem)) {
+                TOGSmithingTechnology.notifyValyrianBlocked(this.thePlayer, "anvil:valyrian:reforge", "перековать валирийское снаряжение");
+                return;
+            }
             int cost = this.reforgeCost;
             if (inputItem.isItemStackDamageable()) {
                 inputItem.setItemDamage(0);
             }
-            GOTEnchantmentHelper.applyRandomEnchantments(inputItem, this.theWorld.rand, false, true);
+            GOTEnchantmentHelper.applyRandomEnchantments(inputItem, this.theWorld.rand, false, true, TOGSmithingTechnology.hasMasterSmith(this.thePlayer), TOGSmithingTechnology.hasLegendarySmith(this.thePlayer));
             GOTEnchantmentHelper.setAnvilCost(inputItem, 0);
             if (this.isTrader && this.theNPC instanceof GOTEntityWesterosScrapTrader && applyMischief(inputItem)) {
                 this.doneMischief = true;
@@ -451,6 +476,15 @@ public class GOTContainerAnvil extends Container {
             ItemStack inputCopy = inputItem.copy();
             ItemStack combinerItem = this.invInput.getStackInSlot(1);
             ItemStack materialItem = this.isTrader ? null : this.invInput.getStackInSlot(2);
+            if (!TOGSmithingTechnology.canUseValyrianSmithingItem(this.thePlayer, inputItem) || !TOGSmithingTechnology.canUseValyrianSmithingItem(this.thePlayer, combinerItem)) {
+                this.invOutput.setInventorySlotContents(0, null);
+                this.materialCost = 0;
+                this.reforgeCost = 0;
+                this.engraveOwnerCost = 0;
+                TOGSmithingTechnology.notifyValyrianBlocked(this.thePlayer, "anvil:valyrian:locked", "использовать валирийское снаряжение в наковальне");
+                detectAndSendChanges();
+                return;
+            }
             Map inputEnchants = EnchantmentHelper.getEnchantments(inputCopy);
             boolean enchantingWithBook = false;
             List<GOTEnchantment> inputModifiers = GOTEnchantmentHelper.getEnchantList(inputCopy);
@@ -513,6 +547,15 @@ public class GOTContainerAnvil extends Container {
                 ++renameCost;
             }
             if (this.isTrader && (scrollCombine = GOTEnchantmentCombining.getCombinationResult(inputItem, combinerItem)) != null) {
+                if (GOTEnchantmentHelper.isLegendarySmithModifier(scrollCombine.outputMod) && !TOGSmithingTechnology.hasLegendarySmith(this.thePlayer)) {
+                    this.invOutput.setInventorySlotContents(0, null);
+                    this.materialCost = 0;
+                    this.reforgeCost = 0;
+                    this.engraveOwnerCost = 0;
+                    TOGTechnologyNotifier.notifyBlocked(this.thePlayer, "anvil:legendary_smith_scroll", "создать легендарный чертеж", "не открыта технология для получения этого чертежа", TOGTechnologyLocks.LEGENDARY_SMITH);
+                    detectAndSendChanges();
+                    return;
+                }
                 this.invOutput.setInventorySlotContents(0, scrollCombine.createOutputItem());
                 this.materialCost = scrollCombine.cost;
                 this.reforgeCost = 0;
@@ -522,6 +565,7 @@ public class GOTContainerAnvil extends Container {
             }
             boolean combining = false;
             if (combinerItem != null) {
+                boolean usingModifierTemplate = combinerItem.getItem() instanceof GOTItemModifierTemplate;
                 enchantingWithBook = combinerItem.getItem() == Items.enchanted_book && Items.enchanted_book.func_92110_g(combinerItem).tagCount() > 0;
                 if (enchantingWithBook && !GOTConfig.enchantingVanilla) {
                     this.invOutput.setInventorySlotContents(0, null);
@@ -615,6 +659,15 @@ public class GOTContainerAnvil extends Container {
                 ArrayList<GOTEnchantment> outputMods = new ArrayList<>(inputModifiers);
                 List<GOTEnchantment> combinerMods = GOTEnchantmentHelper.getEnchantList(combinerItem);
                 if (combinerItemEnchant != null) {
+                    if (GOTEnchantmentHelper.isLegendarySmithModifier(combinerItemEnchant) && !TOGSmithingTechnology.hasLegendarySmith(this.thePlayer)) {
+                        this.invOutput.setInventorySlotContents(0, null);
+                        this.materialCost = 0;
+                        this.reforgeCost = 0;
+                        this.engraveOwnerCost = 0;
+                        TOGTechnologyNotifier.notifyBlocked(this.thePlayer, "anvil:legendary_modifier", "наложить легендарный чертеж", "не открыта технология для применения этого чертежа", TOGTechnologyLocks.LEGENDARY_SMITH);
+                        detectAndSendChanges();
+                        return;
+                    }
                     if (!combinerItemEnchant.canApply(inputItem, false)) {
                         this.invOutput.setInventorySlotContents(0, null);
                         this.materialCost = 0;
@@ -646,13 +699,13 @@ public class GOTContainerAnvil extends Container {
                         continue;
                     }
                     outputMods.add(combinerMod);
-                    if (!combinerMod.isBeneficial()) {
-                        continue;
-                    }
+					if (!combinerMod.isBeneficial()) {
+						continue;
+					}
                     if (this.isTrader) {
                         combineCost = 20;
                     } else {
-                        combineCost = 2;
+                        combineCost = usingModifierTemplate ? TOGSmithingTechnology.applyMasterSmithTemplateDiscount(this.thePlayer, 20) : 20;
                     }
                 }
                 GOTEnchantmentHelper.setEnchantList(inputCopy, outputMods);
@@ -791,6 +844,9 @@ public class GOTContainerAnvil extends Container {
                 this.materialCost *= stringFactor;
                 this.reforgeCost *= stringFactor;
                 this.engraveOwnerCost *= stringFactor;
+            }
+            if (!this.isTrader) {
+                this.reforgeCost = TOGSmithingTechnology.applyExperiencedSmithReforgeDiscount(this.thePlayer, this.reforgeCost);
             }
             if (this.isTrader) {
                 boolean isCommonRenameOnly = nameChange && this.materialCost == 0;

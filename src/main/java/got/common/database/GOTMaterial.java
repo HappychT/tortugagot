@@ -64,6 +64,7 @@ public class GOTMaterial {
 	public static ArmorMaterial VALYRIAN_CHAINMAIL = EnumHelper.addArmorMaterial("GOT_VALYRIAN_CHAINMAIL", 82, new int[] { 3, 7, 5, 2 }, 13);
 	public static ArmorMaterial VALYRIAN = EnumHelper.addArmorMaterial("GOT_VALYRIAN", 82, new int[] { 3, 8, 6, 3 }, 10);
 	public static ArmorMaterial VOLANTIS = EnumHelper.addArmorMaterial("GOT_VOLANTIS", 37, new int[] { 2, 6, 5, 2 }, 9);
+	public static ArmorMaterial WESTEROS = EnumHelper.addArmorMaterial("GOT_WESTEROS", 18, new int[] { 2, 5, 4, 1 }, 9);
 	public static ArmorMaterial WESTERLANDS = EnumHelper.addArmorMaterial("GOT_WESTERLANDS", 37, new int[] { 2, 6, 4, 1 }, 9);
 	public static ArmorMaterial WESTERLANDSGUARD = EnumHelper.addArmorMaterial("GOT_WESTERLANDSGUARD", 60, new int[] { 2, 7, 6, 3 }, 9);
 	public static ArmorMaterial WESTKING = EnumHelper.addArmorMaterial("GOT_WESTKING", 60, new int[] { 2, 7, 6, 3 }, 9);
@@ -170,6 +171,7 @@ public class GOTMaterial {
 		VALYRIAN_CHAINMAIL.customCraftingMaterial = GOTRegistry.valyrianIngot;
 		VALYRIAN.customCraftingMaterial = GOTRegistry.valyrianIngot;
 		VOLANTIS.customCraftingMaterial = Items.iron_ingot;
+		WESTEROS.customCraftingMaterial = Items.iron_ingot;
 		WESTERLANDS.customCraftingMaterial = Items.iron_ingot;
 		WESTERLANDSGUARD.customCraftingMaterial = Items.iron_ingot;
 		WESTKING.customCraftingMaterial = Items.iron_ingot;

@@ -2,6 +2,7 @@ package got.common.item.weapon;
 
 import java.util.List;
 
+import com.tortugagot.togcore.technology.TOGWarriorTechnology;
 import cpw.mods.fml.relauncher.*;
 import got.common.GOTEventHandler;
 import got.common.database.*;
@@ -19,6 +20,7 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 public class GOTItemCrossbow extends ItemBow {
+	private static final String AMMO_PRESERVED_KEY = "TOGCrossbowAmmoPreserved";
 	public double boltDamageFactor;
 	public Item.ToolMaterial crossbowMaterial;
 	public int crossbowPullTime;
@@ -142,25 +144,19 @@ public class GOTItemCrossbow extends ItemBow {
 				float charge = 1.0f;
 				ItemStack shotBolt = boltItem.copy();
 				shotBolt.stackSize = 1;
-				GOTEntityCrossbowBolt bolt = new GOTEntityCrossbowBolt(world, entityplayer, shotBolt, charge * 2.0f * GOTItemCrossbow.getCrossbowLaunchSpeedFactor(itemstack));
-				if (bolt.boltDamageFactor < 1.0) {
-					bolt.boltDamageFactor = 1.0;
-				}
-				if (charge >= 1.0f) {
-					bolt.setIsCritical(true);
-				}
-				GOTItemCrossbow.applyCrossbowModifiers(bolt, itemstack);
-				if (!shouldConsumeBolt(itemstack, entityplayer)) {
-					bolt.canBePickedUp = 2;
-				}
 				if (!world.isRemote) {
-					world.spawnEntityInWorld(bolt);
-					StaminaServerHandler.drainStaminaByPercent(0.8, entityplayer);
+					boolean tripleShot = TOGWarriorTechnology.isCrossbowTripleShotLoaded(itemstack);
+					boolean disablePickup = tripleShot || !shouldConsumeBolt(itemstack, entityplayer) || isAmmoPreserved(itemstack);
+					spawnCrossbowBolts(world, entityplayer, itemstack, shotBolt, charge, tripleShot, disablePickup);
+					StaminaServerHandler.drainStaminaByPercent(TOGWarriorTechnology.getCrossbowShotStaminaCost(entityplayer, 0.8D), entityplayer);
+					TOGWarriorTechnology.markCrossbowShot(itemstack, entityplayer);
+					TOGWarriorTechnology.clearCrossbowTripleShot(itemstack, entityplayer);
 					setChargeTime(itemstack, 0);
 				}
 				world.playSoundAtEntity(entityplayer, "got:item.crossbow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
 				itemstack.damageItem(1, entityplayer);
 				if (!world.isRemote) {
+					setAmmoPreserved(itemstack, false);
 					setLoaded(itemstack, null);
 				}
 			}
@@ -184,14 +180,19 @@ public class GOTItemCrossbow extends ItemBow {
 				boltItem = new ItemStack(GOTRegistry.crossbowBolt);
 			}
 			if (boltItem != null) {
-				if (shouldConsume && boltSlot >= 0) {
+				boolean boltPreserved = shouldConsume && boltSlot >= 0 && !world.isRemote && TOGWarriorTechnology.rollCrossbowBoltPreserved(entityplayer);
+				ItemStack loadedBolt = boltItem.copy();
+				loadedBolt.stackSize = 1;
+				if (shouldConsume && boltSlot >= 0 && (world.isRemote || !boltPreserved)) {
 					--boltItem.stackSize;
 					if (boltItem.stackSize <= 0) {
 						entityplayer.inventory.mainInventory[boltSlot] = null;
 					}
 				}
 				if (!world.isRemote) {
-					setLoaded(itemstack, boltItem.copy());
+					setLoaded(itemstack, loadedBolt);
+					setAmmoPreserved(itemstack, boltPreserved);
+					TOGWarriorTechnology.recordCrossbowReload(itemstack, entityplayer);
 					setChargeTime(itemstack, entityplayer.worldObj.getTotalWorldTime());
 				}
 			}
@@ -237,6 +238,55 @@ public class GOTItemCrossbow extends ItemBow {
 		}
 	}
 
+	private void spawnCrossbowBolts(World world, EntityPlayer entityplayer, ItemStack crossbow, ItemStack shotBolt, float charge, boolean tripleShot, boolean disablePickup) {
+		if (tripleShot) {
+			spawnCrossbowBolt(world, entityplayer, crossbow, shotBolt, charge, -0.35D, true);
+			spawnCrossbowBolt(world, entityplayer, crossbow, shotBolt, charge, 0.0D, true);
+			spawnCrossbowBolt(world, entityplayer, crossbow, shotBolt, charge, 0.35D, true);
+			return;
+		}
+		spawnCrossbowBolt(world, entityplayer, crossbow, shotBolt, charge, 0.0D, disablePickup);
+	}
+
+	private void spawnCrossbowBolt(World world, EntityPlayer entityplayer, ItemStack crossbow, ItemStack shotBolt, float charge, double sideOffset, boolean disablePickup) {
+		GOTEntityCrossbowBolt bolt = new GOTEntityCrossbowBolt(world, entityplayer, shotBolt.copy(), charge * 2.0f * GOTItemCrossbow.getCrossbowLaunchSpeedFactor(crossbow));
+		if (sideOffset != 0.0D) {
+			double yaw = Math.toRadians(entityplayer.rotationYaw);
+			bolt.setPosition(bolt.posX + Math.cos(yaw) * sideOffset, bolt.posY, bolt.posZ + Math.sin(yaw) * sideOffset);
+		}
+		if (bolt.boltDamageFactor < 1.0) {
+			bolt.boltDamageFactor = 1.0;
+		}
+		if (charge >= 1.0f) {
+			bolt.setIsCritical(true);
+		}
+		GOTItemCrossbow.applyCrossbowModifiers(bolt, crossbow);
+		if (disablePickup) {
+			bolt.canBePickedUp = 2;
+		}
+		world.spawnEntityInWorld(bolt);
+	}
+
+	private static boolean isAmmoPreserved(ItemStack itemstack) {
+		return itemstack != null && itemstack.hasTagCompound() && itemstack.getTagCompound().getBoolean(AMMO_PRESERVED_KEY);
+	}
+
+	private static void setAmmoPreserved(ItemStack itemstack, boolean preserved) {
+		if (itemstack == null) {
+			return;
+		}
+		NBTTagCompound nbt = itemstack.getTagCompound();
+		if (nbt == null) {
+			nbt = new NBTTagCompound();
+			itemstack.setTagCompound(nbt);
+		}
+		if (preserved) {
+			nbt.setBoolean(AMMO_PRESERVED_KEY, true);
+		} else {
+			nbt.removeTag(AMMO_PRESERVED_KEY);
+		}
+	}
+
 	public boolean shouldConsumeBolt(ItemStack itemstack, EntityPlayer entityplayer) {
 		return !entityplayer.capabilities.isCreativeMode && EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, itemstack) == 0;
 	}
@@ -255,11 +305,12 @@ public class GOTItemCrossbow extends ItemBow {
 			bolt.setFire(100);
 		}
 		for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-			if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+			if (!GOTEnchantmentHelper.shouldApplyProjectileEnchantment(itemstack, ench)) {
 				continue;
 			}
 			GOTEnchantmentHelper.setProjectileEnchantment(bolt, ench);
 		}
+		TOGWarriorTechnology.markProjectileWeapon(bolt, itemstack);
 	}
 
 	public static float getCrossbowLaunchSpeedFactor(ItemStack itemstack) {
@@ -268,7 +319,7 @@ public class GOTItemCrossbow extends ItemBow {
 			if (itemstack.getItem() instanceof GOTItemCrossbow) {
 				f = (float) (f * ((GOTItemCrossbow) itemstack.getItem()).boltDamageFactor);
 			}
-			f *= GOTEnchantmentHelper.calcRangedDamageFactor(itemstack);
+			f *= GOTEnchantmentHelper.calcRangedLaunchDamageFactor(itemstack);
 		}
 		return f;
 	}

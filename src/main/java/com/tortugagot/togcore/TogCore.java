@@ -4,7 +4,9 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.tortugagot.togcore.network.TOGPacketHandler;
 import com.tortugagot.togcore.registry.TOGEntityRegistry;
+import com.tortugagot.togcore.registry.TOGItemRegistry;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -32,6 +34,8 @@ public class TogCore {
     // preInit "Run before anything else. Read your config, create blocks, items, etc, and register them with the
     // GameRegistry." (Remove if not needed)
     public void preInit(FMLPreInitializationEvent event) {
+        TOGPacketHandler.register();
+        TOGItemRegistry.registerItems();
         proxy.preInit(event);
         TOGEntityRegistry.registerEntities();
     }

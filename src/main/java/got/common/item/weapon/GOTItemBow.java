@@ -2,6 +2,7 @@ package got.common.item.weapon;
 
 import java.util.Arrays;
 
+import com.tortugagot.togcore.technology.TOGWarriorTechnology;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import got.client.render.other.GOTRenderBow;
@@ -139,6 +140,7 @@ public class GOTItemBow extends ItemBow {
             arrowItem = new ItemStack(Items.arrow);
         }
         if (arrowItem != null) {
+            boolean arrowPreserved = shouldConsume && !world.isRemote && TOGWarriorTechnology.rollBowArrowPreserved(entityplayer);
             float charge = (float) useTick / (float) getMaxDrawTime();
             if (charge < 0.65f)
                 return;
@@ -166,7 +168,7 @@ public class GOTItemBow extends ItemBow {
             GOTItemBow.applyBowModifiers(arrow, itemstack);
             itemstack.damageItem(1, entityplayer);
             world.playSoundAtEntity(entityplayer, "random.bow", 1.0f, 1.0f / (itemRand.nextFloat() * 0.4f + 1.2f) + charge * 0.5f);
-            if (!shouldConsume) {
+            if (!shouldConsume || arrowPreserved) {
                 arrow.canBePickedUp = 2;
             } else if (arrowSlot >= 0) {
                 --arrowItem.stackSize;
@@ -218,11 +220,12 @@ public class GOTItemBow extends ItemBow {
             arrow.setFire(100);
         }
         for (GOTEnchantment ench : GOTEnchantment.allEnchantments) {
-            if (!ench.applyToProjectile() || !GOTEnchantmentHelper.hasEnchant(itemstack, ench)) {
+            if (!GOTEnchantmentHelper.shouldApplyProjectileEnchantment(itemstack, ench)) {
                 continue;
             }
             GOTEnchantmentHelper.setProjectileEnchantment(arrow, ench);
         }
+        TOGWarriorTechnology.markProjectileWeapon(arrow, itemstack);
     }
 
     public static float getLaunchSpeedFactor(ItemStack itemstack) {
@@ -231,7 +234,7 @@ public class GOTItemBow extends ItemBow {
             if (itemstack.getItem() instanceof GOTItemBow) {
                 f = (float) (f * ((GOTItemBow) itemstack.getItem()).arrowDamageFactor);
             }
-            f *= GOTEnchantmentHelper.calcRangedDamageFactor(itemstack);
+            f *= GOTEnchantmentHelper.calcRangedLaunchDamageFactor(itemstack);
         }
         return f;
     }
