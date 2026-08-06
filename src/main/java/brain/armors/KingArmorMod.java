@@ -6,6 +6,7 @@ import brain.armors.weapons.ItemHammerValyrian;
 import brain.armors.weapons.ItemSpearValyrian;
 import brain.armors.weapons.ItemSwordIce;
 import brain.armors.weapons.ItemSwordPathkeeper;
+import brain.armors.weapons.ItemSwordPathkeeperRed;
 import brain.armors.weapons.ItemValyrianSword;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -110,6 +111,10 @@ public class KingArmorMod {
             .setUnlocalizedName("sword_pathkeeper")
             .setCreativeTab(CreativeTabs.tabCombat);
 
+        swordPathkeeperRed = new ItemSwordPathkeeperRed()
+            .setUnlocalizedName("sword_pathkeeper_red")
+            .setCreativeTab(CreativeTabs.tabCombat);
+
         battleaxeValyrian = new ItemBattleaxeValyrian()
             .setUnlocalizedName("battleaxe_valyrian")
             .setCreativeTab(CreativeTabs.tabCombat);
@@ -124,6 +129,7 @@ public class KingArmorMod {
         
         GameRegistry.registerItem(swordIce, "sword_ice");
         GameRegistry.registerItem(swordPathkeeper, "sword_pathkeeper");
+        GameRegistry.registerItem(swordPathkeeperRed, "sword_pathkeeper_red");
 
     }
     
