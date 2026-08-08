@@ -703,10 +703,11 @@ public class TOGTechnologyAuditTest {
         assertEquals(3, TOGWarriorTechnology.passiveCounterThreshold(TOGWarriorTechnology.WeaponCategory.BOW), "bow passive counter threshold");
         assertEquals(5, TOGWarriorTechnology.passiveCounterThreshold(TOGWarriorTechnology.WeaponCategory.CROSSBOW), "crossbow passive counter threshold");
         assertEquals(0, TOGWarriorTechnology.passiveCounterThreshold(TOGWarriorTechnology.WeaponCategory.PIKE), "pike passive has no buildup counter");
-        assertEquals(0, TOGWarriorTechnology.passiveCounterThreshold(TOGWarriorTechnology.WeaponCategory.HAMMER), "hammer passive has no buildup counter");
+        assertEquals(2, TOGWarriorTechnology.passiveCounterThreshold(TOGWarriorTechnology.WeaponCategory.HAMMER), "hammer passive must trigger every second hit");
         assertEquals("Фехтовальщик", TOGWarriorTechnology.passiveCounterLabel(TOGWarriorTechnology.WeaponCategory.SWORD), "sword passive counter label");
         assertEquals("\u0423\u0434\u0430\u0440 \u0432 \u0441\u043F\u0438\u043D\u0443", TOGWarriorTechnology.passiveCounterLabel(TOGWarriorTechnology.WeaponCategory.DAGGER), "dagger passive counter label");
         assertEquals("Тройной залп", TOGWarriorTechnology.passiveCounterLabel(TOGWarriorTechnology.WeaponCategory.CROSSBOW), "crossbow passive counter label");
+        assertEquals("\u041E\u0433\u043B\u0443\u0448\u0435\u043D\u0438\u0435", TOGWarriorTechnology.passiveCounterLabel(TOGWarriorTechnology.WeaponCategory.HAMMER), "hammer passive counter label");
         assertTrue(TOGWarriorTechnology.isBackstabPosition(0.0D, -1.0D, 0.0D, 0.0D, 0.0F), "attacker behind target facing south");
         assertTrue(!TOGWarriorTechnology.isBackstabPosition(0.0D, 1.0D, 0.0D, 0.0D, 0.0F), "attacker in front must not be backstab");
         assertTrue(!TOGWarriorTechnology.isBackstabPosition(1.0D, 0.0D, 0.0D, 0.0D, 0.0F), "side hit must not be backstab");
@@ -717,6 +718,10 @@ public class TOGTechnologyAuditTest {
         assertDoubleEquals(0.0D, TOGWarriorTechnology.getCrossbowBoltSaveChance(false, false), "crossbow no bolt save chance");
         assertDoubleEquals(0.10D, TOGWarriorTechnology.getCrossbowBoltSaveChance(true, false), "crossbow first bolt save chance");
         assertDoubleEquals(0.20D, TOGWarriorTechnology.getCrossbowBoltSaveChance(true, true), "crossbow full bolt save chance");
+        assertDoubleEquals(3.0D, TOGWarriorTechnology.getRangedShotStaminaCostForNodes(false, 3.0D), "ranged shot stamina cost without pressure");
+        assertDoubleEquals(1.5D, TOGWarriorTechnology.getRangedShotStaminaCostForNodes(true, 3.0D), "stamina pressure must reduce owner ranged shot cost");
+        assertDoubleEquals(1.0D, TOGWarriorTechnology.getRangedTargetStaminaDrainForNodes(false, 1.0D), "ranged target stamina drain without pressure");
+        assertDoubleEquals(2.0D, TOGWarriorTechnology.getRangedTargetStaminaDrainForNodes(true, 1.0D), "stamina pressure must increase target ranged stamina drain");
         assertDoubleEquals(6.0D, TOGWarriorTechnology.getAttackStaminaCostForNodes(false, false, 6.0D), "attack stamina cost without choices");
         assertDoubleEquals(4.0D, TOGWarriorTechnology.getAttackStaminaCostForNodes(true, false, 6.0D), "first attack stamina choice must divide cost by 1.5");
         assertDoubleEquals(4.0D, TOGWarriorTechnology.getAttackStaminaCostForNodes(false, true, 6.0D), "second attack stamina choice must divide cost by 1.5");
