@@ -172,7 +172,7 @@ public class BlockServerHandler {
 
             } else {
                 if (!event.source.isUnblockable() && !togAdjustment.skipsBlockVulnerability()) {
-                    event.ammount += event.ammount;
+                    event.ammount = compensateVanillaBlockReduction(event.ammount);
                 }
 
                 if (attackerPlayer != null) {
@@ -267,6 +267,11 @@ public class BlockServerHandler {
 
     public boolean isBlocking(EntityPlayer player) {
         return !TOGWarriorTechnology.isStunned(player) && player.isUsingItem() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemSword && player.isBlocking();
+    }
+
+    private float compensateVanillaBlockReduction(float amount) {
+        // EntityPlayer applies vanilla sword blocking after LivingHurtEvent as (1 + damage) * 0.5.
+        return Math.max(0.0F, amount * 2.0F - 1.0F);
     }
 
     private boolean isDamageBlocked(EntityPlayer player, DamageSource source, float[] blockAngles) {
