@@ -50,6 +50,10 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
     private static final int DETAILS_GAP = 16;
     private static final int DETAILS_BOTTOM_MARGIN = 44;
     private static final int TREE_BOTTOM_MARGIN = 12;
+    private static final int BRANCH_LABEL_LEFT = 16;
+    private static final int BRANCH_LABEL_Y_OFFSET = -4;
+    private static final int MENU_RETURN_LABEL_GAP = 7;
+    private static final String WARRIOR_LABEL_ROOT_ID = "polearm_mastery";
 
     private TOGTechnology selectedTechnology;
     private TOGTechnology hoveredTechnology;
@@ -96,6 +100,7 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
         configureLayout();
         super.initGui();
         clampTreeScroll();
+        updateMenuReturnButtonPosition();
         unlockButton = new GOTGuiButton(2001, guiLeft + detailsLeft + detailsWidth - 120, guiTop + ySize - 32, 120, 20, "Открыть");
         buttonList.add(unlockButton);
         if (selectedTechnology == null && !TOGTechnologyRegistry.getAll().isEmpty()) {
@@ -197,14 +202,14 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
 
     private void drawBranchLabels() {
         drawBranchLane(TOGTechnologyBranch.CRAFTSMAN, "craftsman_i");
-        drawBranchLane(TOGTechnologyBranch.WARRIOR, "polearm_mastery");
+        drawBranchLane(TOGTechnologyBranch.WARRIOR, WARRIOR_LABEL_ROOT_ID);
         drawBranchLane(TOGTechnologyBranch.GATHERER, "hunter_i");
     }
 
     private void drawBranchLane(TOGTechnologyBranch branch, String rootTechnologyId) {
         TOGTechnology rootTechnology = TOGTechnologyRegistry.get(rootTechnologyId);
         int centerY = rootTechnology != null ? nodeCenterY(rootTechnology) : guiTop + 80;
-        drawBranchLabel(branch, guiLeft + 16, centerY - 4);
+        drawBranchLabel(branch, guiLeft + BRANCH_LABEL_LEFT, centerY + BRANCH_LABEL_Y_OFFSET);
     }
 
     private void drawBranchLabel(TOGTechnologyBranch branch, int x, int y) {
@@ -529,6 +534,19 @@ public class TOGGuiTechnologyTree extends GOTGuiMenuBase {
         treeScrollX += deltaX;
         treeScrollY += deltaY;
         clampTreeScroll();
+        updateMenuReturnButtonPosition();
+    }
+
+    private void updateMenuReturnButtonPosition() {
+        if (buttonMenuReturn == null) {
+            return;
+        }
+        TOGTechnology warriorRoot = TOGTechnologyRegistry.get(WARRIOR_LABEL_ROOT_ID);
+        int warriorLabelY = warriorRoot != null ? nodeCenterY(warriorRoot) + BRANCH_LABEL_Y_OFFSET : guiTop + 80;
+        int minY = guiTop + TREE_VIEW_TOP + 4;
+        int maxY = guiTop + treeViewBottom - buttonMenuReturn.height - 4;
+        buttonMenuReturn.xPosition = guiLeft + BRANCH_LABEL_LEFT;
+        buttonMenuReturn.yPosition = clamp(warriorLabelY + fontRendererObj.FONT_HEIGHT + MENU_RETURN_LABEL_GAP, minY, maxY);
     }
 
     private void clampTreeScroll() {
