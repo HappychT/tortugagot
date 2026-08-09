@@ -1,7 +1,5 @@
 package got.common.item.weapon;
 
-import com.tortugagot.togcore.technology.TOGEngineeringTechnology;
-import got.common.database.GOTCreativeTabs;
 import got.common.database.GOTRegistry;
 import got.common.entity.other.GOTEntityCrossbowBolt;
 import got.common.recipe.GOTRecipe;
@@ -19,7 +17,6 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
         setMaxDamage((int) (this.crossbowMaterial.getMaxUses() * 1.25f));
         setMaxStackSize(1);
         this.boltDamageFactor = 1.25f;
-        setCreativeTab(GOTCreativeTabs.tabStory);
     }
 
     @Override
@@ -61,11 +58,6 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
 
     @Override
     public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
-        if (!world.isRemote && !TOGEngineeringTechnology.canUseSiegeCrossbow(entityplayer)) {
-            TOGEngineeringTechnology.notifySiegeCrossbowBlocked(entityplayer);
-            return itemstack;
-        }
-
         if (GOTItemCrossbow.isLoaded(itemstack)) {
             ItemStack boltItem = GOTItemCrossbow.getLoaded(itemstack);
             if (boltItem != null) {
@@ -105,14 +97,8 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
 
     @Override
     public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer entityplayer, int useTick) {
-        if (!world.isRemote && !TOGEngineeringTechnology.canUseSiegeCrossbow(entityplayer)) {
-            entityplayer.clearItemInUse();
-            TOGEngineeringTechnology.notifySiegeCrossbowBlocked(entityplayer);
-            return;
-        }
-
         int ticksInUse = getMaxItemUseDuration(itemstack) - useTick;
-        if (ticksInUse >= getMaxDrawTime(entityplayer) && !GOTItemCrossbow.isLoaded(itemstack)) {
+        if (ticksInUse >= getMaxDrawTime() && !GOTItemCrossbow.isLoaded(itemstack)) {
             ItemStack boltItem = null;
             int boltSlot = getInvBoltSlot(entityplayer);
             if (boltSlot >= 0) {
@@ -140,12 +126,7 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
     @Override
     public void onUsingTick(ItemStack itemstack, EntityPlayer entityplayer, int count) {
         World world = entityplayer.worldObj;
-        if (!world.isRemote && !TOGEngineeringTechnology.canUseSiegeCrossbow(entityplayer)) {
-            entityplayer.clearItemInUse();
-            TOGEngineeringTechnology.notifySiegeCrossbowBlocked(entityplayer);
-            return;
-        }
-        if (!world.isRemote && !GOTItemCrossbow.isLoaded(itemstack) && getMaxItemUseDuration(itemstack) - count == getMaxDrawTime(entityplayer)) {
+        if (!world.isRemote && !GOTItemCrossbow.isLoaded(itemstack) && getMaxItemUseDuration(itemstack) - count == getMaxDrawTime()) {
             world.playSoundAtEntity(entityplayer, "got:item.crossbowLoad", 1.0f, 1.5f + world.rand.nextFloat() * 0.2f);
         }
     }
@@ -153,10 +134,6 @@ public class GOTItemSiegeCrossbow extends GOTItemCrossbow {
     @Override
     public boolean shouldConsumeBolt(ItemStack itemstack, EntityPlayer entityplayer) {
         return !entityplayer.capabilities.isCreativeMode && EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, itemstack) == 0;
-    }
-
-    private int getMaxDrawTime(EntityPlayer entityplayer) {
-        return TOGEngineeringTechnology.getReloadTime(getMaxDrawTime(), entityplayer);
     }
 
 }

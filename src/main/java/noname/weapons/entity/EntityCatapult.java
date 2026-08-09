@@ -1,6 +1,6 @@
 package noname.weapons.entity;
 
-import com.tortugagot.togcore.technology.TOGEngineeringTechnology;
+import brain.factions.servers.SiegeActivationManager;
 import noname.weapons.RegItem;
 import noname.weapons.config.WeaponsConfig;
 import net.minecraft.entity.Entity;
@@ -15,6 +15,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 public class EntityCatapult extends EntityLivingBase {
+    private double anchorX;
+    private double anchorY;
+    private double anchorZ;
+    private float anchorYaw;
+    private boolean anchorSet = false;
 
     private int reloadTimer = 0;
     private boolean isReloading = false;
@@ -24,14 +29,14 @@ public class EntityCatapult extends EntityLivingBase {
 
     public EntityCatapult(World world) {
         super(world);
-        this.setSize(2.0F, 1.5F);
+        this.setSize(2.2F, 1.4F);
         this.preventEntitySpawning = true;
     }
 
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(WeaponsConfig.maxHealthCatapult);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(WeaponsConfig.maxHealthCatapult);
     }
 
     @Override
@@ -42,45 +47,35 @@ public class EntityCatapult extends EntityLivingBase {
         this.dataWatcher.addObject(19, Float.valueOf(0.0F));
         this.dataWatcher.addObject(20, Float.valueOf(0.0F));
         this.dataWatcher.addObject(21, Byte.valueOf((byte)0));
+        this.dataWatcher.addObject(28, Float.valueOf(0.6F));
     }
+
+    private static final float RANGE_MIN = 0.2F;
+    private static final float RANGE_MAX = 1.0F;
+    private static final float RANGE_STEP = 0.015F;
 
     @Override
     public void onUpdate() {
+        stabilizeIfUnsupported();
         super.onUpdate();
+        updateAnchor();
+        lockToAnchor();
+        stabilizeIfUnsupported();
 
         if (!this.worldObj.isRemote) {
             if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) this.riddenByEntity;
                 this.rider = player;
-                if (!TOGEngineeringTechnology.canUseSiegeWeapon(player, this)) {
-                    player.mountEntity(null);
-                    this.rider = null;
-                    lastSwingState = false;
-                    if (isReloading) {
-                        stopReloading();
-                    }
-                    TOGEngineeringTechnology.notifySiegeWeaponBlocked(player, this);
-                    return;
-                }
-
-                float targetYaw = player.rotationYaw;
-                float difference = targetYaw - this.rotationYaw;
-
-                while (difference > 180.0F) difference -= 360.0F;
-                while (difference < -180.0F) difference += 360.0F;
-
-                float maxRotation = WeaponsConfig.rotationSpeedCatapult;
-
-                if (difference > maxRotation) {
-                    difference = maxRotation;
-                } else if (difference < -maxRotation) {
-                    difference = -maxRotation;
-                }
-
+                updateControlledYaw(player.rotationYaw, WeaponsConfig.rotationSpeedCatapult);
                 this.prevRotationYaw = this.rotationYaw;
-                this.rotationYaw += difference;
+                this.rotationYaw = this.anchorYaw;
                 this.dataWatcher.updateObject(19, Float.valueOf(this.rotationYaw));
                 this.dataWatcher.updateObject(20, Float.valueOf(this.prevRotationYaw));
+
+                float range = this.dataWatcher.getWatchableObjectFloat(28);
+                if (player.moveForward > 0.1F) range = Math.min(RANGE_MAX, range + RANGE_STEP);
+                else if (player.moveForward < -0.1F) range = Math.max(RANGE_MIN, range - RANGE_STEP);
+                this.dataWatcher.updateObject(28, Float.valueOf(range));
 
                 if (player.isSwingInProgress && !lastSwingState && isReadyToFire()) {
                     fire();
@@ -100,7 +95,7 @@ public class EntityCatapult extends EntityLivingBase {
                         reloadTimer++;
                         this.dataWatcher.updateObject(18, Integer.valueOf(reloadTimer));
 
-                        if (reloadTimer >= TOGEngineeringTechnology.getReloadTime(WeaponsConfig.reloadTimeCatapult, player)) {
+                        if (reloadTimer >= WeaponsConfig.reloadTimeCatapult) {
                             completeReload();
                         }
                     }
@@ -125,6 +120,59 @@ public class EntityCatapult extends EntityLivingBase {
             isReloading = (this.dataWatcher.getWatchableObjectByte(17) & 1) != 0;
             reloadTimer = this.dataWatcher.getWatchableObjectInt(18);
         }
+    }
+
+    private void updateAnchor() {
+        if (!anchorSet) {
+            anchorX = posX;
+            anchorY = posY;
+            anchorZ = posZ;
+            anchorYaw = rotationYaw;
+            anchorSet = true;
+        }
+    }
+
+    private void lockToAnchor() {
+        if (!anchorSet) {
+            return;
+        }
+        motionX = 0.0D;
+        motionY = 0.0D;
+        motionZ = 0.0D;
+        prevPosX = posX = anchorX;
+        prevPosY = posY = anchorY;
+        prevPosZ = posZ = anchorZ;
+        prevRotationYaw = rotationYaw = anchorYaw;
+        fallDistance = 0.0F;
+        setPosition(anchorX, anchorY, anchorZ);
+    }
+
+    private void stabilizeIfUnsupported() {
+        int blockX = MathHelper.floor_double(this.posX);
+        int blockY = MathHelper.floor_double(this.posY - 0.1D);
+        int blockZ = MathHelper.floor_double(this.posZ);
+        if (this.worldObj.isAirBlock(blockX, blockY, blockZ)) {
+            this.motionY = 0.0D;
+            this.fallDistance = 0.0F;
+            this.onGround = true;
+        }
+    }
+
+    private void updateControlledYaw(float targetYaw, float maxStep) {
+        float yawDiff = MathHelper.wrapAngleTo180_float(targetYaw - this.anchorYaw);
+        if (yawDiff > maxStep) {
+            yawDiff = maxStep;
+        } else if (yawDiff < -maxStep) {
+            yawDiff = -maxStep;
+        }
+        this.anchorYaw += yawDiff;
+    }
+
+    @Override
+    public void moveEntityWithHeading(float strafe, float forward) {
+        motionX = 0.0D;
+        motionY = 0.0D;
+        motionZ = 0.0D;
     }
 
     private boolean hasAmmo(EntityPlayer player) {
@@ -179,16 +227,9 @@ public class EntityCatapult extends EntityLivingBase {
 
     public void fire() {
         if (!this.worldObj.isRemote && this.riddenByEntity != null) {
+            if (!SiegeActivationManager.getInstance().isSiegeActive(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ)) return;
             EntityPlayer player = (EntityPlayer) this.riddenByEntity;
-
-            if (!TOGEngineeringTechnology.canUseSiegeWeapon(player, this)) {
-                TOGEngineeringTechnology.notifySiegeWeaponBlocked(player, this);
-                return;
-            }
-
-            if (!isReadyToFire()) {
-                return;
-            }
+            if (!isReadyToFire()) return;
 
             float yaw = this.rotationYaw;
             float pitch = player.rotationPitch;
@@ -199,7 +240,8 @@ public class EntityCatapult extends EntityLivingBase {
             double motionZ = MathHelper.cos(yaw / 180.0F * (float)Math.PI) *
                     MathHelper.cos(pitch / 180.0F * (float)Math.PI);
 
-            double speed = WeaponsConfig.catapultProjectileSpeed;
+            float rangePower = this.dataWatcher.getWatchableObjectFloat(28);
+            double speed = WeaponsConfig.catapultProjectileSpeed * (double)rangePower;
             motionX *= speed;
             motionY *= speed;
             motionZ *= speed;
@@ -276,10 +318,6 @@ public class EntityCatapult extends EntityLivingBase {
 
     @Override
     public boolean interactFirst(EntityPlayer player) {
-        if (!this.worldObj.isRemote && !TOGEngineeringTechnology.canUseSiegeWeapon(player, this)) {
-            TOGEngineeringTechnology.notifySiegeWeaponBlocked(player, this);
-            return true;
-        }
         if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer &&
                 this.riddenByEntity != player) {
             return true;
@@ -319,7 +357,17 @@ public class EntityCatapult extends EntityLivingBase {
         this.reloadTimer = nbt.getInteger("ReloadTimer");
         this.isReloading = nbt.getBoolean("IsReloading");
         this.isLoaded = nbt.getBoolean("IsLoaded");
-
+        if (nbt.hasKey("AnchorX")) {
+            this.anchorX = nbt.getDouble("AnchorX");
+            this.anchorY = nbt.getDouble("AnchorY");
+            this.anchorZ = nbt.getDouble("AnchorZ");
+            this.anchorYaw = nbt.getFloat("AnchorYaw");
+            this.anchorSet = true;
+        }
+        if (nbt.hasKey("RangePower")) {
+            float r = MathHelper.clamp_float(nbt.getFloat("RangePower"), RANGE_MIN, RANGE_MAX);
+            this.dataWatcher.updateObject(28, Float.valueOf(r));
+        }
         this.dataWatcher.updateObject(21, Byte.valueOf(this.isLoaded ? (byte)1 : (byte)0));
     }
 
@@ -329,6 +377,11 @@ public class EntityCatapult extends EntityLivingBase {
         nbt.setInteger("ReloadTimer", this.reloadTimer);
         nbt.setBoolean("IsReloading", this.isReloading);
         nbt.setBoolean("IsLoaded", this.isLoaded);
+        nbt.setDouble("AnchorX", this.anchorX);
+        nbt.setDouble("AnchorY", this.anchorY);
+        nbt.setDouble("AnchorZ", this.anchorZ);
+        nbt.setFloat("AnchorYaw", this.anchorYaw);
+        nbt.setFloat("RangePower", this.dataWatcher.getWatchableObjectFloat(28));
     }
 
     public String getEntityName() {

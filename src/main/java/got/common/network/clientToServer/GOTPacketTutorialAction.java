@@ -42,8 +42,15 @@ public class GOTPacketTutorialAction extends AbstractPacket.AbstractServerMessag
                         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Blocks.planks, 64, 0));
                         player.inventoryContainer.detectAndSendChanges();
                         brain.tutorial.TutorialManager.getInstance().advanceStage9(player, 1);
-                    } else if (action.equals("dodge") && ext.getTutorialStage() == 7 && ext.getTutorialProgress() == 10) {
-                        brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 11);
+                    } else if (action.equals("dodge") && ext.getTutorialStage() == 7 && ext.getTutorialProgress() == 18) {
+                        // Require 3 dodges before advancing
+                        int dodgeCount = brain.tutorial.TutorialManager.getInstance().incrementDodgeCount(player);
+                        if (dodgeCount >= 3) {
+                            brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 19);
+                        } else {
+                            brain.tutorial.TutorialManager.getInstance().setSubtitle(player,
+                                String.format(brain.tutorial.TutorialTexts.get("subtitle.stage7.dodge_progress"), dodgeCount, 3));
+                        }
                     }
                 }
             }

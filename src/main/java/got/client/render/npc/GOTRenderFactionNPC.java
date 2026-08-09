@@ -29,6 +29,9 @@ public class GOTRenderFactionNPC extends GOTRenderBiped {
 
 	@Override
 	public ResourceLocation getEntityTexture(Entity entity) {
+		if (entity instanceof got.common.entity.GOTEnchaldBlacksmith) {
+			return new ResourceLocation("got:textures/entity/" + path + "/male/0.png");
+		}
 		GOTEntityNPC mob = (GOTEntityNPC) entity;
 		boolean child = mob.isChild();
 		if (mob.familyInfo.isMale()) {

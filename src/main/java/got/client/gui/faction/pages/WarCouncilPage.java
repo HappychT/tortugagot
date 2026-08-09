@@ -26,7 +26,6 @@ public class WarCouncilPage implements IPageRenderer {
     private List<GOTFaction> enemies = new ArrayList<>();
     private List<GOTFaction> wars = new ArrayList<>();
 
-    private static final ResourceLocation BANNER_TEX = new ResourceLocation("got", "textures/gui/faction/banner_bg.png");
     private static final ResourceLocation PLATE_TEX = new ResourceLocation("got", "textures/gui/faction/info_plate.png");
 
     public WarCouncilPage(GOTGuiFactions parent) {
@@ -112,7 +111,7 @@ public class WarCouncilPage implements IPageRenderer {
         int bannerY = 15;
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        parent.mc.getTextureManager().bindTexture(BANNER_TEX);
+        parent.mc.getTextureManager().bindTexture(GOTGuiFactions.getFactionBanner(GOTGuiFactions.currentFaction));
         parent.drawScaledCustomSizeModalRect(bannerX, bannerY, 0, 0, 362, 356, bannerWidth, bannerHeight, 362.0F, 356.0F);
 
         int plateWidth = 250;

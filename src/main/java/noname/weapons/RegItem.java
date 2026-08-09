@@ -12,7 +12,6 @@ public class RegItem {
     public static ItemBalistaSpawner balistaSpawner;
     public static ItemRepairKit repairKit;
     public static ItemBalistaBolt balistaBolt;
-    public static ItemWarTicket warTicket;
 
     public static void regitem() {
         catapultSpawner = new ItemCatapultSpawner();
@@ -35,8 +34,5 @@ public class RegItem {
 
         balistaBolt = new ItemBalistaBolt();
         GameRegistry.registerItem(balistaBolt, "balista_bolt");
-
-        warTicket = new ItemWarTicket();
-        GameRegistry.registerItem(warTicket, "war_ticket");
     }
 }

@@ -33,7 +33,10 @@ public class GOTPacketBlacksmithForge extends AbstractPacket.AbstractServerMessa
             
             got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
             if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
-                brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 4);
+                int prog = ext.getTutorialProgress();
+                if (prog < 4) {
+                    brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 4);
+                }
             }
         }
     }

@@ -286,5 +286,7 @@ public class GOTRender {
         renders.put(got.common.entity.tutorial.GOTEntityTutorialSailor.class, new GOTRenderFactionNPC("westeros/westeros"));
         renders.put(got.common.entity.tutorial.GOTEntityTutorialMutineer.class, new GOTRenderFactionNPC("westeros/westeros"));
         renders.put(got.common.entity.tutorial.GOTEntityTutorialJaqen.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialArmorsmith.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialMWSmith.class, new GOTRenderFactionNPC("westeros/westeros"));
     }
 }

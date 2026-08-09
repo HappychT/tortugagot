@@ -186,16 +186,34 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 		if (this.currentView == View.LIST) {
 			this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/clansinfo_menu2.png");
 		} else if (this.currentView == View.FACTION) {
-			if (this.currentPage == Page.PLAYER_LIST) {
-				this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/playersinfo_menu.png");
-			} else if (this.currentPage == Page.TITLE_HIERARCHY) {
-				this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/prefix_menu.png");
-			} else {
-				this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
-			}
+			this.currentBackgroundTexture = getFactionBackground(currentFaction);
 		} else {
 			this.currentBackgroundTexture = new ResourceLocation("got", "textures/gui/faction/background_main.png");
 		}
+	}
+
+	public static ResourceLocation getFactionBackground(GOTFaction faction) {
+		if (faction == null) return new ResourceLocation("got", "textures/gui/faction/background_main.png");
+		String codeName = faction.codeName().toLowerCase().replace(" ", "_");
+		
+		if (codeName.equals("martell")) codeName = "dorne";
+		if (codeName.equals("nights_watch") || codeName.equals("nights watch")) codeName = "night_watch";
+		if (codeName.equals("wildling")) codeName = "wilding";
+		if (codeName.equals("high_power")) codeName = "tortuga";
+		
+		return new ResourceLocation("got", "textures/gui/faction/fac/" + codeName + ".png");
+	}
+
+	public static ResourceLocation getFactionBanner(GOTFaction faction) {
+		if (faction == null) return new ResourceLocation("got", "textures/gui/faction/banner_bg.png");
+		String codeName = faction.codeName().toLowerCase().replace(" ", "_");
+		
+		if (codeName.equals("martell") || codeName.equals("dorne")) return new ResourceLocation("got", "textures/gui/faction/fac/banner_martell_replaced.png");
+		if (codeName.equals("night_watch") || codeName.equals("nights watch")) codeName = "nights_watch";
+		if (codeName.equals("wilding")) codeName = "wildling";
+		if (codeName.equals("high_power")) codeName = "tortuga";
+		
+		return new ResourceLocation("got", "textures/gui/faction/fac/banner_" + codeName + ".png");
 	}
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -370,10 +388,22 @@ public class GOTGuiFactions extends GOTGuiMenuWBBase {
 			GOTGuiButtonPledge pledgeButton = (GOTGuiButtonPledge) button;
 			if (pledgeButton.enabled) {
 				if (pledgeButton.isPledgedToThisFaction) {
-					brain.factions.servers.CoreFaction.brainChannel.sendToServer(new brain.factions.network.PacketMessage("quet"));
-					this.mc.displayGuiScreen(null);
+					// Покинуть фракцию — через overlay подтверждения
+					setCurrentOverlay(Overlay.CONFIRM_LEAVE, true);
 				} else {
-					got.common.network.GOTPacketHandler.networkWrapper.sendToServer(new got.common.network.GOTPacketPledgeSet(pledgeButton.targetFaction));
+					boolean isTutorial = brain.tutorial.client.TutorialClientState.isTutorialActive
+							&& brain.tutorial.client.TutorialClientState.tutorialStage == 3;
+					if (isTutorial) {
+						// В туториале — прямое вступление (без системы заявок, сервер сам добавит в players)
+						brain.factions.servers.CoreFaction.brainChannel.sendToServer(
+							new brain.factions.network.PacketMessage("tutorialJoin#" + pledgeButton.targetFaction.codeName())
+						);
+					} else {
+						// В обычном режиме — подача заявки через brain-систему
+						brain.factions.servers.CoreFaction.brainChannel.sendToServer(
+							new brain.factions.network.PacketMessage("sendApplication#" + pledgeButton.targetFaction.codeName())
+						);
+					}
 					pledgeButton.updatePledgeState();
 				}
 			}

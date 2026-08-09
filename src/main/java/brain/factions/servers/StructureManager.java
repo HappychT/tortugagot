@@ -266,6 +266,7 @@ public class StructureManager {
 
         return null;
     }
+
     public static void handlePurchase(EntityPlayerMP player, String structureId, String purchaseType, String subType) {
         Faction playerFaction = PacketMessage.getCurrentFaction(player.getCommandSenderName());
         FactionStructureSlot slot = FactionStructureManager.getStructureById(structureId);
@@ -323,13 +324,9 @@ public class StructureManager {
                 int xOffset = structureData.getWidth() / 2;
                 int zOffset = structureData.getDepth() / 2;
 
-                // ==========================================
-                // Берем координаты слота в качестве статического якоря
-                // ==========================================
-                int anchorX = slot.xCoord;
-                int anchorY = slot.yCoord;
-                int anchorZ = slot.zCoord;
-
+                int oldHeartX = slot.xCoord;
+                int oldHeartY = slot.yCoord;
+                int oldHeartZ = slot.zCoord;
                 int minX = 0, minY = 0, minZ = 0;
                 int maxX = 0, maxY = 0, maxZ = 0;
 
@@ -342,29 +339,32 @@ public class StructureManager {
                     if (b.getZ() > maxZ) maxZ = b.getZ();
                 }
 
-                // 1. Очистка территории относительно якоря (без пропуска центрального блока)
                 for (int x = minX; x <= maxX; x++) {
                     for (int y = minY; y <= maxY; y++) {
                         for (int z = minZ; z <= maxZ; z++) {
-                            int clearX = anchorX + x - xOffset;
-                            int clearY = anchorY + y - 3;
-                            int clearZ = anchorZ + z - zOffset;
+                            int clearX = oldHeartX + x - xOffset;
+                            int clearY = oldHeartY + y - 3;
+                            int clearZ = oldHeartZ + z - zOffset;
+
+                            if (clearX == oldHeartX && clearY == oldHeartY && clearZ == oldHeartZ) continue;
 
                             world.setBlockToAir(clearX, clearY, clearZ);
                         }
                     }
                 }
-
                 boolean newHeartPlaced = false;
 
-                // 2. Расстановка блоков схематики
                 for (BlockData blockData : structureData.getBlocks()) {
                     Block block = (Block) Block.blockRegistry.getObject(blockData.getId());
                     if (block == null) continue;
 
-                    int blockX = anchorX + blockData.getX() - xOffset;
-                    int blockY = anchorY + blockData.getY() - 3;
-                    int blockZ = anchorZ + blockData.getZ() - zOffset;
+                    int blockX = oldHeartX + blockData.getX() - xOffset;
+                    int blockY = oldHeartY + blockData.getY() - 3;
+                    int blockZ = oldHeartZ + blockData.getZ() - zOffset;
+
+                    if (blockX == oldHeartX && blockY == oldHeartY && blockZ == oldHeartZ) {
+                        continue;
+                    }
 
                     if (block instanceof BlockStructureHeart) {
                         if (newHeartPlaced) {
@@ -374,6 +374,10 @@ public class StructureManager {
                         }
 
                         world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
+
+                        slot.xCoord = blockX;
+                        slot.yCoord = blockY;
+                        slot.zCoord = blockZ;
                         newHeartPlaced = true;
 
                         TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
@@ -399,8 +403,15 @@ public class StructureManager {
                     }
                 }
 
-                if (!newHeartPlaced) {
-                    CoreFaction.logger().log(Level.SEVERE, "Structure slot " + slot.id + " at " + anchorX + "," + anchorY + "," + anchorZ + " did not place a new heart from schematic!");
+                if (newHeartPlaced) {
+                    world.setBlockToAir(oldHeartX, oldHeartY, oldHeartZ);
+                } else {
+                    TileEntity te = world.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
+                    if (te instanceof TileEntityStructureHeart) {
+                        ((TileEntityStructureHeart) te).setStructureId(structureId);
+                    } else {
+                        CoreFaction.logger().log(Level.SEVERE, "Structure slot " + slot.id + " at " + slot.xCoord + "," + slot.yCoord + "," + slot.zCoord + " is NOT a TileEntityStructureHeart and no new heart was provided!");
+                    }
                 }
 
                 playerFaction.setTreasury(playerFaction.getTreasury() - finalPrice);
