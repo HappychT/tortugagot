@@ -31,8 +31,6 @@ public final class TOGWarriorTechnology {
     private static final String CROSSBOW_TRIPLE_LOADED_KEY = "TOGCrossbowTripleLoaded";
     private static final double BOW_ARROW_SAVE_STEP = 0.05D;
     private static final double CROSSBOW_BOLT_SAVE_STEP = 0.10D;
-    private static final float SPEAR_PIERCING_DAMAGE_MULTIPLIER = 1.1F;
-    private static final float PIKE_PIERCING_DAMAGE_MULTIPLIER = 0.9F;
     private static final int BOW_SLOW_HIT_THRESHOLD = 3;
     private static final int BOW_SLOW_DURATION_TICKS = 60;
     private static final int BOW_SLOW_AMPLIFIER = 3;
@@ -138,7 +136,7 @@ public final class TOGWarriorTechnology {
         if (category == WeaponCategory.CLAYMORE || category == WeaponCategory.TWO_HANDED_SWORD || category == WeaponCategory.AXE || category == WeaponCategory.BOW) {
             return 3;
         }
-        if (category == WeaponCategory.DAGGER || category == WeaponCategory.SPEAR || category == WeaponCategory.HAMMER) {
+        if (category == WeaponCategory.DAGGER || category == WeaponCategory.SPEAR) {
             return 2;
         }
         if (category == WeaponCategory.CROSSBOW) {
@@ -171,9 +169,6 @@ public final class TOGWarriorTechnology {
         }
         if (category == WeaponCategory.CROSSBOW) {
             return "\u0422\u0440\u043E\u0439\u043D\u043E\u0439 \u0437\u0430\u043B\u043F";
-        }
-        if (category == WeaponCategory.HAMMER) {
-            return "\u041E\u0433\u043B\u0443\u0448\u0435\u043D\u0438\u0435";
         }
         return "";
     }
@@ -265,30 +260,22 @@ public final class TOGWarriorTechnology {
     }
 
     public static double getBowShotStaminaCost(EntityPlayer player, double baseCost) {
-        return getRangedShotStaminaCostForNodes(TOGTechnologyLocks.has(player, TOGTechnologyLocks.BOW_STAMINA), baseCost);
+        return TOGTechnologyLocks.has(player, TOGTechnologyLocks.BOW_STAMINA) ? baseCost * 2.0D : baseCost;
     }
 
     public static double getCrossbowShotStaminaCost(EntityPlayer player, double baseCost) {
-        return getRangedShotStaminaCostForNodes(TOGTechnologyLocks.has(player, TOGTechnologyLocks.CROSSBOW_STAMINA), baseCost);
-    }
-
-    static double getRangedShotStaminaCostForNodes(boolean staminaPressure, double baseCost) {
-        return staminaPressure ? baseCost / 2.0D : baseCost;
+        return TOGTechnologyLocks.has(player, TOGTechnologyLocks.CROSSBOW_STAMINA) ? baseCost * 2.0D : baseCost;
     }
 
     public static double getRangedTargetStaminaDrain(EntityPlayer attacker, DamageSource source, double baseDrain) {
         WeaponCategory category = getDamageCategory(attacker, source);
         if (category == WeaponCategory.BOW && TOGTechnologyLocks.has(attacker, TOGTechnologyLocks.BOW_STAMINA)) {
-            return getRangedTargetStaminaDrainForNodes(true, baseDrain);
+            return baseDrain * 2.0D;
         }
         if (category == WeaponCategory.CROSSBOW && TOGTechnologyLocks.has(attacker, TOGTechnologyLocks.CROSSBOW_STAMINA)) {
-            return getRangedTargetStaminaDrainForNodes(true, baseDrain);
+            return baseDrain * 2.0D;
         }
-        return getRangedTargetStaminaDrainForNodes(false, baseDrain);
-    }
-
-    static double getRangedTargetStaminaDrainForNodes(boolean staminaPressure, double baseDrain) {
-        return staminaPressure ? baseDrain * 2.0D : baseDrain;
+        return baseDrain;
     }
 
     public static int getFinalDamageBonusForNodes(int unlockedNodes, boolean targetIsPlayer) {
@@ -379,9 +366,7 @@ public final class TOGWarriorTechnology {
             return;
         }
         if (category == WeaponCategory.HAMMER && hasPassive(attacker, WeaponCategory.HAMMER)) {
-            if (incrementCombo(attacker, "hammer_stun", passiveCounterThreshold(category), category, false)) {
-                applyHammerStun(target, isTwoHandedHammer(attacker.getHeldItem()));
-            }
+            applyHammerStun(target, isTwoHandedHammer(attacker.getHeldItem()));
         }
     }
 
@@ -439,7 +424,7 @@ public final class TOGWarriorTechnology {
         if (!isShieldWeapon(weapon) || !SHIELD_WALL_READY.contains(attacker.getUniqueID())) {
             return;
         }
-        applyPureDamage(attacker, target, isShieldPike(weapon) ? 2.0F : 1.0F);
+        applyPureDamage(attacker, target, isShieldPike(weapon) ? 1.0F : 0.5F);
         applyExtraKnockback(attacker, target);
     }
 
@@ -618,14 +603,14 @@ public final class TOGWarriorTechnology {
         }
         if (category == WeaponCategory.SPEAR && hasPassive(attacker, WeaponCategory.SPEAR) && !isShieldWeapon(weapon)) {
             if (incrementCombo(attacker, "spear_piercing", passiveCounterThreshold(category), category, false)) {
-                adjustment.amount *= SPEAR_PIERCING_DAMAGE_MULTIPLIER;
+                adjustment.amount *= 0.7F;
                 adjustment.ignoreBlock = true;
                 adjustment.skipBlockVulnerability = true;
             }
             return;
         }
         if (category == WeaponCategory.PIKE && hasPassive(attacker, WeaponCategory.PIKE) && !isShieldWeapon(weapon)) {
-            adjustment.amount *= PIKE_PIERCING_DAMAGE_MULTIPLIER;
+            adjustment.amount *= 0.7F;
             adjustment.ignoreBlock = true;
             adjustment.skipBlockVulnerability = true;
             adjustment.suppressKnockback = true;
@@ -788,7 +773,7 @@ public final class TOGWarriorTechnology {
             return;
         }
         if (incrementCombo(attacker, "axe_bloodthirst", passiveCounterThreshold(WeaponCategory.AXE), WeaponCategory.AXE, false)) {
-            target.addPotionEffect(new PotionEffect(GOTEffects.bleeding.id, twoHanded ? 40 : 30, 0));
+            target.addPotionEffect(new PotionEffect(GOTEffects.bleeding.id, twoHanded ? 60 : 40, 0));
         }
     }
 
