@@ -903,17 +903,17 @@ public class TOGTechnologyAuditTest {
 
         assertContains(data.getBlockedReason("craftsman_i"), "предыдущая технология", "craftsman_i must require strong_hands");
         assertTrue(data.unlock("strong_hands"), "strong_hands should unlock");
-        assertEquals(88, data.getMasteryPoints(), "strong_hands should cost 12 as first unlock");
-        assertEquals(12, data.getSpentTechnologyPoints(), "spent after first unlock");
+        assertEquals(85, data.getMasteryPoints(), "strong_hands should cost 15 as first unlock");
+        assertEquals(15, data.getSpentTechnologyPoints(), "spent after first unlock");
         assertTrue(!data.unlock("strong_hands"), "repeat unlock should fail");
-        assertEquals(88, data.getMasteryPoints(), "repeat unlock must not charge points");
+        assertEquals(85, data.getMasteryPoints(), "repeat unlock must not charge points");
 
         assertTrue(data.unlock("craftsman_i"), "craftsman_i should unlock after strong_hands");
-        assertEquals(64, data.getMasteryPoints(), "craftsman_i should cost 24 as second unlock");
-        assertEquals(36, data.getSpentTechnologyPoints(), "spent after two unlocks");
+        assertEquals(55, data.getMasteryPoints(), "craftsman_i should cost 30 as second unlock");
+        assertEquals(45, data.getSpentTechnologyPoints(), "spent after two unlocks");
 
         int refund = data.resetTechnologies();
-        assertEquals(36, refund, "reset refund");
+        assertEquals(45, refund, "reset refund");
         assertEquals(100, data.getMasteryPoints(), "reset should restore spent points");
         assertTrue(data.getUnlockedTechnologies().isEmpty(), "reset should clear unlocked technologies");
         assertEquals(0, data.resetTechnologies(), "second reset should not refund twice");
