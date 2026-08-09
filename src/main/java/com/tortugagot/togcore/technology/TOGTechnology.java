@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class TOGTechnology {
-    private static final int UNLOCK_COST_GROWTH_PER_TECHNOLOGY = 5;
-
     private final String id;
     private final String name;
     private final String description;
@@ -63,7 +61,7 @@ public class TOGTechnology {
     }
 
     public int getUnlockCost(int alreadyUnlockedCount) {
-        return baseCost + (alreadyUnlockedCount + 1) * UNLOCK_COST_GROWTH_PER_TECHNOLOGY;
+        return baseCost + (alreadyUnlockedCount + 1) * 2;
     }
 
     public int getBranchMask() {

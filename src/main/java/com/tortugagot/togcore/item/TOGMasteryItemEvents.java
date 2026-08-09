@@ -38,9 +38,6 @@ public class TOGMasteryItemEvents {
         if (!TOGMasteryItemOwnership.isMasteryItem(stack)) {
             return;
         }
-        if (TOGMasteryItemOwnership.canOperatorKeepUnbound(stack, event.player)) {
-            return;
-        }
         boolean hadOwner = TOGMasteryItemOwnership.hasOwner(stack);
         TOGMasteryItemOwnership.bindToPlayer(stack, event.player);
         event.entityItem.setDead();
@@ -79,9 +76,6 @@ public class TOGMasteryItemEvents {
             EntityItem droppedEntity = iterator.next();
             ItemStack stack = droppedEntity.getEntityItem();
             if (TOGMasteryItemOwnership.isMasteryItem(stack)) {
-                if (TOGMasteryItemOwnership.canOperatorKeepUnbound(stack, event.entityPlayer)) {
-                    continue;
-                }
                 TOGMasteryItemOwnership.bindToPlayer(stack, event.entityPlayer);
                 droppedEntity.setDead();
                 iterator.remove();
@@ -136,9 +130,6 @@ public class TOGMasteryItemEvents {
     public void onEntityInteract(EntityInteractEvent event) {
         ItemStack stack = event.entityPlayer.getCurrentEquippedItem();
         if (TOGMasteryItemOwnership.isMasteryItem(stack)) {
-            if (TOGMasteryItemOwnership.canOperatorKeepUnbound(stack, event.entityPlayer)) {
-                return;
-            }
             TOGMasteryItemOwnership.bindToPlayer(stack, event.entityPlayer);
             event.setCanceled(true);
             sendMessage(event.entityPlayer, "togcore.chat.masteryItemNoTransfer");
@@ -150,11 +141,6 @@ public class TOGMasteryItemEvents {
         for (int slot = 0; slot < player.inventory.getSizeInventory(); slot++) {
             ItemStack stack = player.inventory.getStackInSlot(slot);
             if (!TOGMasteryItemOwnership.isMasteryItem(stack)) {
-                continue;
-            }
-            boolean hadOwner = TOGMasteryItemOwnership.hasOwner(stack);
-            if (TOGMasteryItemOwnership.canOperatorKeepUnbound(stack, player)) {
-                changed |= hadOwner;
                 continue;
             }
             if (!TOGMasteryItemOwnership.hasOwner(stack)) {
@@ -186,11 +172,6 @@ public class TOGMasteryItemEvents {
                 continue;
             }
             if (slot.inventory == player.inventory) {
-                boolean hadOwner = TOGMasteryItemOwnership.hasOwner(stack);
-                if (TOGMasteryItemOwnership.canOperatorKeepUnbound(stack, player)) {
-                    changed |= hadOwner;
-                    continue;
-                }
                 if (!TOGMasteryItemOwnership.hasOwner(stack)) {
                     TOGMasteryItemOwnership.bindToPlayer(stack, player);
                     changed = true;
