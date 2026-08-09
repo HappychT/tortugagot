@@ -32,16 +32,25 @@ public class PacketBounceRequest extends AbstractPacket.AbstractServerMessage<Pa
     public void process(EntityPlayer player, Side side) {
         if (player != null) {
             //System.out.println("Bouncing in packet " + direction);
-            boolean bounced = StaminaServerHandler.INSTANCE.handleBounceRequest(player, direction);
+            StaminaServerHandler.INSTANCE.handleBounceRequest(player, direction);
 
             got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
-            if (bounced && ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 7 && ext.getTutorialProgress() == 18) {
-                int dodgeCount = brain.tutorial.TutorialManager.getInstance().incrementDodgeCount(player);
-                if (dodgeCount >= 3) {
-                    brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 19);
+            if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 7 && ext.getTutorialProgress() == 10) {
+                net.minecraft.item.ItemStack held = player.getHeldItem();
+                boolean validWeapon = true;
+                if (held != null) {
+                    if (held.getItem() instanceof got.common.item.weapon.GOTItemShieldSpear || 
+                        held.getItem() instanceof got.common.item.weapon.GOTItemShieldPike ||
+                        held.getItem() == got.common.database.GOTRegistry.ironSpear ||
+                        held.getItem() == got.common.database.GOTRegistry.ironPike) {
+                        validWeapon = false;
+                    }
                 } else {
-                    brain.tutorial.TutorialManager.getInstance().setSubtitle(player,
-                        String.format(brain.tutorial.TutorialTexts.get("subtitle.stage7.dodge_progress"), dodgeCount, 3));
+                    validWeapon = false; // must hold a weapon
+                }
+                
+                if (validWeapon) {
+                    brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 11);
                 }
             }
         }

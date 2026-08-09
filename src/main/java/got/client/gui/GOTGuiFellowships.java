@@ -864,24 +864,8 @@ public class GOTGuiFellowships extends GOTGuiMenuBase {
             if (!brain.tutorial.client.TutorialGuiFellowshipsHighlight.handleMouseClick(buttonList, i, j, k, guiLeft, guiTop, xSize, ySize)) {
                 return; // Blocked by tutorial
             }
-            
-            // Read AFTER handleMouseClick, so if the button was clicked and the tutorial advanced,
-            // we don't block super.mouseClicked.
-            int p = brain.tutorial.client.TutorialClientState.tutorialProgress; 
-            
-            // On text-field steps, skip super to prevent button actions from changing page state;
-            // instead, only forward the click to the relevant text field
-            if (p == 39 && page == Page.CREATE) {
-                textFieldName.mouseClicked(i, j, k);
-                return;
-            }
-            if (p == 42 && page == Page.INVITE) {
-                textFieldPlayer.mouseClicked(i, j, k);
-                return;
-            }
         }
 		super.mouseClicked(i, j, k);
-
 		if (page == Page.LIST && mouseOverFellowship != null) {
 			buttonSound();
 			page = Page.FELLOWSHIP;

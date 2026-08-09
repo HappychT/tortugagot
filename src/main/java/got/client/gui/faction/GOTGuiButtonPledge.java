@@ -61,7 +61,7 @@ public class GOTGuiButtonPledge extends GuiButton {
             setDisplayLines("§cПокинуть фракцию", "§7(" + targetFaction.factionName() + ")");
         } else if (canPledge) {
             if (hasEnoughAlignment) {
-                setDisplayLines("§aПодать заявку", "§7(" + targetFaction.factionName() + ")");
+                setDisplayLines("§aВступить во фракцию", "§7(" + targetFaction.factionName() + ")");
             } else {
                 setDisplayLines("§cНедостаточно репутации", "§7(Требуется: " + (int)ALIGNMENT_REQUIREMENT + ")");
             }

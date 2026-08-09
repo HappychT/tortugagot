@@ -44,7 +44,7 @@ public class GOTGuiFactionBlacksmith extends GuiContainer {
     private static final boolean HAS_NEI = Loader.isModLoaded("NotEnoughItems");
     private boolean anyButtonSelected;
     private boolean hasItemInSlot;
-    public boolean isBuyingSlot = false;
+    private boolean isBuyingSlot = false;
     private boolean isSpecialProtectionSelected = false;
     private boolean needSwitchButton = false;
     private boolean neiOverlayHidden;
@@ -207,7 +207,7 @@ public class GOTGuiFactionBlacksmith extends GuiContainer {
         for (int i = 0; i < enchantmentSlots; i++) {
             boolean slotUnlocked = theBlacksmithNPC.isSlotUnlocked(i);
             setVisible(getButton(i), !isBuyingSlot);
-            setEnabled(getButton(i), (!slotUnlocked && container.canUnlockSlot(i)) || (hasItemInSlot && slotUnlocked && container.canApplyWeaponEnchantments(i) && availableToSelect));
+            setEnabled(getButton(i), (!hasItemInSlot && !slotUnlocked && container.canUnlockSlot(i)) || (hasItemInSlot && slotUnlocked && container.canApplyWeaponEnchantments(i) && availableToSelect));
 
             if (!availableToSelect) {
                 setEnabled(getButton(i), isButtonSelected(i));
@@ -448,29 +448,20 @@ public class GOTGuiFactionBlacksmith extends GuiContainer {
         super.drawScreen(mouseX, mouseY, p_73863_3_);
         textField.drawTextBox();
         
-        if (brain.tutorial.client.TutorialClientState.tutorialStage == 6) {
-            int prog = brain.tutorial.client.TutorialClientState.tutorialProgress;
-            if (type == got.common.entity.GOTEnchaldBlacksmith.BlacksmithType.ARM) {
-                // Бронник: 1 (ждет предмет) -> 2 (ждет чар) -> 3 (ждет рефордж)
-                if (prog == 1 && hasItemInSlot) {
-                    brain.tutorial.client.TutorialClientState.tutorialProgress = 2;
-                } else if (prog == 2 && isAnyButtonSelected()) {
-                    brain.tutorial.client.TutorialClientState.tutorialProgress = 3;
-                } else if (prog > 1 && !hasItemInSlot) {
-                    brain.tutorial.client.TutorialClientState.tutorialProgress = 1;
-                }
-            } else {
-                // Оружейник: 5 (ждет предмет) -> 6 (ждет чар) -> 7 (ждет рефордж)
-                if (prog == 5 && hasItemInSlot) {
-                    brain.tutorial.client.TutorialClientState.tutorialProgress = 6;
-                } else if (prog == 6 && isAnyButtonSelected()) {
-                    brain.tutorial.client.TutorialClientState.tutorialProgress = 7;
-                } else if (prog > 5 && !hasItemInSlot) {
-                    brain.tutorial.client.TutorialClientState.tutorialProgress = 5;
-                }
+        got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+        if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
+            int prog = ext.getTutorialProgress();
+            if (prog == 0) {
+                // GUI opened
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 1);
+            } else if (prog == 1 && isAnyButtonSelected()) {
+                // Enchant selected
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 2);
+            } else if (prog == 2 && container.getSlot(0).getHasStack()) {
+                // Item placed in center slot
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 3);
             }
         }
-
         
         brain.tutorial.client.TutorialGuiBlacksmithHighlight.drawHighlight(this);
 //        int originalWidth = this.width;

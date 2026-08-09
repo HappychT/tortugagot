@@ -143,7 +143,7 @@ public class TutorialGuiBlacksmithHighlight {
         if (TutorialClientState.tutorialStage != 6) return;
         
         int prog = TutorialClientState.tutorialProgress;
-        if (prog == 0 || prog == 4 || prog == 8) return; // Waiting for player to open the GUI
+        if (prog > 3) return; // After 3, it's anvil time
 
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -163,45 +163,21 @@ public class TutorialGuiBlacksmithHighlight {
 
         java.util.List buttons = cpw.mods.fml.common.ObfuscationReflectionHelper.getPrivateValue(net.minecraft.client.gui.GuiScreen.class, gui, "buttonList", "field_146292_n");
 
-        if (gui.isBuyingSlot) {
-            GuiButton yesBtn = null;
-            if (buttons != null) {
-                for (Object obj : buttons) {
-                    GuiButton gb = (GuiButton) obj;
-                    if (gb.id == 103) {
-                        yesBtn = gb;
-                        break;
-                    }
-                }
-            }
-            if (yesBtn != null && yesBtn.visible) {
-                drawPointerToArea(yesBtn.xPosition, yesBtn.yPosition, yesBtn.width, yesBtn.height, alpha, desc, screenW, screenH);
-            }
-        } else if ((prog == 2 || prog == 6) && buttons != null && !buttons.isEmpty()) {
+        if (prog == 1 && buttons != null && !buttons.isEmpty()) {
             // Need to select an enchant. Highlight one of the buttons.
-            GuiButton btn = null;
-            for (Object obj : buttons) {
-                GuiButton gb = (GuiButton) obj;
-                if (gb.id < 100 && gb.visible && gb.enabled) {
-                    btn = gb;
-                    break;
-                }
-            }
-            if (btn == null) {
-                btn = (GuiButton) buttons.get(0);
-            }
+            GuiButton btn = (GuiButton) buttons.get(0); // The first enchant button
             if (btn != null && btn.visible) {
                 drawPointerToArea(btn.xPosition, btn.yPosition, btn.width, btn.height, alpha, desc, screenW, screenH);
             }
-        } else if (prog == 1 || prog == 5) {
-            // Put armor/sword in slot
+        } else if (prog == 2) {
+            // Put armor in slot
             Slot slot = (Slot) gui.inventorySlots.inventorySlots.get(0); // The central slot for item
             if (slot != null) {
                 int sx = guiLeft + slot.xDisplayPosition;
                 int sy = guiTop + slot.yDisplayPosition;
                 drawPointerToArea(sx, sy, 16, 16, alpha, desc, screenW, screenH);
             }
-        } else if ((prog == 3 || prog == 7) && buttons != null) {
+        } else if (prog == 3 && buttons != null) {
             // Press reforge button (ID 100)
             GuiButton btn = null;
             for (Object obj : buttons) {
@@ -225,15 +201,15 @@ public class TutorialGuiBlacksmithHighlight {
         if (TutorialClientState.tutorialStage != 6) return false;
         int prog = TutorialClientState.tutorialProgress;
         
-        // Progress 0 or 4: they just opened it. We can auto-advance.
-        if (prog == 0 || prog == 4 || prog == 8) {
+        // Progress 0: they just opened it. We can auto-advance to 1.
+        if (prog == 0) {
             return false;
         }
         
         int guiLeft = (gui.width - 512) / 2;
         int guiTop = (gui.height - 512) / 2;
         
-        if (prog == 1 || prog == 5) {
+        if (prog == 1) {
             java.util.List buttons = cpw.mods.fml.common.ObfuscationReflectionHelper.getPrivateValue(net.minecraft.client.gui.GuiScreen.class, gui, "buttonList", "field_146292_n");
             // Allow clicking enchant buttons. (id < 23)
             if (buttons != null) {
@@ -249,9 +225,9 @@ public class TutorialGuiBlacksmithHighlight {
             }
             // Allow inventory clicks just in case
             return false; // Let's not fully block them so they don't get stuck.
-        } else if (prog == 2 || prog == 6) {
+        } else if (prog == 2) {
             return false;
-        } else if (prog == 3 || prog == 7) {
+        } else if (prog == 3) {
             return false;
         }
         return false;

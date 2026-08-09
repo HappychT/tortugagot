@@ -111,16 +111,6 @@ public class TutorialManager {
         FMLCommonHandler.instance().bus().register(INSTANCE);
     }
 
-    /**
-     * Increments the dodge counter for step 18 and returns the new count.
-     */
-    public int incrementDodgeCount(EntityPlayer player) {
-        UUID uuid = player.getUniqueID();
-        int count = tutorialSubSteps.getOrDefault(uuid, 0) + 1;
-        tutorialSubSteps.put(uuid, count);
-        return count;
-    }
-
     public void startTutorial(EntityPlayer player) {
         ExtendedPlayer ext = ExtendedPlayer.get(player);
         if (ext != null && ext.getTutorialStage() == 0) {
@@ -515,25 +505,24 @@ public class TutorialManager {
                                 tutorialTimers.remove(uuid);
                             }
                         } else if (ext.getTutorialStage() == 6) {
-                            if (ext.getTutorialProgress() == 8 && timer == 100) { // 5 seconds after sword forged
+                            if (ext.getTutorialProgress() == 7 && timer == 100) { // 5 seconds
                                 startStage7(player, ext);
                             }
                         } else if (ext.getTutorialStage() == 7) {
-                            int p = ext.getTutorialProgress();
-                            if (p == 0 && timer == 100) {
+                            if (ext.getTutorialProgress() == 0 && timer == 100) {
                                 advanceStage7(player, 1);
-                            } else if (p == 1 && timer == 200) {
+                            } else if (ext.getTutorialProgress() == 1 && timer == 200) {
                                 advanceStage7(player, 2);
-                            } else if (p == 2) {
-                                // Boosted stamina drain during run phase every tick
-                                got.common.handlers.StaminaServerHandler.drainStaminaByPercent(0.18, player);
-                                if (timer >= 160) { // 8 seconds
+                            } else if (ext.getTutorialProgress() == 2) {
+                                float stamina = ExtendedPlayer.get(player).getStamina();
+                                if (stamina < got.common.handlers.StaminaServerHandler.MAX_STAMINA * 0.8f) {
                                     advanceStage7(player, 3);
                                 }
-                            } else if (p == 3 && timer == 80) {
+                            } else if (ext.getTutorialProgress() == 3 && timer == 80) { // Text delay
                                 advanceStage7(player, 4);
-                            } else if (p == 13) {
-                                // Shield craft check: need shieldSpear AND shieldPike
+                            } else if (ext.getTutorialProgress() == 7 && timer == 80) { // Delay before sailor spawn
+                                advanceStage7(player, 8);
+                            } else if (ext.getTutorialProgress() == 9) {
                                 boolean hasShieldSpear = false;
                                 boolean hasShieldPike = false;
                                 for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
@@ -544,11 +533,9 @@ public class TutorialManager {
                                     }
                                 }
                                 if (hasShieldSpear && hasShieldPike) {
-                                    advanceStage7(player, 14);
+                                    advanceStage7(player, 10);
                                 }
-                            } else if (p == 14 && timer == 80) { // Delay before block fight 1
-                                advanceStage7(player, 15);
-                            } else if (p == 19 && timer == 60) { // 3 seconds after done
+                            } else if (ext.getTutorialProgress() == 11 && timer == 60) { // 3 seconds
                                 startStage8(player, ext);
                                 tutorialTimers.remove(uuid);
                             }
@@ -703,45 +690,19 @@ public class TutorialManager {
                     net.minecraft.item.ItemStack held = player.getHeldItem();
                     boolean correct = false;
                     int p = ext.getTutorialProgress();
-                    // Step 4 = dagger
-                    if (p == 4 && held != null && held.getItem() instanceof got.common.item.weapon.GOTItemDagger) {
+                    if (p == 4 && held != null && held.getItem() == net.minecraft.init.Items.wooden_sword) {
                         correct = true;
-                    // Step 5 = sword (vanilla iron sword)
-                    } else if (p == 5 && held != null && (held.getItem() instanceof got.common.item.weapon.GOTItemSword || held.getItem() == net.minecraft.init.Items.iron_sword)) {
+                        brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 5);
+                    } else if (p == 5 && (event.source.getSourceOfDamage() instanceof got.common.entity.other.GOTEntitySpear || (held != null && held.getItem() instanceof got.common.item.weapon.GOTItemPolearm))) {
                         correct = true;
-                    // Step 6 = axe (one-handed, not battleaxe)
-                    } else if (p == 6 && held != null && (held.getItem() instanceof got.common.item.tool.GOTItemAxe || held.getItem() instanceof got.common.item.weapon.GOTItemIronBornAxe) && !(held.getItem() instanceof got.common.item.weapon.GOTItemBattleaxe)) {
+                        brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 6);
+                    } else if (p == 6 && event.source.getSourceOfDamage() instanceof net.minecraft.entity.projectile.EntityArrow) {
                         correct = true;
-                    // Step 7 = hammer
-                    } else if (p == 7 && held != null && held.getItem() instanceof got.common.item.weapon.GOTItemHammer) {
-                        correct = true;
-                    // Step 8 = battleaxe (two-handed)
-                    } else if (p == 8 && held != null && held.getItem() instanceof got.common.item.weapon.GOTItemBattleaxe) {
-                        correct = true;
-                    // Step 9 = spear (melee polearm)
-                    } else if (p == 9 && (event.source.getSourceOfDamage() instanceof got.common.entity.other.GOTEntitySpear || (held != null && held.getItem() instanceof got.common.item.weapon.GOTItemSpear))) {
-                        correct = true;
-                    // Step 10 = pike
-                    } else if (p == 10 && held != null && held.getItem() instanceof got.common.item.weapon.GOTItemPike) {
-                        correct = true;
-                    // Step 11 = bow (arrow)
-                    } else if (p == 11 && event.source.isProjectile()) {
-                        correct = true;
-                    // Step 12 = crossbow (bolt, also EntityArrow subclass)
-                    } else if (p == 12 && event.source.isProjectile()) {
-                        correct = true;
+                        brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 7);
                     }
                     
                     if (correct) {
-                        int hits = tutorialSubSteps.getOrDefault(player.getUniqueID(), 0);
-                        if (hits < 1) { // Requires 2 hits (hits=0, hits=1->advance)
-                            tutorialSubSteps.put(player.getUniqueID(), hits + 1);
-                            event.entityLiving.setHealth(event.entityLiving.getMaxHealth()); // heal it so it doesn't die
-                        } else {
-                            tutorialSubSteps.put(player.getUniqueID(), 0);
-                            event.entityLiving.setDead();
-                            brain.tutorial.TutorialManager.getInstance().advanceStage7(player, p + 1);
-                        }
+                        event.entityLiving.setDead();
                     } else {
                         event.setCanceled(true);
                     }
@@ -755,30 +716,8 @@ public class TutorialManager {
             EntityPlayer player = (EntityPlayer) event.entityLiving;
             ExtendedPlayer ext = ExtendedPlayer.get(player);
             if (ext != null && ext.isTutorialActive()) {
-                // Block fights at steps 15, 16, 17
-                if (ext.getTutorialStage() == 7 && (ext.getTutorialProgress() == 15 || ext.getTutorialProgress() == 16 || ext.getTutorialProgress() == 17)) {
+                if (ext.getTutorialStage() == 7 && ext.getTutorialProgress() == 8) {
                     if (event.source.getEntity() instanceof got.common.entity.tutorial.GOTEntityTutorialSailor) {
-                        
-                        // Check if player holds the CORRECT weapon to block!
-                        int p = ext.getTutorialProgress();
-                        net.minecraft.item.ItemStack held = player.getHeldItem();
-                        boolean correctWeapon = false;
-                        if (held != null) {
-                            if (p == 15 && (held.getItem() instanceof got.common.item.weapon.GOTItemSword || held.getItem() == net.minecraft.init.Items.iron_sword)) {
-                                correctWeapon = true;
-                            } else if (p == 16 && held.getItem() instanceof got.common.item.weapon.GOTItemHammer) {
-                                correctWeapon = true;
-                            } else if (p == 17 && (held.getItem() instanceof got.common.item.weapon.GOTItemShieldSpear || held.getItem() instanceof got.common.item.weapon.GOTItemShieldPike)) {
-                                correctWeapon = true;
-                            }
-                        }
-                        
-                        if (!correctWeapon) {
-                            brain.tutorial.TutorialManager.getInstance().setSubtitle(player, "\u00a7c[\u0411\u043e\u0446\u043c\u0430\u043d] \u0412\u043e\u0437\u044c\u043c\u0438 \u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u043e\u0435 \u043e\u0440\u0443\u0436\u0438\u0435 \u0434\u043b\u044f \u044d\u0442\u043e\u0433\u043e \u0442\u0435\u0441\u0442\u0430!");
-                            event.setCanceled(true);
-                            return;
-                        }
-
                         boolean isBlocking = player.isBlocking();
                         if (!isBlocking) {
                             try {
@@ -811,8 +750,7 @@ public class TutorialManager {
                             
                             if (blocked) {
                                 event.setCanceled(true);
-                                int nextStep = ext.getTutorialProgress() + 1;
-                                brain.tutorial.TutorialManager.getInstance().advanceStage7(player, nextStep);
+                                brain.tutorial.TutorialManager.getInstance().advanceStage7(player, 9);
                                 event.source.getEntity().setDead(); // kill sailor
                             } else {
                                 brain.tutorial.TutorialManager.getInstance().setSubtitle(player, "\u00a7c[\u0411\u043e\u0446\u043c\u0430\u043d] \u0423\u0434\u0430\u0440 \u043f\u0440\u043e\u0448\u0435\u043b! \u041f\u043e\u0432\u0435\u0440\u043d\u0438\u0441\u044c \u043b\u0438\u0446\u043e\u043c \u043a \u043f\u0440\u043e\u0442\u0438\u0432\u043d\u0438\u043a\u0443!");
@@ -994,7 +932,7 @@ public class TutorialManager {
     public void startStage6(EntityPlayer player, ExtendedPlayer ext) {
         clearTutorialEntities(player);
         ext.setTutorialStage(6);
-        ext.setTutorialProgress(0); // 0 = ждём открытия бронника
+        ext.setTutorialProgress(0); // 0 = wait for reforge armor, 1 = wait for enchant sword
         syncState(player);
         
         if (player instanceof net.minecraft.entity.player.EntityPlayerMP) {
@@ -1002,7 +940,6 @@ public class TutorialManager {
             ((net.minecraft.entity.player.EntityPlayerMP) player).playerNetServerHandler.setPlayerLocation(brain.tutorial.TutorialConfig.stage6_x, brain.tutorial.TutorialConfig.stage6_y, brain.tutorial.TutorialConfig.stage6_z, player.rotationYaw, player.rotationPitch);
         }
         
-        // Выдаём: бронзовый нагрудник и меч для перековки, ресурсы для разблокировки слота
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeChestplate, 1, 0));
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeSword, 1, 0));
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeIngot, 5, 0));
@@ -1012,31 +949,16 @@ public class TutorialManager {
         net.minecraft.item.ItemStack scroll = new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.smithScroll, 1, 0);
         got.common.item.other.GOTItemModifierTemplate.setModifier(scroll, got.common.enchant.GOTEnchantment.strong1);
         player.inventory.addItemStackToInventory(scroll);
-        got.common.item.other.GOTItemCoin.giveCoins(3000, player);
+        got.common.item.other.GOTItemCoin.giveCoins(1000, player);
         
         net.minecraft.world.World world = player.worldObj;
-        
-        // Убрали декоративную наковальню, чтобы игрок не кликал по ней случайно
         if (brain.tutorial.TutorialConfig.generatePlatforms) {
-            world.setBlockToAir(brain.tutorial.TutorialConfig.mwsmith_stage6_x, brain.tutorial.TutorialConfig.mwsmith_stage6_y, brain.tutorial.TutorialConfig.mwsmith_stage6_z + 1);
+            world.setBlock(brain.tutorial.TutorialConfig.stage6_x + 2, brain.tutorial.TutorialConfig.stage6_y, brain.tutorial.TutorialConfig.stage6_z + 2, net.minecraft.init.Blocks.anvil);
         }
         
-        // Спавним бронника-туториального NPC
-        got.common.entity.tutorial.GOTEntityTutorialArmorsmith armorsmith = new got.common.entity.tutorial.GOTEntityTutorialArmorsmith(world);
-        armorsmith.setPosition(
-            brain.tutorial.TutorialConfig.armorsmith_stage6_x,
-            brain.tutorial.TutorialConfig.armorsmith_stage6_y,
-            brain.tutorial.TutorialConfig.armorsmith_stage6_z
-        );
-        armorsmith.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.armorsmith"));
-        armorsmith.getEntityData().setString("TutorialOwner", player.getCommandSenderName());
-        world.spawnEntityInWorld(armorsmith);
-        registerTutorialEntity(player, armorsmith);
-        
-        
         setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.start"));
+        
         syncState(player);
-
     }
     
     public void advanceStage6(EntityPlayer player, int step) {
@@ -1045,29 +967,7 @@ public class TutorialManager {
             if (ext.getTutorialProgress() < step) {
                 ext.setTutorialProgress(step);
                 syncState(player);
-                if (step == 1) {
-                    // Бронник открыт: подсказка — разблокировать чар, положить нагрудник
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.armorsmith_open"));
-                } else if (step == 2) {
-                    // Чар выбран: подсказка — положить нагрудник в центральный слот
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.armorsmith_enchant"));
-                } else if (step == 3) {
-                    // Нагрудник вложен: подсказка — нажать перековка
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.armorsmith_forge"));
-                } else if (step == 4) {
-                    // Нагрудник перекован: переход к наковальне
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.anvil_start"));
-                } else if (step == 5) {
-                    // Меч видно: подсказка — выбрать чар для меча
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.anvil_open"));
-                } else if (step == 6) {
-                    // Чар выбран: положить меч
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.anvil_enchant"));
-                } else if (step == 7) {
-                    // Меч вложен: нажать перековка
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.anvil_forge"));
-                } else if (step == 8) {
-                    // Готово!
+                if (step == 7) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.done"));
                     tutorialTimers.put(player.getUniqueID(), 0);
                 }
@@ -1078,16 +978,9 @@ public class TutorialManager {
     public void startStage7(EntityPlayer player, ExtendedPlayer ext) {
         clearTutorialEntities(player);
         ext.setTutorialStage(7);
-        // Progress map:
-        // 0=health/armor/food, 1=stamina_info, 2=run(8s forced drain), 3=regen_info,
-        // 4=dagger_dummy, 5=sword_dummy, 6=axe_dummy, 7=hammer_dummy, 8=battleaxe_dummy,
-        // 9=spear_dummy, 10=pike_dummy, 11=bow_dummy, 12=crossbow_dummy,
-        // 13=shield_craft, 14=block_info, 15=block_fight1(sword), 16=block_fight2(hammer), 17=block_fight3(shieldspear),
-        // 18=dodge_info(x3), 19=done
-        ext.setTutorialProgress(0);
+        ext.setTutorialProgress(0); // 0 = health/armor/food, 1 = stamina, 2 = run, 3 = wait text, 4 = sword dummy, 5 = spear, 6 = bow, 7 = block, 8 = shield craft
         syncState(player);
         tutorialTimers.put(player.getUniqueID(), 0);
-        tutorialSubSteps.put(player.getUniqueID(), 0);
         
         net.minecraft.world.World world = player.worldObj;
         if (brain.tutorial.TutorialConfig.generatePlatforms) {
@@ -1110,34 +1003,28 @@ public class TutorialManager {
         syncState(player);
     }
     
-    /**
-     * Spawns a dummy for a given weapon step. Steps 4-12 = weapon dummies.
-     * Steps 11 (bow) and 12 (crossbow) get a moving dummy.
-     * HP is set to 15 so damage is visible.
-     */
     public void spawnDummyForStage7(EntityPlayer player, int step) {
         net.minecraft.world.World world = player.worldObj;
         got.common.entity.tutorial.GOTEntityTutorialDummy dummy = new got.common.entity.tutorial.GOTEntityTutorialDummy(world);
         
-        // Use dummy1 pos for all weapon dummies — cleared between each step
-        dummy.setPosition(brain.tutorial.TutorialConfig.dummy1_stage7_x, brain.tutorial.TutorialConfig.dummy1_stage7_y, brain.tutorial.TutorialConfig.dummy1_stage7_z);
-        
-        boolean moving = (step == 11 || step == 12); // bow and crossbow get moving dummies
-        if (moving) {
+        if (step == 4) {
+            dummy.setPosition(brain.tutorial.TutorialConfig.dummy1_stage7_x, brain.tutorial.TutorialConfig.dummy1_stage7_y, brain.tutorial.TutorialConfig.dummy1_stage7_z);
+        } else if (step == 5) {
+            dummy.setPosition(brain.tutorial.TutorialConfig.dummy2_stage7_x, brain.tutorial.TutorialConfig.dummy2_stage7_y, brain.tutorial.TutorialConfig.dummy2_stage7_z);
+        } else if (step == 6) {
             dummy.setPosition(brain.tutorial.TutorialConfig.dummy3_stage7_x, brain.tutorial.TutorialConfig.dummy3_stage7_y, brain.tutorial.TutorialConfig.dummy3_stage7_z);
+        } else {
+            return;
         }
         
         dummy.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.dummy"));
-        dummy.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.movementSpeed).setBaseValue(moving ? 0.15D : 0.0D);
-        dummy.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.maxHealth).setBaseValue(15.0D);
-        dummy.setHealth(15.0F);
+        dummy.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.movementSpeed).setBaseValue(0.0D);
+        dummy.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.maxHealth).setBaseValue(20.0D);
+        dummy.setHealth(20.0F);
         dummy.setCurrentItemOrArmor(4, new net.minecraft.item.ItemStack(net.minecraft.init.Blocks.pumpkin));
         dummy.setCurrentItemOrArmor(3, new net.minecraft.item.ItemStack(net.minecraft.init.Items.leather_chestplate));
         dummy.setCurrentItemOrArmor(2, new net.minecraft.item.ItemStack(net.minecraft.init.Items.leather_leggings));
         dummy.setCurrentItemOrArmor(1, new net.minecraft.item.ItemStack(net.minecraft.init.Items.leather_boots));
-        if (moving) {
-            dummy.getEntityData().setBoolean("TutorialDummyMoving", true);
-        }
         world.spawnEntityInWorld(dummy);
         registerTutorialEntity(player, dummy);
     }
@@ -1149,68 +1036,20 @@ public class TutorialManager {
                 ext.setTutorialProgress(step);
                 syncState(player);
                 
-                // Clear tutorial entities between weapon dummies (steps 4-12)
-                if (step >= 4 && step <= 12) {
-                    // Kill previous dummy before spawning next
-                    java.util.List<Integer> entities = tutorialEntitiesMap.getOrDefault(player.getUniqueID(), new java.util.ArrayList<>());
-                    for (int id : entities) {
-                        net.minecraft.entity.Entity e = player.worldObj.getEntityByID(id);
-                        if (e instanceof got.common.entity.tutorial.GOTEntityTutorialDummy) {
-                            e.setDead();
-                        }
-                    }
-                    entities.removeIf(id -> {
-                        net.minecraft.entity.Entity e = player.worldObj.getEntityByID(id);
-                        return e == null || e.isDead;
-                    });
-                    tutorialEntitiesMap.put(player.getUniqueID(), entities);
-                }
-                // Kill sailors between block fights (steps 15-17)
-                if (step >= 15 && step <= 17) {
-                    java.util.List<Integer> entities = tutorialEntitiesMap.getOrDefault(player.getUniqueID(), new java.util.ArrayList<>());
-                    for (int id : entities) {
-                        net.minecraft.entity.Entity e = player.worldObj.getEntityByID(id);
-                        if (e instanceof got.common.entity.tutorial.GOTEntityTutorialSailor) {
-                            e.setDead();
-                        }
-                    }
-                    entities.removeIf(id -> {
-                        net.minecraft.entity.Entity e = player.worldObj.getEntityByID(id);
-                        return e == null || e.isDead;
-                    });
-                    tutorialEntitiesMap.put(player.getUniqueID(), entities);
-                }
-                
                 if (step == 1) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.stamina_info"));
                 } else if (step == 2) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.run_info"));
                     tutorialTimers.put(player.getUniqueID(), 0);
-                    // Restore stamina first so drain is visible
-                    ExtendedPlayer.get(player).setStamina(got.common.handlers.StaminaServerHandler.MAX_STAMINA);
-                    got.common.network.base.PacketDispatcher.sendTo(new got.common.network.serverToClient.PacketSendStamina(got.common.handlers.StaminaServerHandler.MAX_STAMINA), (net.minecraft.entity.player.EntityPlayerMP) player);
                 } else if (step == 3) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.stamina_regen"));
                     tutorialTimers.put(player.getUniqueID(), 0);
                 } else if (step == 4) {
-                    for (int i = 0; i < player.inventory.mainInventory.length; i++) {
-                        player.inventory.mainInventory[i] = null;
-                    }
-                    if (player instanceof net.minecraft.entity.player.EntityPlayerMP) {
-                        ((net.minecraft.entity.player.EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);
-                    }
-                    // Give all 9 weapon types + ammo
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironDagger, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Items.iron_sword, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeAxe, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.westerosHammer, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironBattleaxe, 1, 0));
+                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Items.wooden_sword, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironSpear, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironPike, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Items.bow, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeCrossbow, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Items.arrow, 64, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.crossbowBolt, 64, 0));
                     
                     net.minecraft.world.World world = player.worldObj;
                     got.common.entity.tutorial.GOTEntityTutorialBoatswain boatswain = new got.common.entity.tutorial.GOTEntityTutorialBoatswain(world);
@@ -1220,76 +1059,32 @@ public class TutorialManager {
                     registerTutorialEntity(player, boatswain);
                     
                     spawnDummyForStage7(player, 4);
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.dagger_hit"));
-                } else if (step == 5) {
-                    spawnDummyForStage7(player, 5);
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.sword_hit"));
-                } else if (step == 6) {
-                    spawnDummyForStage7(player, 6);
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.axe_hit"));
-                } else if (step == 7) {
-                    spawnDummyForStage7(player, 7);
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.hammer_hit"));
-                } else if (step == 8) {
-                    spawnDummyForStage7(player, 8);
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.battleaxe_hit"));
-                } else if (step == 9) {
-                    spawnDummyForStage7(player, 9);
+                } else if (step == 5) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.spear_hit"));
-                } else if (step == 10) {
-                    spawnDummyForStage7(player, 10);
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.pike_hit"));
-                } else if (step == 11) {
-                    spawnDummyForStage7(player, 11);
+                    spawnDummyForStage7(player, 5);
+                } else if (step == 6) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.bow_hit"));
-                } else if (step == 12) {
-                    spawnDummyForStage7(player, 12);
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.crossbow_hit"));
-                } else if (step == 13) {
-                    // Shield craft: give shields
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 2, 0));
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.shield_craft"));
-                } else if (step == 14) {
+                    spawnDummyForStage7(player, 6);
+                } else if (step == 7) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.block_info"));
                     tutorialTimers.put(player.getUniqueID(), 0);
-                } else if (step == 15) {
-                    // Block fight 1: sailor with sword
+                } else if (step == 8) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.block_hold"));
                     net.minecraft.world.World world = player.worldObj;
                     got.common.entity.tutorial.GOTEntityTutorialSailor sailor = new got.common.entity.tutorial.GOTEntityTutorialSailor(world);
                     sailor.setPosition(brain.tutorial.TutorialConfig.sailor_stage7_x, brain.tutorial.TutorialConfig.sailor_stage7_y, brain.tutorial.TutorialConfig.sailor_stage7_z);
                     sailor.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.sailor"));
-                    sailor.setCurrentItemOrArmor(0, new net.minecraft.item.ItemStack(net.minecraft.init.Items.iron_sword));
+                    sailor.setCurrentItemOrArmor(0, new net.minecraft.item.ItemStack(net.minecraft.init.Items.wooden_sword));
                     sailor.setAttackTarget(player);
                     world.spawnEntityInWorld(sailor);
                     registerTutorialEntity(player, sailor);
-                } else if (step == 16) {
-                    // Block fight 2: sailor with sword
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.block_hold2"));
-                    net.minecraft.world.World world = player.worldObj;
-                    got.common.entity.tutorial.GOTEntityTutorialSailor sailor = new got.common.entity.tutorial.GOTEntityTutorialSailor(world);
-                    sailor.setPosition(brain.tutorial.TutorialConfig.sailor_stage7_x, brain.tutorial.TutorialConfig.sailor_stage7_y, brain.tutorial.TutorialConfig.sailor_stage7_z);
-                    sailor.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.sailor"));
-                    sailor.setCurrentItemOrArmor(0, new net.minecraft.item.ItemStack(net.minecraft.init.Items.iron_sword));
-                    sailor.setAttackTarget(player);
-                    world.spawnEntityInWorld(sailor);
-                    registerTutorialEntity(player, sailor);
-                } else if (step == 17) {
-                    // Block fight 3: sailor with sword
-                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.block_hold3"));
-                    net.minecraft.world.World world = player.worldObj;
-                    got.common.entity.tutorial.GOTEntityTutorialSailor sailor = new got.common.entity.tutorial.GOTEntityTutorialSailor(world);
-                    sailor.setPosition(brain.tutorial.TutorialConfig.sailor_stage7_x, brain.tutorial.TutorialConfig.sailor_stage7_y, brain.tutorial.TutorialConfig.sailor_stage7_z);
-                    sailor.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.sailor"));
-                    sailor.setCurrentItemOrArmor(0, new net.minecraft.item.ItemStack(net.minecraft.init.Items.iron_sword));
-                    sailor.setAttackTarget(player);
-                    world.spawnEntityInWorld(sailor);
-                    registerTutorialEntity(player, sailor);
-                } else if (step == 18) {
-                    // Dodge: require 3 dodges
-                    tutorialSubSteps.put(player.getUniqueID(), 0);
+                } else if (step == 9) {
+                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.shield, 2, 0));
+                    setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.shield_craft"));
+                } else if (step == 10) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.dodge_info"));
-                } else if (step == 19) {
+                } else if (step == 11) {
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage7.done"));
                     tutorialTimers.put(player.getUniqueID(), 0);
                 }

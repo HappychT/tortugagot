@@ -37,8 +37,8 @@ public class GOTPacketBlacksmithUnlock implements IMessage {
                 GOTContainerFactionBlacksmith containerBlacksmith = (GOTContainerFactionBlacksmith) container;
                 if (containerBlacksmith.isSlotUnlocked(packet.slot))
                     return null;
-                containerBlacksmith.theBlacksmithNPC.applyUnlockSlot(entityplayer, packet.slot);
                 containerBlacksmith.takeUnlockItems(packet.slot);
+                containerBlacksmith.theBlacksmithNPC.applyUnlockSlot(entityplayer, packet.slot);
             }
             return null;
         }

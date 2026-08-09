@@ -7349,18 +7349,3 @@ entity.got.TutorialSailor.name=Матрос
 entity.got.TutorialMutineer.name=Мятежник
 entity.got.TutorialBartender.name=Бармен
 entity.got.TutorialJaqen.name=Якен Х'гар
-
-gui.map.regions_info=Информация о регионах
-gui.factions.tortuga=Тортуга
-gui.factions.scroll_down=Прокрутите вниз
-gui.factions.rmb_nickname=ПКМ - скопировать ник
-gui.factions.press_esc_close=Нажмите ESC чтобы закрыть
-gui.banner.switch_mode=ЛКМ - переключить режим
-gui.banner.press_esc=Нажмите ESC для выхода
-
-subtitle.stage8.end=Отлично! Вы научились основам боя.
-subtitle.stage10.jaqen1=Человек имеет много лиц.
-
-subtitle.stage7.block_hold=[Обучение] Возьмите железный меч в руку и удерживайте ПКМ для блока.
-subtitle.stage7.block_hold2=[Обучение] Возьмите молот в руку и удерживайте ПКМ для блока.
-subtitle.stage7.block_hold3=[Обучение] Возьмите щит во вторую (левую) руку и удерживайте ПКМ для блока.

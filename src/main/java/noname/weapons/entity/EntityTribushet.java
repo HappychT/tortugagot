@@ -1,6 +1,7 @@
 package noname.weapons.entity;
 
 import brain.factions.servers.SiegeActivationManager;
+import com.tortugagot.togcore.technology.TOGEngineeringTechnology;
 import noname.weapons.RegItem;
 import noname.weapons.config.WeaponsConfig;
 import net.minecraft.entity.Entity;
@@ -75,6 +76,17 @@ public class EntityTribushet extends EntityLivingBase {
             if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) this.riddenByEntity;
                 this.rider = player;
+                if (!TOGEngineeringTechnology.canUseSiegeWeapon(player, this)) {
+                    player.mountEntity(null);
+                    this.rider = null;
+                    lastSwingState = false;
+                    if (isReloading) {
+                        stopReloading();
+                    }
+                    TOGEngineeringTechnology.notifySiegeWeaponBlocked(player, this);
+                    return;
+                }
+
                 updateControlledYaw(player.rotationYaw, WeaponsConfig.rotationSpeedTribushet);
                 this.prevRotationYaw = this.rotationYaw;
                 this.rotationYaw = this.anchorYaw;
@@ -104,7 +116,7 @@ public class EntityTribushet extends EntityLivingBase {
                         reloadTimer++;
                         this.dataWatcher.updateObject(18, Integer.valueOf(reloadTimer));
 
-                        if (reloadTimer >= WeaponsConfig.reloadTimeTribushet) {
+                        if (reloadTimer >= TOGEngineeringTechnology.getReloadTime(WeaponsConfig.reloadTimeTribushet, player)) {
                             completeReload();
                         }
                     }
@@ -239,7 +251,15 @@ public class EntityTribushet extends EntityLivingBase {
         if (!this.worldObj.isRemote && this.riddenByEntity != null) {
             if (!SiegeActivationManager.getInstance().isSiegeActive(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ)) return;
             EntityPlayer player = (EntityPlayer) this.riddenByEntity;
-            if (!isReadyToFire()) return;
+
+            if (!TOGEngineeringTechnology.canUseSiegeWeapon(player, this)) {
+                TOGEngineeringTechnology.notifySiegeWeaponBlocked(player, this);
+                return;
+            }
+
+            if (!isReadyToFire()) {
+                return;
+            }
 
             float yaw = this.rotationYaw;
             float yawRad = yaw / 180.0F * (float) Math.PI;
@@ -333,6 +353,10 @@ public class EntityTribushet extends EntityLivingBase {
 
     @Override
     public boolean interactFirst(EntityPlayer player) {
+        if (!this.worldObj.isRemote && !TOGEngineeringTechnology.canUseSiegeWeapon(player, this)) {
+            TOGEngineeringTechnology.notifySiegeWeaponBlocked(player, this);
+            return true;
+        }
         if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer &&
                 this.riddenByEntity != player) {
             return true;

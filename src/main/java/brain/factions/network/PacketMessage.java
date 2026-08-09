@@ -117,35 +117,7 @@ public class PacketMessage implements IMessage {
 				brain.factions.servers.CoreFaction.brainChannel.sendTo(new PacketBarracksPlayers(barracksPlayers), player);
 				return null;
 			}
-			if(args[0].equalsIgnoreCase("tutorialJoin")) {
-				Faction faction = getFaction(args[1]);
-				if (faction == null) return null;
-
-				String playerName = player.getDisplayName();
-
-				// Если уже состоит — ничего не делаем
-				if (faction.getPlayers().containsKey(playerName)) return null;
-
-				// Убираем возможную старую заявку
-				faction.getApplications().remove(playerName);
-
-				// Сразу добавляем в участники (аналог одобрения заявки)
-				faction.getPlayers().put(playerName, new Faction.PlayerData("", System.currentTimeMillis(), "Игрок"));
-				CoreFaction.updatePrefix(playerName);
-
-				// Устанавливаем pledge в GOT-данных
-				got.common.faction.GOTFaction gotFaction = got.common.faction.GOTFaction.forName(faction.getID());
-				if (gotFaction != null) {
-					got.common.GOTPlayerData pd = got.common.GOTLevelData.getData(player);
-					if (pd != null) pd.setPledgeFaction(gotFaction);
-				}
-
-				CoreFaction.saveFactions();
-				CoreFaction.initFactions();
-				CoreFaction.sendAllGui();
-				return null;
-			} else if(args[0].equalsIgnoreCase("sendApplication")) {
-
+			if(args[0].equalsIgnoreCase("sendApplication")) {
 				Faction faction = getFaction(args[1]);
 				if(faction == null ) {
 					return null;

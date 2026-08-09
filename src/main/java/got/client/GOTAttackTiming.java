@@ -32,8 +32,11 @@ public class GOTAttackTiming {
 
         ItemStack itemstack = mc.thePlayer.getHeldItem();
 
-        if (mc.thePlayer.isPotionActive(GOTEffects.exhaustion) || mc.thePlayer.isPotionActive(Potion.digSlowdown)) {
-            attackTime = fullAttackTime = (int) (GOTWeaponStats.getAttackTimePlayer(itemstack, mc.thePlayer) + (GOTWeaponStats.getAttackTimePlayer(itemstack, mc.thePlayer) * 1.3));
+        if (mc.thePlayer.isPotionActive(Potion.digSlowdown)) {
+            int level = mc.thePlayer.getActivePotionEffect(Potion.digSlowdown).getAmplifier() + 1;
+            int baseTime = GOTWeaponStats.getAttackTimePlayer(itemstack, mc.thePlayer);
+            double speedMultiplier = 1.0 - (level * 0.1);
+            attackTime = fullAttackTime = (int) (baseTime / speedMultiplier);
         } else {
             attackTime = fullAttackTime = GOTWeaponStats.getAttackTimePlayer(itemstack, mc.thePlayer);
         }

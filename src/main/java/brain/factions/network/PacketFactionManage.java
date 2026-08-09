@@ -414,9 +414,7 @@ public class PacketFactionManage implements IMessage {
         }
 
         private void handleTitleHierarchyEdit(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
-            got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
-            boolean isTutorial = ext != null && ext.isTutorialActive();
-            if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_MANAGE_HIERARCHY) && !isTutorial) {
+            if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_MANAGE_HIERARCHY)) {
                 player.addChatMessage(new ChatComponentText("§cУ вас нет прав на изменение иерархии титулов."));
                 return;
             }
@@ -576,9 +574,7 @@ public class PacketFactionManage implements IMessage {
         }
 
         private void handleTitleCreate(EntityPlayerMP player, Faction faction, PacketFactionManage message) {
-            got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
-            boolean isTutorial = ext != null && ext.isTutorialActive();
-            if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_CREATE_TITLES) && !isTutorial) {
+            if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_CREATE_TITLES)) {
                 player.addChatMessage(new ChatComponentText("§cУ вас нет прав на создание титулов."));
                 return;
             }
@@ -661,13 +657,13 @@ public class PacketFactionManage implements IMessage {
 
                 player.addChatMessage(new ChatComponentText("§aИгрок " + targetName + " был изгнан из фракции."));
             } else if (action.equals("setTitle")) {
-                got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
-                boolean isTutorial = ext != null && ext.isTutorialActive();
-                if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_CREATE_TITLES) && !isTutorial) {
+                if (!faction.playerHasPermission(player.getCommandSenderName(), Faction.Permission.CAN_CREATE_TITLES)) {
                     player.addChatMessage(new ChatComponentText("§cУ вас нет прав назначать титулы."));
                     return;
                 }
-                if (isTutorial && !targetName.equals(player.getCommandSenderName())) {
+                
+                got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+                if (ext != null && ext.isTutorialActive() && !targetName.equals(player.getCommandSenderName())) {
                     player.addChatMessage(new ChatComponentText("§cВы не можете изменять титулы других игроков во время обучения."));
                     return;
                 }

@@ -155,21 +155,6 @@ public class FactionStructureManager {
         return null;
     }
 
-    public static FactionStructureSlot getStructureByName(String name) {
-        if (name == null || structureSlots == null) return null;
-        String lower = name.toLowerCase();
-        for (FactionStructureSlot slot : structureSlots) {
-            if (slot.name != null && slot.name.toLowerCase().equals(lower)) return slot;
-            if (slot.id != null && slot.id.toLowerCase().equals(lower)) return slot;
-        }
-        return null;
-    }
-
-    public static FactionStructureSlot getFortressByName(String name) {
-        FactionStructureSlot slot = getStructureByName(name);
-        return (slot != null && slot.category == FactionStructureSlot.StructureCategory.FORTRESS) ? slot : null;
-    }
-
     public static FactionStructureSlot getStructureNearby(int x, int y, int z) {
         if (structureSlots == null) return null;
 

@@ -37,6 +37,7 @@ public class FrontPage implements IPageRenderer {
     private List<GOTFaction> wars = new ArrayList<>();
     private GuiButton buttonWarCouncil;
 
+    private static final ResourceLocation BANNER_TEX = new ResourceLocation("got", "textures/gui/faction/banner_bg.png");
     private static final ResourceLocation PLATE_TEX = new ResourceLocation("got", "textures/gui/faction/info_plate.png");
     private static final ResourceLocation MAP_FRAME_TEX = new ResourceLocation("got", "textures/gui/faction/map_frame.png");
 
@@ -127,7 +128,7 @@ public class FrontPage implements IPageRenderer {
         int bannerY = 15;
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        parent.mc.getTextureManager().bindTexture(GOTGuiFactions.getFactionBanner(GOTGuiFactions.currentFaction));
+        parent.mc.getTextureManager().bindTexture(BANNER_TEX);
         parent.drawScaledCustomSizeModalRect(bannerX, bannerY, 0, 0, 362, 356, bannerWidth, bannerHeight, 362.0F, 356.0F);
 
         int plateWidth = 250;

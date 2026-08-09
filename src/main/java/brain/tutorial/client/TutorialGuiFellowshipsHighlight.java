@@ -232,7 +232,7 @@ public class TutorialGuiFellowshipsHighlight {
                 advance(); return true;
             }
             if (isHoveringAnyOtherButton(buttonList, 1, mouseX, mouseY)) { return false; }
-            return true; // Let them type — caller will forward to text field directly
+            return true; // Let them type
         } else if (p == 40) {
             if (mouseX >= guiLeft + 8 && mouseX <= guiLeft + xSize - 8 && mouseY >= guiTop + 30 && mouseY <= guiTop + ySize - 30) {
                 advance(); return true;
@@ -248,7 +248,7 @@ public class TutorialGuiFellowshipsHighlight {
                 advance(); return true;
             }
             if (isHoveringAnyOtherButton(buttonList, 3, mouseX, mouseY)) { return false; }
-            return true; // Let them type — caller will forward to text field directly
+            return true;
         }
         
         return true;

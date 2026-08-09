@@ -33,9 +33,7 @@ public class GOTPacketBlacksmithEnchantmentButton extends AbstractPacket.Abstrac
     @Override
     public void process(EntityPlayer player, Side side) {
         if(player != null) {
-            if (player.openContainer instanceof got.common.faction.GOTContainerFactionBlacksmith) {
-                ((got.common.faction.GOTContainerFactionBlacksmith) player.openContainer).switchButtonState(slot);
-            }
+            ((GOTContainerFactionBlacksmith) player.openContainer).switchButtonState(slot);
         }
     }
 }
