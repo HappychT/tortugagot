@@ -563,5 +563,7 @@ public class GOTEntity {
         GOTEntityRegistry.register(got.common.entity.tutorial.GOTEntityTutorialSailor.class, id++, GOTFaction.UNALIGNED);
         GOTEntityRegistry.register(got.common.entity.tutorial.GOTEntityTutorialMutineer.class, id++, GOTFaction.UNALIGNED);
         GOTEntityRegistry.register(got.common.entity.tutorial.GOTEntityTutorialJaqen.class, id++, GOTFaction.UNALIGNED);
+        GOTEntityRegistry.registerHidden(got.common.entity.tutorial.GOTEntityTutorialArmorsmith.class, id++);
+        GOTEntityRegistry.registerHidden(got.common.entity.tutorial.GOTEntityTutorialMWSmith.class, id++);
     }
 }

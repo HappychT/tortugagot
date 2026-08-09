@@ -399,13 +399,18 @@ public class TutorialGuiFactionsHighlight {
             if (gui.getActiveRenderer() instanceof got.client.gui.faction.FactionListRenderer) {
                 got.client.gui.faction.FactionListRenderer listRenderer = (got.client.gui.faction.FactionListRenderer) gui.getActiveRenderer();
                 int[] bounds = listRenderer.getFactionBounds("HIGH_POWER");
-                if (bounds != null && gui.isHover(bounds[0], bounds[1], bounds[2], bounds[3], mouseX, mouseY)) {
+
+                // Клик точно по баннеру HIGH_POWER (и он виден) → advance + передать клик
+                if (bounds != null && isHighPowerVisible(listRenderer, gui)
+                        && gui.isHover(bounds[0], bounds[1], bounds[2], bounds[3], mouseX, mouseY)) {
                     if (button == 0) { advance(); }
-                    return true;
+                    return true; // пропустить → FactionListRenderer выполнит setCurrentFaction
                 }
+
+                // Клик в зону списка (другая фракция, или HIGH_POWER вне экрана) → строго блокируем
                 int listX = 70, listY = 50;
                 int listW = gui.getBaseWidth() - 140, listH = gui.getBaseHeight() - 85;
-                if (gui.isHover(listX, listY, listW, listH, mouseX, mouseY)) { return true; } // allow scrolling/interacting with list
+                if (gui.isHover(listX, listY, listW, listH, mouseX, mouseY)) { return false; } // заблокировать клик по чужим фракциям
             }
             return false;
         } else if (p == 7) {
@@ -629,6 +634,18 @@ public class TutorialGuiFactionsHighlight {
             }
         }
         return false;
+    }
+
+
+
+    // Проверяет, что баннер HIGH_POWER реально виден в viewport списка фракций
+    private static boolean isHighPowerVisible(got.client.gui.faction.FactionListRenderer listRenderer, GOTGuiFactions gui) {
+        int[] bounds = listRenderer.getFactionBounds("HIGH_POWER");
+        if (bounds == null) return false;
+        int listX = 70;
+        int listWidth = gui.getBaseWidth() - 140;
+        // Баннер виден если хотя бы частично попадает в [listX, listX+listWidth]
+        return bounds[0] + bounds[2] > listX && bounds[0] < listX + listWidth;
     }
 
     private static void advance() {

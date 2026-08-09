@@ -49,6 +49,8 @@ public class TutorialConfig {
     
     public static int captain_stage9_x, captain_stage9_y, captain_stage9_z;
     public static int jaqen_stage10_x, jaqen_stage10_y, jaqen_stage10_z;
+    public static int armorsmith_stage6_x, armorsmith_stage6_y, armorsmith_stage6_z;
+    public static int mwsmith_stage6_x, mwsmith_stage6_y, mwsmith_stage6_z;
     
     public static void setupAndLoad() {
         config = new Configuration(new File("config", "tutorial.cfg"));
@@ -162,6 +164,14 @@ public class TutorialConfig {
         jaqen_stage10_x = config.get(entCat, "jaqen_stage10_x", stage10_x).getInt();
         jaqen_stage10_y = config.get(entCat, "jaqen_stage10_y", stage10_y).getInt();
         jaqen_stage10_z = config.get(entCat, "jaqen_stage10_z", stage10_z + 2).getInt();
+        
+        armorsmith_stage6_x = config.get(entCat, "armorsmith_stage6_x", stage6_x - 3).getInt();
+        armorsmith_stage6_y = config.get(entCat, "armorsmith_stage6_y", stage6_y).getInt();
+        armorsmith_stage6_z = config.get(entCat, "armorsmith_stage6_z", stage6_z + 2).getInt();
+        
+        mwsmith_stage6_x = config.get(entCat, "mwsmith_stage6_x", stage6_x + 4).getInt();
+        mwsmith_stage6_y = config.get(entCat, "mwsmith_stage6_y", stage6_y).getInt();
+        mwsmith_stage6_z = config.get(entCat, "mwsmith_stage6_z", stage6_z + 2).getInt();
         
         if (config.hasChanged()) {
             config.save();

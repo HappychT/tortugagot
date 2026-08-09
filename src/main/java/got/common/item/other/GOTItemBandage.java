@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting; // <-- ДОБАВИТЬ ИМПОРТ
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -38,15 +38,14 @@ public class GOTItemBandage extends Item {
 
     private int getUseDuration(EntityPlayer player) {
         if (player.inventory.hasItem(GOTRegistry.gauzeSet)) {
-            return 60;
+            return 30;
         }
-        return 100;
+        return 50;
     }
 
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
-
-        return 100;
+        return 50;
     }
 
     @Override
@@ -59,20 +58,21 @@ public class GOTItemBandage extends Item {
             return itemStack;
         }
 
+        if (itemStack.stackTagCompound == null) {
+            itemStack.setTagCompound(new NBTTagCompound());
+        }
+
         Entity target = getEntityPlayerLookingAt(player, 3.5D);
 
-        if (target instanceof EntityPlayer && target != player) {
-            if (itemStack.stackTagCompound == null) {
-                itemStack.setTagCompound(new NBTTagCompound());
-            }
+        // Если зажат Shift и игрок смотрит на тиммейта — лечим тиммейта. Иначе лечим себя.
+        if (player.isSneaking() && target instanceof EntityPlayer && target != player) {
             itemStack.stackTagCompound.setInteger(HEALING_TARGET_ID_NBT, target.getEntityId());
-
-            player.setItemInUse(itemStack, this.getUseDuration(player));
         } else {
-            if (!world.isRemote) {
-                player.addChatMessage(new ChatComponentText("Цель не найдена или слишком далеко."));
-            }
+            itemStack.stackTagCompound.setInteger(HEALING_TARGET_ID_NBT, player.getEntityId());
         }
+
+        player.setItemInUse(itemStack, this.getUseDuration(player));
+
         return itemStack;
     }
 
@@ -112,9 +112,14 @@ public class GOTItemBandage extends Item {
 
                     BandageCooldownHandler.setCooldown(player, 35);
 
-                    player.addChatMessage(new ChatComponentText("Вы вылечили " + targetPlayer.getDisplayName() + "."));
-                    targetPlayer.addChatMessage(new ChatComponentText("Вас вылечили!"));
-                    world.playSoundAtEntity(targetPlayer, "random.orb", 1.0F, 1.0F);
+                    if (targetPlayer == player) {
+                        player.addChatMessage(new ChatComponentText("Вы перевязали свои раны."));
+                        world.playSoundAtEntity(player, "random.orb", 1.0F, 1.0F);
+                    } else {
+                        player.addChatMessage(new ChatComponentText("Вы вылечили " + targetPlayer.getDisplayName() + "."));
+                        targetPlayer.addChatMessage(new ChatComponentText("Вас вылечили!"));
+                        world.playSoundAtEntity(targetPlayer, "random.orb", 1.0F, 1.0F);
+                    }
                 }
             }
         }

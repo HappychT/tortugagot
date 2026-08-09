@@ -47,6 +47,11 @@ public class TOGWeaponSkillEvents {
     }
 
     private String getServerEffectKey(EntityPlayer player, ItemStack heldItem) {
+        got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+        if (ext != null && ext.isTutorialActive()) {
+            return null;
+        }
+        
         if (TOGWeaponTechnology.hasUnskilledWarrior(player, heldItem)) {
             String technologyId = TOGWeaponTechnology.getRequiredTechnology(heldItem);
             return technologyId != null ? "unskilled_warrior_" + technologyId : null;

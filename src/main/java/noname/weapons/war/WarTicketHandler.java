@@ -13,7 +13,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import noname.weapons.RegItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,7 +108,7 @@ public class WarTicketHandler {
     }
 
     private boolean isWarTicket(ItemStack stack) {
-        return stack != null && (stack.getItem() == GOTRegistry.millitaryCard || stack.getItem() == RegItem.warTicket);
+        return stack != null && stack.getItem() == GOTRegistry.millitaryCard;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

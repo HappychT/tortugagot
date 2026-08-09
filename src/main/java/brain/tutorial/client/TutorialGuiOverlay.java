@@ -79,7 +79,7 @@ public class TutorialGuiOverlay {
                     float newPosX = aX - 89.5f;
                     float newPosY = aY - 114 + 40;
                     drawBeautifulBorder((int)newPosX, (int)newPosY, 200, 14, 0x00FF00); // Stamina (width doubled to 200)
-                } else if (p == 8) {
+                } else if (p == 14 || p == 15 || p == 16) {
                     drawBlockAngleIndicator(mc, sr);
                 }
             }

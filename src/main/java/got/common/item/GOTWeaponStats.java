@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Multimap;
 
-import com.tortugagot.togcore.technology.TOGWeaponTechnology;
 import got.GOT;
 import got.common.database.GOTRegistry;
 import got.common.handlers.PlayerParryData;
@@ -36,10 +35,6 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemLongsword.class, 0.8f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemSword.class, 0.6897f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemBattleaxe.class, 0.54f);
-
-		GOTWeaponStats.registerMeleeSpeed(ItemBattleaxeWestros.class, 0.54f);
-		GOTWeaponStats.registerMeleeReach(ItemBattleaxeWestros.class, 0.96f);
-
 		GOTWeaponStats.registerMeleeSpeed(GOTItemPoleaxe.class, 0.49f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemArrynClaymore.class, 0.629f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemRiverlandsTrident.class, 0.45f);
@@ -60,8 +55,8 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeSpeed(GOTItemShieldRiverlandsTrident.class, 0.35f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemLeaderBattleaxe.class, 0.45f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemThiefKnife.class, 1.5f);
-        GOTWeaponStats.registerMeleeSpeed(GOTItemDamnedCaptainSaber.class, 0.69f);
-        GOTWeaponStats.registerMeleeSpeed(GOTItemGiantClub.class, 0.2f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemDamnedCaptainSaber.class, 0.69f);
+		GOTWeaponStats.registerMeleeSpeed(GOTItemGiantClub.class, 0.2f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemCavalryLance.class, 0.35f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemValyrianShieldHalbert.class, 0.3f);
 		GOTWeaponStats.registerMeleeSpeed(GOTItemValyrianShieldSpear.class, 0.54f);
@@ -150,13 +145,13 @@ public class GOTWeaponStats {
 		GOTWeaponStats.registerMeleeReach(GOTItemHammer.class, 1.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemNorthGreatSword.class, 1.1f);
 		GOTWeaponStats.registerMeleeReach(GOTItemThiefKnife.class, 0.75f);
-        GOTWeaponStats.registerMeleeReach(GOTItemGiantClub.class, 1.3f);
+		GOTWeaponStats.registerMeleeReach(GOTItemGiantClub.class, 1.3f);
 		GOTWeaponStats.registerMeleeReach(GOTItemValyrianShieldHalbert.class, 2.0f);
 		GOTWeaponStats.registerMeleeReach(GOTItemValyrianShieldSpear.class, 1.3f);
-		
+
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemHammer.class, 1);
 		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemLance.class, 1);
-		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemGiantClub.class, 1);		
+		GOTWeaponStats.registerMeleeExtraKnockback(GOTItemGiantClub.class, 1);
 	}
 
 	public static int getArmorProtection(ItemStack itemstack) {
@@ -185,9 +180,6 @@ public class GOTWeaponStats {
 			if (parryData != null && player.worldObj.getTotalWorldTime() - parryData.getLastSyrioCounterTime() <= 100) {
 				time /= 1.1f;
 			}
-		}
-		if (TOGWeaponTechnology.hasUnskilledWarrior(player, itemstack)) {
-			time /= TOGWeaponTechnology.UNSKILLED_WARRIOR_SPEED_FACTOR;
 		}
 		return Math.round(Math.max(time, 1.0f));
 	}

@@ -60,29 +60,47 @@ public class TutorialTexts {
         loadString("subtitle.stage5.bartender", "§e[Трактирщик] Купи у меня что-нибудь (ПКМ).", category);
 
         // Stage 6
-        loadString("subtitle.stage6.start", "§e[Обучение] Перекуйте броню у кузнеца (ПКМ), а затем зачаруйте меч на наковальне с чертежом.", category);
+        loadString("subtitle.stage6.start", "§e[Обучение] Подойди к бронникy (ПКМ) — он поможет зачаровать нагрудник.", category);
+        loadString("subtitle.stage6.armorsmith_open", "§e[Обучение] Следуй подсказкам на экране.", category);
+        loadString("subtitle.stage6.armorsmith_enchant", "§e[Обучение] Следуй подсказкам на экране.", category);
+        loadString("subtitle.stage6.armorsmith_forge", "§e[Обучение] Следуй подсказкам на экране.", category);
+        loadString("subtitle.stage6.anvil_start", "§e[Обучение] Нагрудник готов! Теперь иди к оружейнику и зачаруй меч.", category);
+        loadString("subtitle.stage6.anvil_open", "§e[Обучение] Следуй подсказкам на экране.", category);
+        loadString("subtitle.stage6.anvil_enchant", "§e[Обучение] Следуй подсказкам на экране.", category);
+        loadString("subtitle.stage6.anvil_forge", "§e[Обучение] Следуй подсказкам на экране.", category);
         loadString("subtitle.stage6.done", "§a[Обучение] Оружие и броня готовы, пора на корабль!", category);
 
-        // Stage 7
+        // Stage 7 – weapon dummies (9 weapons)
         loadString("subtitle.stage7.start", "§e[Капитан] Обрати внимание на свои характеристики: Здоровье, Броня, Еда.", category);
-        loadString("subtitle.stage7.stamina1", "§e[Капитан] А здесь твоя выносливость. Она тратится на бег и удары.", category);
-        loadString("subtitle.stage7.stamina2", "§e[Капитан] Побегай, чтобы потратить её. (Дважды W или Ctrl)", category);
-        loadString("subtitle.stage7.stamina3", "§e[Капитан] Отлично! Она восстанавливается, если стоять или идти.", category);
-        loadString("subtitle.stage7.dummy_sword", "§e[Боцман] Открой инвентарь и посмотри характеристики оружия, а затем ударь манекен МЕЧОМ.", category);
-        loadString("subtitle.stage7.dummy_spear", "§e[Боцман] Отлично! А теперь ударь КОПЬЕМ! У него больше радиус!", category);
-        loadString("subtitle.stage7.dummy_bow", "§e[Боцман] Хорошо! Теперь отстреливайся ЛУКОМ издалека!", category);
-        loadString("subtitle.stage7.block1", "§e[Боцман] А сейчас попробуй блокировать удар!", category);
-        loadString("subtitle.stage7.block2", "§e[Боцман] Заблокируй удар матроса (Удерживайте ПКМ пока он не ударит).", category);
-        loadString("subtitle.stage7.shield", "§e[Боцман] Возьми щиты. Объедини копье и пику со щитами в крафте (инвентарь).", category);
-        loadString("subtitle.stage7.dodge", "§e[Боцман] А также попробуй отскок: A/S/D + ПКМ + Пробел. Возьми любое оружие, кроме копья и пики!", category);
-        loadString("subtitle.stage7.done", "§e[Боцман] Молодец, ты справился! Теперь следующая задача: разберись с разъяренными матросами!", category);
-        loadString("subtitle.stage7.block_success", "§c[Боцман] Удар прошел! Повернись лицом к противнику!", category);
-        loadString("subtitle.stage7.block_hold", "§c[Боцман] Нажми и удерживай ПКМ для блока!", category);
+        loadString("subtitle.stage7.stamina_info", "§e[Капитан] А здесь твоя выносливость. Она тратится на бег и удары.", category);
+        loadString("subtitle.stage7.run_info", "§e[Капитан] Побегай и попрыгай, чтобы потратить её! (Дважды W или Ctrl + Пробел)", category);
+        loadString("subtitle.stage7.stamina_regen", "§e[Капитан] Выносливость восстанавливается стоя или идя. Можно пить зелья или есть еду!", category);
+        loadString("subtitle.stage7.dagger_hit", "§e[Боцман] Возьми КИНЖАЛ и ударь манекен! Открой инвентарь — посмотри характеристики.", category);
+        loadString("subtitle.stage7.sword_hit", "§e[Боцман] Теперь бери МЕЧ! Сравни урон с кинжалом.", category);
+        loadString("subtitle.stage7.axe_hit", "§e[Боцман] ТОПОР — оружие с большим разбросом удара!", category);
+        loadString("subtitle.stage7.hammer_hit", "§e[Боцман] МОЛОТ — медленный, но бьёт очень больно!", category);
+        loadString("subtitle.stage7.battleaxe_hit", "§e[Боцман] СЕКИРА — двуручное оружие, широкий замах!", category);
+        loadString("subtitle.stage7.spear_hit", "§e[Боцман] КОПЬЁ — длинный радиус, бей из-за строя!", category);
+        loadString("subtitle.stage7.pike_hit", "§e[Боцман] ПИКА — ещё длиннее копья. Идеально против конницы!", category);
+        loadString("subtitle.stage7.bow_hit", "§e[Боцман] ЛУК — стреляй издалека! Манекен движется — целься!", category);
+        loadString("subtitle.stage7.crossbow_hit", "§e[Боцман] АРБАЛЕТ — мощнее лука, но перезаряжается дольше. Огонь!", category);
+        // Stage 7 – block fights (3 rounds)
+        loadString("subtitle.stage7.block_info", "§e[Боцман] А сейчас попробуй блокировать удар! Держи ПКМ и смотри на врага.", category);
+        loadString("subtitle.stage7.block_hold", "§c[Обучение] Бой 1/3: Меч! Возьмите железный меч в руку и удерживайте ПКМ для блока.", category);
+        loadString("subtitle.stage7.block_hold2", "§c[Обучение] Бой 2/3: Молот! Возьмите молот в руку и удерживайте ПКМ для блока.", category);
+        loadString("subtitle.stage7.block_hold3", "§c[Обучение] Бой 3/3: Щит! Возьмите щит во вторую (левую) руку и удерживайте ПКМ для блока.", category);
+        // Stage 7 – shield craft and dodge
+        loadString("subtitle.stage7.shield_craft", "§e[Боцман] Возьми щиты. Объедини копьё и пику со щитами в крафте (инвентарь).", category);
+        loadString("subtitle.stage7.dodge_info", "§e[Боцман] Отскок x3: A/S/D + ПКМ + Пробел. Возьми любое оружие, кроме копья/пики со щитом!", category);
+        loadString("subtitle.stage7.dodge_progress", "§e[Боцман] Отскок %d/3 — продолжай!", category);
+        loadString("subtitle.stage7.done", "§a[Боцман] Превосходно! Ты освоил боевую систему. Впереди — настоящий бой!", category);
+        loadString("subtitle.stage7.block_success", "§a[Боцман] Удар заблокирован! Продолжаем.", category);
 
         // Stage 8
         loadString("subtitle.stage8.start", "§c[Капитан] Бунт на корабле! Убейте всех (3) бунтовщиков! (0/3)", category);
         loadString("subtitle.stage8.progress", "§c[Капитан] Убито: %d/3", category);
         loadString("subtitle.stage8.done", "§a[Капитан] Отличная работа! Подойди ко мне (ПКМ), чтобы закончить.", category);
+        loadString("subtitle.stage8.end", "§a[Обучение] Отлично! Вы научились основам боя.", category);
 
         // Stage 9
         loadString("subtitle.stage9.captain1", "§e[Капитан] Для постройки корабля нам нужно 64 доски. Подойди к точке сбора ресурсов (Блок с крестом), открой его и выбери доски!", category);
@@ -91,6 +109,7 @@ public class TutorialTexts {
 
         // Stage 10
         loadString("subtitle.stage10.jaqen", "§4[Якен Хгар] Вижу, ты уже готов выйти во внешний мир?", category);
+        loadString("subtitle.stage10.jaqen1", "§4[Якен Хгар] Человек имеет много лиц.", category);
 
         // Other messages
         loadString("chat.tutorial_complete", "§a[Обучение] Поздравляем! Обучение успешно пройдено.", category);
@@ -107,6 +126,8 @@ public class TutorialTexts {
         loadString("entity.mutineer", "Бунтовщик", category);
         loadString("entity.bartender", "Трактирщик", category);
         loadString("entity.jaqen", "Якен Хгар", category);
+        loadString("entity.armorsmith", "Бронник", category);
+        loadString("entity.mwsmith", "Оружейник", category);
 
         // --- Substeps Stage 3 (Factions Menu) ---
         loadString("substep.3.0", "Капитан: Это вкладка Достижений. Здесь отслеживается ваш прогресс.", category);
@@ -165,8 +186,14 @@ public class TutorialTexts {
         loadString("substep.4.5", "Интендант: Приват освоен! Переходим к следующему этапу...", category);
 
         // --- Substeps Stage 6 (Blacksmith) ---
-        loadString("substep.6.0", "§e[Обучение] Положите Бронзовый Нагрудник в левый слот, Слиток Бронзы в нижний, и нажмите Перековка.", category);
-        loadString("substep.6.1", "§e[Обучение] Положите Меч в левый слот, Свиток в верхний слот, Слиток Сплава в нижний, и заберите меч справа.", category);
+        loadString("substep.6.0", "§e[Бронник] Откройте интерфейс кузнеца-бронника, нажав ПКМ по нему.", category);
+        loadString("substep.6.1", "§e[Бронник] Положите бронзовый нагрудник в центральный слот.", category);
+        loadString("substep.6.2", "§e[Бронник] Выберите любой чар из списка.", category);
+        loadString("substep.6.3", "§e[Бронник] Нажмите кнопку Перековать внизу.", category);
+        loadString("substep.6.4", "§e[Оружейник] Теперь подойдите к оружейнику и откройте его интерфейс (ПКМ).", category);
+        loadString("substep.6.5", "§e[Оружейник] Положите меч в центральный слот.", category);
+        loadString("substep.6.6", "§e[Оружейник] Выберите чар на урон.", category);
+        loadString("substep.6.7", "§e[Оружейник] Нажмите кнопку Перековать внизу.", category);
 
         // GUI Hints
         loadString("hint.banner.toggle", "Сначала нажмите эту кнопку, чтобы переключить режим на вайт-лист.", category);

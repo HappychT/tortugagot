@@ -144,24 +144,26 @@ public class StaminaServerHandler {
         extendedPlayer.setPreviousPosZ(currentPosZ);
     }
 
-    public void handleBounceRequest(EntityPlayer player, int direction) {
+    public boolean handleBounceRequest(EntityPlayer player, int direction) {
         if (!player.onGround)
-            return;
+            return false;
 
         ExtendedPlayer extendedPlayer = ExtendedPlayer.get(player);
 
         if (extendedPlayer.getBounceCooldown() > 0)
-            return;
+            return false;
 
         if (player.getHeldItem() != null && (player.getHeldItem().getItem() instanceof GOTItemShieldSpear || player.getHeldItem().getItem() instanceof GOTItemShieldPike))
-            return;
+            return false;
 
         if (extendedPlayer.getStamina() <= (MAX_STAMINA * 0.1))
-            return;
+            return false;
 
         if (direction != 0) {
             executeBounce(player, direction);
+            return true;
         }
+        return false;
     }
     @SubscribeEvent
     public void onPlayerAttack(AttackEntityEvent event) {

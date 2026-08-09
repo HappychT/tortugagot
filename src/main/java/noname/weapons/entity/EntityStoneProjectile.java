@@ -10,6 +10,7 @@ import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
@@ -42,7 +43,7 @@ public class EntityStoneProjectile extends EntityThrowable {
                     
                     float directDamage = WeaponsConfig.entityDirectDamage;
                     ((EntityLivingBase) entityHit).attackEntityFrom(
-                            net.minecraft.util.DamageSource.generic,
+                            DamageSource.causeThrownDamage(this, getThrower()),
                             directDamage
                     );
                 }
@@ -166,7 +167,7 @@ public class EntityStoneProjectile extends EntityThrowable {
                     float splashDamage = baseSplashDamage - (float) distance * falloff;
                     if (splashDamage > 0) {
                         livingEntity.attackEntityFrom(
-                                net.minecraft.util.DamageSource.generic,
+                                DamageSource.causeThrownDamage(this, getThrower()),
                                 splashDamage
                         );
                     }
