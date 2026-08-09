@@ -20,6 +20,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.entity.EntityEvent;
@@ -72,6 +73,30 @@ public class TOGTechnologyEvents {
         }
         TOGWarriorTechnology.updateShieldWall(event.player);
         TOGCookingTechnology.discardLockedCookingOutputs(event.player);
+        if (TOGTechnologyLocks.has(event.player, TOGTechnologyLocks.FACTION_ARMOR)) {
+            return;
+        }
+        boolean changed = false;
+        for (int armorSlot = 0; armorSlot < event.player.inventory.armorInventory.length; armorSlot++) {
+            ItemStack stack = event.player.inventory.armorInventory[armorSlot];
+            if (!isLockedFactionArmor(stack)) {
+                continue;
+            }
+            ItemStack toReturn = stack.copy();
+            event.player.inventory.armorInventory[armorSlot] = null;
+            if (event.player.inventory.addItemStackToInventory(toReturn)) {
+                changed = true;
+            } else {
+                event.player.inventory.armorInventory[armorSlot] = stack;
+                TOGTechnologyNotifier.notifyBlocked(event.player, "armor:faction:no_space", "снять заблокированную фракционную броню", "в инвентаре нет места для возврата предмета", TOGTechnologyLocks.FACTION_ARMOR);
+                continue;
+            }
+            TOGTechnologyNotifier.notifyBlocked(event.player, "armor:faction", "надеть фракционную броню", "не открыта технология для использования этой брони", TOGTechnologyLocks.FACTION_ARMOR);
+        }
+        if (changed) {
+            event.player.inventory.markDirty();
+            event.player.inventoryContainer.detectAndSendChanges();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -246,6 +271,24 @@ public class TOGTechnologyEvents {
 
     private void notifyBlocked(EntityPlayer player, TOGGatheringTechnology.GatheringLock lock) {
         player.addChatMessage(new ChatComponentText(lock.getMessage()));
+    }
+
+    private boolean isLockedFactionArmor(ItemStack stack) {
+        if (stack == null) {
+            return false;
+        }
+        Item item = stack.getItem();
+        return item == GOTRegistry.arrynHelmet || item == GOTRegistry.arrynChestplate || item == GOTRegistry.arrynLeggings || item == GOTRegistry.arrynBoots
+                || item == GOTRegistry.crownlandsHelmet || item == GOTRegistry.crownlandsChestplate || item == GOTRegistry.crownlandsLeggings || item == GOTRegistry.crownlandsBoots
+                || item == GOTRegistry.dorneHelmet || item == GOTRegistry.dorneChestplate || item == GOTRegistry.dorneLeggings || item == GOTRegistry.dorneBoots
+                || item == GOTRegistry.dragonstoneHelmet || item == GOTRegistry.dragonstoneChestplate || item == GOTRegistry.dragonstoneLeggings || item == GOTRegistry.dragonstoneBoots
+                || item == GOTRegistry.giftHelmet || item == GOTRegistry.giftChestplate || item == GOTRegistry.giftLeggings || item == GOTRegistry.giftBoots
+                || item == GOTRegistry.ironbornHelmet || item == GOTRegistry.ironbornChestplate || item == GOTRegistry.ironbornLeggings || item == GOTRegistry.ironbornBoots
+                || item == GOTRegistry.northHelmet || item == GOTRegistry.northChestplate || item == GOTRegistry.northLeggings || item == GOTRegistry.northBoots
+                || item == GOTRegistry.reachHelmet || item == GOTRegistry.reachChestplate || item == GOTRegistry.reachLeggings || item == GOTRegistry.reachBoots
+                || item == GOTRegistry.riverlandsHelmet || item == GOTRegistry.riverlandsChestplate || item == GOTRegistry.riverlandsLeggings || item == GOTRegistry.riverlandsBoots
+                || item == GOTRegistry.stormlandsHelmet || item == GOTRegistry.stormlandsChestplate || item == GOTRegistry.stormlandsLeggings || item == GOTRegistry.stormlandsBoots
+                || item == GOTRegistry.westerlandsHelmet || item == GOTRegistry.westerlandsChestplate || item == GOTRegistry.westerlandsLeggings || item == GOTRegistry.westerlandsBoots;
     }
 
     private EntityPlayer getPlayer(Entity entity) {
