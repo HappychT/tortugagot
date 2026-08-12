@@ -3,6 +3,7 @@ package com.tortugagot.togcore.item;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 
 import java.util.UUID;
 
@@ -49,6 +50,9 @@ public final class TOGMasteryItemOwnership {
         if (!isMasteryItem(stack) || player == null || hasOwner(stack)) {
             return;
         }
+        if (canOperatorKeepUnbound(stack, player)) {
+            return;
+        }
         if (!stack.hasTagCompound()) {
             stack.setTagCompound(new NBTTagCompound());
         }
@@ -65,7 +69,37 @@ public final class TOGMasteryItemOwnership {
     }
 
     public static boolean ensureOwnedBy(ItemStack stack, EntityPlayer player) {
+        if (canOperatorKeepUnbound(stack, player)) {
+            return true;
+        }
         bindToPlayer(stack, player);
         return isOwnedBy(stack, player);
+    }
+
+    public static boolean canOperatorKeepUnbound(ItemStack stack, EntityPlayer player) {
+        if (!isMasteryItem(stack) || !isOperator(player)) {
+            return false;
+        }
+        if (isOwnedBy(stack, player)) {
+            clearOwner(stack);
+        }
+        return !hasOwner(stack);
+    }
+
+    private static void clearOwner(ItemStack stack) {
+        if (!isMasteryItem(stack) || !stack.hasTagCompound()) {
+            return;
+        }
+        NBTTagCompound tag = stack.getTagCompound();
+        tag.removeTag(OWNER_UUID_MOST);
+        tag.removeTag(OWNER_UUID_LEAST);
+        tag.removeTag(OWNER_NAME);
+    }
+
+    private static boolean isOperator(EntityPlayer player) {
+        if (player == null || MinecraftServer.getServer() == null || MinecraftServer.getServer().getConfigurationManager() == null) {
+            return false;
+        }
+        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
     }
 }
