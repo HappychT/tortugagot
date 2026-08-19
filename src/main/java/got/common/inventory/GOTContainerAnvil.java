@@ -240,9 +240,37 @@ public class GOTContainerAnvil extends Container {
         if (this.invInput.getStackInSlot(1) != null && this.invInput.getStackInSlot(1).getItem() instanceof GOTItemModifierTemplate)
             return materialItem.getItem() == GOTRegistry.alloySteelIngot;
 
+        Item item = inputItem.getItem();
+        Item mat = materialItem.getItem();
+        Item steel = cpw.mods.fml.common.registry.GameRegistry.findItem("togcore", "steel");
+        Item steelPlate = cpw.mods.fml.common.registry.GameRegistry.findItem("togcore", "steel_plate");
+        Item hardenedSteelPlate = cpw.mods.fml.common.registry.GameRegistry.findItem("togcore", "hardened_steel_plate");
+
+        boolean isWesterosWeapon = item == GOTRegistry.westerosBow || item == GOTRegistry.westerosDagger || item == GOTRegistry.westerosDaggerPoisoned || item == GOTRegistry.westerosHammer || item == GOTRegistry.westerosLance || item == GOTRegistry.westerosPike || item == GOTRegistry.westerosSpear || item == GOTRegistry.westerosSword || item == GOTRegistry.westerosPolearm || item == GOTRegistry.westerosLongsword || item == GOTRegistry.westerosGreatsword;
+        boolean isWesterosArmor = item == GOTRegistry.westerosHelmet || item == GOTRegistry.westerosChestplate || item == GOTRegistry.westerosLeggings || item == GOTRegistry.westerosBoots || item == GOTRegistry.westerosHorseArmor;
+
+        boolean isFactionArmor = false;
+        if (item instanceof GOTItemArmor && !isWesterosArmor) {
+            ItemArmor.ArmorMaterial material = ((GOTItemArmor) item).getArmorMaterial();
+            if (material != GOTMaterial.WESTEROS && material != GOTMaterial.BONE && material != GOTMaterial.FUR && material != GOTMaterial.GEMSBOK && material != GOTMaterial.LHAZAR && material != GOTMaterial.LHAZAR_LION && material != GOTMaterial.ROBES && material != GOTMaterial.KAFTAN && material != GOTMaterial.VALYRIAN && material != GOTMaterial.VALYRIAN_CHAINMAIL && material != GOTMaterial.ICE && material != GOTMaterial.FIRST_PEOPLE && material != GOTMaterial.BRONZE && material != GOTMaterial.BRONZE_CHAINMAIL && material != GOTMaterial.SOTHORYOS_GOLD && material != GOTMaterial.ANONYMOUS && material != GOTMaterial.HAND) {
+                isFactionArmor = true;
+            }
+        }
+        
+        if (isWesterosWeapon) {
+            return steel != null && mat == steel;
+        }
+        
+        if (isWesterosArmor) {
+            return steelPlate != null && mat == steelPlate;
+        }
+        
+        if (isFactionArmor) {
+            return hardenedSteelPlate != null && mat == hardenedSteelPlate;
+        }
+
         if (inputItem.getItem().getIsRepairable(inputItem, materialItem))
             return true;
-        Item item = inputItem.getItem();
         if (item == Items.bow && materialItem.getItem() == Items.string || item instanceof ItemFishingRod && materialItem.getItem() == Items.string)
             return true;
         if (item instanceof ItemShears && materialItem.getItem() == Items.iron_ingot || item instanceof GOTItemChisel && materialItem.getItem() == Items.iron_ingot)
@@ -752,9 +780,9 @@ public class GOTContainerAnvil extends Container {
             }
             if (GOTEnchantmentHelper.isReforgeable(inputItem)) {
                 ItemStack reforgeCopy;
-                this.reforgeCost = 200;
+                this.reforgeCost = 20;
                 if (inputItem.getItem() instanceof ItemArmor) {
-                    this.reforgeCost = 300;
+                    this.reforgeCost = 30;
                 }
                 if (inputItem.isItemStackDamageable() && (oneItemRepair = Math.min((reforgeCopy = inputItem.copy()).getItemDamageForDisplay(), reforgeCopy.getMaxDamage() / 4)) > 0) {
                     int usedMaterials = 0;

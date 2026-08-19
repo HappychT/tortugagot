@@ -57,37 +57,14 @@ public class GOTEntityTutorialArmorsmith extends GOTEnchaldBlacksmith {
     }
 
     @Override
-    public boolean isSlotUnlocked(int slot) {
-        return this.getEntityData().getBoolean("TutorialSlotUnlocked_" + slot);
-    }
-
-    @Override
     public void applyUnlockSlot(EntityPlayer player, int slot) {
-        this.getEntityData().setBoolean("TutorialSlotUnlocked_" + slot, true);
-        
+        // Use the parent's mechanism (slots[], sendClientPacket)
+        super.applyUnlockSlot(player, slot);
+
+        // Tutorial progression hook
         got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
         if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6 && ext.getTutorialProgress() == 1) {
              brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 2);
-        }
-    }
-
-    @Override
-    public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) {
-        super.writeEntityToNBT(nbt);
-        for (int i = 0; i < 9; i++) {
-            if (this.getEntityData().hasKey("TutorialSlotUnlocked_" + i)) {
-                nbt.setBoolean("TutorialSlotUnlocked_" + i, this.getEntityData().getBoolean("TutorialSlotUnlocked_" + i));
-            }
-        }
-    }
-
-    @Override
-    public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {
-        super.readEntityFromNBT(nbt);
-        for (int i = 0; i < 9; i++) {
-            if (nbt.hasKey("TutorialSlotUnlocked_" + i)) {
-                this.getEntityData().setBoolean("TutorialSlotUnlocked_" + i, nbt.getBoolean("TutorialSlotUnlocked_" + i));
-            }
         }
     }
 

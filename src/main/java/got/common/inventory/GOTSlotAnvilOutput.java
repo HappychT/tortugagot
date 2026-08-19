@@ -37,7 +37,7 @@ public class GOTSlotAnvilOutput extends Slot {
 			if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
 				if (ext.getTutorialProgress() == 0 && itemstack.getItem() == got.common.database.GOTRegistry.bronzeChestplate) {
 					brain.tutorial.TutorialManager.getInstance().advanceStage6(entityplayer, 1);
-				} else if (ext.getTutorialProgress() == 1 && itemstack.getItem() == got.common.database.GOTRegistry.bronzeSword) {
+				} else if (ext.getTutorialProgress() >= 4 && itemstack.getItem() == got.common.database.GOTRegistry.bronzeSword) {
 					brain.tutorial.TutorialManager.getInstance().startStage7(entityplayer, ext);
 				}
 			}
@@ -59,10 +59,6 @@ public class GOTSlotAnvilOutput extends Slot {
 			theAnvil.takeMaterialOrCoinAmount(materials);
 		}
 		
-		got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
-		if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6 && ext.getTutorialProgress() == 1) {
-		    brain.tutorial.TutorialManager.getInstance().startStage7(entityplayer, ext);
-		}
 		if (!entityplayer.worldObj.isRemote && wasSmithCombine) {
 			GOTLevelData.getData(entityplayer).addAchievement(GOTAchievement.combineSmithScrolls);
 		}

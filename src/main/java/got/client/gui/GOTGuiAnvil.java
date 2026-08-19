@@ -166,15 +166,16 @@ public class GOTGuiAnvil extends GuiContainer {
 		buttonEngraveOwner.enabled = canEngrave && theAnvil.canEngraveNewOwner(inputItem, mc.thePlayer);
 		buttonEngraveOwner.visible = buttonEngraveOwner.enabled;
 		
-        got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(mc.thePlayer);
-        if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
-            int prog = ext.getTutorialProgress();
+        if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 6) {
+            int prog = brain.tutorial.client.TutorialClientState.tutorialProgress;
             if (prog == 4) {
                 // GUI opened
                 brain.tutorial.TutorialManager.getInstance().advanceStage6(mc.thePlayer, 5);
+                brain.tutorial.client.TutorialClientState.tutorialProgress = 5;
             } else if (prog == 5 && theAnvil.invInput.getStackInSlot(0) != null && theAnvil.invInput.getStackInSlot(1) != null && theAnvil.invInput.getStackInSlot(2) != null) {
-                // Items placed in slots (left, middle, right-top)
+                // Items placed in slots (left, middle)
                 brain.tutorial.TutorialManager.getInstance().advanceStage6(mc.thePlayer, 6);
+                brain.tutorial.client.TutorialClientState.tutorialProgress = 6;
             }
         }
         

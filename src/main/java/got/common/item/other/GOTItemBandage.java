@@ -36,16 +36,20 @@ public class GOTItemBandage extends Item {
         return EnumAction.bow;
     }
 
-    private int getUseDuration(EntityPlayer player) {
+    private int getUseDuration(EntityPlayer player, boolean isTeammate) {
+        int duration = isTeammate ? 60 : 120; // 3 сек (60 тиков) на тиммейта, 6 сек (120 тиков) на себя
         if (player.inventory.hasItem(GOTRegistry.gauzeSet)) {
-            return 30;
+            duration /= 2; // В два раза быстрее: 1.5 сек на тиммейта, 3 сек на себя
         }
-        return 50;
+        return duration;
     }
 
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
-        return 50;
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("useDuration")) {
+            return stack.getTagCompound().getInteger("useDuration");
+        }
+        return 120; // Максимальное время по умолчанию (6 сек)
     }
 
     @Override
@@ -65,13 +69,18 @@ public class GOTItemBandage extends Item {
         Entity target = getEntityPlayerLookingAt(player, 3.5D);
 
         // Если зажат Shift и игрок смотрит на тиммейта — лечим тиммейта. Иначе лечим себя.
-        if (player.isSneaking() && target instanceof EntityPlayer && target != player) {
+        boolean isTeammate = player.isSneaking() && target instanceof EntityPlayer && target != player;
+
+        if (isTeammate) {
             itemStack.stackTagCompound.setInteger(HEALING_TARGET_ID_NBT, target.getEntityId());
         } else {
             itemStack.stackTagCompound.setInteger(HEALING_TARGET_ID_NBT, player.getEntityId());
         }
 
-        player.setItemInUse(itemStack, this.getUseDuration(player));
+        int duration = this.getUseDuration(player, isTeammate);
+        itemStack.stackTagCompound.setInteger("useDuration", duration);
+
+        player.setItemInUse(itemStack, duration);
 
         return itemStack;
     }
@@ -125,6 +134,7 @@ public class GOTItemBandage extends Item {
         }
         if (stack.stackTagCompound != null) {
             stack.stackTagCompound.removeTag(HEALING_TARGET_ID_NBT);
+            stack.stackTagCompound.removeTag("useDuration");
         }
 
         stack.stackSize--;
@@ -137,6 +147,7 @@ public class GOTItemBandage extends Item {
     public void onPlayerStoppedUsing(ItemStack stack, World world, EntityPlayer player, int itemInUseCount) {
         if (stack.stackTagCompound != null) {
             stack.stackTagCompound.removeTag(HEALING_TARGET_ID_NBT);
+            stack.stackTagCompound.removeTag("useDuration");
         }
     }
 

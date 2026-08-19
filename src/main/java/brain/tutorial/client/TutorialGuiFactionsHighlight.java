@@ -232,7 +232,7 @@ public class TutorialGuiFactionsHighlight {
                 got.client.gui.faction.FactionListRenderer listRenderer = (got.client.gui.faction.FactionListRenderer) gui.getActiveRenderer();
                 int[] bounds = listRenderer.getFactionBounds("HIGH_POWER");
                 if (bounds != null) {
-                    drawPointerToArea(gui, bounds[0], bounds[1], bounds[2], bounds[3], alpha, desc + " " + TutorialTextsClient.get("gui.factions.tortuga"));
+                    drawPointerToArea(gui, bounds[0], bounds[1], bounds[2], bounds[3], alpha, desc + " ");
                 } else {
                     FontRenderer font = Minecraft.getMinecraft().fontRenderer;
                     drawInfoPanel(font, desc + " " + TutorialTextsClient.get("gui.factions.scroll_tortuga"), gui.getBaseWidth() / 2 - 86, 20, alpha);
@@ -433,7 +433,7 @@ public class TutorialGuiFactionsHighlight {
                 if (isButtonHovered(gui, 17, mouseX, mouseY)) { 
                     got.client.gui.faction.overlays.CreateTitleOverlay overlay = (got.client.gui.faction.overlays.CreateTitleOverlay) gui.getActiveRenderer();
                     String name = overlay.titleNameField.getText().trim();
-                    if (org.apache.commons.lang3.StringUtils.isNotBlank(name) && !name.contains("!")) {
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(name) && !name.startsWith("§")) {
                         brain.factions.Faction faction = brain.factions.network.PacketMessage.getCurrentFaction(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
                         if (faction == null || !faction.getTitles().containsKey(name)) {
                             advance(); advance(); 
@@ -518,7 +518,22 @@ public class TutorialGuiFactionsHighlight {
             if (isButtonHovered(gui, 11, mouseX, mouseY)) { advance(); return true; }
             return false;
         } else if (p == 24) {
-            if (isButtonHovered(gui, 12, mouseX, mouseY)) { advance(); return true; }
+            if (isButtonHovered(gui, 12, mouseX, mouseY)) { 
+                got.client.gui.faction.overlays.CreateCollectionOverlay overlay = (got.client.gui.faction.overlays.CreateCollectionOverlay) gui.getActiveRenderer();
+                String name = overlay.collectionNameField.getText().trim();
+                String amountStr = overlay.collectionAmountField.getText().trim();
+                boolean valid = false;
+                if (org.apache.commons.lang3.StringUtils.isNotBlank(name) && !name.startsWith("§")) {
+                    try {
+                        long amount = Long.parseLong(amountStr);
+                        if (amount > 0) valid = true;
+                    } catch (NumberFormatException e) {}
+                }
+                if (valid) {
+                    advance();
+                }
+                return true; 
+            }
             if (gui.getCurrentOverlay() != GOTGuiFactions.Overlay.CREATE_COLLECTION) {
                 if (isButtonHovered(gui, 11, mouseX, mouseY)) return true;
             }
@@ -539,7 +554,19 @@ public class TutorialGuiFactionsHighlight {
             if (isButtonHovered(gui, 201, mouseX, mouseY)) { advance(); return true; }
             return false;
         } else if (p == 27) {
-            if (isButtonHovered(gui, 19, mouseX, mouseY)) { advance(); return true; }
+            if (isButtonHovered(gui, 19, mouseX, mouseY)) { 
+                got.client.gui.faction.overlays.TreasuryActionOverlay overlay = (got.client.gui.faction.overlays.TreasuryActionOverlay) gui.getActiveRenderer();
+                String amountStr = overlay.treasuryAmountField.getText().trim();
+                boolean valid = false;
+                try {
+                    long amount = Long.parseLong(amountStr);
+                    if (amount > 0) valid = true;
+                } catch (NumberFormatException e) {}
+                if (valid) {
+                    advance();
+                }
+                return true; 
+            }
             if (gui.getCurrentOverlay() != GOTGuiFactions.Overlay.TREASURY_ACTION) {
                 if (isButtonHovered(gui, 201, mouseX, mouseY)) return true;
             }

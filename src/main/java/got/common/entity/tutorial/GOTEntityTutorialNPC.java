@@ -8,12 +8,30 @@ public class GOTEntityTutorialNPC extends GOTEntityHumanBase {
         super(world);
         this.canBeMarried = false;
         this.setSize(0.6F, 1.8F);
+        this.familyInfo.setMale(true);
         // By default, no tasks. Subclasses can override or they are statues.
     }
 
     @Override
     public got.common.faction.GOTFaction getFaction() {
         return got.common.faction.GOTFaction.UNALIGNED;
+    }
+
+    @Override
+    public void onLivingUpdate() {
+        super.onLivingUpdate();
+        if (!this.worldObj.isRemote && this.ticksExisted % 100 == 0) {
+            String ownerName = this.getEntityData().getString("TutorialOwner");
+            if (ownerName != null && !ownerName.isEmpty()) {
+                net.minecraft.entity.player.EntityPlayer player = this.worldObj.getPlayerEntityByName(ownerName);
+                if (player != null) {
+                    got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(player);
+                    if (ext == null || !ext.isTutorialActive() || ext.getTutorialStage() <= 0) {
+                        this.setDead();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -39,6 +57,9 @@ public class GOTEntityTutorialNPC extends GOTEntityHumanBase {
     }
 
     private boolean isTargetValid(net.minecraft.entity.EntityLivingBase target) {
+        if (target instanceof GOTEntityTutorialNPC) {
+            return false;
+        }
         if (target instanceof net.minecraft.entity.player.EntityPlayer) {
             String owner = this.getEntityData().getString("TutorialOwner");
             if (owner != null && !owner.isEmpty()) {
@@ -66,6 +87,14 @@ public class GOTEntityTutorialNPC extends GOTEntityHumanBase {
             }
         }
         return super.attackEntityAsMob(entity);
+    }
+
+    @Override
+    public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
+        if (source.getEntity() instanceof GOTEntityTutorialNPC) {
+            return false;
+        }
+        return super.attackEntityFrom(source, amount);
     }
 
     @Override

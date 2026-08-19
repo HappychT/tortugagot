@@ -118,6 +118,7 @@ public class CreateTitleOverlay implements IOverlayRenderer {
     @Override
     public void actionPerformed(GuiButton button) {
         if (button == buttonCreateTitle) {
+            if (hasError) return;
             String name = titleNameField.getText().trim();
             if (StringUtils.isNotBlank(name)) {
                 brain.factions.Faction faction = brain.factions.network.PacketMessage.getCurrentFaction(net.minecraft.client.Minecraft.getMinecraft().thePlayer.getCommandSenderName());

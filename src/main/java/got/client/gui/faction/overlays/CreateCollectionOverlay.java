@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CreateCollectionOverlay implements IOverlayRenderer {
     private final GOTGuiFactions parent;
-    private GuiTextField collectionNameField, collectionAmountField;
+    public GuiTextField collectionNameField, collectionAmountField;
     private GuiButton buttonConfirmCollection, buttonCancelCollection;
 
     public CreateCollectionOverlay(GOTGuiFactions parent) {
@@ -68,7 +68,7 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
         if (button == buttonConfirmCollection) {
             try {
                 String name = this.collectionNameField.getText();
-                if (StringUtils.isBlank(name)) {
+                if (StringUtils.isBlank(name) || name.startsWith("§")) {
                     this.collectionNameField.setText("§cИмя не может быть пустым!");
                     return;
                 }
@@ -96,9 +96,17 @@ public class CreateCollectionOverlay implements IOverlayRenderer {
     @Override
     public void keyTyped(char c, int key) {
         if (collectionNameField.isFocused()) {
-            collectionNameField.textboxKeyTyped(c, key);
+            if (collectionNameField.getText().startsWith("§")) {
+                collectionNameField.setText("");
+                if (key != 14 && key != 203 && key != 205) collectionNameField.textboxKeyTyped(c, key);
+            } else {
+                collectionNameField.textboxKeyTyped(c, key);
+            }
         } else if (collectionAmountField.isFocused()) {
-            if (Character.isDigit(c) || key == 14 || key == 203 || key == 205) {
+            if (collectionAmountField.getText().startsWith("§")) {
+                collectionAmountField.setText("");
+                if (key != 14 && key != 203 && key != 205 && Character.isDigit(c)) collectionAmountField.textboxKeyTyped(c, key);
+            } else if (Character.isDigit(c) || key == 14 || key == 203 || key == 205) {
                 collectionAmountField.textboxKeyTyped(c, key);
             }
         }

@@ -218,7 +218,7 @@ public class BlockStructureHeart extends BlockContainer {
                             slot.provisions = 0;
                             player.addChatMessage(new ChatComponentText("§aВаша фракция захватила крепость!"));
                         } else {
-                            if (slot.structureFile != null && !slot.structureFile.isEmpty()) {
+                            if (slot.canBuild && slot.structureFile != null && !slot.structureFile.isEmpty()) {
                                 try {
                                     java.io.File structureFile = new java.io.File(new java.io.File(brain.factions.servers.CoreFaction.configFolder, "structures"), slot.structureFile);
                                     if (structureFile.exists()) {

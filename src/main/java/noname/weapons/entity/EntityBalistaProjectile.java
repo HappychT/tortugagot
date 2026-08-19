@@ -74,8 +74,8 @@ public class EntityBalistaProjectile extends EntityThrowable {
 
             double distanceTraveled = Math.sqrt(
                     Math.pow(this.posX - startX, 2) +
-                    Math.pow(this.posY - startY, 2) +
-                    Math.pow(this.posZ - startZ, 2)
+                            Math.pow(this.posY - startY, 2) +
+                            Math.pow(this.posZ - startZ, 2)
             );
 
             if (distanceTraveled >= this.maxRange) {
@@ -127,7 +127,7 @@ public class EntityBalistaProjectile extends EntityThrowable {
         }
     }
 
-    
+
 
 
 
@@ -232,4 +232,3 @@ public class EntityBalistaProjectile extends EntityThrowable {
         return 2.5F;
     }
 }
-

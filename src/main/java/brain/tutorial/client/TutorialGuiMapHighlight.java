@@ -114,11 +114,8 @@ public class TutorialGuiMapHighlight {
         String desc = TutorialClientState.getSubStepSubtitle();
 
         if (p == 2) {
-            // "На карте есть путевые точки. Приблизьте карту (колесиком мыши), чтобы рассмотреть их."
-            // "Также на карте обозначены: все регионы, биомы, моря Вестероса."
             FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-            drawInfoPanel(font, desc + " " + TutorialTextsClient.get("gui.map.regions_info"), gui.width / 2 - 86, 20, alpha);
-            
+
             // Text for waypoint is handled automatically by the map's default tooltip logic when hovering
         } else if (p == 3) {
             // Кнопка создания путевой точки: widgetAddCWP

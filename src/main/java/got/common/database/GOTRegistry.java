@@ -1685,6 +1685,7 @@ public class GOTRegistry {
     public static Item bundle_firewood_modded;
     public static Item bundle_ironwood;
     public static Item processedGold;
+    public static Item processedDragonGlass;
     public static Item processedSilver;
     public static Item processedIron;
     public static Item barrelCod;
@@ -2524,10 +2525,10 @@ public class GOTRegistry {
         crossbowBolt = new GOTItemCrossbowBolt();
         crossbowBoltPoisoned = new GOTItemCrossbowBolt().setPoisoned();
         crowbar = new GOTItemLegendaryCrowbar(GOTMaterial.IRON).setCreativeTab(null);
-        crownlandsBoots = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 3, "kingslanding", "kingslanding").setFactionArmor(GOTFaction.CROWNLANDS);
-        crownlandsChestplate = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 1, "kingslanding", "kingslanding").setFactionArmor(GOTFaction.CROWNLANDS);
-        crownlandsHelmet = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 0, "kingslanding", "kingslanding").setFactionArmor(GOTFaction.CROWNLANDS);
-        crownlandsLeggings = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 2, "kingslanding", "kingslanding").setFactionArmor(GOTFaction.CROWNLANDS);
+        crownlandsBoots = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 3, "kingslanding", "kingslanding");
+        crownlandsChestplate = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 1, "kingslanding", "kingslanding");
+        crownlandsHelmet = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 0, "kingslanding", "kingslanding");
+        crownlandsLeggings = new GOTItemCustomSetArmor(GOTMaterial.CROWNLANDS, 2, "kingslanding", "kingslanding");
 
         bronzeChainmailBoots = new GOTItemArmor(GOTMaterial.BRONZE_CHAINMAIL, 3);
         bronzeChainmailChestplate = new GOTItemArmor(GOTMaterial.BRONZE_CHAINMAIL, 1);
@@ -3197,6 +3198,7 @@ public class GOTRegistry {
         bundle_firewood_modded = new GOTItemResource();
         bundle_ironwood= new GOTItemResource();
         processedGold= new GOTItemResource();
+        processedDragonGlass= new GOTItemResource();
         processedSilver= new GOTItemResource();
         processedIron= new GOTItemResource();
         barrelCod= new GOTItemResource();
@@ -4798,6 +4800,7 @@ public class GOTRegistry {
         registerItem(bundle_firewood_modded, "bundle_firewood_modded");
         registerItem(bundle_ironwood, "bundle_ironwood");
         registerItem(processedGold, "processed_gold");
+        registerItem(processedDragonGlass, "processed_dragon_glass");
         registerItem(processedSilver, "processed_silver");
         registerItem(processedIron, "processed_iron");
         registerItem(barrelCod, "barrel_cod");

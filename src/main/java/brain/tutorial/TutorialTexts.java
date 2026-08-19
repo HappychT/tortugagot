@@ -44,7 +44,7 @@ public class TutorialTexts {
         // Progress Formats
         loadString("stage1.progress", "%d/2 пьяниц убито", category);
         loadString("stage3.progress", "%d/46", category);
-        loadString("stage8.progress", "%d/3 Убито", category);
+        loadString("stage8.progress", "%d/5 убито", category);
 
         // Subtitles Stage 1-2
         loadString("subtitle.stage1.drunkard1", "§c<Пьяница> Эй, ты! Что забыл в нашем трактире?!", category);
@@ -64,7 +64,7 @@ public class TutorialTexts {
         loadString("subtitle.stage6.armorsmith_open", "§e[Обучение] Следуй подсказкам на экране.", category);
         loadString("subtitle.stage6.armorsmith_enchant", "§e[Обучение] Следуй подсказкам на экране.", category);
         loadString("subtitle.stage6.armorsmith_forge", "§e[Обучение] Следуй подсказкам на экране.", category);
-        loadString("subtitle.stage6.anvil_start", "§e[Обучение] Нагрудник готов! Теперь иди к оружейнику и зачаруй меч.", category);
+        loadString("subtitle.stage6.anvil_start", "§e[Обучение] Нагрудник готов! Теперь иди к наковальне и зачаруй меч.", category);
         loadString("subtitle.stage6.anvil_open", "§e[Обучение] Следуй подсказкам на экране.", category);
         loadString("subtitle.stage6.anvil_enchant", "§e[Обучение] Следуй подсказкам на экране.", category);
         loadString("subtitle.stage6.anvil_forge", "§e[Обучение] Следуй подсказкам на экране.", category);
@@ -86,9 +86,9 @@ public class TutorialTexts {
         loadString("subtitle.stage7.crossbow_hit", "§e[Боцман] АРБАЛЕТ — мощнее лука, но перезаряжается дольше. Огонь!", category);
         // Stage 7 – block fights (3 rounds)
         loadString("subtitle.stage7.block_info", "§e[Боцман] А сейчас попробуй блокировать удар! Держи ПКМ и смотри на врага.", category);
-        loadString("subtitle.stage7.block_hold", "§c[Обучение] Бой 1/3: Меч! Возьмите железный меч в руку и удерживайте ПКМ для блока.", category);
-        loadString("subtitle.stage7.block_hold2", "§c[Обучение] Бой 2/3: Молот! Возьмите молот в руку и удерживайте ПКМ для блока.", category);
-        loadString("subtitle.stage7.block_hold3", "§c[Обучение] Бой 3/3: Щит! Возьмите щит во вторую (левую) руку и удерживайте ПКМ для блока.", category);
+        loadString("subtitle.stage7.block_hold", "§c[Обучение] Возьмите железный меч в руку и удерживайте ПКМ для блока.", category);
+        loadString("subtitle.stage7.block_hold2", "§c[Обучение] Возьмите молот в руку и удерживайте ПКМ для блока.", category);
+        loadString("subtitle.stage7.block_hold3", "§c[Обучение] Возьмите щит во вторую (левую) руку и удерживайте ПКМ для блока.", category);
         // Stage 7 – shield craft and dodge
         loadString("subtitle.stage7.shield_craft", "§e[Боцман] Возьми щиты. Объедини копьё и пику со щитами в крафте (инвентарь).", category);
         loadString("subtitle.stage7.dodge_info", "§e[Боцман] Отскок x3: A/S/D + ПКМ + Пробел. Возьми любое оружие, кроме копья/пики со щитом!", category);
@@ -97,10 +97,10 @@ public class TutorialTexts {
         loadString("subtitle.stage7.block_success", "§a[Боцман] Удар заблокирован! Продолжаем.", category);
 
         // Stage 8
-        loadString("subtitle.stage8.start", "§c[Капитан] Бунт на корабле! Убейте всех (3) бунтовщиков! (0/3)", category);
-        loadString("subtitle.stage8.progress", "§c[Капитан] Убито: %d/3", category);
+        loadString("subtitle.stage8.start", "§c[Капитан] Бунт на корабле! Убейте всех (5) бунтовщиков! (0/5)", category);
+        loadString("subtitle.stage8.progress", "§c[Капитан] Убито: %d/5", category);
         loadString("subtitle.stage8.done", "§a[Капитан] Отличная работа! Подойди ко мне (ПКМ), чтобы закончить.", category);
-        loadString("subtitle.stage8.end", "§a[Обучение] Отлично! Вы научились основам боя.", category);
+        loadString("subtitle.stage8.end", "§aОтлично! Вы научились основам боя.", category);
 
         // Stage 9
         loadString("subtitle.stage9.captain1", "§e[Капитан] Для постройки корабля нам нужно 64 доски. Подойди к точке сбора ресурсов (Блок с крестом), открой его и выбери доски!", category);
@@ -109,7 +109,7 @@ public class TutorialTexts {
 
         // Stage 10
         loadString("subtitle.stage10.jaqen", "§4[Якен Хгар] Вижу, ты уже готов выйти во внешний мир?", category);
-        loadString("subtitle.stage10.jaqen1", "§4[Якен Хгар] Человек имеет много лиц.", category);
+        loadString("subtitle.stage10.jaqen1", "§4Человек имеет много лиц.", category);
 
         // Other messages
         loadString("chat.tutorial_complete", "§a[Обучение] Поздравляем! Обучение успешно пройдено.", category);
@@ -190,12 +190,20 @@ public class TutorialTexts {
         loadString("substep.6.1", "§e[Бронник] Положите бронзовый нагрудник в центральный слот.", category);
         loadString("substep.6.2", "§e[Бронник] Выберите любой чар из списка.", category);
         loadString("substep.6.3", "§e[Бронник] Нажмите кнопку Перековать внизу.", category);
-        loadString("substep.6.4", "§e[Оружейник] Теперь подойдите к оружейнику и откройте его интерфейс (ПКМ).", category);
-        loadString("substep.6.5", "§e[Оружейник] Положите меч в центральный слот.", category);
-        loadString("substep.6.6", "§e[Оружейник] Выберите чар на урон.", category);
-        loadString("substep.6.7", "§e[Оружейник] Нажмите кнопку Перековать внизу.", category);
+        loadString("substep.6.4", "§e[Обучение] Теперь подойдите к наковальне и откройте её интерфейс (ПКМ).", category);
+        loadString("substep.6.5", "§e[Обучение] Положите меч в левый слот.", category);
+        loadString("substep.6.6", "§e[Обучение] Положите ресурс для улучшения в правый слот.", category);
+        loadString("substep.6.7", "§e[Обучение] Заберите улучшенный меч.", category);
 
         // GUI Hints
+        loadString("gui.map.regions_info", "Информация о регионах", category);
+        loadString("gui.factions.tortuga", "Тортуга", category);
+        loadString("gui.factions.scroll_down", "Прокрутите вниз", category);
+        loadString("gui.factions.rmb_nickname", "ПКМ", category);
+        loadString("gui.factions.press_esc_close", "Нажмите ESC чтобы закрыть", category);
+        loadString("gui.banner.switch_mode", "ЛКМ - переключить режим", category);
+        loadString("gui.banner.press_esc", "Нажмите ESC для выхода", category);
+
         loadString("hint.banner.toggle", "Сначала нажмите эту кнопку, чтобы переключить режим на вайт-лист.", category);
         loadString("hint.banner.close", "Отлично! Теперь нажмите ESC, чтобы сохранить настройки и закрыть окно.", category);
 

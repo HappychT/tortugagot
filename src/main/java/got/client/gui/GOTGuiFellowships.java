@@ -861,7 +861,7 @@ public class GOTGuiFellowships extends GOTGuiMenuBase {
 	@Override
 	protected void mouseClicked(int i, int j, int k) {
         if (brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3) {
-            if (!brain.tutorial.client.TutorialGuiFellowshipsHighlight.handleMouseClick(buttonList, i, j, k, guiLeft, guiTop, xSize, ySize)) {
+            if (!brain.tutorial.client.TutorialGuiFellowshipsHighlight.handleMouseClick(buttonList, i, j, k, guiLeft, guiTop, xSize, ySize, mouseOverFellowship != null)) {
                 return; // Blocked by tutorial
             }
             

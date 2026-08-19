@@ -156,7 +156,6 @@ public class GOTGuiMenu extends GOTGuiScreenBase {
 			}
 			
 			
-			buttonList.add(new net.minecraft.client.gui.GuiButton(999, width - 210, 10, 200, 20, "\u041f\u0435\u0440\u0435\u0437\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u043e\u0431\u0443\u0447\u0435\u043d\u0438\u0435"));
 	}
 
 	@Override

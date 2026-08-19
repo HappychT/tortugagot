@@ -24,6 +24,7 @@ public class FactionStructureSlot {
     public int barracksCapacity;
     public String ownerFactionID;
     public int level;
+    public boolean canBuild = true;
 
     public long lastCollectionTime;
     public int destructionCount;

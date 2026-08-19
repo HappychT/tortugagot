@@ -45,6 +45,8 @@ public class TutorialConfig {
     public static int mutineer1_stage8_x, mutineer1_stage8_y, mutineer1_stage8_z;
     public static int mutineer2_stage8_x, mutineer2_stage8_y, mutineer2_stage8_z;
     public static int mutineer3_stage8_x, mutineer3_stage8_y, mutineer3_stage8_z;
+    public static int mutineer4_stage8_x, mutineer4_stage8_y, mutineer4_stage8_z;
+    public static int mutineer5_stage8_x, mutineer5_stage8_y, mutineer5_stage8_z;
     public static int captain_stage8_x, captain_stage8_y, captain_stage8_z;
     
     public static int captain_stage9_x, captain_stage9_y, captain_stage9_z;
@@ -152,7 +154,15 @@ public class TutorialConfig {
         mutineer3_stage8_x = config.get(entCat, "mutineer3_stage8_x", stage8_x - 2).getInt();
         mutineer3_stage8_y = config.get(entCat, "mutineer3_stage8_y", stage8_y).getInt();
         mutineer3_stage8_z = config.get(entCat, "mutineer3_stage8_z", stage8_z + 2).getInt();
-        
+
+        mutineer4_stage8_x = config.get(entCat, "mutineer4_stage8_x", stage8_x + 4).getInt();
+        mutineer4_stage8_y = config.get(entCat, "mutineer4_stage8_y", stage8_y).getInt();
+        mutineer4_stage8_z = config.get(entCat, "mutineer4_stage8_z", stage8_z).getInt();
+
+        mutineer5_stage8_x = config.get(entCat, "mutineer5_stage8_x", stage8_x - 4).getInt();
+        mutineer5_stage8_y = config.get(entCat, "mutineer5_stage8_y", stage8_y).getInt();
+        mutineer5_stage8_z = config.get(entCat, "mutineer5_stage8_z", stage8_z + 4).getInt();
+
         captain_stage8_x = config.get(entCat, "captain_stage8_x", stage8_x).getInt();
         captain_stage8_y = config.get(entCat, "captain_stage8_y", stage8_y).getInt();
         captain_stage8_z = config.get(entCat, "captain_stage8_z", stage8_z).getInt();

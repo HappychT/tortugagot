@@ -2061,6 +2061,9 @@ public class GOTPlayerData {
 
     public void revokePledgeFaction(EntityPlayer entityplayer, boolean intentional) {
         GOTFaction wasPledge = this.pledgeFaction;
+        if (wasPledge == null) {
+            return;
+        }
         float pledgeLvl = wasPledge.getPledgeAlignment();
         float prevAlign = getAlignment(wasPledge);
         float diff = prevAlign - pledgeLvl;

@@ -35,7 +35,11 @@ public class GOTPacketBlacksmithForge extends AbstractPacket.AbstractServerMessa
             if (ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6) {
                 int prog = ext.getTutorialProgress();
                 if (prog < 4) {
+                    // Бронник: перековка нагрудника → переход к оружейнику
                     brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 4);
+                } else if (prog >= 5 && prog < 8) {
+                    // Оружейник: перековка меча → готово (сервер не знает о промежуточных шагах 6 и 7)
+                    brain.tutorial.TutorialManager.getInstance().advanceStage6(player, 8);
                 }
             }
         }

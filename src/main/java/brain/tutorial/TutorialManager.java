@@ -294,6 +294,29 @@ public class TutorialManager {
 
             // Removed forced pledge to tortuga because the client now handles the pledge through the normal network packet
             if (currentStep >= 45) {
+                // CLEANUP TORTUGA JUNK
+                brain.factions.Faction faction = brain.factions.network.PacketMessage.getCurrentFaction(player.getCommandSenderName());
+                if (faction != null) {
+                    brain.factions.Faction.PlayerData pData = faction.getPlayers().get(player.getCommandSenderName());
+                    if (pData != null) {
+                        String playerTitleName = pData.getTitle();
+                        if (playerTitleName != null && !playerTitleName.equals("Участник") && !playerTitleName.equals("Лидер")) {
+                            faction.getTitles().remove(playerTitleName);
+                            pData.setTitle("Участник");
+                        }
+                    }
+                    if (faction.getCollectionGoals() != null) {
+                        faction.getCollectionGoals().removeIf(goal -> {
+                            if (goal.getHistory() != null && !goal.getHistory().isEmpty()) {
+                                return goal.getHistory().get(0).getPlayerName().equals(player.getCommandSenderName());
+                            }
+                            return false;
+                        });
+                    }
+                    brain.factions.servers.CoreFaction.saveFactions();
+                    brain.factions.servers.CoreFaction.sendAllGui();
+                }
+
                 if (ext.isTutorialReplay()) {
                     ext.setTutorialReplay(false);
                     completeTutorial(player);
@@ -309,6 +332,8 @@ public class TutorialManager {
     }
 
     public void completeTutorial(EntityPlayer player) {
+        clearTutorialEntities(player);
+        tutorialEntitiesMap.remove(player.getUniqueID());
         freeArena(player.getUniqueID(), player.worldObj);
         tutorialTimers.remove(player.getUniqueID());
         tutorialSubSteps.remove(player.getUniqueID());
@@ -323,9 +348,9 @@ public class TutorialManager {
             player.inventory.clearInventory(null, -1);
             player.inventoryContainer.detectAndSendChanges();
             
-            // Kick from faction Тортуга
+            // Kick from faction
             brain.factions.Faction faction = brain.factions.network.PacketMessage.getCurrentFaction(player.getCommandSenderName());
-            if (faction != null && faction.getID().equals("Тортуга")) {
+            if (faction != null) {
                 faction.getPlayers().remove(player.getCommandSenderName());
                 got.common.GOTPlayerData pd = got.common.GOTLevelData.getData(player);
                 if (pd != null) {
@@ -448,6 +473,8 @@ public class TutorialManager {
         ext.setTutorialStage(2);
         ext.setTutorialProgress(0);
         syncState(player);
+        
+        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeSword, 1, 0));
         
         tutorialTimers.put(player.getUniqueID(), 0);
         tutorialSubSteps.put(player.getUniqueID(), 0);
@@ -710,13 +737,13 @@ public class TutorialManager {
                     } else if (p == 5 && held != null && (held.getItem() instanceof got.common.item.weapon.GOTItemSword || held.getItem() == net.minecraft.init.Items.iron_sword)) {
                         correct = true;
                     // Step 6 = axe (one-handed, not battleaxe)
-                    } else if (p == 6 && held != null && (held.getItem() instanceof got.common.item.tool.GOTItemAxe || held.getItem() instanceof got.common.item.weapon.GOTItemIronBornAxe) && !(held.getItem() instanceof got.common.item.weapon.GOTItemBattleaxe)) {
+                    } else if (p == 6 && held != null && (held.getItem() instanceof got.common.item.tool.GOTItemAxe || held.getItem() instanceof got.common.item.weapon.GOTItemIronBornAxe || held.getItem() instanceof got.common.item.weapon.GOTItemBattleaxe)) {
                         correct = true;
                     // Step 7 = hammer
                     } else if (p == 7 && held != null && held.getItem() instanceof got.common.item.weapon.GOTItemHammer) {
                         correct = true;
                     // Step 8 = battleaxe (two-handed)
-                    } else if (p == 8 && held != null && held.getItem() instanceof got.common.item.weapon.GOTItemBattleaxe) {
+                    } else if (p == 8 && held != null && (held.getItem() instanceof got.common.item.weapon.GOTItemBattleaxe || held.getItem() instanceof got.common.item.weapon.GOTItemPoleaxe)) {
                         correct = true;
                     // Step 9 = spear (melee polearm)
                     } else if (p == 9 && (event.source.getSourceOfDamage() instanceof got.common.entity.other.GOTEntitySpear || (held != null && held.getItem() instanceof got.common.item.weapon.GOTItemSpear))) {
@@ -964,7 +991,6 @@ public class TutorialManager {
         }
         
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeChestplate, 1, 0));
-        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeSword, 1, 0));
         got.common.item.other.GOTItemCoin.giveCoins(200, player);
         
         net.minecraft.world.World world = player.worldObj;
@@ -1004,15 +1030,14 @@ public class TutorialManager {
         
         // Выдаём: бронзовый нагрудник и меч для перековки, ресурсы для разблокировки слота
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeChestplate, 1, 0));
-        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeSword, 1, 0));
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeIngot, 5, 0));
-        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Blocks.iron_block, 10, 0));
-        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Blocks.coal_block, 10, 0));
+        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Blocks.iron_block, 20, 0));
+        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Blocks.coal_block, 20, 0));
         player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.alloySteelIngot, 5, 0));
         net.minecraft.item.ItemStack scroll = new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.smithScroll, 1, 0);
         got.common.item.other.GOTItemModifierTemplate.setModifier(scroll, got.common.enchant.GOTEnchantment.strong1);
         player.inventory.addItemStackToInventory(scroll);
-        got.common.item.other.GOTItemCoin.giveCoins(3000, player);
+        got.common.item.other.GOTItemCoin.giveCoins(15000, player);
         
         net.minecraft.world.World world = player.worldObj;
         
@@ -1055,7 +1080,24 @@ public class TutorialManager {
                     // Нагрудник вложен: подсказка — нажать перековка
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.armorsmith_forge"));
                 } else if (step == 4) {
-                    // Нагрудник перекован: переход к наковальне
+                    // Следующий подпункт: ставим наковальню
+                    net.minecraft.world.World world = player.worldObj;
+                    if (!world.isRemote) {
+                        world.setBlock(
+                            brain.tutorial.TutorialConfig.mwsmith_stage6_x,
+                            brain.tutorial.TutorialConfig.mwsmith_stage6_y,
+                            brain.tutorial.TutorialConfig.mwsmith_stage6_z,
+                            net.minecraft.init.Blocks.anvil, 1, 3
+                        );
+                        
+                        net.minecraft.item.ItemStack scroll = new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.smithScroll);
+                        got.common.item.other.GOTItemModifierTemplate.setModifier(scroll, got.common.enchant.GOTEnchantment.strong1);
+                        player.inventory.addItemStackToInventory(scroll);
+                        player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.alloySteelIngot, 25));
+                        if (player instanceof net.minecraft.entity.player.EntityPlayerMP) {
+                            ((net.minecraft.entity.player.EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);
+                        }
+                    }
                     setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage6.anvil_start"));
                 } else if (step == 5) {
                     // Меч видно: подсказка — выбрать чар для меча
@@ -1202,9 +1244,9 @@ public class TutorialManager {
                     // Give all 9 weapon types + ammo
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironDagger, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Items.iron_sword, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.bronzeAxe, 1, 0));
-                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.westerosHammer, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironBattleaxe, 1, 0));
+                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.westerosHammer, 1, 0));
+                    player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.wildlingPolearm, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironSpear, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(got.common.database.GOTRegistry.ironPike, 1, 0));
                     player.inventory.addItemStackToInventory(new net.minecraft.item.ItemStack(net.minecraft.init.Items.bow, 1, 0));
@@ -1379,7 +1421,25 @@ public class TutorialManager {
         m3.setAttackTarget(player);
         world.spawnEntityInWorld(m3);
         registerTutorialEntity(player, m3);
-        
+
+        // m4 — лучник с луком и стрелами
+        got.common.entity.tutorial.GOTEntityTutorialMutineer m4 = new got.common.entity.tutorial.GOTEntityTutorialMutineer(world);
+        m4.setPosition(brain.tutorial.TutorialConfig.mutineer4_stage8_x, brain.tutorial.TutorialConfig.mutineer4_stage8_y, brain.tutorial.TutorialConfig.mutineer4_stage8_z);
+        m4.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.mutineer"));
+        m4.setCurrentItemOrArmor(0, new net.minecraft.item.ItemStack(net.minecraft.init.Items.bow));
+        m4.setCurrentItemOrArmor(1, new net.minecraft.item.ItemStack(net.minecraft.init.Items.arrow, 32));
+        m4.setAttackTarget(player);
+        world.spawnEntityInWorld(m4);
+        registerTutorialEntity(player, m4);
+
+        got.common.entity.tutorial.GOTEntityTutorialMutineer m5 = new got.common.entity.tutorial.GOTEntityTutorialMutineer(world);
+        m5.setPosition(brain.tutorial.TutorialConfig.mutineer5_stage8_x, brain.tutorial.TutorialConfig.mutineer5_stage8_y, brain.tutorial.TutorialConfig.mutineer5_stage8_z);
+        m5.setCustomNameTag(brain.tutorial.TutorialTexts.get("entity.mutineer"));
+        m5.setCurrentItemOrArmor(0, new net.minecraft.item.ItemStack(net.minecraft.init.Items.wooden_sword));
+        m5.setAttackTarget(player);
+        world.spawnEntityInWorld(m5);
+        registerTutorialEntity(player, m5);
+
         setSubtitle(player, brain.tutorial.TutorialTexts.get("subtitle.stage8.start"));
         syncState(player);
     }
@@ -1390,7 +1450,7 @@ public class TutorialManager {
             ext.setTutorialProgress(count);
             syncState(player);
             setSubtitle(player, String.format(brain.tutorial.TutorialTexts.get("subtitle.stage8.progress"), count));
-            if (count >= 3) {
+            if (count >= 5) {
                 clearTutorialEntities(player);
                 ext.setTutorialProgress(1); // Wait for Captain interaction
                 syncState(player);

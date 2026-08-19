@@ -626,7 +626,10 @@ public class GOTEventHandler implements IFuelHandler {
                 event.setCanceled(true);
                 return;
             }
-            if (block == Blocks.anvil && (GOTConfig.isGOTEnchantingEnabled(world) || !GOTConfig.isEnchantingEnabled(world)) && !world.isRemote) {
+            got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(entityplayer);
+            boolean forceTutorialAnvil = ext != null && ext.isTutorialActive() && ext.getTutorialStage() == 6;
+
+            if (block == Blocks.anvil && (forceTutorialAnvil || GOTConfig.isGOTEnchantingEnabled(world) || !GOTConfig.isEnchantingEnabled(world)) && !world.isRemote) {
                 entityplayer.openGui(GOT.instance, 53, world, i, j, k);
                 event.setCanceled(true);
                 return;

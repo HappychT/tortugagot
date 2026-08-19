@@ -153,6 +153,7 @@ public class GOTRender {
 
     public static void onInit() {
         renders.put(GOTEntityBlizzard.class, new GOTRenderBlizzard());
+        renders.put(got.common.entity.GOTEnchaldBlacksmith.class, new got.client.render.npc.GOTRenderBlacksmith());
         renders.put(GOTEntityShryke.class, new GOTRenderFactionNPCLayered("essos/shryke"));
         renders.put(GOTEntityHillman.class, new GOTRenderFactionNPCLayered("westeros/wild"));
         renders.put(GOTEntityNorthHillman.class, new GOTRenderFactionNPCLayered("westeros/wild"));
@@ -278,15 +279,15 @@ public class GOTRender {
         renders.put(GOTEntitySmoke.class, new GOTRenderLingeringPotion());
         renders.put(GOTEntityBattleRam.class, new GOTRenderBattleRam());
 
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialDrunkard.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialCaptain.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialBartender.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialBoatswain.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialDummy.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialSailor.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialMutineer.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialJaqen.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialArmorsmith.class, new GOTRenderFactionNPC("westeros/westeros"));
-        renders.put(got.common.entity.tutorial.GOTEntityTutorialMWSmith.class, new GOTRenderFactionNPC("westeros/westeros"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialDrunkard.class,   new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/drunkard"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialCaptain.class,    new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/captain"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialBartender.class,  new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/bartender"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialBoatswain.class,  new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/boatswain"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialDummy.class,      new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/dummy"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialSailor.class,     new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/sailor"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialMutineer.class,   new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/mutineer"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialJaqen.class,      new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/jaqen"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialArmorsmith.class, new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/bartender"));
+        renders.put(got.common.entity.tutorial.GOTEntityTutorialMWSmith.class,    new got.client.render.npc.GOTRenderTutorial18NPC("tutorial/boatswain"));
     }
 }

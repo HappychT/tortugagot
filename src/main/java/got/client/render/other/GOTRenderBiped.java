@@ -171,52 +171,55 @@ public abstract class GOTRenderBiped extends RenderBiped {
 			}
 			GL11.glPopMatrix();
 		}
-		heldItemLeft = ((GOTEntityNPC) entity).getHeldItemLeft();
-		if (heldItemLeft != null) {
-			boolean is3D;
-			float f14;
-			GL11.glPushMatrix();
-			if (mainModel.isChild) {
-				f1 = 0.5f;
-				GL11.glTranslatef(0.0f, 0.625f, 0.0f);
-				GL11.glRotatef(-20.0f, -1.0f, 0.0f, 0.0f);
-				GL11.glScalef(f1, f1, f1);
-			}
-			modelBipedMain.bipedLeftArm.postRender(0.0625f);
-			GL11.glTranslatef(0.0625f, 0.4375f, 0.0625f);
-			IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(heldItemLeft, IItemRenderer.ItemRenderType.EQUIPPED);
-			is3D = customRenderer != null && customRenderer.shouldUseRenderHelper(IItemRenderer.ItemRenderType.EQUIPPED, heldItemLeft, IItemRenderer.ItemRendererHelper.BLOCK_3D);
-			if (heldItemLeft.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(heldItemLeft.getItem()).getRenderType()))) {
-				f14 = 0.5f;
-				GL11.glTranslatef(0.0f, getHeldItemYTranslation(), -0.3125f);
-				GL11.glRotatef(20.0f, 1.0f, 0.0f, 0.0f);
-				GL11.glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
-				GL11.glScalef(-(f14 *= 0.75f), -f14, f14);
-			} else {
-				if (heldItemLeft.getItem().isFull3D()) {
-					f14 = 0.625f;
-					if (heldItemLeft.getItem().shouldRotateAroundWhenRendering()) {
-						GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
-						GL11.glTranslatef(0.0f, -getHeldItemYTranslation(), 0.0f);
-					}
+		if (entity instanceof GOTEntityNPC) {
+			GOTEntityNPC npcEntity = (GOTEntityNPC) entity;
+			heldItemLeft = npcEntity.getHeldItemLeft();
+			if (heldItemLeft != null) {
+				boolean is3D;
+				float f14;
+				GL11.glPushMatrix();
+				if (mainModel.isChild) {
+					f1 = 0.5f;
+					GL11.glTranslatef(0.0f, 0.625f, 0.0f);
+					GL11.glRotatef(-20.0f, -1.0f, 0.0f, 0.0f);
+					GL11.glScalef(f1, f1, f1);
+				}
+				modelBipedMain.bipedLeftArm.postRender(0.0625f);
+				GL11.glTranslatef(0.0625f, 0.4375f, 0.0625f);
+				IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(heldItemLeft, IItemRenderer.ItemRenderType.EQUIPPED);
+				is3D = customRenderer != null && customRenderer.shouldUseRenderHelper(IItemRenderer.ItemRenderType.EQUIPPED, heldItemLeft, IItemRenderer.ItemRendererHelper.BLOCK_3D);
+				if (heldItemLeft.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(heldItemLeft.getItem()).getRenderType()))) {
+					f14 = 0.5f;
+					GL11.glTranslatef(0.0f, getHeldItemYTranslation(), -0.3125f);
+					GL11.glRotatef(20.0f, 1.0f, 0.0f, 0.0f);
+					GL11.glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
+					GL11.glScalef(-(f14 *= 0.75f), -f14, f14);
 				} else {
-					f14 = 0.3175f;
+					if (heldItemLeft.getItem().isFull3D()) {
+						f14 = 0.625f;
+						if (heldItemLeft.getItem().shouldRotateAroundWhenRendering()) {
+							GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+							GL11.glTranslatef(0.0f, -getHeldItemYTranslation(), 0.0f);
+						}
+					} else {
+						f14 = 0.3175f;
+					}
+					GL11.glTranslatef(0.0f, getHeldItemYTranslation(), 0.0f);
+					GL11.glScalef(f14, -f14, f14);
+					GL11.glRotatef(-100.0f, 1.0f, 0.0f, 0.0f);
+					GL11.glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
 				}
-				GL11.glTranslatef(0.0f, getHeldItemYTranslation(), 0.0f);
-				GL11.glScalef(f14, -f14, f14);
-				GL11.glRotatef(-100.0f, 1.0f, 0.0f, 0.0f);
-				GL11.glRotatef(45.0f, 0.0f, 1.0f, 0.0f);
-			}
-			renderManager.itemRenderer.renderItem(entity, heldItemLeft, 0);
-			if (heldItemLeft.getItem().requiresMultipleRenderPasses()) {
-				for (int i = 1; i < heldItemLeft.getItem().getRenderPasses(heldItemLeft.getItemDamage()); ++i) {
-					renderManager.itemRenderer.renderItem(entity, heldItemLeft, i);
+				renderManager.itemRenderer.renderItem(entity, heldItemLeft, 0);
+				if (heldItemLeft.getItem().requiresMultipleRenderPasses()) {
+					for (int i = 1; i < heldItemLeft.getItem().getRenderPasses(heldItemLeft.getItemDamage()); ++i) {
+						renderManager.itemRenderer.renderItem(entity, heldItemLeft, i);
+					}
 				}
+				GL11.glPopMatrix();
 			}
-			GL11.glPopMatrix();
+			renderNPCShield(npcEntity);
+			renderNPCCape(npcEntity);
 		}
-		renderNPCShield((GOTEntityNPC) entity);
-		renderNPCCape((GOTEntityNPC) entity);
 	}
 
 	public void renderNPCCape(GOTEntityNPC entity) {

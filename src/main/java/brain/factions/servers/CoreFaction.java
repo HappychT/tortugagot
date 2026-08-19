@@ -52,6 +52,49 @@ public class CoreFaction {
 	public static HashMap<String, Faction> factions;
 	private static volatile boolean factionsInitialized = false;
 
+	private static final Map<String, String> FACTION_NAMES_RU = new HashMap<>();
+	static {
+		FACTION_NAMES_RU.put("NORTH",         "Север");
+		FACTION_NAMES_RU.put("WESTERLANDS",   "Западные земли");
+		FACTION_NAMES_RU.put("RIVERLANDS",    "Речные земли");
+		FACTION_NAMES_RU.put("STORMLANDS",    "Штормовые земли");
+		FACTION_NAMES_RU.put("REACH",         "Простор");
+		FACTION_NAMES_RU.put("DORNE",         "Дорн");
+		FACTION_NAMES_RU.put("IRONBORN",      "Железные острова");
+		FACTION_NAMES_RU.put("ARRYN",         "Долина Аррен");
+		FACTION_NAMES_RU.put("DRAGONSTONE",   "Драконий Камень");
+		FACTION_NAMES_RU.put("CROWNLANDS",    "Королевские земли");
+		FACTION_NAMES_RU.put("NIGHT_WATCH",   "Ночной Дозор");
+		FACTION_NAMES_RU.put("WILDLING",      "Одичалые");
+		FACTION_NAMES_RU.put("HILL_TRIBES",   "Горные кланы");
+		FACTION_NAMES_RU.put("WHITE_WALKER",  "Белые ходоки");
+		FACTION_NAMES_RU.put("HIGH_POWER",    "Тортуга");
+		FACTION_NAMES_RU.put("DOTHRAKI",      "Дотракийцы");
+		FACTION_NAMES_RU.put("BRAAVOS",       "Браавос");
+		FACTION_NAMES_RU.put("LYS",           "Лис");
+		FACTION_NAMES_RU.put("MYR",           "Мир");
+		FACTION_NAMES_RU.put("TYROSH",        "Тирош");
+		FACTION_NAMES_RU.put("PENTOS",        "Пентос");
+		FACTION_NAMES_RU.put("VOLANTIS",      "Волантис");
+		FACTION_NAMES_RU.put("QOHOR",         "Квохор");
+		FACTION_NAMES_RU.put("NORVOS",        "Норвос");
+		FACTION_NAMES_RU.put("LORATH",        "Лорат");
+		FACTION_NAMES_RU.put("ASSHAI",        "Асшай");
+		FACTION_NAMES_RU.put("GHISCAR",       "Гискар");
+		FACTION_NAMES_RU.put("QARTH",         "Кварт");
+		FACTION_NAMES_RU.put("MOSSOVY",       "Моссовия");
+		FACTION_NAMES_RU.put("IBBEN",         "Иббен");
+		FACTION_NAMES_RU.put("LHAZAR",        "Лхазар");
+		FACTION_NAMES_RU.put("SOTHORYOS",     "Соториос");
+		FACTION_NAMES_RU.put("JOGOS",         "Джогос Нхай");
+		FACTION_NAMES_RU.put("YI_TI",         "Йи Ти");
+		FACTION_NAMES_RU.put("SUMMER_ISLANDS","Летние острова");
+		FACTION_NAMES_RU.put("ULTHOS",        "Ультос");
+		FACTION_NAMES_RU.put("BANDITS",       "Бандиты");
+		FACTION_NAMES_RU.put("HOSTILE",       "Враждебная фракция");
+		FACTION_NAMES_RU.put("UNALIGNED",     "Нейтральная фракция");
+	}
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		configFolder = new File(event.getModConfigurationDirectory(), "BrainFaction");
@@ -155,6 +198,16 @@ public class CoreFaction {
 		initFactions();
 	}
 	public static void updatePrefix(String playerName) {
+		if (MinecraftServer.getServer() != null && MinecraftServer.getServer().getConfigurationManager() != null) {
+			net.minecraft.entity.player.EntityPlayerMP targetPlayer = MinecraftServer.getServer().getConfigurationManager().func_152612_a(playerName);
+			if (targetPlayer != null) {
+				got.rome.ExtendedPlayer ext = got.rome.ExtendedPlayer.get(targetPlayer);
+				if (ext != null && ext.isTutorialActive()) {
+					return;
+				}
+			}
+		}
+
 		Faction faction = PacketMessage.getCurrentFaction(playerName);
 		String newPrefix = "";
 		Faction.PlayerData pData = null;
@@ -176,7 +229,7 @@ public class CoreFaction {
 				}
 			}
 
-			String factionName = faction.getID();
+			String factionName = FACTION_NAMES_RU.getOrDefault(faction.getID(), faction.getID());
 
 			if (!titleText.isEmpty()) {
 				newPrefix = color + "[" + factionName + "][" + titleText + "] ";

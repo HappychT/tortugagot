@@ -81,6 +81,11 @@ public class TutorialClientState {
         return TutorialTextsClient.get("substep." + tutorialStage + "." + tutorialProgress);
     }
 
+    public static String getRawText(String key, String def) {
+        String res = TutorialTextsClient.get(key);
+        return res.equals(key) ? def : res;
+    }
+
     public static boolean isChatAllowed() {
         if (!isTutorialActive) return true;
         return false;

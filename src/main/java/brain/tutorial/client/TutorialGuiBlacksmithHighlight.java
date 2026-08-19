@@ -277,7 +277,7 @@ public class TutorialGuiBlacksmithHighlight {
         int guiLeft = (gui.width - 176) / 2;
         int guiTop = (gui.height - 198) / 2;
 
-        if (prog == 0) {
+        if (false) {
             // Reforge armor: Highlight Slot 0, Slot 2, and buttonReforge
             Slot slot0 = (Slot) gui.inventorySlots.inventorySlots.get(0);
             if (slot0 != null && !slot0.getHasStack()) {
@@ -296,23 +296,23 @@ public class TutorialGuiBlacksmithHighlight {
                     }
                 }
             }
-        } else if (prog == 1) {
+        } else if (prog >= 5 && prog <= 7) {
             // Enchant sword: Highlight Slot 0, Slot 1, and Slot 3 (output)
             Slot slot0 = (Slot) gui.inventorySlots.inventorySlots.get(0);
             if (slot0 != null && (!slot0.getHasStack() || slot0.getStack().getItem() != got.common.database.GOTRegistry.bronzeSword)) {
-                drawPointerToArea(guiLeft + slot0.xDisplayPosition, guiTop + slot0.yDisplayPosition, 16, 16, alpha, desc, screenW, screenH);
+                drawPointerToArea(guiLeft + slot0.xDisplayPosition, guiTop + slot0.yDisplayPosition, 16, 16, alpha, TutorialClientState.getRawText("substep.6.5", desc), screenW, screenH);
             } else {
                 Slot slot1 = (Slot) gui.inventorySlots.inventorySlots.get(1);
                 if (slot1 != null && !slot1.getHasStack()) {
-                    drawPointerToArea(guiLeft + slot1.xDisplayPosition, guiTop + slot1.yDisplayPosition, 16, 16, alpha, desc, screenW, screenH);
+                    drawPointerToArea(guiLeft + slot1.xDisplayPosition, guiTop + slot1.yDisplayPosition, 16, 16, alpha, TutorialClientState.getRawText("substep.6.6", desc), screenW, screenH);
                 } else {
                     Slot slot2 = (Slot) gui.inventorySlots.inventorySlots.get(2);
                     if (slot2 != null && !slot2.getHasStack()) {
-                        drawPointerToArea(guiLeft + slot2.xDisplayPosition, guiTop + slot2.yDisplayPosition, 16, 16, alpha, desc, screenW, screenH);
+                        drawPointerToArea(guiLeft + slot2.xDisplayPosition, guiTop + slot2.yDisplayPosition, 16, 16, alpha, TutorialClientState.getRawText("substep.6.6_2", "Положите сплавленную сталь в правый слот"), screenW, screenH);
                     } else {
                         Slot slot3 = (Slot) gui.inventorySlots.inventorySlots.get(3);
                         if (slot3 != null && slot3.getHasStack()) {
-                            drawPointerToArea(guiLeft + slot3.xDisplayPosition, guiTop + slot3.yDisplayPosition, 16, 16, alpha, desc, screenW, screenH);
+                            drawPointerToArea(guiLeft + slot3.xDisplayPosition, guiTop + slot3.yDisplayPosition, 16, 16, alpha, TutorialClientState.getRawText("substep.6.7", desc), screenW, screenH);
                         }
                     }
                 }

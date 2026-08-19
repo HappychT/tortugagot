@@ -53,7 +53,7 @@ public class GuiStructureBlock extends GuiScreen {
     private final int xSize = 340;
     private final int ySize = 200;
 
-    private enum ScreenState { UNOWNED, OWNED_SELF, OWNED_ALLY, OWNED_ENEMY, PURCHASE_CATEGORY, PURCHASE_SUBTYPE }
+    private enum ScreenState { UNOWNED, OWNED_SELF, OWNED_ALLY, OWNED_ENEMY, PURCHASE_META_CATEGORY, PURCHASE_CATEGORY, PURCHASE_SUBTYPE }
     private enum FortressState { MAIN, BARRACKS, SIEGE_EQUIPMENT }
     private enum Overlay { NONE, DEPOSIT_PROVISIONS, ADD_BARRACKS_PLAYER, INCREASE_CAPACITY }
 
@@ -84,7 +84,7 @@ public class GuiStructureBlock extends GuiScreen {
                 currentState = ScreenState.OWNED_ALLY;
             }
         }
-        if (currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE && structure != null && structure.ownerFactionID == null) {
+        if (currentState != ScreenState.PURCHASE_META_CATEGORY && currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE && structure != null && structure.ownerFactionID == null) {
             currentState = ScreenState.UNOWNED;
         }
     }
@@ -93,7 +93,7 @@ public class GuiStructureBlock extends GuiScreen {
         this.structure = newSlot;
         this.availableStructures = structures != null ? structures : new HashMap<>();
 
-        if (currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE) {
+        if (currentState != ScreenState.PURCHASE_META_CATEGORY && currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE) {
             determineState();
         } else if (newSlot != null && newSlot.ownerFactionID != null) {
             determineState();
@@ -291,7 +291,17 @@ public class GuiStructureBlock extends GuiScreen {
         switch (currentState) {
             case UNOWNED:
                 if (button.id == 0) {
+                    currentState = ScreenState.PURCHASE_META_CATEGORY;
+                    initGui();
+                }
+                break;
+            case PURCHASE_META_CATEGORY:
+                if (button.id == 15) {
                     currentState = ScreenState.PURCHASE_CATEGORY;
+                    initGui();
+                } else if (button.id == 16) {
+                    selectedCategory = "FORTRESS";
+                    currentState = ScreenState.PURCHASE_SUBTYPE;
                     initGui();
                 }
                 break;
@@ -366,10 +376,17 @@ public class GuiStructureBlock extends GuiScreen {
             selectedBarracksPlayerName = null;
             needsReinit = true;
         } else if (currentState == ScreenState.PURCHASE_SUBTYPE) {
-            currentState = ScreenState.PURCHASE_CATEGORY;
+            if ("FORTRESS".equals(selectedCategory)) {
+                currentState = ScreenState.PURCHASE_META_CATEGORY;
+            } else {
+                currentState = ScreenState.PURCHASE_CATEGORY;
+            }
             selectedCategory = "";
             needsReinit = true;
         } else if (currentState == ScreenState.PURCHASE_CATEGORY) {
+            currentState = ScreenState.PURCHASE_META_CATEGORY;
+            needsReinit = true;
+        } else if (currentState == ScreenState.PURCHASE_META_CATEGORY) {
             currentState = ScreenState.UNOWNED;
             needsReinit = true;
         }
@@ -509,12 +526,12 @@ public class GuiStructureBlock extends GuiScreen {
         String title = "Структура";
         if (structure != null && structure.name != null && !structure.name.isEmpty() && currentState != ScreenState.UNOWNED) {
             title = structure.name;
-        } else if (currentState == ScreenState.UNOWNED || currentState == ScreenState.PURCHASE_CATEGORY || currentState == ScreenState.PURCHASE_SUBTYPE) {
+        } else if (currentState == ScreenState.UNOWNED || currentState == ScreenState.PURCHASE_META_CATEGORY || currentState == ScreenState.PURCHASE_CATEGORY || currentState == ScreenState.PURCHASE_SUBTYPE) {
             title = "Нейтральная территория";
         }
         this.drawCenteredString(this.fontRendererObj, title, width / 2, guiTop + 15, 0xFFFFFF);
 
-        if (structure == null && currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE) {
+        if (structure == null && currentState != ScreenState.PURCHASE_META_CATEGORY && currentState != ScreenState.PURCHASE_CATEGORY && currentState != ScreenState.PURCHASE_SUBTYPE) {
             this.drawCenteredString(fontRendererObj, "Загрузка данных...", width / 2, guiTop + 90, 0xAAAAAA);
             return;
         }
@@ -587,6 +604,9 @@ public class GuiStructureBlock extends GuiScreen {
                         this.drawCenteredString(this.fontRendererObj, "Уровень: §b" + structure.level, width / 2, guiTop + 60, 0xFFFFFF);
                     }
                 }
+                break;
+            case PURCHASE_META_CATEGORY:
+                this.drawCenteredString(this.fontRendererObj, "Выберите тип объекта:", width / 2, guiTop + 35, 0xFFFFFF);
                 break;
             case PURCHASE_CATEGORY:
                 this.drawCenteredString(this.fontRendererObj, "Выберите категорию постройки:", width / 2, guiTop + 35, 0xFFFFFF);
@@ -821,3 +841,4 @@ public class GuiStructureBlock extends GuiScreen {
         if (capacityAmountField != null) capacityAmountField.updateCursorCounter();
     }
 }
+

@@ -7207,3 +7207,5 @@ entity.got.TutorialSailor.name=Sailor
 entity.got.TutorialMutineer.name=Mutineer
 entity.got.TutorialBartender.name=Bartender
 entity.got.TutorialJaqen.name=Jaqen H'ghar
+
+item.got:processed_dragon_glass.name=Refined Dragon Glass

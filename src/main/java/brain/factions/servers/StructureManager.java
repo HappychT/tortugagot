@@ -318,15 +318,17 @@ public class StructureManager {
                     return;
                 }
 
-                String jsonContent = Files.toString(structureFile, Charsets.UTF_8);
-                StructureData structureData = new Gson().fromJson(jsonContent, StructureData.class);
-
-                int xOffset = structureData.getWidth() / 2;
-                int zOffset = structureData.getDepth() / 2;
-
+                boolean newHeartPlaced = false;
                 int oldHeartX = slot.xCoord;
                 int oldHeartY = slot.yCoord;
                 int oldHeartZ = slot.zCoord;
+
+                if (slot.canBuild) {
+                    String jsonContent = Files.toString(structureFile, Charsets.UTF_8);
+                    StructureData structureData = new Gson().fromJson(jsonContent, StructureData.class);
+
+                    int xOffset = structureData.getWidth() / 2;
+                    int zOffset = structureData.getDepth() / 2;
                 int minX = 0, minY = 0, minZ = 0;
                 int maxX = 0, maxY = 0, maxZ = 0;
 
@@ -352,7 +354,6 @@ public class StructureManager {
                         }
                     }
                 }
-                boolean newHeartPlaced = false;
 
                 for (BlockData blockData : structureData.getBlocks()) {
                     Block block = (Block) Block.blockRegistry.getObject(blockData.getId());
@@ -404,8 +405,11 @@ public class StructureManager {
                 }
 
                 if (newHeartPlaced) {
-                    world.setBlockToAir(oldHeartX, oldHeartY, oldHeartZ);
-                } else {
+                        world.setBlockToAir(oldHeartX, oldHeartY, oldHeartZ);
+                    }
+                } // End of if (slot.canBuild)
+
+                if (!newHeartPlaced) {
                     TileEntity te = world.getTileEntity(slot.xCoord, slot.yCoord, slot.zCoord);
                     if (te instanceof TileEntityStructureHeart) {
                         ((TileEntityStructureHeart) te).setStructureId(structureId);

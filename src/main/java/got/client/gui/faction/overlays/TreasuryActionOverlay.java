@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TreasuryActionOverlay implements IOverlayRenderer {
     private final GOTGuiFactions parent;
-    private GuiTextField treasuryAmountField;
+    public GuiTextField treasuryAmountField;
     private GuiButton treasuryConfirmButton, treasuryCancelButton;
 
     private String treasuryActionType = "deposit";
@@ -60,6 +60,7 @@ public class TreasuryActionOverlay implements IOverlayRenderer {
     @Override
     public void actionPerformed(GuiButton button) {
         if (button == treasuryConfirmButton) {
+            if (hasError) return;
             try {
                 long amount = Long.parseLong(treasuryAmountField.getText().trim());
                 if (amount > 0) {

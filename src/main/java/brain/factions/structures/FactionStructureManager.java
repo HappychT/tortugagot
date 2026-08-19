@@ -202,6 +202,7 @@ public class FactionStructureManager {
             if (src.ownerFactionID != null) obj.addProperty("ownerFactionID", src.ownerFactionID);
             obj.addProperty("level", src.level);
             obj.addProperty("destructionCount", src.destructionCount);
+            obj.addProperty("canBuild", src.canBuild);
 
             if (src.initial_faction != null && !src.initial_faction.isEmpty()) obj.addProperty("initial_faction", src.initial_faction);
             if (src.for_fraction != null && !src.for_fraction.isEmpty()) obj.addProperty("for_fraction", src.for_fraction);
@@ -258,6 +259,7 @@ public class FactionStructureManager {
             slot.ownerFactionID = obj.has("ownerFactionID") ? obj.get("ownerFactionID").getAsString() : null;
             slot.level = obj.has("level") ? obj.get("level").getAsInt() : 0;
             slot.destructionCount = obj.has("destructionCount") ? obj.get("destructionCount").getAsInt() : 0;
+            slot.canBuild = obj.has("canBuild") ? obj.get("canBuild").getAsBoolean() : true;
 
             slot.initial_faction = obj.has("initial_faction") ? obj.get("initial_faction").getAsString() : null;
             slot.for_fraction = obj.has("for_fraction") ? obj.get("for_fraction").getAsString() : null;

@@ -267,11 +267,17 @@ public class GOTGuiFactionBlacksmith extends GuiContainer {
 
     public void detectInputSlotInteraction() {
         ItemStack is = container.invInput.getStackInSlot(0);
+        boolean wasEmpty = !hasItemInSlot;
         hasItemInSlot = is != null;
         if (hasItemInSlot && !ItemStack.areItemStacksEqual(itemstack, is)) {
             itemstack = is;
             itemName = is.getDisplayName();
             updateState();
+            // Tutorial: stage 6, step 7 — меч вложен в слот у оружейника (MW)
+            got.rome.ExtendedPlayer extSlot = got.rome.ExtendedPlayer.get(mc.thePlayer);
+            if (wasEmpty && extSlot != null && extSlot.isTutorialActive() && extSlot.getTutorialStage() == 6 && extSlot.getTutorialProgress() == 6) {
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(mc.thePlayer, 7);
+            }
         } else if (!hasItemInSlot && itemstack != null) {
             itemstack = null;
             itemName = "";
@@ -339,6 +345,11 @@ public class GOTGuiFactionBlacksmith extends GuiContainer {
             updateButtonPositions();
         } else if (button.id < enchantmentSlots) {
             switchButtonState(button.id);
+            // Tutorial: stage 6, step 6 — выбран зачар у оружейника (MW)
+            got.rome.ExtendedPlayer extBtn = got.rome.ExtendedPlayer.get(mc.thePlayer);
+            if (extBtn != null && extBtn.isTutorialActive() && extBtn.getTutorialStage() == 6 && extBtn.getTutorialProgress() == 5) {
+                brain.tutorial.TutorialManager.getInstance().advanceStage6(mc.thePlayer, 6);
+            }
         }
 
         switch (button.id) {

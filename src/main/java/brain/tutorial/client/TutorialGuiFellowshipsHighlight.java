@@ -219,7 +219,7 @@ public class TutorialGuiFellowshipsHighlight {
         GL11.glPopMatrix();
     }
 
-    public static boolean handleMouseClick(List buttonList, int mouseX, int mouseY, int button, int guiLeft, int guiTop, int xSize, int ySize) {
+    public static boolean handleMouseClick(List buttonList, int mouseX, int mouseY, int button, int guiLeft, int guiTop, int xSize, int ySize, boolean fellowshipHovered) {
         int p = TutorialClientState.tutorialProgress;
         
         if (p == 38) {
@@ -234,10 +234,15 @@ public class TutorialGuiFellowshipsHighlight {
             if (isHoveringAnyOtherButton(buttonList, 1, mouseX, mouseY)) { return false; }
             return true; // Let them type — caller will forward to text field directly
         } else if (p == 40) {
-            if (mouseX >= guiLeft + 8 && mouseX <= guiLeft + xSize - 8 && mouseY >= guiTop + 30 && mouseY <= guiTop + ySize - 30) {
+            // Only advance if the player actually clicked on a fellowship entry, not empty space
+            if (fellowshipHovered) {
                 advance(); return true;
             }
-            return false;
+            // If clicked inside the list area but nothing hovered, block (don't advance, don't do anything)
+            if (mouseX >= guiLeft + 8 && mouseX <= guiLeft + xSize - 8 && mouseY >= guiTop + 30 && mouseY <= guiTop + ySize - 30) {
+                return false; // Inside list area but no fellowship — block
+            }
+            return false; // Outside list area — block too
         } else if (p == 41) {
             if (isButtonHovered(buttonList, 2, mouseX, mouseY)) {
                 advance(); return true;
