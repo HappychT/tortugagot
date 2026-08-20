@@ -174,6 +174,7 @@ public class GuiStructureBlock extends GuiScreen {
             int y = guiTop + 60;
             int id = 20;
             for (String category : availableStructures.keySet()) {
+                if ("FORTRESS".equals(category)) continue;
                 mainButtons.add(new GuiCustomButton(id++, guiLeft + (xSize - 140) / 2, y, 140, 20, getCategoryDisplayName(category)));
                 y += 25;
             }
@@ -295,7 +296,15 @@ public class GuiStructureBlock extends GuiScreen {
         switch (currentState) {
             case UNOWNED:
                 if (button.id == 0) {
-                    currentState = ScreenState.PURCHASE_META_CATEGORY;
+                    if (structure != null && structure.category == FactionStructureSlot.StructureCategory.FORTRESS) {
+                        selectedCategory = "FORTRESS";
+                        currentState = ScreenState.PURCHASE_SUBTYPE;
+                    } else if (structure != null && structure.category != FactionStructureSlot.StructureCategory.NONE) {
+                        selectedCategory = structure.category.name();
+                        currentState = ScreenState.PURCHASE_SUBTYPE;
+                    } else {
+                        currentState = ScreenState.PURCHASE_META_CATEGORY;
+                    }
                     initGui();
                 }
                 break;
@@ -380,7 +389,10 @@ public class GuiStructureBlock extends GuiScreen {
             selectedBarracksPlayerName = null;
             needsReinit = true;
         } else if (currentState == ScreenState.PURCHASE_SUBTYPE) {
-            if ("FORTRESS".equals(selectedCategory)) {
+            boolean slotHasCategory = structure != null && structure.category != FactionStructureSlot.StructureCategory.NONE;
+            if (slotHasCategory) {
+                currentState = ScreenState.UNOWNED;
+            } else if ("FORTRESS".equals(selectedCategory)) {
                 currentState = ScreenState.PURCHASE_META_CATEGORY;
             } else {
                 currentState = ScreenState.PURCHASE_CATEGORY;

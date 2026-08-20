@@ -116,6 +116,7 @@ public class GOTCommandTutorial extends CommandBase {
             sender.addChatMessage(new ChatComponentText("\u00a7aTutorial stage for " + player.getCommandSenderName() + " set to " + stage));
         } else if (action.equalsIgnoreCase("stop")) {
             ext.setTutorialActive(false);
+            removeFromTutorialFaction(player);
             TutorialManager.getInstance().syncState(player);
             sender.addChatMessage(new ChatComponentText("\u00a7aTutorial stopped for " + player.getCommandSenderName()));
         } else if (action.equalsIgnoreCase("restart")) {
@@ -129,6 +130,9 @@ public class GOTCommandTutorial extends CommandBase {
             ext.setTutorialStage(0);
             ext.setTutorialProgress(0);
             ext.setTutorialReplay(false);
+            
+            // Кик из фракции перед перезапуском
+            removeFromTutorialFaction(player);
 
             // 3. Убрать флаг TutorialCompleted из persisted NBT
             net.minecraft.nbt.NBTTagCompound persisted = player.getEntityData()
@@ -149,6 +153,21 @@ public class GOTCommandTutorial extends CommandBase {
             sender.addChatMessage(new ChatComponentText("\u00a7aTutorial fully reset for " + player.getCommandSenderName() + "!"));
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
+        }
+    }
+
+    private void removeFromTutorialFaction(EntityPlayerMP player) {
+        brain.factions.Faction faction = brain.factions.network.PacketMessage.getCurrentFaction(player.getCommandSenderName());
+        if (faction != null) {
+            faction.getPlayers().remove(player.getCommandSenderName());
+            got.common.GOTPlayerData pd = got.common.GOTLevelData.getData(player);
+            if (pd != null) {
+                pd.revokePledgeFaction(player, true);
+            }
+            brain.factions.servers.CoreFaction.saveFactions();
+            brain.factions.servers.CoreFaction.initFactions();
+            brain.factions.servers.CoreFaction.sendAllGui();
+            brain.factions.servers.CoreFaction.updatePrefix(player.getCommandSenderName());
         }
     }
 }
