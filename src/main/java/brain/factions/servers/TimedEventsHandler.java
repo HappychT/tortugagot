@@ -21,8 +21,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -112,24 +110,23 @@ public class TimedEventsHandler {
     }
 
     private void checkRaidTime() {
-        LocalDateTime now = LocalDateTime.now();
+        boolean anyRaidActive = false;
 
-        try {
-            String[] time = StructureManager.config.raidTimeResourcePoints.split("-");
-            LocalTime start = LocalTime.parse(time[0]);
-            LocalTime end = LocalTime.parse(time[1]);
-            boolean shouldBeRaidTime = !now.toLocalTime().isBefore(start) && now.toLocalTime().isBefore(end);
-
-            if (shouldBeRaidTime && !StructureManager.isRaidTime) {
-                StructureManager.isRaidTime = true;
-                SiegeActivationManager.getInstance().rebuildRaidZones(0);
-                MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§4[!] Началось время рейдов! Структуры врагов уязвимы!"));
-            } else if (!shouldBeRaidTime && StructureManager.isRaidTime) {
-                StructureManager.isRaidTime = false;
-                SiegeActivationManager.getInstance().clearRaidZones();
-                MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§a[!] Время рейдов окончено! Структуры в безопасности."));
+        for (FactionStructureSlot slot : FactionStructureManager.structureSlots) {
+            if (StructureManager.isRaidTimeNow(slot) || StructureManager.activeRaidPoints.contains(slot.id)) {
+                anyRaidActive = true;
+                break;
             }
-        } catch (Exception e) {
+        }
+
+        if (anyRaidActive && !StructureManager.isRaidTime) {
+            StructureManager.isRaidTime = true;
+            SiegeActivationManager.getInstance().rebuildRaidZones(0);
+            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§4[!] Началось время рейдов! Структуры врагов уязвимы!"));
+        } else if (!anyRaidActive && StructureManager.isRaidTime) {
+            StructureManager.isRaidTime = false;
+            SiegeActivationManager.getInstance().clearRaidZones();
+            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentText("§a[!] Время рейдов окончено! Структуры в безопасности."));
         }
     }
 

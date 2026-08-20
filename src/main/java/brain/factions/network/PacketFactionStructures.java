@@ -19,7 +19,6 @@ import java.util.List;
 public class PacketFactionStructures implements IMessage {
 
     private List<FactionStructureSlot> structures;
-    public static String raidTimeString;
     public boolean isRaidTimeFortress;
     public int serverTimeMinutes;
 
@@ -34,7 +33,6 @@ public class PacketFactionStructures implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        raidTimeString = ByteBufUtils.readUTF8String(buf);
         isRaidTimeFortress = buf.readBoolean();
         serverTimeMinutes = buf.readInt();
         StructureManager.isRaidTimeFortress = isRaidTimeFortress;
@@ -68,7 +66,6 @@ public class PacketFactionStructures implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, StructureManager.config.raidTimeResourcePoints != null ? StructureManager.config.raidTimeResourcePoints : "00:00-00:00");
         buf.writeBoolean(StructureManager.isRaidTimeFortress);
 
         LocalTime now = LocalTime.now();
@@ -95,6 +92,7 @@ public class PacketFactionStructures implements IMessage {
             ByteBufUtils.writeUTF8String(buf, slot.raidTime != null ? slot.raidTime : "");
         }
     }
+
     public static class Handler implements IMessageHandler<PacketFactionStructures, IMessage> {
         @Override
         public IMessage onMessage(final PacketFactionStructures message, MessageContext ctx) {
@@ -102,10 +100,6 @@ public class PacketFactionStructures implements IMessage {
                 @Override
                 public void run() {
                     StructureManager.isRaidTimeFortress = message.isRaidTimeFortress;
-
-                    if (StructureManager.config != null) {
-                        StructureManager.config.raidTimeResourcePoints = PacketFactionStructures.raidTimeString;
-                    }
 
                     LocalTime now = LocalTime.now();
                     int clientMinutes = now.getHour() * 60 + now.getMinute();
@@ -121,4 +115,4 @@ public class PacketFactionStructures implements IMessage {
             return null;
         }
     }
-}
+}

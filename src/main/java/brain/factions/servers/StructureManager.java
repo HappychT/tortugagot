@@ -141,29 +141,13 @@ public class StructureManager {
 
     public static boolean isRaidTimeNow(FactionStructureSlot slot) {
         if (slot == null) return false;
-
-        String timeString = null;
-
-        if (slot.raidTime != null && !slot.raidTime.isEmpty() && !slot.raidTime.equals("00:00-00:00")) {
-            timeString = slot.raidTime;
-        } else {
-            if (slot.category == FactionStructureSlot.StructureCategory.FORTRESS) {
-                timeString = config.specificRaidTimes.get("FORTRESS");
-            } else if (slot.category != null) {
-                timeString = config.specificRaidTimes.get(slot.category.name());
-            }
-
-            if (timeString == null) {
-                timeString = config.raidTimeResourcePoints;
-            }
-        }
-
-        return isTimeInInterval(timeString);
+        // Время рейда задаётся только в поле raidTime самого слота (faction_structures.json)
+        return isTimeInInterval(slot.raidTime);
     }
 
     public static boolean isTimeInInterval(String interval) {
         try {
-            if (interval == null || !interval.contains("-")) return false;
+            if (interval == null || interval.isEmpty() || !interval.contains("-")) return false;
             String[] parts = interval.split("-");
             LocalTime start = LocalTime.parse(parts[0]);
             LocalTime end = LocalTime.parse(parts[1]);
@@ -329,82 +313,82 @@ public class StructureManager {
 
                     int xOffset = structureData.getWidth() / 2;
                     int zOffset = structureData.getDepth() / 2;
-                int minX = 0, minY = 0, minZ = 0;
-                int maxX = 0, maxY = 0, maxZ = 0;
+                    int minX = 0, minY = 0, minZ = 0;
+                    int maxX = 0, maxY = 0, maxZ = 0;
 
-                for (BlockData b : structureData.getBlocks()) {
-                    if (b.getX() < minX) minX = b.getX();
-                    if (b.getX() > maxX) maxX = b.getX();
-                    if (b.getY() < minY) minY = b.getY();
-                    if (b.getY() > maxY) maxY = b.getY();
-                    if (b.getZ() < minZ) minZ = b.getZ();
-                    if (b.getZ() > maxZ) maxZ = b.getZ();
-                }
-
-                for (int x = minX; x <= maxX; x++) {
-                    for (int y = minY; y <= maxY; y++) {
-                        for (int z = minZ; z <= maxZ; z++) {
-                            int clearX = oldHeartX + x - xOffset;
-                            int clearY = oldHeartY + y - 3;
-                            int clearZ = oldHeartZ + z - zOffset;
-
-                            if (clearX == oldHeartX && clearY == oldHeartY && clearZ == oldHeartZ) continue;
-
-                            world.setBlockToAir(clearX, clearY, clearZ);
-                        }
-                    }
-                }
-
-                for (BlockData blockData : structureData.getBlocks()) {
-                    Block block = (Block) Block.blockRegistry.getObject(blockData.getId());
-                    if (block == null) continue;
-
-                    int blockX = oldHeartX + blockData.getX() - xOffset;
-                    int blockY = oldHeartY + blockData.getY() - 3;
-                    int blockZ = oldHeartZ + blockData.getZ() - zOffset;
-
-                    if (blockX == oldHeartX && blockY == oldHeartY && blockZ == oldHeartZ) {
-                        continue;
+                    for (BlockData b : structureData.getBlocks()) {
+                        if (b.getX() < minX) minX = b.getX();
+                        if (b.getX() > maxX) maxX = b.getX();
+                        if (b.getY() < minY) minY = b.getY();
+                        if (b.getY() > maxY) maxY = b.getY();
+                        if (b.getZ() < minZ) minZ = b.getZ();
+                        if (b.getZ() > maxZ) maxZ = b.getZ();
                     }
 
-                    if (block instanceof BlockStructureHeart) {
-                        if (newHeartPlaced) {
-                            CoreFaction.logger().log(Level.WARNING, "Структура " + fileName + " содержит более одного сердца! Лишний блок заменен на воздух.");
-                            world.setBlockToAir(blockX, blockY, blockZ);
-                            continue;
-                        }
+                    for (int x = minX; x <= maxX; x++) {
+                        for (int y = minY; y <= maxY; y++) {
+                            for (int z = minZ; z <= maxZ; z++) {
+                                int clearX = oldHeartX + x - xOffset;
+                                int clearY = oldHeartY + y - 3;
+                                int clearZ = oldHeartZ + z - zOffset;
 
-                        world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
+                                if (clearX == oldHeartX && clearY == oldHeartY && clearZ == oldHeartZ) continue;
 
-                        slot.xCoord = blockX;
-                        slot.yCoord = blockY;
-                        slot.zCoord = blockZ;
-                        newHeartPlaced = true;
-
-                        TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
-                        if (te instanceof TileEntityStructureHeart) {
-                            ((TileEntityStructureHeart) te).setStructureId(structureId);
-                        }
-
-                        NBTTagCompound nbt = blockData.getNbt();
-                        if (nbt != null && te != null) {
-                            te.readFromNBT(nbt);
-                            te.markDirty();
-                        }
-                    } else {
-                        world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
-                        NBTTagCompound nbt = blockData.getNbt();
-                        if (nbt != null) {
-                            TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
-                            if (te != null) {
-                                te.readFromNBT(nbt);
-                                te.markDirty();
+                                world.setBlockToAir(clearX, clearY, clearZ);
                             }
                         }
                     }
-                }
 
-                if (newHeartPlaced) {
+                    for (BlockData blockData : structureData.getBlocks()) {
+                        Block block = (Block) Block.blockRegistry.getObject(blockData.getId());
+                        if (block == null) continue;
+
+                        int blockX = oldHeartX + blockData.getX() - xOffset;
+                        int blockY = oldHeartY + blockData.getY() - 3;
+                        int blockZ = oldHeartZ + blockData.getZ() - zOffset;
+
+                        if (blockX == oldHeartX && blockY == oldHeartY && blockZ == oldHeartZ) {
+                            continue;
+                        }
+
+                        if (block instanceof BlockStructureHeart) {
+                            if (newHeartPlaced) {
+                                CoreFaction.logger().log(Level.WARNING, "Структура " + fileName + " содержит более одного сердца! Лишний блок заменен на воздух.");
+                                world.setBlockToAir(blockX, blockY, blockZ);
+                                continue;
+                            }
+
+                            world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
+
+                            slot.xCoord = blockX;
+                            slot.yCoord = blockY;
+                            slot.zCoord = blockZ;
+                            newHeartPlaced = true;
+
+                            TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
+                            if (te instanceof TileEntityStructureHeart) {
+                                ((TileEntityStructureHeart) te).setStructureId(structureId);
+                            }
+
+                            NBTTagCompound nbt = blockData.getNbt();
+                            if (nbt != null && te != null) {
+                                te.readFromNBT(nbt);
+                                te.markDirty();
+                            }
+                        } else {
+                            world.setBlock(blockX, blockY, blockZ, block, blockData.getMetadata(), 3);
+                            NBTTagCompound nbt = blockData.getNbt();
+                            if (nbt != null) {
+                                TileEntity te = world.getTileEntity(blockX, blockY, blockZ);
+                                if (te != null) {
+                                    te.readFromNBT(nbt);
+                                    te.markDirty();
+                                }
+                            }
+                        }
+                    }
+
+                    if (newHeartPlaced) {
                         world.setBlockToAir(oldHeartX, oldHeartY, oldHeartZ);
                     }
                 } // End of if (slot.canBuild)

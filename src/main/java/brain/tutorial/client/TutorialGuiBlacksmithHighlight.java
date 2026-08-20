@@ -308,7 +308,7 @@ public class TutorialGuiBlacksmithHighlight {
                 } else {
                     Slot slot2 = (Slot) gui.inventorySlots.inventorySlots.get(2);
                     if (slot2 != null && !slot2.getHasStack()) {
-                        drawPointerToArea(guiLeft + slot2.xDisplayPosition, guiTop + slot2.yDisplayPosition, 16, 16, alpha, TutorialClientState.getRawText("substep.6.6_2", "Положите сплавленную сталь в правый слот"), screenW, screenH);
+                        drawPointerToArea(guiLeft + slot2.xDisplayPosition, guiTop + slot2.yDisplayPosition, 16, 16, alpha, TutorialClientState.getRawText("substep.6.6_2", "Положите легированную сталь в нижний слот"), screenW, screenH);
                     } else {
                         Slot slot3 = (Slot) gui.inventorySlots.inventorySlots.get(3);
                         if (slot3 != null && slot3.getHasStack()) {

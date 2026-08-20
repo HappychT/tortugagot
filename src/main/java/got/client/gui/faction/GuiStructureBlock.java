@@ -166,6 +166,10 @@ public class GuiStructureBlock extends GuiScreen {
                 setupResourcePointButtons(guiLeft, guiTop);
             }
 
+        } else if (currentState == ScreenState.PURCHASE_META_CATEGORY) {
+            mainButtons.add(new GuiCustomButton(15, guiLeft + (xSize - 140) / 2, guiTop + 70, 140, 20, "Ресурсная точка"));
+            mainButtons.add(new GuiCustomButton(16, guiLeft + (xSize - 140) / 2, guiTop + 95, 140, 20, "Крепость"));
+            mainButtons.add(new GuiCustomButton(99, guiLeft + (xSize - 140) / 2, guiTop + 160, 140, 20, "Отмена"));
         } else if (currentState == ScreenState.PURCHASE_CATEGORY) {
             int y = guiTop + 60;
             int id = 20;

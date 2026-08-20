@@ -197,7 +197,7 @@ public class MapView implements IPageRenderer {
                             if (relation == GOTFactionRelations.Relation.ALLY || playerFaction == ownerFaction) {
                                 tooltip.add("§7Уровень: §b" + slot.level);
                             } else if (relation == GOTFactionRelations.Relation.ENEMY || relation == GOTFactionRelations.Relation.MORTAL_ENEMY) {
-                                tooltip.add("§7Рейд-тайм: §c" + PacketFactionStructures.raidTimeString);
+                                tooltip.add("§7Рейд-тайм: §c" + (slot.raidTime != null && !slot.raidTime.isEmpty() ? slot.raidTime : "не задан"));
                             }
                         }
                     }

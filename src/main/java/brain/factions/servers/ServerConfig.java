@@ -23,9 +23,6 @@ public class ServerConfig {
     public Map<Integer, Integer> structureBreakCounts = new HashMap<>();
     public Map<Integer, Integer> fortressBarracksCapacity = new HashMap<>();
 
-    public String raidTimeResourcePoints;
-    public Map<String, String> specificRaidTimes = new HashMap<>();
-
     public ServerConfig(File file) {
         this.config = new Configuration(file);
         syncConfig();
@@ -43,14 +40,6 @@ public class ServerConfig {
         warStateRecruitmentCost = config.getInt("warStateRecruitmentCost", "costs", 25000, 0, Integer.MAX_VALUE, "Стоимость принятия нового участника во время войны.");
         warTaxPerMember = config.getInt("warTaxPerMember", "costs", 250, 0, Integer.MAX_VALUE, "Ежедневный военный налог за каждого участника фракции.");
         provisionCostPerBarracksSlot = config.getInt("provisionCostPerBarracksSlot", "costs", 500, 1, Integer.MAX_VALUE, "Стоимость одного слота в казарме (в единицах продовольствия).");
-
-        raidTimeResourcePoints = config.getString("raidTimeResourcePoints", "general", "18:00-20:00", "Общее время рейда для ресурсных точек (HH:mm-HH:mm).");
-
-        String[] categories = {"FARMS", "INDUSTRY", "BARN", "ENGINEERING_WORKSHOP", "FORTRESS"};
-        for(String cat : categories) {
-            String time = config.getString("raidTime_" + cat, "raid_times", raidTimeResourcePoints, "Время рейда для категории " + cat);
-            specificRaidTimes.put(cat, time);
-        }
 
         for (int i = 1; i <= maxStructureLevel; i++) {
             upgradeCost.put(i, config.getInt("upgradeCostLevel" + i, "costs", 5000 * i, 100, Integer.MAX_VALUE, "Стоимость улучшения до уровня " + i));

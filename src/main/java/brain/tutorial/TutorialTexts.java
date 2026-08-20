@@ -192,7 +192,7 @@ public class TutorialTexts {
         loadString("substep.6.3", "§e[Бронник] Нажмите кнопку Перековать внизу.", category);
         loadString("substep.6.4", "§e[Обучение] Теперь подойдите к наковальне и откройте её интерфейс (ПКМ).", category);
         loadString("substep.6.5", "§e[Обучение] Положите меч в левый слот.", category);
-        loadString("substep.6.6", "§e[Обучение] Положите ресурс для улучшения в правый слот.", category);
+        loadString("substep.6.6", "§e[Обучение] Положите чертёж в верхний слот.", category);
         loadString("substep.6.7", "§e[Обучение] Заберите улучшенный меч.", category);
 
         // GUI Hints

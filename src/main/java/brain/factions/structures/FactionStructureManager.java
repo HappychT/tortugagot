@@ -207,6 +207,8 @@ public class FactionStructureManager {
             if (src.initial_faction != null && !src.initial_faction.isEmpty()) obj.addProperty("initial_faction", src.initial_faction);
             if (src.for_fraction != null && !src.for_fraction.isEmpty()) obj.addProperty("for_fraction", src.for_fraction);
 
+            if (src.raidTime != null && !src.raidTime.isEmpty()) obj.addProperty("raidTime", src.raidTime);
+
             if (src.category == FactionStructureSlot.StructureCategory.FORTRESS) {
                 obj.addProperty("barnLevel", src.barnLevel > 0 ? src.barnLevel : 1);
                 obj.addProperty("workshopLevel", src.workshopLevel > 0 ? src.workshopLevel : 1);
@@ -218,7 +220,6 @@ public class FactionStructureManager {
                 obj.addProperty("lastSiegePurchaseTime", src.lastSiegePurchaseTime);
             } else {
                 obj.addProperty("securityLevel", src.securityLevel);
-                if (src.raidTime != null && !src.raidTime.isEmpty()) obj.addProperty("raidTime", src.raidTime);
 
                 if (src.category == FactionStructureSlot.StructureCategory.BARN) {
                     obj.addProperty("provisions", src.provisions);

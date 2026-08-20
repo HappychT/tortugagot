@@ -54,11 +54,24 @@ public class GOTGuiButtonPledge extends GuiButton {
         boolean isTutorial = brain.tutorial.client.TutorialClientState.isTutorialActive && brain.tutorial.client.TutorialClientState.tutorialStage == 3;
         boolean hasEnoughAlignment = alignment >= ALIGNMENT_REQUIREMENT || isTutorial;
 
-        canPledge = currentPledge == null;
+        // Проверяем принадлежность к brain-фракции (не только GOT-клятву)
+        boolean isInBrainFaction = false;
+        String playerName = mc.thePlayer.getCommandSenderName();
+        brain.factions.Faction brainFaction = brain.factions.network.PacketInfoFactions.getFactions().get(targetFaction.codeName());
+        if (brainFaction != null && playerName != null && brainFaction.getPlayers() != null) {
+            isInBrainFaction = brainFaction.getPlayers().containsKey(playerName)
+                    || playerName.equals(brainFaction.getLeaderName())
+                    || playerName.equals(brainFaction.getAssistantName());
+        }
+
+        canPledge = currentPledge == null && !isInBrainFaction;
         enabled = (canPledge && hasEnoughAlignment) || isPledgedToThisFaction;
 
         if (isPledgedToThisFaction) {
             setDisplayLines("§cПокинуть фракцию", "§7(" + targetFaction.factionName() + ")");
+        } else if (isInBrainFaction) {
+            setDisplayLines("§aВы состоите в этой фракции", "§7(" + targetFaction.factionName() + ")");
+            enabled = false;
         } else if (canPledge) {
             if (hasEnoughAlignment) {
                 setDisplayLines("§aПодать заявку", "§7(" + targetFaction.factionName() + ")");
