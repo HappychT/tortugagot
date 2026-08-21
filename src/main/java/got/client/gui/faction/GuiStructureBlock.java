@@ -631,6 +631,13 @@ public class GuiStructureBlock extends GuiScreen {
                 this.drawCenteredString(this.fontRendererObj, "Выберите тип постройки:", width / 2, guiTop + 35, 0xFFFFFF);
                 break;
         }
+
+        // Показываем время рейда внизу GUI (если задано)
+        if (structure != null && currentState != ScreenState.PURCHASE_META_CATEGORY
+                && currentState != ScreenState.PURCHASE_CATEGORY
+                && currentState != ScreenState.PURCHASE_SUBTYPE) {
+            drawRaidTimeInfo(guiLeft, guiTop);
+        }
     }
 
     private void drawOverlay(int mouseX, int mouseY, float partialTicks) {
@@ -855,6 +862,21 @@ public class GuiStructureBlock extends GuiScreen {
         super.updateScreen();
         if (provisionsAmountField != null) provisionsAmountField.updateCursorCounter();
         if (capacityAmountField != null) capacityAmountField.updateCursorCounter();
+    }
+
+    private void drawRaidTimeInfo(int guiLeft, int guiTop) {
+        if (structure == null) return;
+        String raidTime = structure.raidTime;
+        if (raidTime == null || raidTime.isEmpty()) return;
+
+        String raidLabel;
+        int raidDays = structure.raidDays;
+        if (raidDays <= 1) {
+            raidLabel = "Рейд: §e" + raidTime + " §7(каждый день)";
+        } else {
+            raidLabel = "Рейд: §e" + raidTime + " §7(раз в " + raidDays + " д.)";
+        }
+        this.drawCenteredString(this.fontRendererObj, raidLabel, width / 2, guiTop + 148, 0xAAAAAA);
     }
 }
 

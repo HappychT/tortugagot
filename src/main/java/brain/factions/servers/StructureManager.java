@@ -141,8 +141,14 @@ public class StructureManager {
 
     public static boolean isRaidTimeNow(FactionStructureSlot slot) {
         if (slot == null) return false;
-        // Время рейда задаётся только в поле raidTime самого слота (faction_structures.json)
-        return isTimeInInterval(slot.raidTime);
+        // Проверяем временной интервал
+        if (!isTimeInInterval(slot.raidTime)) return false;
+        // Проверяем частоту дней (raidDays): 0 или 1 = каждый день
+        if (slot.raidDays > 1) {
+            long epochDay = java.time.LocalDate.now().toEpochDay();
+            if (epochDay % slot.raidDays != 0) return false;
+        }
+        return true;
     }
 
     public static boolean isTimeInInterval(String interval) {

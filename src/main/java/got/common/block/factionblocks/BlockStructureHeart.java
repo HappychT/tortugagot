@@ -185,7 +185,19 @@ public class BlockStructureHeart extends BlockContainer {
                     if (isFortress) {
                         player.addChatMessage(new ChatComponentText("§cЭта крепость сейчас не находится в состоянии войны!"));
                     } else {
-                        player.addChatMessage(new ChatComponentText("§cЭту точку можно атаковать только во время рейда!"));
+                        String raidTime = (slot.raidTime != null && !slot.raidTime.isEmpty()) ? slot.raidTime : null;
+                        if (raidTime != null) {
+                            String freq;
+                            if (slot.raidDays <= 1) {
+                                freq = "каждый день";
+                            } else {
+                                freq = "раз в " + slot.raidDays + " д.";
+                            }
+                            player.addChatMessage(new ChatComponentText("§cЭту точку можно атаковать только во время рейда!"));
+                            player.addChatMessage(new ChatComponentText("§7Время рейда: §e" + raidTime + " §7(" + freq + ")"));
+                        } else {
+                            player.addChatMessage(new ChatComponentText("§cЭту точку можно атаковать только во время рейда!"));
+                        }
                     }
                     return;
                 }

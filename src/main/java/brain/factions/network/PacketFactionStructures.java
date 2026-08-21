@@ -60,6 +60,7 @@ public class PacketFactionStructures implements IMessage {
                 slot.ownerFactionID = null;
             }
             slot.raidTime = ByteBufUtils.readUTF8String(buf);
+            slot.raidDays = buf.readInt();
             this.structures.add(slot);
         }
     }
@@ -90,6 +91,7 @@ public class PacketFactionStructures implements IMessage {
                 ByteBufUtils.writeUTF8String(buf, slot.ownerFactionID);
             }
             ByteBufUtils.writeUTF8String(buf, slot.raidTime != null ? slot.raidTime : "");
+            buf.writeInt(slot.raidDays);
         }
     }
 

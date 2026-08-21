@@ -208,6 +208,7 @@ public class FactionStructureManager {
             if (src.for_fraction != null && !src.for_fraction.isEmpty()) obj.addProperty("for_fraction", src.for_fraction);
 
             if (src.raidTime != null && !src.raidTime.isEmpty()) obj.addProperty("raidTime", src.raidTime);
+            if (src.raidDays != 1) obj.addProperty("raidDays", src.raidDays);
 
             if (src.category == FactionStructureSlot.StructureCategory.FORTRESS) {
                 obj.addProperty("barnLevel", src.barnLevel > 0 ? src.barnLevel : 1);
@@ -265,6 +266,7 @@ public class FactionStructureManager {
             slot.initial_faction = obj.has("initial_faction") ? obj.get("initial_faction").getAsString() : null;
             slot.for_fraction = obj.has("for_fraction") ? obj.get("for_fraction").getAsString() : null;
             slot.raidTime = obj.has("raidTime") ? obj.get("raidTime").getAsString() : "";
+            slot.raidDays = obj.has("raidDays") ? obj.get("raidDays").getAsInt() : 1;
 
             slot.barnLevel = obj.has("barnLevel") ? obj.get("barnLevel").getAsInt() : 0;
             slot.workshopLevel = obj.has("workshopLevel") ? obj.get("workshopLevel").getAsInt() : 0;

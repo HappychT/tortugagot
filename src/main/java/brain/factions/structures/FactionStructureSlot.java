@@ -31,6 +31,7 @@ public class FactionStructureSlot {
     public long lastSiegePurchaseTime;
 
     public String raidTime = "";
+    public int raidDays = 1; // 1 = каждый день, 2 = раз в 2 дня и т.д. 0 = нет ограничения по дням
 
     public static enum StructureCategory {
         NONE, FARMS, INDUSTRY, BARN, ENGINEERING_WORKSHOP, FORTRESS, STABLE
